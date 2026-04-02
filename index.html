@@ -4,103 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>EazyLife Robotics & Electronics Solutions - Ibadan</title>
-  <style>
-    :root {
-      --navy: #0A2540;
-      --green: #00C853;
-      --light: #f8f9fa;
-    }
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      line-height: 1.6;
-      color: #333;
-      background-color: #fff;
-    }
-    header {
-      background: linear-gradient(135deg, var(--navy), #1a3a5f);
-      color: white;
-      text-align: center;
-      padding: 60px 20px;
-    }
-    .logo {
-      max-width: 180px;
-      margin-bottom: 20px;
-      border-radius: 12px;
-    }
-    h1 {
-      font-size: 2.8rem;
-      margin: 10px 0;
-    }
-    .tagline {
-      font-size: 1.3rem;
-      opacity: 0.95;
-      margin: 15px 0;
-    }
-    .location {
-      font-size: 1.1rem;
-      opacity: 0.9;
-    }
-    section {
-      padding: 60px 20px;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-    h2 {
-      color: var(--navy);
-      border-bottom: 3px solid var(--green);
-      padding-bottom: 10px;
-      display: inline-block;
-    }
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-    li {
-      padding: 12px 0;
-      font-size: 1.1rem;
-      border-bottom: 1px solid #eee;
-    }
-    .highlight {
-      background: #f0fff0;
-      padding: 20px;
-      border-left: 5px solid var(--green);
-      margin: 20px 0;
-    }
-    footer {
-      background: var(--navy);
-      color: white;
-      text-align: center;
-      padding: 40px 20px;
-      font-size: 1.1rem;
-    }
-    .whatsapp-btn {
-      display: inline-block;
-      background: #25D366;
-      color: white;
-      padding: 15px 30px;
-      border-radius: 50px;
-      text-decoration: none;
-      font-weight: bold;
-      margin-top: 20px;
-      font-size: 1.1rem;
-    }
-    .whatsapp-btn:hover {
-      background: #128C7E;
-    }
-    @media (max-width: 768px) {
-      h1 { font-size: 2.2rem; }
-    }
-  </style>
+  
+  <!-- Dynamic Favicon -->
+  <link id="favicon" rel="icon" type="image/x-icon" href="">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/styles.css">
+  <link id="theme-stylesheet" rel="stylesheet" href="">
 </head>
 <body>
-
   <header>
-    <img src="https://via.placeholder.com/180x180/0A2540/00C853?text=EazyLife" alt="EazyLife Logo" class="logo">
+    <img id="logo" src="" alt="EazyLife Logo" class="logo">
     <h1>EazyLife Robotics & Electronics Solutions</h1>
     <p class="tagline">Integrity & Affordability in Every Device</p>
     <p class="location">Ibadan, Oyo State | eazylife.ng</p>
+    <a href="admin/admin.html" class="admin-link">⚙️ Admin</a>
   </header>
 
   <section id="about">
@@ -109,7 +27,7 @@
     <p>From reliable TVs, smartphones, laptops, and powerbanks to custom embedded systems and robotics development — we combine technical expertise with integrity.</p>
   </section>
 
-  <section id="services" style="background: #f8f9fa;">
+  <section id="services" class="alt-bg">
     <h2>Our Services</h2>
     <ul>
       <li><strong>Electronics Sales</strong> — Genuine TVs, phones, laptops, powerbanks and accessories with warranty</li>
@@ -146,7 +64,10 @@
   <footer>
     <p>&copy; 2026 EazyLife Robotics & Electronics Solutions • Ibadan, Nigeria</p>
     <p>eazylife.ng • Integrity & Affordability</p>
+    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
   </footer>
 
+  <script src="js/theme-manager.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
