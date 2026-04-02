@@ -1,1 +1,11 @@
-{"siteTitle": "My Application", "siteDescription": "This is a default site settings configuration.", "theme": "light", "language": "en"}
+{
+  "primaryColor": "#0A2540",
+  "accentColor": "#00C853",
+  "logoLight": "https://via.placeholder.com/180x180/0A2540/00C853?text=EazyLife",
+  "logoDark": "https://via.placeholder.com/180x180/ffffff/00C853?text=EazyLife",
+  "faviconLight": "🚀",
+  "faviconDark": "🚀",
+  "tagline": "Integrity & Affordability in Every Device",
+  "whatsapp": "2347051548082",
+  "aboutText": "We are an Ibadan-based technology company committed to delivering quality electronics and smart solutions at honest prices."
+}
