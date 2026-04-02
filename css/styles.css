@@ -1,0 +1,29 @@
+/* Main Stylesheet using CSS Variables for Theming */
+
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2ecc71;
+    --accent-color: #e74c3c;
+    --background-color: #ecf0f1;
+    --text-color: #2c3e50;
+    --font-family: 'Arial, sans-serif';
+}
+
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-family: var(--font-family);
+}
+
+h1, h2, h3 {
+    color: var(--primary-color);
+}
+
+button {
+    background-color: var(--secondary-color);
+    color: #fff;
+}
+
+button:hover {
+    background-color: var(--accent-color);
+}
