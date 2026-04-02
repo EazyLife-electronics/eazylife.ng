@@ -1,29 +1,154 @@
-/* Main Stylesheet using CSS Variables for Theming */
-
 :root {
-    --primary-color: #3498db;
-    --secondary-color: #2ecc71;
-    --accent-color: #e74c3c;
-    --background-color: #ecf0f1;
-    --text-color: #2c3e50;
-    --font-family: 'Arial, sans-serif';
+  --navy: #0A2540;
+  --green: #00C853;
+  --light: #f8f9fa;
+  --text-color: #333;
+  --bg-color: #fff;
+  --border-color: #eee;
 }
 
 body {
-    background-color: var(--background-color);
-    color: var(--text-color);
-    font-family: var(--font-family);
+  font-family: 'Segoe UI', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  transition: background-color 0.3s, color 0.3s;
 }
 
-h1, h2, h3 {
-    color: var(--primary-color);
+header {
+  background: linear-gradient(135deg, var(--navy), #1a3a5f);
+  color: white;
+  text-align: center;
+  padding: 60px 20px;
+  position: relative;
 }
 
-button {
-    background-color: var(--secondary-color);
-    color: #fff;
+.logo {
+  max-width: 180px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  transition: transform 0.3s;
 }
 
-button:hover {
-    background-color: var(--accent-color);
+.logo:hover {
+  transform: scale(1.05);
+}
+
+h1 {
+  font-size: 2.8rem;
+  margin: 10px 0;
+}
+
+.tagline {
+  font-size: 1.3rem;
+  opacity: 0.95;
+  margin: 15px 0;
+}
+
+.location {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.admin-link {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  color: white;
+  text-decoration: none;
+  font-size: 1.5rem;
+  padding: 10px 15px;
+  border-radius: 8px;
+  background: rgba(0, 200, 83, 0.2);
+  transition: background 0.3s;
+}
+
+.admin-link:hover {
+  background: rgba(0, 200, 83, 0.4);
+}
+
+section {
+  padding: 60px 20px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+section.alt-bg {
+  background: var(--light);
+}
+
+h2 {
+  color: var(--navy);
+  border-bottom: 3px solid var(--green);
+  padding-bottom: 10px;
+  display: inline-block;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  padding: 12px 0;
+  font-size: 1.1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.highlight {
+  background: #f0fff0;
+  padding: 20px;
+  border-left: 5px solid var(--green);
+  margin: 20px 0;
+}
+
+footer {
+  background: var(--navy);
+  color: white;
+  text-align: center;
+  padding: 40px 20px;
+  font-size: 1.1rem;
+  position: relative;
+}
+
+.whatsapp-btn {
+  display: inline-block;
+  background: #25D366;
+  color: white;
+  padding: 15px 30px;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: bold;
+  margin-top: 20px;
+  font-size: 1.1rem;
+  transition: background 0.3s;
+}
+
+.whatsapp-btn:hover {
+  background: #128C7E;
+}
+
+.theme-toggle {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+@media (max-width: 768px) {
+  h1 { font-size: 2.2rem; }
+  .admin-link, .theme-toggle { font-size: 1.2rem; }
 }
