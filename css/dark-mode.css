@@ -1,0 +1,19 @@
+.dark-mode {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+button {
+    background-color: #6200ea;
+    color: #ffffff;
+}
+
+input, textarea {
+    background-color: #1e1e1e;
+    color: #ffffff;
+    border: 1px solid #3a3a3a;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #ffffff;
+}
