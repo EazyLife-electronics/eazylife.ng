@@ -1,19 +1,22 @@
-.dark-mode {
-    background-color: #121212;
-    color: #ffffff;
+:root {
+  --text-color: #e0e0e0;
+  --bg-color: #1e1e1e;
+  --border-color: #444;
 }
 
-button {
-    background-color: #6200ea;
-    color: #ffffff;
+body {
+  background-color: #121212;
 }
 
-input, textarea {
-    background-color: #1e1e1e;
-    color: #ffffff;
-    border: 1px solid #3a3a3a;
+section.alt-bg {
+  background: #2d2d2d;
 }
 
-h1, h2, h3, h4, h5, h6 {
-    color: #ffffff;
+.highlight {
+  background: #1a3a1a;
+  border-left-color: #00C853;
+}
+
+h2 {
+  color: #4db8ff;
 }
