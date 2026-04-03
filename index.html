@@ -1,73 +1,171 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EazyLife Robotics & Electronics Solutions - Ibadan</title>
-  
-  <!-- Dynamic Favicon -->
-  <link rel="icon" type="image/x-icon" href="assets/pictures/icon_dark.png">
-  
-  <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/styles.css">
-  <link id="theme-stylesheet" rel="stylesheet" href="">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EAZYLIFE ROBOTICS & ELECTRONICS SOLUTIONS</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="templatemo-parallax-starter.css">
+
+  
 </head>
 <body>
-  <header>
-    <img src="assets/pictures/logo_black.png" alt="EazyLife Logo" class="logo">
-    <h1>EazyLife Robotics & Electronics Solutions</h1>
-    <p class="tagline">Integrity & Affordability in Every Device</p>
-    <p class="location">Ibadan, Oyo State | eazylife.ng</p>
-    <a href="admin/admin.html" class="admin-link">⚙️ Admin</a>
-  </header>
 
-  <section id="about">
-    <h2>About Us</h2>
-    <p>We are an Ibadan-based technology company committed to delivering quality electronics and smart solutions at honest prices.</p>
-    <p>From reliable TVs, smartphones, laptops, and powerbanks to custom embedded systems and robotics development — we combine technical expertise with integrity.</p>
-  </section>
+    <!-- Navigation -->
+    <nav id="templatemo-nav">
+        <div class="nav-container">
+            <a href="#home" class="nav-logo">EAZYLIFE</a>
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#home" class="active">HOME</a></li>
+                <li><a href="#about">ABOUT</a></li>
+                <li><a href="#services">SERVICES</a></li>
+                <li><a href="#gallery">GALLERY</a></li>
+                <li><a href="#contact">CONTACT</a></li>
+            </ul>
+        </div>
+    </nav>
 
-  <section id="services" class="alt-bg">
-    <h2>Our Services</h2>
-    <ul>
-      <li><strong>Electronics Sales</strong> — Genuine TVs, phones, laptops, powerbanks and accessories with warranty</li>
-      <li><strong>Embedded Systems Development</strong> — Arduino, ESP32, custom PCB design and prototyping</li>
-      <li><strong>Robotics & Automation Solutions</strong> — Developing practical robot waiters and automation systems for hotels and restaurants (Coming Soon)</li>
-    </ul>
-    <div class="highlight">
-      <strong>Special Focus:</strong> Affordable, locally-supported robot waiter systems designed for Nigerian hotels and restaurants to improve service speed and reduce costs.
-    </div>
-  </section>
+    <!-- Section 1: Home / Hero -->
+    <section id="home" class="parallax-section">
+        <div class="parallax-bg" data-speed="0.5" style="background-image: url('images/parallax-bg-01.jpg')"></div>
+        <div class="parallax-overlay"></div>
+        <div class="section-content">
+            <h1 class="section-title hero-title">WELCOME TO EAZYLIFE SOLUTIONS</h1>
+            <p class="section-subtitle caps">Integrity & Affordability in Every Device</p>
+            <a href="#about" class="btn-scroll">EXPLORE</a>
+        </div>
+    </section>
 
-  <section id="products">
-    <h2>Our Products</h2>
-    <ul>
-      <li>Smart TVs & LED Televisions</li>
-      <li>Smartphones & Accessories</li>
-      <li>Laptops & Computer Systems</li>
-      <li>Powerbanks & Solar Solutions</li>
-      <li>Chargers, Cables & Gadgets</li>
-    </ul>
-  </section>
+    <!-- Section 2: About -->
+    <section id="about" class="parallax-section">
+        <div class="parallax-bg" data-speed="0.45" style="background-image: url('images/parallax-bg-02.jpg')"></div>
+        <div class="parallax-overlay"></div>
+        <div class="section-content">
+            <h2 class="section-title">ABOUT US</h2>
+            <div class="about-cols">
+                <div class="about-col">
+                    <div class="about-thumb thumb-top-left">
+                        <img src="images/about-01.jpg" alt="Our Team">
+                    </div>
+                    <p>We are a Nigeria-Based company offering quality electronics (TVs, phones, laptops, powerbanks) and developing embedded systems & robotics solutions.</p>
+                </div>
+                <div class="about-col">
+                    <div class="about-thumb-wide">
+                        <img src="images/about-02.jpg" alt="Our Process">
+                    </div>
+                    <p>Our approach combines research-driven insights with bold creative execution. We believe great design is not just about how things look, but how they work and how they make people feel.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-  <section id="contact">
-    <h2>Contact Us</h2>
-    <p><strong>WhatsApp:</strong> <a href="https://wa.me/2347051548082" target="_blank">+234 705 154 8082</a></p>
-    <p><strong>Location:</strong> Ibadan, Oyo State, Nigeria</p>
-    <p>We respond fastest on WhatsApp. Feel free to ask about electronics or discuss your automation project.</p>
-    
-    <a href="https://wa.me/2347051548082" class="whatsapp-btn" target="_blank">
-      Chat with us on WhatsApp
-    </a>
-  </section>
+    <!-- Section 3: Services -->
+    <section id="services" class="parallax-section">
+        <div class="parallax-bg" data-speed="0.55" style="background-image: url('images/parallax-bg-03.jpg')"></div>
+        <div class="parallax-overlay overlay-dark"></div>
+        <div class="section-content">
+            <h2 class="section-title">WHAT WE DO</h2>
+            <p class="section-subtitle caps">SALES &middot; DESIGN &middot; DEVELOP &middot; DELIVER</p>
+            <div class="services-grid">
+                <div class="service-item">
+                    <div class="service-icon">
+                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                            <rect x="4" y="4" width="32" height="32" rx="2" stroke="white" stroke-width="1.5"/>
+                            <line x1="4" y1="14" x2="36" y2="14" stroke="white" stroke-width="1.5"/>
+                            <circle cx="10" cy="9" r="2" fill="white"/>
+                            <circle cx="16" cy="9" r="2" fill="white"/>
+                        </svg>
+                    </div>
+                    <h3>ELECTRONICS SALES</h3>
+                    <p class="caps">PHONES, LAPTOPS, ACCESSORIES, CHARGERS, POWERBANKS,APPLIANCES AND GADGETS</p>
+                </div>
+                <div class="service-item">
+                    <div class="service-icon">
+                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                            <path d="M20 4L36 12V28L20 36L4 28V12L20 4Z" stroke="white" stroke-width="1.5"/>
+                            <path d="M20 36V20" stroke="white" stroke-width="1.5"/>
+                            <path d="M36 12L20 20" stroke="white" stroke-width="1.5"/>
+                            <path d="M4 12L20 20" stroke="white" stroke-width="1.5"/>
+                        </svg>
+                    </div>
+                    <h3>EMBEDDED SYSTEMS DEVELOPMENT</h3>
+                    <p class="caps">EERYTHING IN ANYTHING AND ANYTHING IN EVERYTHING</p>
+                </div>
+                <div class="service-item">
+                    <div class="service-icon">
+                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                            <rect x="8" y="2" width="24" height="36" rx="3" stroke="white" stroke-width="1.5"/>
+                            <line x1="8" y1="8" x2="32" y2="8" stroke="white" stroke-width="1.5"/>
+                            <line x1="8" y1="32" x2="32" y2="32" stroke="white" stroke-width="1.5"/>
+                            <circle cx="20" cy="35" r="1.5" fill="white"/>
+                        </svg>
+                    </div>
+                    <h3>DEVELOPMENT</h3>
+                    <p class="caps">USEFUL AND AFRODABLE ROBOTIC SYSTEMS</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-  <footer>
-    <p>&copy; 2026 EazyLife Robotics & Electronics Solutions • Ibadan, Nigeria</p>
-    <p>eazylife.ng • Integrity & Affordability</p>
-    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
-  </footer>
+    <!-- Section 4: Gallery -->
+    <section id="gallery" class="parallax-section">
+        <div class="parallax-bg" data-speed="0.5" style="background-image: url('images/parallax-bg-04.jpg')"></div>
+        <div class="parallax-overlay"></div>
+        <div class="section-content">
+            <h2 class="section-title">OUR WORK</h2>
+            <div class="content-block">
+                <p>From boutique startups to established brands, our portfolio reflects a commitment to quality and attention to detail. Each project is an opportunity to push boundaries and explore new ideas.</p>
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <span class="stat-number">150+</span>
+                        <span class="stat-label caps">PROJECTS COMPLETED</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">80+</span>
+                        <span class="stat-label caps">HAPPY CLIENTS</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">12</span>
+                        <span class="stat-label caps">YEARS OF EXPERIENCE</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-  <script src="js/theme-manager.js"></script>
-  <script src="js/app.js"></script>
+    <!-- Section 5: Contact -->
+    <section id="contact" class="parallax-section">
+        <div class="parallax-bg" data-speed="0.5" style="background-image: url('images/parallax-bg-05.jpg')"></div>
+        <div class="parallax-overlay overlay-medium"></div>
+        <div class="section-content">
+            <h2 class="section-title">GET IN TOUCH</h2>
+            <p class="section-subtitle caps">ASK FOR AND ABOUT SOMETHING TODAY</p>
+            <div class="contact-form-wrap">
+                <form id="contactForm" class="contact-form">
+                    <div class="form-row">
+                        <input type="text" placeholder="Your name" required>
+                        <input type="email" placeholder="Your email" required>
+                    </div>
+                    <textarea placeholder="Your message" rows="5" required></textarea>
+                    <button type="submit" class="btn-submit">SEND MESSAGE</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="templatemo-footer">
+        <p>Copyright &copy; 2026 Your Company. Designed by Eazylife.ng</a></p>
+    </footer>
+    <script src="templatemo-parallax-script.js"></script>
 </body>
 </html>
