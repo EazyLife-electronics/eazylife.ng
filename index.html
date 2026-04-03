@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EazyLife Robotics & Electronics Solutions</title>
-
+    <title>EazyLife | Robotics & Custom Electronics Solutions</title>
+    
+    <meta name="description" content="Premium Robotics, Embedded Systems, and Electronics Retail based in Ibadan, Nigeria. Custom hardware and Python-driven automation.">
     <link rel="icon" type="image/png" href="assets/images/logos/favicon/favicon-32.png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,20 +15,51 @@
     <link rel="stylesheet" href="templatemo-parallax-starter.css">
 
     <style>
-        /* Injecting your Brand Colors into the Template */
         :root {
-            --primary-navy: #0A2540;
-            --accent-teal: #2AC5C5;
-            --accent-green: #88C888;
+            --navy: #0A2540;
+            --teal: #2AC5C5;
+            --green: #88C888;
+            --dark-bg: #050c14; /* Deeper than navy for that premium feel */
         }
-        .nav-logo, .hero-title, .section-title { color: white !important; }
+
+        body { background-color: var(--dark-bg); color: white; }
+
+        /* Navigation glassmorphism */
+        #templatemo-nav {
+            background: rgba(5, 12, 20, 0.7);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .nav-links a.active { color: var(--teal) !important; font-weight: 600; }
+        
+        /* Hero Styling */
+        .hero-title {
+            font-weight: 600;
+            letter-spacing: 15px;
+            background: linear-gradient(to right, var(--teal), var(--green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Buttons: Minimalist & Clean */
         .btn-scroll, .btn-submit { 
-            background-color: var(--accent-teal) !important; 
-            border: none !important;
-            color: white !important;
+            background: transparent !important;
+            border: 2px solid var(--teal) !important;
+            border-radius: 50px !important;
+            transition: 0.3s all ease;
         }
-        .active { border-bottom: 3px solid var(--accent-teal) !important; }
-        .service-icon svg { stroke: var(--accent-teal) !important; }
+        .btn-scroll:hover { background: var(--teal) !important; color: var(--navy) !important; }
+
+        /* Content Card refinement */
+        .about-col, .service-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(42, 197, 197, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            transition: border 0.3s ease;
+        }
+        .about-col:hover { border-color: var(--teal); }
     </style>
 </head>
 <body>
@@ -35,16 +67,16 @@
     <nav id="templatemo-nav">
         <div class="nav-container">
             <a href="#home" class="nav-logo">
-                <img src="assets/images/logos/logo-light.png" alt="EazyLife" style="height: 40px; vertical-align: middle;">
+                <img src="assets/images/logos/logo-light.png" alt="EazyLife Logo" style="height: 35px;">
             </a>
             <button class="nav-toggle" id="navToggle">
                 <span></span><span></span><span></span>
             </button>
             <ul class="nav-links" id="navLinks">
-                <li><a href="#home" class="active">HOME</a></li>
+                <li><a href="#home">HOME</a></li>
                 <li><a href="#about">ABOUT</a></li>
-                <li><a href="#services">SERVICES</a></li>
-                <li><a href="#gallery">PROJECTS</a></li>
+                <li><a href="#services">SOLUTIONS</a></li>
+                <li><a href="#projects">ENGINEERING</a></li>
                 <li><a href="#contact">CONTACT</a></li>
             </ul>
         </div>
@@ -54,46 +86,45 @@
         <div class="parallax-bg" data-speed="0.5" style="background-image: url('assets/images/heroes/hero-home.jpg')"></div>
         <div class="parallax-overlay"></div>
         <div class="section-content">
-            <h1 class="section-title hero-title">SMARTER SOLUTIONS FOR A MODERN LIFE</h1>
-            <p class="section-subtitle caps">Integrity & Affordability in Every Device</p>
-            <a href="#about" class="btn-scroll">DISCOVER MORE</a>
+            <h1 class="section-title hero-title">EAZYLIFE</h1>
+            <p class="section-subtitle caps">Advancing Robotics & Electronics in Nigeria</p>
+            <a href="#services" class="btn-scroll">VIEW SOLUTIONS</a>
         </div>
     </section>
 
     <section id="about" class="parallax-section">
-        <div class="parallax-bg" data-speed="0.45" style="background-image: url('assets/images/heroes/hero-robot.jpg')"></div>
+        <div class="parallax-bg" data-speed="0.4" style="background-image: url('assets/images/heroes/hero-robot.jpg')"></div>
         <div class="parallax-overlay overlay-dark"></div>
         <div class="section-content">
-            <h2 class="section-title">WHO WE ARE</h2>
+            <h2 class="section-title">ENGINEERING THE FUTURE</h2>
             <div class="about-cols">
                 <div class="about-col">
-                    <p>Based in Ibadan, Nigeria, <strong>EazyLife Robotics & Electronics Solutions</strong> is dedicated to bridging the gap between high-end technology and everyday affordability.</p>
+                    <p>Headquartered in <strong>Ibadan</strong>, EazyLife Robotics & Electronics Solutions bridges the gap between complex hardware and user-centric affordability.</p>
                 </div>
                 <div class="about-col">
-                    <p>Whether it's providing the latest smartphones and laptops or developing custom-coded embedded systems, we ensure that "Eazy" isn't just in our name—it's in how our products work for you.</p>
+                    <p>From <strong>Python-automated workflows</strong> to custom <strong>Lithium-ion power solutions</strong>, we build hardware that works for you.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="services" class="parallax-section">
-        <div class="parallax-bg" data-speed="0.55" style="background-image: url('assets/images/parallax-bg-03.jpg')"></div>
+    <section id="projects" class="parallax-section">
+        <div class="parallax-bg" data-speed="0.6" style="background-image: url('assets/images/parallax-bg-03.jpg')"></div>
         <div class="parallax-overlay overlay-dark"></div>
         <div class="section-content">
-            <h2 class="section-title">WHAT WE DO</h2>
-            <p class="section-subtitle caps">RETAIL &middot; EMBEDDED SYSTEMS &middot; ROBOTICS</p>
+            <h2 class="section-title">CURRENT PROJECTS</h2>
             <div class="services-grid">
                 <div class="service-item">
-                    <h3>ELECTRONICS RETAIL</h3>
-                    <p class="caps">Premium TVs, Phones, Laptops, and high-capacity Powerbanks for the Nigerian market.</p>
+                    <h3 style="color:var(--green)">ROBOT WAITER</h3>
+                    <p>Autonomous hospitality service robot using ESP32 & Hoverboard Hub motors.</p>
                 </div>
                 <div class="service-item">
-                    <h3>EMBEDDED SYSTEMS</h3>
-                    <p class="caps">Custom IoT solutions and hardware automation. Intelligence integrated into everyday objects.</p>
+                    <h3 style="color:var(--green)">SMART POWER</h3>
+                    <p>Custom 4S 148Wh Power Banks with integrated BMS for reliable energy.</p>
                 </div>
                 <div class="service-item">
-                    <h3>ROBOTICS DEVELOPMENT</h3>
-                    <p class="caps">Designing useful, affordable robotic assistants and automated service systems.</p>
+                    <h3 style="color:var(--green)">AUTOMATION</h3>
+                    <p>Workflow optimization using Python and Playwright for enterprise data.</p>
                 </div>
             </div>
         </div>
@@ -103,18 +134,19 @@
         <div class="parallax-bg" data-speed="0.5" style="background-image: url('assets/images/parallax-bg-05.jpg')"></div>
         <div class="parallax-overlay overlay-medium"></div>
         <div class="section-content">
-            <h2 class="section-title">START A CONVERSATION</h2>
-            <p class="section-subtitle caps">Available in Ibadan & Delivering Nationwide</p>
+            <h2 class="section-title">GET IN TOUCH</h2>
+            <p class="section-subtitle caps">Serving Ibadan and Beyond</p>
             <div class="contact-form-wrap">
-                <a href="https://wa.me/2347051548082" target="_blank" class="btn-submit" style="display:inline-block; text-decoration:none; padding: 20px 40px;">
-                    CHAT WITH US ON WHATSAPP
+                <a href="https://wa.me/2347051548082?text=Hello%20Israel,%20I'm%20interested%20in%20an%20electronics%20solution." 
+                   class="btn-submit" style="padding: 20px 50px; text-decoration: none;">
+                    WHATSAPP US
                 </a>
             </div>
         </div>
     </section>
 
     <footer id="templatemo-footer">
-        <p>Copyright &copy; 2026 EazyLife Robotics & Electronics Solutions. <br> Ibadan, Nigeria.</p>
+        <p>&copy; 2026 EazyLife Robotics & Electronics Solutions &middot; Ibadan, Nigeria.</p>
     </footer>
 
     <script src="templatemo-parallax-script.js"></script>
