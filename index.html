@@ -1,120 +1,287 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EazyLife | Robotics & Electronics Solutions</title>
-    
-    <meta name="description" content="Advanced Robotics and Custom Electronics Solutions based in Ibadan, Nigeria.">
-    <link rel="icon" type="image/png" href="assets/pictures/icon_black.png">
+  <!-- Required Meta Tags Always Come First -->
+  <meta charset="utf-8">
+  <meta name="robots" content="max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <link rel="canonical" href="https://eazylife.ng/">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="EazyLife Robotics & Electronics Solutions: Premium laptops, TVs, and custom engineering automation in Ibadan, Nigeria. CAC Registered RC-9462420.">
 
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;700&display=swap" rel="stylesheet">
-    
-    <link href="templatemo-electric-xtra.css" rel="stylesheet">
+  <meta name="twitter:site" content="@preline">
+  <meta name="twitter:creator" content="@preline">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="EazyLife | Robotics & Electronics Solutions">
+  <meta name="twitter:description" content="Quality electronics and embedded systems engineering with full integrity. Based in Ibadan.">
+  <meta name="twitter:image" content="https://eazylife.ng/assets/pictures/logo_white.png">
 
-    <style>
-        /* Overriding Template Colors with EazyLife Branding */
-        :root {
-            --primary-color: #2AC5C5; /* Your Teal */
-            --secondary-color: #88C888; /* Your Green */
-            --bg-dark: #050c14;
-        }
+  <meta property="og:url" content="https://eazylife.ng/">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="EazyLife Robotics">
+  <meta property="og:title" content="EazyLife | Robotics & Electronics Solutions">
+  <meta property="og:description" content="Advancing Robotics & Electronics in Ibadan. Shop Laptops or request Custom Automation.">
+  <meta property="og:image" content="https://eazylife.ng/assets/pictures/logo_white.png">
 
-        /* Fixing the Nav Logo display issues */
-        .logo-link img {
-            height: 45px;
-            width: auto;
-            object-fit: contain;
-        }
+  <!-- Title -->
+  <title>EazyLife | Robotics & Electronics Solutions Ibadan</title>
 
-        .glitch-text {
-            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="../../favicon.ico">
 
-        /* Customizing the particles to match your teal/green */
-        .particle { background: var(--primary-color) !important; }
-    </style>
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Domine:wght@400..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Kode+Mono:wght@400..700&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/preline@2.1.0/dist/preline.min.css">
+
+  <!-- Theme Check and Update -->
+  <script>
+    (function () {
+      const html = document.querySelector('html');
+      const isLightOrAuto = localStorage.getItem('hs_theme') === 'light' || (localStorage.getItem('hs_theme') === 'auto' && !window.matchMedia('(prefers-color-scheme: dark)').matches);
+      const isDarkOrAuto = localStorage.getItem('hs_theme') === 'dark' || (localStorage.getItem('hs_theme') === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+      if (isLightOrAuto && html.classList.contains('dark')) html.classList.remove('dark');
+      else if (isDarkOrAuto && html.classList.contains('light')) html.classList.remove('light');
+      else if (isDarkOrAuto && !html.classList.contains('dark')) html.classList.add('dark');
+      else if (isLightOrAuto && !html.classList.contains('light')) html.classList.add('light');
+    })();
+  </script>
 </head>
-<body>
-    <div class="grid-bg"></div>
-    <div class="gradient-overlay"></div>
-    <div class="scanlines"></div>
 
-    <div id="particles"></div>
+<body class="bg-background">
+  <!-- ========== HEADER ========== -->
+  <header class="sticky top-4 inset-x-0 flex flex-wrap md:justify-start md:flex-nowrap z-50 w-full before:absolute before:inset-0 before:max-w-5xl before:mx-2 lg:before:mx-auto before:rounded before:rounded-[26px] before:bg-navbar before:border before:border-navbar-line">
+    <nav class="relative max-w-5xl w-full flex flex-wrap md:flex-nowrap basis-full items-center justify-between py-2 ps-5 pe-2 md:py-0 mx-2 lg:mx-auto">
+      <div class="flex items-center">
+        <!-- Logo -->
+        <a class="flex-none rounded-md focus:outline-hidden focus:opacity-80" href="index.html" aria-label="EazyLife">
+          <img class="w-32 h-auto" src="https://eazylife.ng/assets/pictures/logo_white.png" alt="EazyLife Logo">
+        </a>
+        <!-- End Logo -->
+      </div>
 
-    <nav id="navbar">
-        <div class="nav-container">
-            <a href="#home" class="logo-link">
-                <img src="assets/pictures/logo_black.png" alt="EazyLife Logo">
-            </a>
-            
-            <div class="menu-toggle" id="menuToggle">
-                <span></span><span></span><span></span>
-            </div>
-
-            <ul class="nav-links" id="navLinks">
-                <li><a href="#home">HOME</a></li>
-                <li><a href="#about">ABOUT</a></li>
-                <li><a href="#solutions">SOLUTIONS</a></li>
-                <li><a href="#engineering">ENGINEERING</a></li>
-                <li><a href="#contact">CONTACT</a></li>
-            </ul>
+      <!-- Button Group -->
+      <div class="md:order-3 flex items-center gap-x-3">
+        <div class="md:ps-3">
+          <a class="group inline-flex items-center gap-x-2 py-2 px-4 bg-teal-600 border border-teal-700 text-white font-medium text-sm rounded-full hover:bg-teal-700 focus:outline-hidden" 
+          href="https://wa.me/2347051548082?text=Hello%20EazyLife,%20I%20am%20interested%20in%20your%20services.">
+          Chat on WhatsApp
+          </a>
         </div>
+
+        <div class="md:hidden">
+          <button type="button" class="hs-collapse-toggle size-9 flex justify-center items-center text-sm font-semibold rounded-full bg-layer border border-layer-line text-layer-foreground disabled:opacity-50 disabled:pointer-events-none" id="hs-pro-an-collapse" aria-expanded="false" aria-controls="hs-pro-an" aria-label="Toggle navigation" data-hs-collapse="#hs-pro-an">
+            <svg class="hs-collapse-open:hidden shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" x2="21" y1="6" y2="6" />
+              <line x1="3" x2="21" y1="12" y2="12" />
+              <line x1="3" x2="21" y1="18" y2="18" />
+            </svg>
+            <svg class="hs-collapse-open:block hidden shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 6 6 18" />
+              <path d="m6 6 12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <!-- End Button Group -->
+
+      <!-- Collapse -->
+      <div id="hs-pro-an" class="hs-collapse hidden overflow-hidden transition-all duration-300 basis-full grow md:block" aria-labelledby="hs-pro-an-collapse" role="region">
+        <!-- Nav -->
+        <div class="overflow-hidden overflow-y-auto max-h-[75vh] [&::-webkit-scrollbar]:w-0">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-end gap-y-3 pt-6 pb-2 md:py-0 md:ps-7">
+            <a class="md:px-3 md:py-4 text-sm text-navbar-2-nav-foreground hover:text-navbar-2-nav-foreground-hover focus:outline-hidden focus:text-navbar-2-nav-foreground-focus" href="index.html" aria-current="page">Home</a>
+            <a class="md:px-3 md:py-4 text-sm text-navbar-2-nav-foreground hover:text-navbar-2-nav-foreground-hover focus:outline-hidden focus:text-navbar-2-nav-foreground-focus" href="#services">Services</a>
+            <a class="md:px-3 md:py-4 text-sm text-navbar-2-nav-foreground hover:text-navbar-2-nav-foreground-hover focus:outline-hidden focus:text-navbar-2-nav-foreground-focus" href="#about">About Us</a>
+            <a class="md:px-3 md:py-4 text-sm text-navbar-2-nav-foreground hover:text-navbar-2-nav-foreground-hover focus:outline-hidden focus:text-navbar-2-nav-foreground-focus" href="#contact">Contact</a>
+            <a class="md:px-3 md:py-4 text-sm text-navbar-2-nav-foreground hover:text-navbar-2-nav-foreground-hover focus:outline-hidden focus:text-navbar-2-nav-foreground-focus" href="https://maps.app.goo.gl/PrtJV4sizmHah9A18" target="_blank">Find Us</a>
+          </div>
+        </div>
+        <!-- End Nav -->
+      </div>
+      <!-- End Collapse -->
     </nav>
+  </header>
+  <div class="w-full bg-green-50 border-y border-green-100 py-2">
+    <div class="max-w-5xl mx-auto px-5 flex justify-between items-center text-[10px] md:text-xs font-bold text-green-700 tracking-widest uppercase">
+      <span>CAC REGISTERED: RC-9462420</span>
+      <span class="flex items-center gap-1">
+        <span class="size-2 bg-green-500 rounded-full animate-pulse"></span>
+        STATUS: ACTIVE
+      </span>
+    </div>
+  </div>
+  <!-- ========== END HEADER ========== -->
 
-    <section id="home" class="hero">
-        <div class="hero-content">
-            <div class="text-rotator">
-                <div class="text-set active">
-                    <h1 class="glitch-text" data-text="EAZYLIFE">EAZYLIFE</h1>
+  <!-- ========== MAIN CONTENT ========== -->
+  <main id="content">
+    <!-- Hero -->
+    <div class="overflow-hidden bg-background">
+      <div class="max-w-5xl mx-auto px-4 xl:px-0 pt-24 lg:pt-32 pb-24">
+        <h1 class="font-semibold text-foreground text-5xl md:text-6xl">
+          <span class="text-teal-600">EazyLife:</span> Advancing Robotics & Electronics
+        </h1>
+        <div class="mt-5 max-w-4xl">
+          <p class="text-muted-foreground-1 text-lg">
+            Integrity and Affordability in every circuit. From premium HP and Dell laptops to custom ESP32/Arduino automation, we provide professional engineering solutions in Ibadan.
+          </p>
+        </div>
+      </div>
+    </div>
+    <!-- End Hero -->
+
+    <!-- Case Stories -->
+    <div id="services" class="bg-background bg-linear-to-t from-background-1 to-transparent">
+      <div class="max-w-5xl px-4 xl:px-0 py-24 mx-auto">
+        <!-- Title -->
+        <div class="max-w-3xl mb-10 lg:mb-14">
+          <h2 class="text-foreground font-semibold text-2xl md:text-4xl md:leading-tight">What we offer</h2>
+          <p class="mt-1 text-muted-foreground-1">From quality electronics at affordable prices to custom embedded systems — we deliver real solutions with full integrity right here in Ibadan.</p>
+        </div>
+        <!-- End Title -->
+
+        <!-- Card Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 items-center border border-card-line divide-y lg:divide-y-0 lg:divide-x divide-card-line rounded-xl">
+          <!-- Card -->
+          <a class="group relative z-10 p-4 md:p-6 h-full flex flex-col bg-card first:rounded-t-xl last:rounded-b-xl lg:first:rounded-l-xl lg:first:rounded-tr-none lg:last:rounded-r-xl lg:last:rounded-bl-none last:before:rounded-b-xl lg:first:before:rounded-s-xl lg:last:before:rounded-e-xl lg:last:before:rounded-bl-none focus:outline-hidden before:absolute before:inset-0 before:bg-linear-to-b hover:before:from-transparent hover:before:via-transparent hover:before:to-primary/10 before:via-80% focus:before:from-transparent focus:before:via-transparent focus:before:to-primary/10 before:-z-1 before:opacity-0 hover:before:opacity-100 focus:before:opacity-100" href="https://wa.me/2347051548082?text=Hello%20EazyLife,%20I%20am%20interested%20in%20buying%20a%20laptop.">
+            <div class="mb-5">
+              <svg class="shrink-0 size-8 text-teal-600" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="18" height="12" x="3" y="4" rx="2" ry="2"/>
+                <line x1="2" x2="22" y1="20" y2="20"/>
+              </svg>
+              <div class="mt-5">
+                <p class="font-semibold text-5xl text-foreground">HP · Dell</p>
+                <h3 class="mt-5 font-semibold text-xl text-foreground">Premium Laptops & Electronics</h3>
+                <p class="mt-1 text-muted-foreground-1">We stock quality HP and Dell laptops, TVs, phones, and powerbanks — all at honest, affordable prices. Every device is genuine and verified before sale.</p>
+              </div>
+            </div>
+            <p class="mt-auto">
+              <span class="font-medium text-sm text-primary pb-1 border-b-2 border-line-2 group-hover:border-primary-hover group-focus:border-primary-focus transition focus:outline-hidden">
+                Shop now
+              </span>
+            </p>
+          </a>
+          <!-- End Card -->
+
+          <!-- Card -->
+          <a class="group relative z-10 p-4 md:p-6 h-full flex flex-col bg-card first:rounded-t-xl last:rounded-b-xl lg:first:rounded-l-xl lg:first:rounded-tr-none lg:last:rounded-r-xl lg:last:rounded-bl-none last:before:rounded-b-xl lg:first:before:rounded-s-xl lg:last:before:rounded-e-xl lg:last:before:rounded-bl-none focus:outline-hidden before:absolute before:inset-0 before:bg-linear-to-b hover:before:from-transparent hover:before:via-transparent hover:before:to-primary/10 before:via-80% focus:before:from-transparent focus:before:via-transparent focus:before:to-primary/10 before:-z-1 before:opacity-0 hover:before:opacity-100 focus:before:opacity-100" href="https://wa.me/2347051548082?text=Hello%20EazyLife,%20I%20need%20a%20custom%20automation%20solution.">
+            <div class="mb-5">
+              <svg class="shrink-0 size-8 text-teal-600" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/>
+              </svg>
+              <div class="mt-5">
+                <p class="font-semibold text-5xl text-foreground">ESP32</p>
+                <h3 class="mt-5 font-semibold text-xl text-foreground">Embedded Systems & Robotics</h3>
+                <p class="mt-1 text-muted-foreground-1">Custom Arduino and ESP32-based automation solutions for homes, businesses, and industry. We design, build and deploy systems tailored to your exact needs.</p>
+              </div>
+            </div>
+            <p class="mt-auto">
+              <span class="font-medium text-sm text-primary pb-1 border-b-2 border-line-2 group-hover:border-primary-hover group-focus:border-primary-focus transition focus:outline-hidden">
+                Request a build
+              </span>
+            </p>
+          </a>
+          <!-- End Card -->
+
+          <!-- Card -->
+          <a class="group relative z-10 p-4 md:p-6 h-full flex flex-col bg-card first:rounded-t-xl last:rounded-b-xl lg:first:rounded-l-xl lg:first:rounded-tr-none lg:last:rounded-r-xl lg:last:rounded-bl-none last:before:rounded-b-xl lg:first:before:rounded-s-xl lg:last:before:rounded-e-xl lg:last:before:rounded-bl-none focus:outline-hidden before:absolute before:inset-0 before:bg-linear-to-b hover:before:from-transparent hover:before:via-transparent hover:before:to-primary/10 before:via-80% focus:before:from-transparent focus:before:via-transparent focus:before:to-primary/10 before:-z-1 before:opacity-0 hover:before:opacity-100 focus:before:opacity-100" href="https://wa.me/2347051548082?text=Hello%20EazyLife,%20I%20need%20help%20with%20repairs.">
+            <div class="mb-5">
+              <svg class="shrink-0 size-8 text-teal-600" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+              </svg>
+              <div class="mt-5">
+                <p class="font-semibold text-5xl text-foreground">Fix It</p>
+                <h3 class="mt-5 font-semibold text-xl text-foreground">Repairs & Technical Support</h3>
+                <p class="mt-1 text-muted-foreground-1">Laptop, TV, and electronics repairs handled with care and expertise. We diagnose fast and restore your devices to full working condition at fair prices.</p>
+              </div>
+            </div>
+            <p class="mt-auto">
+              <span class="font-medium text-sm text-primary pb-1 border-b-2 border-line-2 group-hover:border-primary-hover group-focus:border-primary-focus transition focus:outline-hidden">
+                Book a repair
+              </span>
+            </p>
+          </a>
+          <!-- End Card -->
+        </div>
+        <!-- End Card Grid -->
+
+        <div class="mt-5">
+          <!-- Quick Action -->
+          <a class="py-1 px-3 group inline-flex items-center gap-x-1.5 bg-teal-600 border border-teal-700 text-white text-sm rounded-full focus:outline-hidden hover:bg-teal-700" href="https://wa.me/2347051548082?text=Hello%20EazyLife,%20I%20am%20interested%20in%20your%20services.">
+            Chat with us on WhatsApp
+            <svg class="shrink-0 size-4 transition group-hover:translate-x-0.5 group-focus:translate-x-0.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14" />
+              <path d="m12 5 7 7-7 7" />
+            </svg>
+          </a>
+          <!-- End Quick Action -->
+        </div>
+      </div>
+    </div>
+    <!-- End Case Stories -->
+
+    <div id="about" class="bg-background">
+      <div class="max-w-5xl px-4 xl:px-0 py-10 lg:py-20 mx-auto">
+        <!-- Title -->
+        <div class="max-w-3xl mb-10 lg:mb-14">
+          <h2 class="text-foreground font-semibold text-2xl md:text-4xl md:leading-tight">What our customers say</h2>
+          <p class="mt-1 text-muted-foreground-1">We are proud of the trust our customers place in us. Here is what some of them have shared about their experience with EazyLife.</p>
+        </div>
+        <!-- End Title -->
+
+        <!-- Grid -->
+        <div class="md:grid md:grid-cols-2 md:gap-10 lg:gap-16 md:items-center">
+          <div>
+            <!-- Blockquote -->
+            <blockquote>
+              <p class="font-medium text-xl text-foreground md:text-2xl md:leading-normal xl:text-3xl xl:leading-normal">
+                To say that EazyLife has been a blessing is an understatement. I got my laptop at the best price in Ibadan — genuine, fast, and no stories.
+              </p>
+
+              <footer class="mt-6">
+                <div class="flex items-center">
+                  <div class="md:hidden shrink-0">
+                    <img class="size-12 rounded-full" src="https://images.unsplash.com/photo-1671725501928-b7d85698ccd8?q=80&w=320&h=320&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Avatar">
+                  </div>
+                  <div class="ms-4 md:ms-0">
+                    <div class="text-base font-semibold text-foreground">Adebayo T.</div>
+                    <div class="text-xs text-muted-foreground-1">Business Owner, Ibadan</div>
+                  </div>
                 </div>
-            </div>
-            <p class="subtitle">ADVANCING ROBOTICS & ELECTRONICS IN IBADAN</p>
-            <div class="cta-container">
-                <a href="#about" class="cta-button primary">DISCOVER MORE</a>
-                <a href="https://wa.me/2347051548082" class="cta-button secondary">WHATSAPP US</a>
-            </div>
-        </div>
-    </section>
+              </footer>
+            </blockquote>
+            <!-- End Blockquote -->
+          </div>
+          <!-- End Col -->
 
-    <section id="about" class="about-section">
-        <div class="about-container">
-            <div class="about-text">
-                <h2 class="section-header">ENGINEERING THE FUTURE</h2>
-                <p>Based in Ibadan, we bridge the gap between complex hardware and user-centric affordability. We specialize in Python-driven automation and custom-coded embedded systems.</p>
-            </div>
-            <div class="about-image">
-                <img src="assets/pictures/hero.png" alt="Israel at EazyLife" style="border-radius: 15px; border: 1px solid var(--primary-color);">
-            </div>
+          <div class="hidden md:block mb-24 md:mb-0">
+            <img class="rounded-xl" src="https://images.unsplash.com/photo-1671725501928-b7d85698ccd8?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Avatar">
+          </div>
+          <!-- End Col -->
         </div>
-    </section>
+        <!-- End Grid -->
+      </div>
+    </div>
+    <!-- End Testimonials -->
 
-    <section id="engineering" class="features-section">
-        <h2 class="section-header" style="text-align: center;">CURRENT PROJECTS</h2>
-        <div class="features-container">
-            <div class="feature-card">
-                <h3>ROBOT WAITER</h3>
-                <p>Autonomous hospitality service robot using ESP32 & Hoverboard Hub motors.</p>
-            </div>
-            <div class="feature-card">
-                <h3>SMART POWER</h3>
-                <p>Custom 4S 148Wh Power Banks with integrated BMS for reliable energy.</p>
-            </div>
-            <div class="feature-card">
-                <h3>WORKFLOW AI</h3>
-                <p>Enterprise data reconciliation using Python and Playwright automation.</p>
-            </div>
-        </div>
-    </section>
-
-    <footer>
-        <div class="footer-content">
-            <p class="copyright">© 2026 EazyLife Robotics & Electronics Solutions | Ibadan, Nigeria</p>
-        </div>
-    </footer>
-
-    <script src="templatemo-electric-scripts.js"></script>
-</body>
-</html>
+    <!-- Stats -->
+    <div class="bg-background">
+      <div class="max-w-5xl px-4 xl:px-0 py-10 mx-auto">
+        <div class="border border-line-2 rounded-xl">
+          <div class="p-4 lg:p-8 bg-linear-to-bl from-layer via-background to-background-1 rounded-xl">
+            <div class="grid grid-cols-1 sm:grid-cols-3 items-center gap-y-20 gap-x-12">
+              <!-- Stats -->
+              <div class="relative text-center first:before:hidden before:absolute before:-top-full sm:before:top-1/2 before:start-1/2 sm:before:-start-6 before:h-20 before:border-s before:border-line-2 before:rotate-[60deg] sm:before:rotate-12 before:transform sm:before:-translate-y-1/2 before:-translate-x-1/2 sm:before:-translate-x-0 before:mt-3.5 sm:before:mt-0">
+                <svg class="shrink-0 size-6 sm:size-8 text-primary mx-auto" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m11 17 2 2a1 1 0 1 0 3-3" />
+                  <path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4" />
+                  <path d="m21 3 1 11h-2" />
+                  <path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3" />
+                  <path d="M3 4h8" />
+                </svg>
+                <div class="mt-3 sm:mt-5">
+                  <h3 class="text-lg sm:text-3xl font-semibold text-foreground">500+</h3>
+                  <p class="mt-1 text-sm sm:text-base text-muted-fore
