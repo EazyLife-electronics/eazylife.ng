@@ -53,7 +53,18 @@
 
 <body class="bg-background">
   <!-- ========== HEADER ========== -->
-  <header class="sticky top-4 inset-x-0 flex flex-wrap md:justify-start md:flex-nowrap z-50 w-full before:absolute before:inset-0 before:max-w-5xl before:mx-2 lg:before:mx-auto before:rounded before:rounded-[26px] before:bg-navbar before:border before:border-navbar-line">
+  <header class="sticky top-4 inset-x-0 flex flex-col flex-wrap md:justify-start z-50 w-full before:absolute before:inset-0 before:max-w-5xl before:mx-2 lg:before:mx-auto before:rounded before:rounded-[26px] before:bg-navbar before:border before:border-navbar-line">
+
+    <!-- CAC Trust Bar -->
+    <div class="relative z-10 w-full max-w-5xl mx-2 lg:mx-auto px-5 pt-1.5 pb-0 flex justify-between items-center text-[9px] md:text-[10px] font-bold text-green-700 tracking-widest uppercase border-b border-green-100">
+      <span>CAC Registered · RC-9462420</span>
+      <span class="flex items-center gap-1">
+        <span class="size-1.5 bg-green-500 rounded-full animate-pulse"></span>
+        Active
+      </span>
+    </div>
+    <!-- End CAC Trust Bar -->
+
     <nav class="relative max-w-5xl w-full flex flex-wrap md:flex-nowrap basis-full items-center justify-between py-2 ps-5 pe-2 md:py-0 mx-2 lg:mx-auto">
       <div class="flex items-center">
         <!-- Logo -->
@@ -105,7 +116,6 @@
       <!-- End Collapse -->
     </nav>
   </header>
-
   <!-- ========== END HEADER ========== -->
 
   <!-- ========== MAIN CONTENT ========== -->
