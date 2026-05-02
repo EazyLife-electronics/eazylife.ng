@@ -741,16 +741,16 @@
       </div>
       <div class="hero-stats">
         <div class="stat">
-          <div class="stat-num">500<span>+</span></div>
-          <div class="stat-label">Customers Served</div>
-        </div>
-        <div class="stat">
-          <div class="stat-num">3<span>+</span></div>
-          <div class="stat-label">Service Areas</div>
-        </div>
-        <div class="stat">
           <div class="stat-num">CAC</div>
           <div class="stat-label">Registered Business</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">.ng</div>
+          <div class="stat-label">Verified Domain</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num"><i class="fas fa-shield-halved" style="font-size:1.6rem;color:var(--green);"></i></div>
+          <div class="stat-label">Integrity First</div>
         </div>
       </div>
     </div>
@@ -868,40 +868,9 @@
       <h2 class="section-title">What People Are Saying</h2>
       <p class="section-sub">Real feedback from real customers in Ibadan.</p>
     </div>
-    <div class="testimonials-grid">
-      <div class="testimonial-card">
-        <div class="stars">★★★★★</div>
-        <p class="testimonial-text">"To say that EazyLife has been a blessing is an understatement. I got my laptop at the best price in Ibadan — genuine, fast, and no stories."</p>
-        <div class="testimonial-author">
-          <div class="author-avatar">AT</div>
-          <div>
-            <div class="author-name">Adebayo T.</div>
-            <div class="author-title">Business Owner, Ibadan</div>
-          </div>
-        </div>
-      </div>
-      <div class="testimonial-card">
-        <div class="stars">★★★★★</div>
-        <p class="testimonial-text">"My laptop was completely dead. EazyLife diagnosed and fixed it within a day. The price was fair and they even followed up to check it was working."</p>
-        <div class="testimonial-author">
-          <div class="author-avatar">FK</div>
-          <div>
-            <div class="author-name">Funmi K.</div>
-            <div class="author-title">Student, UI Ibadan</div>
-          </div>
-        </div>
-      </div>
-      <div class="testimonial-card">
-        <div class="stars">★★★★★</div>
-        <p class="testimonial-text">"I needed a custom Arduino project for my final year. EazyLife understood exactly what I needed and delivered on time. Highly recommend."</p>
-        <div class="testimonial-author">
-          <div class="author-avatar">EM</div>
-          <div>
-            <div class="author-name">Emmanuel M.</div>
-            <div class="author-title">Engineering Student, Ibadan</div>
-          </div>
-        </div>
-      </div>
+    <div class="testimonials-grid" id="reviewsGrid">
+      <!-- Reviews load from reviews.json -->
+      <div style="text-align:center;padding:40px;color:var(--text-light);font-size:0.9rem;">Loading reviews...</div>
     </div>
   </section>
 
@@ -1071,12 +1040,75 @@
       });
     }, { threshold: 0.1 });
 
-    document.querySelectorAll('.service-card, .reason, .testimonial-card, .contact-item, .social-card').forEach(el => {
+    document.querySelectorAll('.service-card, .reason, .contact-item, .social-card').forEach(el => {
       el.style.opacity = '0';
       el.style.transform = 'translateY(20px)';
       el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
       observer.observe(el);
     });
+
+    // ── LOAD REVIEWS FROM reviews.json ──
+    async function loadReviews() {
+      const grid = document.getElementById('reviewsGrid');
+      try {
+        const res = await fetch('reviews.json');
+        if (!res.ok) throw new Error('Not found');
+        const reviews = await res.json();
+
+        let html = '';
+        reviews.forEach(r => {
+          const stars = '★'.repeat(r.stars) + '☆'.repeat(5 - r.stars);
+          const initials = r.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+          html += `
+            <div class="testimonial-card">
+              <div class="stars">${stars}</div>
+              <p class="testimonial-text">"${r.text}"</p>
+              <div class="testimonial-author">
+                <div class="author-avatar">${initials}</div>
+                <div>
+                  <div class="author-name">${r.name}</div>
+                  <div class="author-title">${r.title}</div>
+                </div>
+              </div>
+            </div>`;
+        });
+
+        // Always show "Leave a review" card at the end
+        html += `
+          <div class="testimonial-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:var(--blue-light);border:2px dashed var(--blue);gap:12px;padding:32px;">
+            <i class="fas fa-star" style="font-size:2rem;color:var(--blue);opacity:0.4;"></i>
+            <h4 style="font-size:0.95rem;font-weight:700;color:var(--dark);">Have you used EazyLife?</h4>
+            <p style="font-size:0.85rem;color:var(--text-light);line-height:1.6;">Leave us a review on Google Maps and help others in Ibadan find us.</p>
+            <a href="https://maps.app.goo.gl/wgWmKP8UQYWbf5np9" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:var(--blue);color:#fff;text-decoration:none;padding:10px 20px;border-radius:50px;font-size:0.85rem;font-weight:600;font-family:'Syne',sans-serif;">
+              <i class="fas fa-location-dot"></i> Leave a Review
+            </a>
+          </div>`;
+
+        grid.innerHTML = html;
+
+        // Animate new cards
+        grid.querySelectorAll('.testimonial-card').forEach(el => {
+          el.style.opacity = '0';
+          el.style.transform = 'translateY(20px)';
+          el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+          observer.observe(el);
+        });
+
+      } catch (err) {
+        // If file can't load, just show the leave-a-review card
+        grid.innerHTML = `
+          <div class="testimonial-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:var(--blue-light);border:2px dashed var(--blue);gap:12px;padding:32px;">
+            <i class="fas fa-star" style="font-size:2rem;color:var(--blue);opacity:0.4;"></i>
+            <h4 style="font-size:0.95rem;font-weight:700;color:var(--dark);">Be our first reviewer!</h4>
+            <p style="font-size:0.85rem;color:var(--text-light);line-height:1.6;">Leave us a review on Google Maps and help others in Ibadan find us.</p>
+            <a href="https://maps.app.goo.gl/wgWmKP8UQYWbf5np9" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:var(--blue);color:#fff;text-decoration:none;padding:10px 20px;border-radius:50px;font-size:0.85rem;font-weight:600;font-family:'Syne',sans-serif;">
+              <i class="fas fa-location-dot"></i> Leave a Review
+            </a>
+          </div>`;
+      }
+    }
+
+    loadReviews();
   </script>
 </body>
 </html>
