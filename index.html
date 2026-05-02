@@ -1051,7 +1051,7 @@
     async function loadReviews() {
       const grid = document.getElementById('reviewsGrid');
       try {
-        const res = await fetch('reviews.json');
+        const res = await fetch('https://eazylife.ng/reviews.json');
         if (!res.ok) throw new Error('Not found');
         const reviews = await res.json();
 
