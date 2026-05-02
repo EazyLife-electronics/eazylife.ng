@@ -528,7 +528,80 @@
     .author-name { font-weight: 700; font-size: 0.9rem; color: var(--dark); }
     .author-title { font-size: 0.78rem; color: var(--text-light); margin-top: 2px; }
 
-    /* ── CONTACT ── */
+    /* ── REVIEW FORM ── */
+    .review-form-wrap {
+      margin-top: 56px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 40px;
+      max-width: 640px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .review-form-wrap h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 6px;
+    }
+    .review-form-wrap p {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-bottom: 28px;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    .form-group label { font-size: 0.82rem; font-weight: 600; color: var(--dark); }
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      padding: 11px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text);
+      background: var(--white);
+      transition: border-color 0.2s;
+      outline: none;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus { border-color: var(--blue); }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    .btn-submit {
+      width: 100%;
+      padding: 13px;
+      background: var(--blue);
+      color: var(--white);
+      border: none;
+      border-radius: 50px;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-submit:hover { background: var(--blue-dark); transform: translateY(-1px); }
+    .form-success {
+      display: none;
+      text-align: center;
+      padding: 24px;
+      background: var(--blue-light);
+      border-radius: var(--radius-sm);
+      margin-top: 16px;
+    }
+    .form-success i { font-size: 2rem; color: var(--green); margin-bottom: 10px; display: block; }
+    .form-success p { color: var(--dark); font-weight: 600; font-size: 0.95rem; margin: 0; }
+    @media (max-width: 600px) {
+      .form-row { grid-template-columns: 1fr; }
+      .review-form-wrap { padding: 28px 20px; }
+    }
     #contact { background: var(--white); }
     .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
     .contact-info { display: flex; flex-direction: column; gap: 20px; }
@@ -872,6 +945,48 @@
       <!-- Reviews load from reviews.json -->
       <div style="text-align:center;padding:40px;color:var(--text-light);font-size:0.9rem;">Loading reviews...</div>
     </div>
+
+    <!-- Leave a Review Form -->
+    <div class="review-form-wrap">
+      <h3>Share Your Experience</h3>
+      <p>Used EazyLife? We'd love your honest feedback. Approved reviews appear on this page.</p>
+      <form id="reviewForm" action="https://formspree.io/f/xzdozlbk" method="POST">
+        <input type="hidden" name="_subject" value="New EazyLife Review Submission" />
+        <div class="form-row">
+          <div class="form-group">
+            <label for="r-name">Your Name *</label>
+            <input type="text" id="r-name" name="name" placeholder="e.g. Adebayo T." required />
+          </div>
+          <div class="form-group">
+            <label for="r-title">Occupation / Location</label>
+            <input type="text" id="r-title" name="title" placeholder="e.g. Student, Ibadan" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="r-stars">Rating *</label>
+          <select id="r-stars" name="stars" required>
+            <option value="" disabled selected>Select a rating</option>
+            <option value="5">★★★★★ — Excellent</option>
+            <option value="4">★★★★☆ — Very Good</option>
+            <option value="3">★★★☆☆ — Good</option>
+            <option value="2">★★☆☆☆ — Fair</option>
+            <option value="1">★☆☆☆☆ — Poor</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="r-text">Your Review *</label>
+          <textarea id="r-text" name="review" placeholder="Tell others about your experience with EazyLife..." required></textarea>
+        </div>
+        <input type="text" name="_gotcha" style="display:none" />
+        <button type="submit" class="btn-submit">
+          <i class="fas fa-paper-plane"></i> Submit Review
+        </button>
+        <div class="form-success" id="formSuccess">
+          <i class="fas fa-circle-check"></i>
+          <p>Thank you! Your review has been received and will appear here once approved.</p>
+        </div>
+      </form>
+    </div>
   </section>
 
   <!-- Contact -->
@@ -896,11 +1011,11 @@
               <p>6 Ososami Road, Oke-ado, Ibadan, Oyo State</p>
             </div>
           </a>
-          <a href="mailto:hello@eazylife.ng" class="contact-item">
+          <a href="mailto:damzyeazy@gmail.com" class="contact-item">
             <i class="fas fa-envelope"></i>
             <div>
               <h4>Email</h4>
-              <p>hello@eazylife.ng</p>
+              <p>damzyeazy@gmail.com</p>
             </div>
           </a>
         </div>
@@ -1056,33 +1171,26 @@
         const reviews = await res.json();
 
         let html = '';
-        reviews.forEach(r => {
-          const stars = '★'.repeat(r.stars) + '☆'.repeat(5 - r.stars);
-          const initials = r.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-          html += `
-            <div class="testimonial-card">
-              <div class="stars">${stars}</div>
-              <p class="testimonial-text">"${r.text}"</p>
-              <div class="testimonial-author">
-                <div class="author-avatar">${initials}</div>
-                <div>
-                  <div class="author-name">${r.name}</div>
-                  <div class="author-title">${r.title}</div>
+        if (reviews.length === 0) {
+          html = `<div style="text-align:center;padding:40px;color:var(--text-light);font-size:0.9rem;grid-column:1/-1;">No reviews yet — be the first to share your experience below!</div>`;
+        } else {
+          reviews.forEach(r => {
+            const stars = '★'.repeat(r.stars) + '☆'.repeat(5 - r.stars);
+            const initials = r.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+            html += `
+              <div class="testimonial-card">
+                <div class="stars">${stars}</div>
+                <p class="testimonial-text">"${r.text}"</p>
+                <div class="testimonial-author">
+                  <div class="author-avatar">${initials}</div>
+                  <div>
+                    <div class="author-name">${r.name}</div>
+                    <div class="author-title">${r.title}</div>
+                  </div>
                 </div>
-              </div>
-            </div>`;
-        });
-
-        // Always show "Leave a review" card at the end
-        html += `
-          <div class="testimonial-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:var(--blue-light);border:2px dashed var(--blue);gap:12px;padding:32px;">
-            <i class="fas fa-star" style="font-size:2rem;color:var(--blue);opacity:0.4;"></i>
-            <h4 style="font-size:0.95rem;font-weight:700;color:var(--dark);">Have you used EazyLife?</h4>
-            <p style="font-size:0.85rem;color:var(--text-light);line-height:1.6;">Leave us a review on Google Maps and help others in Ibadan find us.</p>
-            <a href="https://maps.app.goo.gl/wgWmKP8UQYWbf5np9" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:var(--blue);color:#fff;text-decoration:none;padding:10px 20px;border-radius:50px;font-size:0.85rem;font-weight:600;font-family:'Syne',sans-serif;">
-              <i class="fas fa-location-dot"></i> Leave a Review
-            </a>
-          </div>`;
+              </div>`;
+          });
+        }
 
         grid.innerHTML = html;
 
@@ -1095,20 +1203,42 @@
         });
 
       } catch (err) {
-        // If file can't load, just show the leave-a-review card
-        grid.innerHTML = `
-          <div class="testimonial-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:var(--blue-light);border:2px dashed var(--blue);gap:12px;padding:32px;">
-            <i class="fas fa-star" style="font-size:2rem;color:var(--blue);opacity:0.4;"></i>
-            <h4 style="font-size:0.95rem;font-weight:700;color:var(--dark);">Be our first reviewer!</h4>
-            <p style="font-size:0.85rem;color:var(--text-light);line-height:1.6;">Leave us a review on Google Maps and help others in Ibadan find us.</p>
-            <a href="https://maps.app.goo.gl/wgWmKP8UQYWbf5np9" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:var(--blue);color:#fff;text-decoration:none;padding:10px 20px;border-radius:50px;font-size:0.85rem;font-weight:600;font-family:'Syne',sans-serif;">
-              <i class="fas fa-location-dot"></i> Leave a Review
-            </a>
-          </div>`;
+        grid.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-light);font-size:0.9rem;grid-column:1/-1;">Be the first to share your experience — use the form below!</div>`;
       }
     }
 
     loadReviews();
+
+    // ── FORMSPREE REVIEW SUBMISSION ──
+    const reviewForm = document.getElementById('reviewForm');
+    if (reviewForm) {
+      reviewForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const btn = reviewForm.querySelector('.btn-submit');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+        btn.disabled = true;
+        try {
+          const response = await fetch(reviewForm.action, {
+            method: 'POST',
+            body: new FormData(reviewForm),
+            headers: { 'Accept': 'application/json' }
+          });
+          if (response.ok) {
+            reviewForm.reset();
+            document.getElementById('formSuccess').style.display = 'block';
+            btn.innerHTML = '<i class="fas fa-circle-check"></i> Submitted!';
+          } else {
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Review';
+            btn.disabled = false;
+            alert('Something went wrong. Please try WhatsApp instead.');
+          }
+        } catch (err) {
+          btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Review';
+          btn.disabled = false;
+          alert('Could not send. Please try WhatsApp instead.');
+        }
+      });
+    }
   </script>
 </body>
 </html>
