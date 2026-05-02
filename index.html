@@ -1,291 +1,1082 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-  <!-- Required Meta Tags Always Come First -->
-  <meta charset="utf-8">
-  <meta name="robots" content="max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-  <link rel="canonical" href="https://eazylife.ng/">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="EazyLife Robotics & Electronics Solutions: Premium laptops, TVs, and custom engineering automation in Ibadan, Nigeria. CAC Registered RC-9462420.">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EazyLife | Robotics & Electronics Solutions — Ibadan, Nigeria</title>
+  <meta name="description" content="EazyLife Robotics & Electronics Solutions — Premium laptops, custom Arduino/ESP32 embedded systems, and professional device repairs in Ibadan, Nigeria. CAC Registered RC-9462420." />
+  <meta name="keywords" content="laptop Ibadan, electronics Ibadan, Arduino Nigeria, ESP32 Ibadan, laptop repair Ibadan, robotics Nigeria, embedded systems Nigeria, HP Dell laptop Ibadan" />
+  <meta name="author" content="EazyLife Robotics & Electronics Solutions" />
+  <!-- Open Graph for social sharing -->
+  <meta property="og:title" content="EazyLife | Robotics & Electronics Solutions" />
+  <meta property="og:description" content="Premium laptops, embedded systems & repairs in Ibadan. Integrity and Affordability in every circuit." />
+  <meta property="og:url" content="https://eazylife.ng" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://eazylife.ng/assets/pictures/logo_white.png" />
+  <!-- Canonical -->
+  <link rel="canonical" href="https://eazylife.ng/" />
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-  <meta name="twitter:site" content="@preline">
-  <meta name="twitter:creator" content="@preline">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="EazyLife | Robotics & Electronics Solutions">
-  <meta name="twitter:description" content="Quality electronics and embedded systems engineering with full integrity. Based in Ibadan.">
-  <meta name="twitter:image" content="https://eazylife.ng/assets/pictures/logo_white.png">
+  <style>
+    :root {
+      --blue: #1A73E8;
+      --blue-dark: #1557b0;
+      --blue-light: #e8f0fe;
+      --dark: #0f1923;
+      --dark2: #1a2535;
+      --text: #2d3748;
+      --text-light: #64748b;
+      --white: #ffffff;
+      --green: #10b981;
+      --orange: #f59e0b;
+      --border: #e2e8f0;
+      --radius: 16px;
+      --radius-sm: 10px;
+    }
 
-  <meta property="og:url" content="https://eazylife.ng/">
-  <meta property="og:locale" content="en_US">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="EazyLife Robotics">
-  <meta property="og:title" content="EazyLife | Robotics & Electronics Solutions">
-  <meta property="og:description" content="Advancing Robotics & Electronics in Ibadan. Shop Laptops or request Custom Automation.">
-  <meta property="og:image" content="https://eazylife.ng/assets/pictures/logo_white.png">
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  <!-- Title -->
-  <title>EazyLife | Robotics & Electronics Solutions Ibadan</title>
+    html { scroll-behavior: smooth; }
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="https://eazylife.ng/assets/pictures/icon_light.png">
-  <link rel="shortcut icon" href="https://eazylife.ng/assets/pictures/icon_light.png">
-  <link rel="apple-touch-icon" href="https://eazylife.ng/assets/pictures/icon_light.png">
+    body {
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+      background: var(--white);
+      overflow-x: hidden;
+    }
 
-  <!-- Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Domine:wght@400..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Kode+Mono:wght@400..700&display=swap" rel="stylesheet">
+    h1, h2, h3, h4, .logo-text { font-family: 'Syne', sans-serif; }
 
-  <!-- CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/preline@2.1.0/dist/preline.min.css">
+    /* ── ANNOUNCEMENT BAR ── */
+    .announcement {
+      background: var(--dark);
+      color: rgba(255,255,255,0.85);
+      text-align: center;
+      font-size: 0.78rem;
+      padding: 8px 20px;
+      letter-spacing: 0.03em;
+    }
+    .announcement span { color: var(--green); font-weight: 600; }
 
-  <!-- Theme Check and Update -->
-  <script>
-    (function () {
-      const html = document.querySelector('html');
-      const isLightOrAuto = localStorage.getItem('hs_theme') === 'light' || (localStorage.getItem('hs_theme') === 'auto' && !window.matchMedia('(prefers-color-scheme: dark)').matches);
-      const isDarkOrAuto = localStorage.getItem('hs_theme') === 'dark' || (localStorage.getItem('hs_theme') === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    /* ── NAVBAR ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 5%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 68px;
+      transition: box-shadow 0.3s;
+    }
+    nav.scrolled { box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
 
-      if (isLightOrAuto && html.classList.contains('dark')) html.classList.remove('dark');
-      else if (isDarkOrAuto && html.classList.contains('light')) html.classList.remove('light');
-      else if (isDarkOrAuto && !html.classList.contains('dark')) html.classList.add('dark');
-      else if (isLightOrAuto && !html.classList.contains('light')) html.classList.add('light');
-    })();
-  </script>
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo img { height: 36px; filter: brightness(0); }
+    .nav-logo .logo-text { font-size: 1.1rem; font-weight: 800; color: var(--dark); letter-spacing: -0.02em; }
+
+    .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
+    .nav-links a { text-decoration: none; color: var(--text); font-size: 0.9rem; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--blue); }
+
+    .nav-social { display: flex; align-items: center; gap: 14px; }
+    .nav-social a {
+      color: var(--text-light);
+      font-size: 1rem;
+      transition: color 0.2s, transform 0.2s;
+      text-decoration: none;
+    }
+    .nav-social a:hover { color: var(--blue); transform: translateY(-2px); }
+    .nav-social a.whatsapp:hover { color: #25d366; }
+    .nav-social a.facebook:hover { color: #1877f2; }
+    .nav-social a.instagram:hover { color: #e1306c; }
+    .nav-social a.gmaps:hover { color: #ea4335; }
+
+    .nav-cta {
+      background: var(--blue);
+      color: var(--white) !important;
+      padding: 8px 20px;
+      border-radius: 50px;
+      font-weight: 600 !important;
+      font-size: 0.85rem !important;
+      transition: background 0.2s, transform 0.2s !important;
+    }
+    .nav-cta:hover { background: var(--blue-dark) !important; transform: translateY(-1px) !important; color: var(--white) !important; }
+
+    /* Hamburger */
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+    .hamburger span { width: 24px; height: 2px; background: var(--dark); border-radius: 2px; transition: all 0.3s; }
+    .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+    /* Mobile menu */
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 68px;
+      left: 0; right: 0;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 24px 5% 32px;
+      z-index: 99;
+      flex-direction: column;
+      gap: 0;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      text-decoration: none;
+      color: var(--text);
+      font-size: 1rem;
+      font-weight: 500;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .mobile-menu a:last-child { border-bottom: none; }
+    .mobile-social {
+      display: flex;
+      gap: 20px;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+    .mobile-social a { color: var(--text-light); font-size: 1.3rem; text-decoration: none; }
+
+    /* ── HERO ── */
+    .hero {
+      background: var(--dark);
+      min-height: 92vh;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      padding: 80px 5%;
+    }
+
+    /* Circuit pattern background */
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 20% 50%, rgba(26,115,232,0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(16,185,129,0.08) 0%, transparent 40%),
+        linear-gradient(135deg, transparent 40%, rgba(26,115,232,0.05) 100%);
+      pointer-events: none;
+    }
+
+    /* Animated grid */
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(26,115,232,0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(26,115,232,0.06) 1px, transparent 1px);
+      background-size: 60px 60px;
+      animation: gridMove 20s linear infinite;
+    }
+    @keyframes gridMove {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(60px); }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 720px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(26,115,232,0.15);
+      border: 1px solid rgba(26,115,232,0.3);
+      color: #93c5fd;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 50px;
+      margin-bottom: 28px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .hero-badge i { font-size: 0.7rem; color: var(--green); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    .hero h1 {
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+    }
+    .hero h1 .accent { color: var(--blue); }
+    .hero h1 .accent2 { color: var(--green); }
+
+    .hero-sub {
+      font-size: 1.05rem;
+      color: rgba(255,255,255,0.65);
+      line-height: 1.7;
+      margin-bottom: 36px;
+      max-width: 540px;
+      font-weight: 300;
+    }
+
+    .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 56px; }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--blue);
+      color: var(--white);
+      text-decoration: none;
+      padding: 14px 28px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.25s;
+      font-family: 'Syne', sans-serif;
+    }
+    .btn-primary:hover { background: var(--blue-dark); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(26,115,232,0.4); }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: rgba(255,255,255,0.8);
+      text-decoration: none;
+      padding: 14px 28px;
+      border-radius: 50px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      border: 1px solid rgba(255,255,255,0.2);
+      transition: all 0.25s;
+    }
+    .btn-secondary:hover { border-color: rgba(255,255,255,0.5); color: var(--white); transform: translateY(-2px); }
+
+    .hero-stats {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+    .stat { }
+    .stat-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1;
+    }
+    .stat-num span { color: var(--blue); }
+    .stat-label { font-size: 0.78rem; color: rgba(255,255,255,0.45); margin-top: 4px; letter-spacing: 0.05em; text-transform: uppercase; }
+
+    /* ── SOCIAL STRIP ── */
+    .social-strip {
+      background: var(--dark2);
+      padding: 20px 5%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .social-strip-label { color: rgba(255,255,255,0.35); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .social-strip-links { display: flex; gap: 20px; align-items: center; }
+    .social-strip-links a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      padding: 6px 14px;
+      border-radius: 50px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .social-strip-links a:hover { color: var(--white); border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
+    .social-strip-links a.wa:hover { background: rgba(37,211,102,0.1); border-color: rgba(37,211,102,0.3); color: #25d366; }
+    .social-strip-links a.fb:hover { background: rgba(24,119,242,0.1); border-color: rgba(24,119,242,0.3); color: #1877f2; }
+    .social-strip-links a.ig:hover { background: rgba(225,48,108,0.1); border-color: rgba(225,48,108,0.3); color: #e1306c; }
+    .social-strip-links a.gm:hover { background: rgba(234,67,53,0.1); border-color: rgba(234,67,53,0.3); color: #ea4335; }
+
+    /* ── SECTION SHARED ── */
+    section { padding: 88px 5%; }
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 14px;
+    }
+    .section-label::before {
+      content: '';
+      width: 20px;
+      height: 2px;
+      background: var(--blue);
+      border-radius: 2px;
+    }
+    .section-title {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800;
+      color: var(--dark);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+    .section-sub {
+      font-size: 1rem;
+      color: var(--text-light);
+      line-height: 1.7;
+      max-width: 560px;
+    }
+
+    /* ── SERVICES ── */
+    #services { background: #f8faff; }
+    .services-header { text-align: center; margin-bottom: 56px; }
+    .services-header .section-label { justify-content: center; }
+    .services-header .section-label::before { display: none; }
+    .services-header .section-sub { margin: 0 auto; }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .service-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 36px 32px;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .service-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--blue);
+      transform: scaleX(0);
+      transition: transform 0.3s;
+      transform-origin: left;
+    }
+    .service-card:hover { box-shadow: 0 16px 48px rgba(26,115,232,0.1); transform: translateY(-4px); border-color: transparent; }
+    .service-card:hover::before { transform: scaleX(1); }
+
+    .service-icon {
+      width: 52px;
+      height: 52px;
+      background: var(--blue-light);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      color: var(--blue);
+      margin-bottom: 20px;
+    }
+    .service-tag {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 10px;
+    }
+    .service-card h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+    .service-card p {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+    .service-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--blue);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      transition: gap 0.2s;
+    }
+    .service-link:hover { gap: 10px; }
+
+    /* ── WHY EAZYLIFE ── */
+    #about { background: var(--white); }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+    .about-visual {
+      background: var(--dark);
+      border-radius: var(--radius);
+      padding: 48px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .about-visual::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 80% 20%, rgba(26,115,232,0.2) 0%, transparent 50%),
+        radial-gradient(circle at 20% 80%, rgba(16,185,129,0.1) 0%, transparent 50%);
+    }
+    .about-visual-content { position: relative; z-index: 1; }
+    .about-visual h3 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1.2;
+      margin-bottom: 20px;
+    }
+    .about-visual h3 em { color: var(--blue); font-style: normal; }
+    .about-visual p { color: rgba(255,255,255,0.6); font-size: 0.9rem; line-height: 1.7; margin-bottom: 28px; }
+    .cac-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.7);
+      font-size: 0.78rem;
+      padding: 8px 16px;
+      border-radius: 50px;
+    }
+    .cac-badge i { color: var(--green); }
+
+    .reasons { display: flex; flex-direction: column; gap: 28px; }
+    .reason { display: flex; gap: 16px; align-items: flex-start; }
+    .reason-icon {
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      background: var(--blue-light);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--blue);
+      font-size: 0.95rem;
+    }
+    .reason h4 { font-size: 0.95rem; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+    .reason p { font-size: 0.875rem; color: var(--text-light); line-height: 1.6; }
+
+    /* ── TESTIMONIALS ── */
+    #testimonials { background: #f8faff; }
+    .testimonials-header { text-align: center; margin-bottom: 56px; }
+    .testimonials-header .section-label { justify-content: center; }
+    .testimonials-header .section-label::before { display: none; }
+    .testimonials-header .section-sub { margin: 0 auto; }
+
+    .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+    .testimonial-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+    }
+    .stars { color: var(--orange); font-size: 0.85rem; margin-bottom: 16px; letter-spacing: 2px; }
+    .testimonial-text { font-size: 0.92rem; color: var(--text); line-height: 1.7; margin-bottom: 24px; font-style: italic; }
+    .testimonial-author { display: flex; align-items: center; gap: 12px; }
+    .author-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    .author-name { font-weight: 700; font-size: 0.9rem; color: var(--dark); }
+    .author-title { font-size: 0.78rem; color: var(--text-light); margin-top: 2px; }
+
+    /* ── CONTACT ── */
+    #contact { background: var(--white); }
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
+    .contact-info { display: flex; flex-direction: column; gap: 20px; }
+    .contact-item {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      padding: 20px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      transition: all 0.2s;
+      color: var(--text);
+    }
+    .contact-item:hover { border-color: var(--blue); background: var(--blue-light); transform: translateX(4px); }
+    .contact-item i { color: var(--blue); font-size: 1.1rem; margin-top: 2px; min-width: 20px; text-align: center; }
+    .contact-item h4 { font-size: 0.85rem; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+    .contact-item p { font-size: 0.85rem; color: var(--text-light); }
+
+    .social-cards { display: flex; flex-direction: column; gap: 14px; }
+    .social-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 20px;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      transition: all 0.25s;
+      border: 1px solid var(--border);
+    }
+    .social-card-left { display: flex; align-items: center; gap: 14px; }
+    .social-card-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--white); }
+    .social-card h4 { font-size: 0.9rem; font-weight: 700; color: var(--dark); margin-bottom: 2px; }
+    .social-card p { font-size: 0.78rem; color: var(--text-light); }
+    .social-card i.fa-arrow-right { color: var(--text-light); font-size: 0.8rem; transition: transform 0.2s; }
+    .social-card:hover i.fa-arrow-right { transform: translateX(4px); }
+
+    .sc-wa { background: rgba(37,211,102,0.06); border-color: rgba(37,211,102,0.2); }
+    .sc-wa:hover { background: rgba(37,211,102,0.12); border-color: rgba(37,211,102,0.4); }
+    .sc-wa .social-card-icon { background: #25d366; }
+
+    .sc-fb { background: rgba(24,119,242,0.06); border-color: rgba(24,119,242,0.2); }
+    .sc-fb:hover { background: rgba(24,119,242,0.12); border-color: rgba(24,119,242,0.4); }
+    .sc-fb .social-card-icon { background: #1877f2; }
+
+    .sc-ig { background: rgba(225,48,108,0.06); border-color: rgba(225,48,108,0.2); }
+    .sc-ig:hover { background: rgba(225,48,108,0.12); border-color: rgba(225,48,108,0.4); }
+    .sc-ig .social-card-icon { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+
+    .sc-gm { background: rgba(234,67,53,0.06); border-color: rgba(234,67,53,0.2); }
+    .sc-gm:hover { background: rgba(234,67,53,0.12); border-color: rgba(234,67,53,0.4); }
+    .sc-gm .social-card-icon { background: #ea4335; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--dark);
+      color: rgba(255,255,255,0.6);
+      padding: 56px 5% 32px;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 48px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 28px;
+    }
+    .footer-brand .logo-text { color: var(--white); font-size: 1.1rem; margin-bottom: 12px; display: block; }
+    .footer-brand p { font-size: 0.85rem; line-height: 1.7; margin-bottom: 20px; }
+    .footer-social { display: flex; gap: 12px; }
+    .footer-social a {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.07);
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    .footer-social a:hover { background: var(--blue); color: var(--white); transform: translateY(-2px); }
+
+    .footer-col h4 { color: var(--white); font-size: 0.85rem; font-weight: 700; margin-bottom: 16px; letter-spacing: 0.05em; text-transform: uppercase; }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-col ul a { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
+    .footer-col ul a:hover { color: var(--white); }
+
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 0.78rem;
+    }
+    .footer-bottom .cac { color: rgba(255,255,255,0.3); }
+
+    /* ── WHATSAPP FLOAT ── */
+    .wa-float {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 999;
+      width: 56px;
+      height: 56px;
+      background: #25d366;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      font-size: 1.5rem;
+      text-decoration: none;
+      box-shadow: 0 8px 24px rgba(37,211,102,0.5);
+      transition: all 0.25s;
+      animation: waBounce 3s ease-in-out infinite;
+    }
+    .wa-float:hover { transform: scale(1.1); box-shadow: 0 12px 32px rgba(37,211,102,0.6); }
+    @keyframes waBounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .nav-links, .nav-social { display: none; }
+      .hamburger { display: flex; }
+      .about-grid, .contact-grid { grid-template-columns: 1fr; gap: 40px; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      section { padding: 64px 5%; }
+      .hero { padding: 60px 5%; min-height: 80vh; }
+      .hero-stats { gap: 24px; }
+      .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+      .social-strip { gap: 16px; }
+      .social-strip-links { flex-wrap: wrap; gap: 10px; }
+    }
+  </style>
 </head>
+<body>
 
-<body class="bg-background">
-  <!-- ========== HEADER ========== -->
-  <header class="sticky top-4 inset-x-0 flex flex-col flex-wrap md:justify-start z-50 w-full before:absolute before:inset-0 before:max-w-5xl before:mx-2 lg:before:mx-auto before:rounded before:rounded-[26px] before:bg-navbar before:border before:border-navbar-line">
+  <!-- Announcement Bar -->
+  <div class="announcement">
+    <span>✓ CAC Registered</span> · RC-9462420 · Serving Ibadan & environs · <span>WhatsApp: +234 705 154 8082</span>
+  </div>
 
-    <!-- CAC Trust Bar -->
-    <div class="relative z-10 w-full max-w-5xl mx-2 lg:mx-auto px-5 pt-1.5 pb-0 flex justify-between items-center text-[9px] md:text-[10px] font-bold text-green-700 tracking-widest uppercase border-b border-green-100">
-      <span>CAC Registered · RC-9462420</span>
-      <span class="flex items-center gap-1">
-        <span class="size-1.5 bg-green-500 rounded-full animate-pulse"></span>
-        Active
-      </span>
+  <!-- Navbar -->
+  <nav id="navbar">
+    <a href="/" class="nav-logo">
+      <img src="https://eazylife.ng/assets/pictures/logo_white.png" alt="EazyLife Logo" onerror="this.style.display='none'" />
+      <span class="logo-text">EazyLife</span>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="#services">Services</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#testimonials">Reviews</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+
+    <div style="display:flex;align-items:center;gap:20px;">
+      <div class="nav-social">
+        <a href="https://wa.me/2347051548082" target="_blank" rel="noopener" class="whatsapp" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+        <a href="https://www.facebook.com/share/18UAAaL3xe/" target="_blank" rel="noopener" class="facebook" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="https://www.instagram.com/eazylifeng" target="_blank" rel="noopener" class="instagram" title="Instagram"><i class="fab fa-instagram"></i></a>
+        <a href="https://maps.app.goo.gl/wgWmKP8UQYWbf5np9" target="_blank" rel="noopener" class="gmaps" title="Find us on Google Maps"><i class="fas fa-location-dot"></i></a>
+      </div>
+      <a href="https://wa.me/2347051548082?text=Hello%20EazyLife,%20I%20am%20interested%20in%20your%20services." target="_blank" class="nav-cta nav-links">Chat with us</a>
     </div>
-    <!-- End CAC Trust Bar -->
 
-    <nav class="relative max-w-5xl w-full flex flex-wrap md:flex-nowrap basis-full items-center justify-between py-2 ps-5 pe-2 md:py-0 mx-2 lg:mx-auto">
-      <div class="flex items-center">
-        <!-- Logo -->
-        <a class="flex-none rounded-md focus:outline-hidden focus:opacity-80" href="index.html" aria-label="EazyLife">
-          <img class="w-32 h-auto" src="https://eazylife.ng/assets/pictures/logo_white.png" alt="EazyLife Logo">
+    <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#services" onclick="toggleMenu()">Services</a>
+    <a href="#about" onclick="toggleMenu()">About Us</a>
+    <a href="#testimonials" onclick="toggleMenu()">Customer Reviews</a>
+    <a href="#contact" onclick="toggleMenu()">Contact & Location</a>
+    <a href="https://wa.me/2347051548082?text=Hello%20EazyLife,%20I%20am%20interested%20in%20your%20services." target="_blank" style="color:var(--blue);font-weight:700;">💬 Chat on WhatsApp</a>
+    <div class="mobile-social">
+      <a href="https://www.facebook.com/share/18UAAaL3xe/" target="_blank"><i class="fab fa-facebook-f"></i></a>
+      <a href="https://www.instagram.com/eazylifeng" target="_blank"><i class="fab fa-instagram"></i></a>
+      <a href="https://maps.app.goo.gl/wgWmKP8UQYWbf5np9" target="_blank"><i class="fas fa-location-dot"></i></a>
+    </div>
+  </div>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <i class="fas fa-circle"></i> Open for business · Ibadan, Nigeria
+      </div>
+      <h1>
+        Advancing <span class="accent">Robotics</span> &amp;<br/>
+        <span class="accent2">Electronics</span> in Ibadan
+      </h1>
+      <p class="hero-sub">
+        From premium HP and Dell laptops to custom Arduino/ESP32 automation systems — we deliver genuine products and professional engineering solutions with full integrity.
+      </p>
+      <div class="hero-actions">
+        <a href="https://wa.me/2347051548082?text=Hello%20EazyLife,%20I%20am%20interested%20in%20your%20services." target="_blank" class="btn-primary">
+          <i class="fab fa-whatsapp"></i> Chat on WhatsApp
         </a>
-        <!-- End Logo -->
+        <a href="#services" class="btn-secondary">
+          <i class="fas fa-arrow-down"></i> Our Services
+        </a>
       </div>
-
-      <!-- Button Group -->
-      <div class="md:order-3 flex items-center gap-x-3">
-        <div class="md:ps-3">
-          <a class="group inline-flex items-center gap-x-2 py-2 px-4 bg-teal-600 border border-teal-700 text-white font-medium text-sm rounded-full hover:bg-teal-700 focus:outline-hidden" 
-          href="https://wa.me/2347051548082?text=Hello%20EazyLife,%20I%20am%20interested%20in%20your%20services.">
-          Chat on WhatsApp
-          </a>
+      <div class="hero-stats">
+        <div class="stat">
+          <div class="stat-num">500<span>+</span></div>
+          <div class="stat-label">Customers Served</div>
         </div>
-
-        <div class="md:hidden">
-          <button type="button" class="hs-collapse-toggle size-9 flex justify-center items-center text-sm font-semibold rounded-full bg-layer border border-layer-line text-layer-foreground disabled:opacity-50 disabled:pointer-events-none" id="hs-pro-an-collapse" aria-expanded="false" aria-controls="hs-pro-an" aria-label="Toggle navigation" data-hs-collapse="#hs-pro-an">
-            <svg class="hs-collapse-open:hidden shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="3" x2="21" y1="6" y2="6" />
-              <line x1="3" x2="21" y1="12" y2="12" />
-              <line x1="3" x2="21" y1="18" y2="18" />
-            </svg>
-            <svg class="hs-collapse-open:block hidden shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M18 6 6 18" />
-              <path d="m6 6 12 12" />
-            </svg>
-          </button>
+        <div class="stat">
+          <div class="stat-num">3<span>+</span></div>
+          <div class="stat-label">Service Areas</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">CAC</div>
+          <div class="stat-label">Registered Business</div>
         </div>
       </div>
-      <!-- End Button Group -->
+    </div>
+  </section>
 
-      <!-- Collapse -->
-      <div id="hs-pro-an" class="hs-collapse hidden overflow-hidden transition-all duration-300 basis-full grow md:block" aria-labelledby="hs-pro-an-collapse" role="region">
-        <!-- Nav -->
-        <div class="overflow-hidden overflow-y-auto max-h-[75vh] [&::-webkit-scrollbar]:w-0">
-          <div class="flex flex-col md:flex-row md:items-center md:justify-end gap-y-3 pt-6 pb-2 md:py-0 md:ps-7">
-            <a class="md:px-3 md:py-4 text-sm text-navbar-2-nav-foreground hover:text-navbar-2-nav-foreground-hover focus:outline-hidden focus:text-navbar-2-nav-foreground-focus" href="index.html" aria-current="page">Home</a>
-            <a class="md:px-3 md:py-4 text-sm text-navbar-2-nav-foreground hover:text-navbar-2-nav-foreground-hover focus:outline-hidden focus:text-navbar-2-nav-foreground-focus" href="#services">Services</a>
-            <a class="md:px-3 md:py-4 text-sm text-navbar-2-nav-foreground hover:text-navbar-2-nav-foreground-hover focus:outline-hidden focus:text-navbar-2-nav-foreground-focus" href="#about">About Us</a>
-            <a class="md:px-3 md:py-4 text-sm text-navbar-2-nav-foreground hover:text-navbar-2-nav-foreground-hover focus:outline-hidden focus:text-navbar-2-nav-foreground-focus" href="#contact">Contact</a>
-            <a class="md:px-3 md:py-4 text-sm text-navbar-2-nav-foreground hover:text-navbar-2-nav-foreground-hover focus:outline-hidden focus:text-navbar-2-nav-foreground-focus" href="https://maps.app.goo.gl/PrtJV4sizmHah9A18" target="_blank">Find Us</a>
+  <!-- Social Strip -->
+  <div class="social-strip">
+    <span class="social-strip-label">Follow & Connect</span>
+    <div class="social-strip-links">
+      <a href="https://wa.me/2347051548082" target="_blank" rel="noopener" class="wa">
+        <i class="fab fa-whatsapp"></i> WhatsApp
+      </a>
+      <a href="https://www.facebook.com/share/18UAAaL3xe/" target="_blank" rel="noopener" class="fb">
+        <i class="fab fa-facebook-f"></i> Facebook
+      </a>
+      <a href="https://www.instagram.com/eazylifeng" target="_blank" rel="noopener" class="ig">
+        <i class="fab fa-instagram"></i> @eazylifeng
+      </a>
+      <a href="https://maps.app.goo.gl/wgWmKP8UQYWbf5np9" target="_blank" rel="noopener" class="gm">
+        <i class="fas fa-location-dot"></i> Find Us
+      </a>
+    </div>
+  </div>
+
+  <!-- Services -->
+  <section id="services">
+    <div class="services-header">
+      <div class="section-label">What We Offer</div>
+      <h2 class="section-title">Professional Solutions<br/>You Can Trust</h2>
+      <p class="section-sub">From quality electronics at honest prices to custom embedded systems — real solutions, right here in Ibadan.</p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-icon"><i class="fas fa-laptop"></i></div>
+        <div class="service-tag">HP · Dell</div>
+        <h3>Premium Laptops &amp; Electronics</h3>
+        <p>Quality HP and Dell laptops, TVs, phones, and powerbanks — all at honest, affordable prices. Every device is genuine and verified before sale. No tokunbo surprises.</p>
+        <a href="https://wa.me/2347051548082?text=Hello%20EazyLife,%20I%20am%20interested%20in%20buying%20a%20laptop." target="_blank" class="service-link">
+          Shop now <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+      <div class="service-card">
+        <div class="service-icon"><i class="fas fa-microchip"></i></div>
+        <div class="service-tag">ESP32 · Arduino</div>
+        <h3>Embedded Systems &amp; Robotics</h3>
+        <p>Custom Arduino and ESP32-based automation solutions for homes, businesses, and final year projects. We design, build and deploy systems tailored to your exact needs.</p>
+        <a href="https://wa.me/2347051548082?text=Hello%20EazyLife,%20I%20need%20a%20custom%20automation%20solution." target="_blank" class="service-link">
+          Request a build <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+      <div class="service-card">
+        <div class="service-icon"><i class="fas fa-screwdriver-wrench"></i></div>
+        <div class="service-tag">Repairs</div>
+        <h3>Repairs &amp; Technical Support</h3>
+        <p>Laptop, TV, and electronics repairs handled with care and expertise. We diagnose fast and restore your devices to full working condition — at fair, transparent prices.</p>
+        <a href="https://wa.me/2347051548082?text=Hello%20EazyLife,%20I%20need%20help%20with%20repairs." target="_blank" class="service-link">
+          Book a repair <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- About / Why EazyLife -->
+  <section id="about">
+    <div class="about-grid">
+      <div class="about-visual">
+        <div class="about-visual-content">
+          <h3>Built on <em>Integrity</em><br/>and Affordability</h3>
+          <p>EazyLife was founded on a simple belief — Ibadan deserves genuine electronics at honest prices, and real engineering expertise that doesn't require a trip to Lagos.</p>
+          <div class="cac-badge">
+            <i class="fas fa-shield-halved"></i>
+            CAC Registered · RC-9462420
           </div>
         </div>
-        <!-- End Nav -->
       </div>
-      <!-- End Collapse -->
-    </nav>
-  </header>
-  <!-- ========== END HEADER ========== -->
-
-  <!-- ========== MAIN CONTENT ========== -->
-  <main id="content">
-    <!-- Hero -->
-    <div class="overflow-hidden bg-background">
-      <div class="max-w-5xl mx-auto px-4 xl:px-0 pt-24 lg:pt-32 pb-24">
-        <h1 class="font-semibold text-foreground text-5xl md:text-6xl">
-          <span class="text-teal-600">EazyLife:</span> Advancing Robotics & Electronics
-        </h1>
-        <div class="mt-5 max-w-4xl">
-          <p class="text-muted-foreground-1 text-lg">
-            Integrity and Affordability in every circuit. From premium HP and Dell laptops to custom ESP32/Arduino automation, we provide professional engineering solutions in Ibadan.
-          </p>
-        </div>
-      </div>
-    </div>
-    <!-- End Hero -->
-
-    <!-- Case Stories -->
-    <div id="services" class="bg-background bg-linear-to-t from-background-1 to-transparent">
-      <div class="max-w-5xl px-4 xl:px-0 py-24 mx-auto">
-        <!-- Title -->
-        <div class="max-w-3xl mb-10 lg:mb-14">
-          <h2 class="text-foreground font-semibold text-2xl md:text-4xl md:leading-tight">What we offer</h2>
-          <p class="mt-1 text-muted-foreground-1">From quality electronics at affordable prices to custom embedded systems — we deliver real solutions with full integrity right here in Ibadan.</p>
-        </div>
-        <!-- End Title -->
-
-        <!-- Card Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 items-center border border-card-line divide-y lg:divide-y-0 lg:divide-x divide-card-line rounded-xl">
-          <!-- Card -->
-          <a class="group relative z-10 p-4 md:p-6 h-full flex flex-col bg-card first:rounded-t-xl last:rounded-b-xl lg:first:rounded-l-xl lg:first:rounded-tr-none lg:last:rounded-r-xl lg:last:rounded-bl-none last:before:rounded-b-xl lg:first:before:rounded-s-xl lg:last:before:rounded-e-xl lg:last:before:rounded-bl-none focus:outline-hidden before:absolute before:inset-0 before:bg-linear-to-b hover:before:from-transparent hover:before:via-transparent hover:before:to-primary/10 before:via-80% focus:before:from-transparent focus:before:via-transparent focus:before:to-primary/10 before:-z-1 before:opacity-0 hover:before:opacity-100 focus:before:opacity-100" href="https://wa.me/2347051548082?text=Hello%20EazyLife,%20I%20am%20interested%20in%20buying%20a%20laptop.">
-            <div class="mb-5">
-              <svg class="shrink-0 size-8 text-teal-600" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <rect width="18" height="12" x="3" y="4" rx="2" ry="2"/>
-                <line x1="2" x2="22" y1="20" y2="20"/>
-              </svg>
-              <div class="mt-5">
-                <p class="font-semibold text-5xl text-foreground">HP · Dell</p>
-                <h3 class="mt-5 font-semibold text-xl text-foreground">Premium Laptops & Electronics</h3>
-                <p class="mt-1 text-muted-foreground-1">We stock quality HP and Dell laptops, TVs, phones, and powerbanks — all at honest, affordable prices. Every device is genuine and verified before sale.</p>
-              </div>
-            </div>
-            <p class="mt-auto">
-              <span class="font-medium text-sm text-primary pb-1 border-b-2 border-line-2 group-hover:border-primary-hover group-focus:border-primary-focus transition focus:outline-hidden">
-                Shop now
-              </span>
-            </p>
-          </a>
-          <!-- End Card -->
-
-          <!-- Card -->
-          <a class="group relative z-10 p-4 md:p-6 h-full flex flex-col bg-card first:rounded-t-xl last:rounded-b-xl lg:first:rounded-l-xl lg:first:rounded-tr-none lg:last:rounded-r-xl lg:last:rounded-bl-none last:before:rounded-b-xl lg:first:before:rounded-s-xl lg:last:before:rounded-e-xl lg:last:before:rounded-bl-none focus:outline-hidden before:absolute before:inset-0 before:bg-linear-to-b hover:before:from-transparent hover:before:via-transparent hover:before:to-primary/10 before:via-80% focus:before:from-transparent focus:before:via-transparent focus:before:to-primary/10 before:-z-1 before:opacity-0 hover:before:opacity-100 focus:before:opacity-100" href="https://wa.me/2347051548082?text=Hello%20EazyLife,%20I%20need%20a%20custom%20automation%20solution.">
-            <div class="mb-5">
-              <svg class="shrink-0 size-8 text-teal-600" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/>
-              </svg>
-              <div class="mt-5">
-                <p class="font-semibold text-5xl text-foreground">ESP32</p>
-                <h3 class="mt-5 font-semibold text-xl text-foreground">Embedded Systems & Robotics</h3>
-                <p class="mt-1 text-muted-foreground-1">Custom Arduino and ESP32-based automation solutions for homes, businesses, and industry. We design, build and deploy systems tailored to your exact needs.</p>
-              </div>
-            </div>
-            <p class="mt-auto">
-              <span class="font-medium text-sm text-primary pb-1 border-b-2 border-line-2 group-hover:border-primary-hover group-focus:border-primary-focus transition focus:outline-hidden">
-                Request a build
-              </span>
-            </p>
-          </a>
-          <!-- End Card -->
-
-          <!-- Card -->
-          <a class="group relative z-10 p-4 md:p-6 h-full flex flex-col bg-card first:rounded-t-xl last:rounded-b-xl lg:first:rounded-l-xl lg:first:rounded-tr-none lg:last:rounded-r-xl lg:last:rounded-bl-none last:before:rounded-b-xl lg:first:before:rounded-s-xl lg:last:before:rounded-e-xl lg:last:before:rounded-bl-none focus:outline-hidden before:absolute before:inset-0 before:bg-linear-to-b hover:before:from-transparent hover:before:via-transparent hover:before:to-primary/10 before:via-80% focus:before:from-transparent focus:before:via-transparent focus:before:to-primary/10 before:-z-1 before:opacity-0 hover:before:opacity-100 focus:before:opacity-100" href="https://wa.me/2347051548082?text=Hello%20EazyLife,%20I%20need%20help%20with%20repairs.">
-            <div class="mb-5">
-              <svg class="shrink-0 size-8 text-teal-600" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
-              </svg>
-              <div class="mt-5">
-                <p class="font-semibold text-5xl text-foreground">Fix It</p>
-                <h3 class="mt-5 font-semibold text-xl text-foreground">Repairs & Technical Support</h3>
-                <p class="mt-1 text-muted-foreground-1">Laptop, TV, and electronics repairs handled with care and expertise. We diagnose fast and restore your devices to full working condition at fair prices.</p>
-              </div>
-            </div>
-            <p class="mt-auto">
-              <span class="font-medium text-sm text-primary pb-1 border-b-2 border-line-2 group-hover:border-primary-hover group-focus:border-primary-focus transition focus:outline-hidden">
-                Book a repair
-              </span>
-            </p>
-          </a>
-          <!-- End Card -->
-        </div>
-        <!-- End Card Grid -->
-
-        <div class="mt-5">
-          <!-- Quick Action -->
-          <a class="py-1 px-3 group inline-flex items-center gap-x-1.5 bg-teal-600 border border-teal-700 text-white text-sm rounded-full focus:outline-hidden hover:bg-teal-700" href="https://wa.me/2347051548082?text=Hello%20EazyLife,%20I%20am%20interested%20in%20your%20services.">
-            Chat with us on WhatsApp
-            <svg class="shrink-0 size-4 transition group-hover:translate-x-0.5 group-focus:translate-x-0.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M5 12h14" />
-              <path d="m12 5 7 7-7 7" />
-            </svg>
-          </a>
-          <!-- End Quick Action -->
-        </div>
-      </div>
-    </div>
-    <!-- End Case Stories -->
-
-    <div id="about" class="bg-background">
-      <div class="max-w-5xl px-4 xl:px-0 py-10 lg:py-20 mx-auto">
-        <!-- Title -->
-        <div class="max-w-3xl mb-10 lg:mb-14">
-          <h2 class="text-foreground font-semibold text-2xl md:text-4xl md:leading-tight">What our customers say</h2>
-          <p class="mt-1 text-muted-foreground-1">We are proud of the trust our customers place in us. Here is what some of them have shared about their experience with EazyLife.</p>
-        </div>
-        <!-- End Title -->
-
-        <!-- Grid -->
-        <div class="md:grid md:grid-cols-2 md:gap-10 lg:gap-16 md:items-center">
+      <div class="reasons">
+        <div class="section-label">Why EazyLife</div>
+        <h2 class="section-title" style="margin-bottom:32px;">Why Customers<br/>Choose Us</h2>
+        <div class="reason">
+          <div class="reason-icon"><i class="fas fa-certificate"></i></div>
           <div>
-            <!-- Blockquote -->
-            <blockquote>
-              <p class="font-medium text-xl text-foreground md:text-2xl md:leading-normal xl:text-3xl xl:leading-normal">
-                To say that EazyLife has been a blessing is an understatement. I got my laptop at the best price in Ibadan — genuine, fast, and no stories.
-              </p>
-
-              <footer class="mt-6">
-                <div class="flex items-center">
-                  <div class="md:hidden shrink-0">
-                    <img class="size-12 rounded-full" src="https://images.unsplash.com/photo-1671725501928-b7d85698ccd8?q=80&w=320&h=320&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Avatar">
-                  </div>
-                  <div class="ms-4 md:ms-0">
-                    <div class="text-base font-semibold text-foreground">Adebayo T.</div>
-                    <div class="text-xs text-muted-foreground-1">Business Owner, Ibadan</div>
-                  </div>
-                </div>
-              </footer>
-            </blockquote>
-            <!-- End Blockquote -->
+            <h4>100% Genuine Products</h4>
+            <p>Every device is verified before sale. No refurbished units sold as new. What you see is what you get.</p>
           </div>
-          <!-- End Col -->
-
-          <div class="hidden md:block mb-24 md:mb-0">
-            <img class="rounded-xl" src="https://images.unsplash.com/photo-1671725501928-b7d85698ccd8?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Avatar">
-          </div>
-          <!-- End Col -->
         </div>
-        <!-- End Grid -->
+        <div class="reason">
+          <div class="reason-icon"><i class="fas fa-naira-sign"></i></div>
+          <div>
+            <h4>Honest, Affordable Pricing</h4>
+            <p>No hidden costs. Fair prices that reflect real value — not inflated margins.</p>
+          </div>
+        </div>
+        <div class="reason">
+          <div class="reason-icon"><i class="fas fa-bolt"></i></div>
+          <div>
+            <h4>Fast Turnaround on Repairs</h4>
+            <p>Most repairs diagnosed within 24 hours. We respect your time as much as we respect your device.</p>
+          </div>
+        </div>
+        <div class="reason">
+          <div class="reason-icon"><i class="fas fa-headset"></i></div>
+          <div>
+            <h4>Responsive Support</h4>
+            <p>Reach us on WhatsApp any time. We follow up after every repair to make sure you're satisfied.</p>
+          </div>
+        </div>
       </div>
     </div>
-    <!-- End Testimonials -->
+  </section>
 
-    <!-- Stats -->
-    <div class="bg-background">
-      <div class="max-w-5xl px-4 xl:px-0 py-10 mx-auto">
-        <div class="border border-line-2 rounded-xl">
-          <div class="p-4 lg:p-8 bg-linear-to-bl from-layer via-background to-background-1 rounded-xl">
-            <div class="grid grid-cols-1 sm:grid-cols-3 items-center gap-y-20 gap-x-12">
-              <!-- Stats -->
-              <div class="relative text-center first:before:hidden before:absolute before:-top-full sm:before:top-1/2 before:start-1/2 sm:before:-start-6 before:h-20 before:border-s before:border-line-2 before:rotate-[60deg] sm:before:rotate-12 before:transform sm:before:-translate-y-1/2 before:-translate-x-1/2 sm:before:-translate-x-0 before:mt-3.5 sm:before:mt-0">
-                <svg class="shrink-0 size-6 sm:size-8 text-primary mx-auto" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="m11 17 2 2a1 1 0 1 0 3-3" />
-                  <path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4" />
-                  <path d="m21 3 1 11h-2" />
-                  <path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3" />
-                  <path d="M3 4h8" />
-                </svg>
-                <div class="mt-3 sm:mt-5">
-                  <h3 class="text-lg sm:text-3xl font-semibold text-foreground">500+</h3>
-                  <p class="mt-1 text-sm sm:text-base text-muted-fore
+  <!-- Testimonials -->
+  <section id="testimonials">
+    <div class="testimonials-header">
+      <div class="section-label">Customer Reviews</div>
+      <h2 class="section-title">What People Are Saying</h2>
+      <p class="section-sub">Real feedback from real customers in Ibadan.</p>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">"To say that EazyLife has been a blessing is an understatement. I got my laptop at the best price in Ibadan — genuine, fast, and no stories."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">AT</div>
+          <div>
+            <div class="author-name">Adebayo T.</div>
+            <div class="author-title">Business Owner, Ibadan</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">"My laptop was completely dead. EazyLife diagnosed and fixed it within a day. The price was fair and they even followed up to check it was working."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">FK</div>
+          <div>
+            <div class="author-name">Funmi K.</div>
+            <div class="author-title">Student, UI Ibadan</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">"I needed a custom Arduino project for my final year. EazyLife understood exactly what I needed and delivered on time. Highly recommend."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">EM</div>
+          <div>
+            <div class="author-name">Emmanuel M.</div>
+            <div class="author-title">Engineering Student, Ibadan</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact">
+    <div class="contact-grid">
+      <div>
+        <div class="section-label">Get in Touch</div>
+        <h2 class="section-title">Find &amp; Contact<br/>EazyLife</h2>
+        <p class="section-sub" style="margin-bottom:32px;">We're based in Ibadan. Reach us on WhatsApp, visit our location, or connect on social media.</p>
+        <div class="contact-info">
+          <a href="https://wa.me/2347051548082" target="_blank" class="contact-item">
+            <i class="fab fa-whatsapp"></i>
+            <div>
+              <h4>WhatsApp</h4>
+              <p>+234 705 154 8082 — Fastest way to reach us</p>
+            </div>
+          </a>
+          <a href="https://maps.app.goo.gl/wgWmKP8UQYWbf5np9" target="_blank" class="contact-item">
+            <i class="fas fa-location-dot"></i>
+            <div>
+              <h4>Our Location</h4>
+              <p>6 Ososami Road, Oke-ado, Ibadan, Oyo State</p>
+            </div>
+          </a>
+          <a href="mailto:hello@eazylife.ng" class="contact-item">
+            <i class="fas fa-envelope"></i>
+            <div>
+              <h4>Email</h4>
+              <p>hello@eazylife.ng</p>
+            </div>
+          </a>
+        </div>
+      </div>
+      <div>
+        <h3 style="font-size:1rem;font-weight:700;color:var(--dark);margin-bottom:20px;font-family:'Syne',sans-serif;">Follow Us Online</h3>
+        <div class="social-cards">
+          <a href="https://wa.me/2347051548082?text=Hello%20EazyLife,%20I%20am%20interested%20in%20your%20services." target="_blank" rel="noopener" class="social-card sc-wa">
+            <div class="social-card-left">
+              <div class="social-card-icon"><i class="fab fa-whatsapp"></i></div>
+              <div>
+                <h4>WhatsApp</h4>
+                <p>Chat with us directly</p>
+              </div>
+            </div>
+            <i class="fas fa-arrow-right"></i>
+          </a>
+          <a href="https://www.facebook.com/share/18UAAaL3xe/" target="_blank" rel="noopener" class="social-card sc-fb">
+            <div class="social-card-left">
+              <div class="social-card-icon"><i class="fab fa-facebook-f"></i></div>
+              <div>
+                <h4>Facebook</h4>
+                <p>EazyLife Robotics & Electronics</p>
+              </div>
+            </div>
+            <i class="fas fa-arrow-right"></i>
+          </a>
+          <a href="https://www.instagram.com/eazylifeng" target="_blank" rel="noopener" class="social-card sc-ig">
+            <div class="social-card-left">
+              <div class="social-card-icon"><i class="fab fa-instagram"></i></div>
+              <div>
+                <h4>Instagram</h4>
+                <p>@eazylifeng</p>
+              </div>
+            </div>
+            <i class="fas fa-arrow-right"></i>
+          </a>
+          <a href="https://maps.app.goo.gl/wgWmKP8UQYWbf5np9" target="_blank" rel="noopener" class="social-card sc-gm">
+            <div class="social-card-left">
+              <div class="social-card-icon"><i class="fas fa-location-dot"></i></div>
+              <div>
+                <h4>Google Maps</h4>
+                <p>6 Ososami Rd, Oke-ado, Ibadan</p>
+              </div>
+            </div>
+            <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <span class="logo-text">EazyLife</span>
+        <p>Integrity and Affordability in every circuit. Premium electronics, custom embedded systems, and professional repairs — right here in Ibadan.</p>
+        <div class="footer-social">
+          <a href="https://wa.me/2347051548082" target="_blank" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+          <a href="https://www.facebook.com/share/18UAAaL3xe/" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="https://www.instagram.com/eazylifeng" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="https://maps.app.goo.gl/wgWmKP8UQYWbf5np9" target="_blank" title="Google Maps"><i class="fas fa-location-dot"></i></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Services</h4>
+        <ul>
+          <li><a href="https://wa.me/2347051548082?text=Hello%20EazyLife,%20I%20am%20interested%20in%20buying%20a%20laptop." target="_blank">Laptops & Electronics</a></li>
+          <li><a href="https://wa.me/2347051548082?text=Hello%20EazyLife,%20I%20need%20a%20custom%20automation%20solution." target="_blank">Embedded Systems</a></li>
+          <li><a href="https://wa.me/2347051548082?text=Hello%20EazyLife,%20I%20need%20help%20with%20repairs." target="_blank">Repairs & Support</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#about">About Us</a></li>
+          <li><a href="#testimonials">Customer Reviews</a></li>
+          <li><a href="#contact">Contact Us</a></li>
+          <li><a href="https://maps.app.goo.gl/wgWmKP8UQYWbf5np9" target="_blank">Find Us</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 EazyLife Robotics & Electronics Solutions · eazylife.ng</span>
+      <span class="cac">CAC Registered · RC-9462420 · Ibadan, Oyo State, Nigeria</span>
+    </div>
+  </footer>
+
+  <!-- WhatsApp Float Button -->
+  <a href="https://wa.me/2347051548082?text=Hello%20EazyLife,%20I%20am%20interested%20in%20your%20services." target="_blank" class="wa-float" title="Chat on WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+
+  <script>
+    // Navbar scroll effect
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+    });
+
+    // Mobile menu toggle
+    function toggleMenu() {
+      const menu = document.getElementById('mobileMenu');
+      const hamburger = document.getElementById('hamburger');
+      menu.classList.toggle('open');
+      hamburger.classList.toggle('open');
+    }
+
+    // Close mobile menu on outside click
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('mobileMenu');
+      const hamburger = document.getElementById('hamburger');
+      if (!menu.contains(e.target) && !hamburger.contains(e.target)) {
+        menu.classList.remove('open');
+        hamburger.classList.remove('open');
+      }
+    });
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    // Fade-in on scroll
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.service-card, .reason, .testimonial-card, .contact-item, .social-card').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(20px)';
+      el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>
