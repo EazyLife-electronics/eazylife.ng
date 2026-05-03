@@ -100,19 +100,19 @@
     }
   }
   </script>
-  <!-- Fonts — optional prevents CLS layout shift -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <!-- Fonts: system stack first, Google Fonts non-blocking -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=optional" rel="stylesheet" />
-  <!-- Font Awesome — only solid + brands subsets needed -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/solid.min.css" media="print" onload="this.media='all'" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/brands.min.css" media="print" onload="this.media='all'" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/fontawesome.min.css" media="print" onload="this.media='all'" />
-  <noscript>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/solid.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/brands.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/fontawesome.min.css" />
-  </noscript>
+  <style>
+    /* System font fallbacks render instantly, Google Fonts swap in */
+    body { font-family: 'DM Sans', 'Segoe UI', system-ui, sans-serif; }
+    h1,h2,h3,h4,.logo-text,.btn-primary,.btn-submit,nav,.section-title,.stat-num,.domain { font-family: 'Syne', 'Segoe UI', system-ui, sans-serif; }
+  </style>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" media="print" onload="this.media='all'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" /></noscript>
+  <!-- Font Awesome: single file, non-blocking -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" media="print" onload="this.media='all'" />
+  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" /></noscript>
 
   <style>
     :root {
@@ -139,14 +139,23 @@
 
     html { scroll-behavior: smooth; }
 
+    @font-face {
+      font-family: 'Syne-fallback';
+      src: local('Segoe UI'), local('system-ui');
+      ascent-override: 96%;
+      descent-override: 22%;
+      line-gap-override: 0%;
+      size-adjust: 104%;
+    }
+
     body {
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
       color: var(--text);
       background: var(--white);
       overflow-x: hidden;
     }
 
-    h1, h2, h3, h4, .logo-text { font-family: 'Syne', sans-serif; }
+    h1, h2, h3, h4, .logo-text { font-family: 'Syne', 'Syne-fallback', 'Segoe UI', system-ui, sans-serif; }
 
     /* ── ANNOUNCEMENT BAR ── */
     .announcement {
