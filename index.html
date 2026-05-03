@@ -15,7 +15,7 @@
   <meta property="og:description" content="EazyLife offers genuine HP & Dell laptops, custom Arduino/ESP32 embedded systems, and professional electronics repairs in Ibadan, Nigeria." />
   <meta property="og:url" content="https://eazylife.ng" />
   <meta property="og:type" content="website" />
-  <meta property="og:image" content="https://eazylife.ng/assets/pictures/og-image.png" />
+  <meta property="og:image" content="https://eazylife.ng/assets/pictures/logo_white.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:locale" content="en_NG" />
@@ -24,7 +24,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="EazyLife | Robotics & Electronics Solutions — Ibadan" />
   <meta name="twitter:description" content="EazyLife offers genuine HP & Dell laptops, custom Arduino/ESP32 embedded systems, and professional electronics repairs in Ibadan, Nigeria." />
-  <meta name="twitter:image" content="https://eazylife.ng/assets/pictures/og-image.png" />
+  <meta name="twitter:image" content="https://eazylife.ng/assets/pictures/logo_white.png" />
   <!-- Canonical -->
   <link rel="canonical" href="https://eazylife.ng/" />
   <!-- Favicon -->
@@ -100,14 +100,19 @@
     }
   }
   </script>
-  <!-- Fonts — preloaded for performance -->
+  <!-- Fonts — optional prevents CLS layout shift -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap&font-display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
-  <noscript><link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" /></noscript>
-  <!-- Icons — deferred -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" media="print" onload="this.media='all'" />
-  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" /></noscript>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=optional" rel="stylesheet" />
+  <!-- Font Awesome — only solid + brands subsets needed -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/solid.min.css" media="print" onload="this.media='all'" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/brands.min.css" media="print" onload="this.media='all'" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/fontawesome.min.css" media="print" onload="this.media='all'" />
+  <noscript>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/solid.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/brands.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/fontawesome.min.css" />
+  </noscript>
 
   <style>
     :root {
@@ -584,8 +589,10 @@
       color: var(--teal);
       font-size: 0.95rem;
     }
-    .reason h4 { font-size: 0.95rem; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+    .reason h4, .reason .reason-title { font-size: 0.95rem; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
     .reason p { font-size: 0.875rem; color: var(--text-light); line-height: 1.6; }
+    .contact-label { font-size: 0.85rem; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+    .social-label { font-size: 0.9rem; font-weight: 700; color: var(--dark); margin-bottom: 2px; }
 
     /* ── TESTIMONIALS ── */
     #testimonials { background: #f4fdf9; }
@@ -999,28 +1006,28 @@
         <div class="reason">
           <div class="reason-icon"><i class="fas fa-certificate"></i></div>
           <div>
-            <h4>100% Genuine Products</h4>
+            <p class="reason-title">100% Genuine Products</p>
             <p>Every device is verified before sale. No refurbished units sold as new. What you see is what you get.</p>
           </div>
         </div>
         <div class="reason">
           <div class="reason-icon"><i class="fas fa-naira-sign"></i></div>
           <div>
-            <h4>Honest, Affordable Pricing</h4>
+            <p class="reason-title">Honest, Affordable Pricing</p>
             <p>No hidden costs. Fair prices that reflect real value — not inflated margins.</p>
           </div>
         </div>
         <div class="reason">
           <div class="reason-icon"><i class="fas fa-bolt"></i></div>
           <div>
-            <h4>Fast Turnaround on Repairs</h4>
+            <p class="reason-title">Fast Turnaround on Repairs</p>
             <p>Most repairs diagnosed within 24 hours. We respect your time as much as we respect your device.</p>
           </div>
         </div>
         <div class="reason">
           <div class="reason-icon"><i class="fas fa-headset"></i></div>
           <div>
-            <h4>Responsive Support</h4>
+            <p class="reason-title">Responsive Support</p>
             <p>Reach us on WhatsApp any time. We follow up after every repair to make sure you're satisfied.</p>
           </div>
         </div>
@@ -1094,21 +1101,21 @@
           <a href="https://wa.me/2347051548082" target="_blank" class="contact-item">
             <i class="fab fa-whatsapp"></i>
             <div>
-              <h4>WhatsApp</h4>
+              <p class="contact-label">WhatsApp</p>
               <p>+234 705 154 8082 — Fastest way to reach us</p>
             </div>
           </a>
           <a href="https://maps.app.goo.gl/wgWmKP8UQYWbf5np9" target="_blank" class="contact-item">
             <i class="fas fa-location-dot"></i>
             <div>
-              <h4>Our Location</h4>
+              <p class="contact-label">Our Location</p>
               <p>6 Ososami Road, Oke-ado, Ibadan, Oyo State</p>
             </div>
           </a>
           <a href="mailto:damzyeazy@gmail.com" class="contact-item">
             <i class="fas fa-envelope"></i>
             <div>
-              <h4>Email</h4>
+              <p class="contact-label">Email</p>
               <p>damzyeazy@gmail.com</p>
             </div>
           </a>
@@ -1121,7 +1128,7 @@
             <div class="social-card-left">
               <div class="social-card-icon"><i class="fab fa-whatsapp"></i></div>
               <div>
-                <h4>WhatsApp</h4>
+                <p class="social-label">WhatsApp</p>
                 <p>Chat with us directly</p>
               </div>
             </div>
@@ -1131,7 +1138,7 @@
             <div class="social-card-left">
               <div class="social-card-icon"><i class="fab fa-facebook-f"></i></div>
               <div>
-                <h4>Facebook</h4>
+                <p class="social-label">Facebook</p>
                 <p>EazyLife Robotics & Electronics</p>
               </div>
             </div>
@@ -1141,7 +1148,7 @@
             <div class="social-card-left">
               <div class="social-card-icon"><i class="fab fa-instagram"></i></div>
               <div>
-                <h4>Instagram</h4>
+                <p class="social-label">Instagram</p>
                 <p>@eazylifeng</p>
               </div>
             </div>
@@ -1151,7 +1158,7 @@
             <div class="social-card-left">
               <div class="social-card-icon"><i class="fas fa-location-dot"></i></div>
               <div>
-                <h4>Google Maps</h4>
+                <p class="social-label">Google Maps</p>
                 <p>6 Ososami Rd, Oke-ado, Ibadan</p>
               </div>
             </div>
