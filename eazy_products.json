@@ -1,0 +1,27 @@
+[
+  {
+    "id": 1,
+    "name": "HP EliteBook 840 G5",
+    "price": 350000,
+    "category": "Laptops",
+    "desc": "Intel Core i5, 16GB RAM, 256GB SSD, Backlit Keyboard.",
+    "image": "https://eazylife.ng/assets/pictures/hp840.jpg"
+  },
+  {
+    "id": 2,
+    "name": "Arduino Uno R3 (Original)",
+    "price": 12500,
+    "category": "Robotics",
+    "desc": "The gold standard for electronics prototyping.",
+    "image": "https://eazylife.ng/assets/pictures/arduino.jpg"
+  },
+  {
+    "id": 3,
+    "name": "ESP32 DevKit V1",
+    "price": 8500,
+    "category": "Robotics",
+    "desc": "WiFi + Bluetooth enabled microcontroller for IoT.",
+    "image": "https://eazylife.ng/assets/pictures/esp32.jpg"
+  }
+]
+
