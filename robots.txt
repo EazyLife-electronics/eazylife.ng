@@ -1,0 +1,11 @@
+# robots.txt — EazyLife Robotics & Electronics Solutions
+# https://eazylife.ng
+
+User-agent: *
+Allow: /
+
+# Block admin folder from crawlers
+Disallow: /admin/
+
+# Sitemap location
+Sitemap: https://eazylife.ng/sitemap.xml
