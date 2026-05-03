@@ -3,97 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EazyLife Catalog | Laptops & Robotics Ibadan</title>
+    <title>EazyLife | Official Catalog</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         :root { --teal: #00B09B; --lime: #8DC63F; --dark: #1a2e2b; }
-        body { font-family: 'DM Sans', sans-serif; }
+        body { font-family: 'DM Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
         h1, h2, .font-syne { font-family: 'Syne', sans-serif; }
         .bg-eazylife { background: linear-gradient(135deg, #00B09B, #8DC63F); }
         .text-teal { color: var(--teal); }
         .active-cat { background-color: var(--teal) !important; color: white !important; border-color: var(--teal) !important; }
-        .product-card { transition: all 0.3s ease; border: 1px solid #f0f0f0; }
-        .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,176,155,0.1); }
+        .product-card { transition: transform 0.2s ease; border: 1px solid #eee; position: relative; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        /* Cart Badge Pulse */
+        #count.has-items { animation: pulse 0.5s ease-in-out; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
     </style>
 </head>
-<body class="bg-gray-50 pb-20">
+<body class="bg-gray-50 pb-24">
 
-<header class="bg-white border-b sticky top-0 z-50 p-4 shadow-sm">
+<header class="bg-white/90 backdrop-blur-md border-b sticky top-0 z-50 p-4 shadow-sm">
     <div class="max-w-6xl mx-auto flex justify-between items-center">
         <a href="index.html" class="flex items-center gap-2">
             <img src="https://eazylife.ng/assets/pictures/logo_white.png" class="h-10 brightness-0" alt="EazyLife">
         </a>
-        <button onclick="showCart()" class="bg-eazylife text-white px-5 py-2 rounded-full font-bold text-sm flex items-center gap-2 shadow-lg">
-            <i class="fas fa-shopping-cart"></i>
-            <span id="count">0</span>
+        <button onclick="showCart()" class="bg-eazylife text-white px-5 py-2 rounded-full font-bold text-sm flex items-center gap-2 shadow-lg hover:opacity-90 transition-all">
+            <i class="fas fa-shopping-basket"></i>
+            <span>Cart</span>
+            <span id="count" class="bg-white text-teal-600 rounded-full px-2 py-0.5 text-xs">0</span>
         </button>
     </div>
 </header>
 
-<main class="p-4 max-w-6xl mx-auto mt-6">
-    <div class="mb-8">
-        <h1 class="text-3xl font-black text-gray-900 mb-2">EazyLife <span class="text-teal">Catalog</span></h1>
-        <p class="text-gray-500 text-sm">Genuine Laptops, Robotics components & Repairs in Ibadan.</p>
+<main class="p-4 max-w-6xl mx-auto">
+    <div class="mt-4 mb-8">
+        <h1 class="text-3xl font-black text-gray-900 tracking-tight">Tech <span class="text-teal">Catalog</span></h1>
+        <p class="text-gray-500 text-sm">Genuine Laptops & Embedded Systems.</p>
     </div>
 
-    <div class="sticky top-[80px] z-40 bg-gray-50/80 backdrop-blur-md py-2">
+    <div class="sticky top-[76px] z-40 bg-gray-50/95 pt-2 pb-4">
         <div class="relative mb-4">
             <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-            <input id="search" onkeyup="filterProducts()" placeholder="Search Laptops, Arduino, ESP32..." 
-                   class="w-full pl-12 pr-4 py-4 rounded-2xl border-none shadow-md focus:ring-2 focus:ring-[#00B09B] outline-none">
+            <input id="search" onkeyup="filterProducts()" placeholder="Search laptops, Arduino, sensors..." 
+                   class="w-full pl-12 pr-4 py-4 rounded-2xl border-none shadow-sm focus:ring-2 focus:ring-[#00B09B] outline-none">
         </div>
-        <div id="catFilters" class="flex gap-2 overflow-x-auto no-scrollbar pb-2"></div>
+        <div id="catFilters" class="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+            </div>
     </div>
 
-    <div id="loader" class="text-center py-20">
-        <div class="animate-spin text-teal text-4xl mb-4"><i class="fas fa-microchip"></i></div>
-        <p class="font-bold text-gray-400">Loading components...</p>
+    <div id="loader" class="flex flex-col items-center justify-center py-20 text-gray-400">
+        <div class="animate-spin text-teal-500 text-3xl mb-3"><i class="fas fa-circle-notch"></i></div>
+        <p class="font-medium">Syncing Inventory...</p>
     </div>
-    <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    
+    <div id="grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"></div>
 </main>
 
 <div id="cartModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-end md:items-center justify-center">
-    <div class="bg-white w-full max-w-md rounded-t-[32px] md:rounded-[24px] shadow-2xl p-6 overflow-y-auto max-h-[85vh]">
+    <div class="bg-white w-full max-w-md rounded-t-[32px] md:rounded-[24px] shadow-2xl p-6 overflow-y-auto max-h-[90vh]">
         <div class="flex justify-between items-center mb-6">
             <h2 class="font-syne font-extrabold text-2xl text-gray-900">Your Quote</h2>
-            <button onclick="hideCart()" class="text-gray-400 text-3xl">&times;</button>
+            <button onclick="hideCart()" class="text-gray-400 p-2 text-3xl">&times;</button>
         </div>
-        <div id="cartItems" class="space-y-4 mb-6"></div>
-        <div class="bg-gray-50 p-4 rounded-2xl mb-6 space-y-3">
-            <input id="custName" placeholder="Full Name" class="w-full border-none p-3 rounded-xl shadow-sm">
-            <textarea id="custAddr" placeholder="Delivery/Office Address" class="w-full border-none p-3 rounded-xl shadow-sm"></textarea>
+
+        <div id="cartItems" class="space-y-4 mb-8">
+            </div>
+
+        <div class="bg-gray-100 p-4 rounded-2xl mb-6 space-y-3">
+            <input id="custName" placeholder="Full Name" class="w-full bg-white border-none p-3 rounded-xl shadow-sm text-sm outline-none">
+            <textarea id="custAddr" placeholder="Delivery Address or Office" class="w-full bg-white border-none p-3 rounded-xl shadow-sm text-sm outline-none" rows="2"></textarea>
         </div>
+
         <div class="flex justify-between items-center px-2">
-            <span class="font-bold text-gray-500">Total</span>
+            <span class="font-bold text-gray-500">Estimated Total</span>
             <span class="text-2xl font-black text-teal">₦<span id="total">0</span></span>
         </div>
-        <button onclick="sendOrder()" class="bg-eazylife text-white w-full py-4 mt-6 rounded-2xl font-bold text-lg shadow-xl">
-            Check Availability on WhatsApp
+
+        <button onclick="previewOrder()" class="bg-[#25D366] text-white w-full py-4 mt-6 rounded-2xl font-black text-lg shadow-xl hover:bg-[#1ebd57] transition-all flex items-center justify-center gap-2">
+            <i class="fab fa-whatsapp"></i>
+            Send Quote to WhatsApp
         </button>
     </div>
 </div>
 
 <script>
-    let products = [];
-    let cart = [];
+    const STORAGE_KEY = "eazylife_cart_v1";
+    const USER_KEY = "eazylife_user_v1";
+
+    let products = []; 
+    let cart = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     let currentCategory = 'All';
 
     window.onload = async () => {
+        await fetchProducts();
+        loadUserData();
+        updateUI();
+    };
+
+    async function fetchProducts() {
         try {
             const res = await fetch('eazy_products.json');
             products = await res.json();
-            document.getElementById("loader").style.display = "none";
-            renderCategories();
-            filterByCategory('All');
-        } catch (e) { console.error("Could not load products", e); }
-    };
+            document.getElementById("loader").classList.add("hidden");
+        } catch (e) {
+            document.getElementById("loader").innerHTML = `<p class="text-red-500">Failed to load eazy_products.json</p>`;
+        }
+    }
 
-    function renderCategories() {
+    function updateUI() {
+        renderCategoryButtons();
+        filterByCategory(currentCategory);
+        updateCartCount();
+    }
+
+    function renderProducts(list) {
+        const grid = document.getElementById("grid");
+        grid.innerHTML = "";
+        
+        if (list.length === 0) {
+            grid.innerHTML = `<div class="col-span-full text-center py-20 text-gray-400 font-bold">Product not found.</div>`;
+            return;
+        }
+
+        list.forEach(p => {
+            const inCart = cart.find(i => i.id === p.id);
+            grid.innerHTML += `
+                <div class="product-card bg-white p-3 rounded-[24px] shadow-sm flex flex-col">
+                    <img src="${p.image || 'https://via.placeholder.com/300?text=' + p.name}" class="h-32 md:h-40 w-full object-contain rounded-xl mb-3 bg-gray-50">
+                    <span class="text-[9px] font-black uppercase text-teal tracking-wider mb-1">${p.category}</span>
+                    <h3 class="font-bold text-gray-800 leading-tight text-xs md:text-sm flex-grow mb-2">${p.name}</h3>
+                    
+                    <div class="mb-3">
+                        <span class="text-gray-900 font-black text-sm md:text-base">₦${p.price.toLocaleString()}</span>
+                    </div>
+                    
+                    <div class="mt-auto">
+                        ${inCart ? `
+                            <div class="flex items-center justify-between bg-teal-50 rounded-xl p-1 border border-teal-100">
+                                <button onclick="changeQty(${p.id},-1)" class="w-8 h-8 bg-white rounded-lg shadow-sm font-bold text-teal">-</button>
+                                <span class="font-bold text-sm text-teal-800">${inCart.quantity}</span>
+                                <button onclick="changeQty(${p.id},1)" class="w-8 h-8 bg-white rounded-lg shadow-sm font-bold text-teal">+</button>
+                            </div>
+                        ` : `
+                            <button onclick="addToCart(${p.id})" class="bg-gray-900 text-white w-full py-2.5 rounded-xl font-bold text-xs hover:bg-black transition-colors">Add to Cart</button>
+                        `}
+                    </div>
+                </div>`;
+        });
+    }
+
+    function renderCategoryButtons() {
         const cats = ['All', ...new Set(products.map(p => p.category))];
         document.getElementById("catFilters").innerHTML = cats.map(c => `
-            <button onclick="filterByCategory('${c}')" class="whitespace-nowrap px-6 py-2.5 rounded-full border text-sm font-bold transition-all ${currentCategory === c ? 'active-cat' : 'bg-white text-gray-500 border-gray-200'}">
+            <button onclick="filterByCategory('${c}')" 
+                    class="whitespace-nowrap px-5 py-2 rounded-full border text-xs font-bold transition-all ${currentCategory === c ? 'active-cat' : 'bg-white text-gray-500 border-gray-200'}">
                 ${c}
             </button>
         `).join('');
@@ -101,90 +166,110 @@
 
     function filterByCategory(cat) {
         currentCategory = cat;
-        renderCategories();
-        const filtered = cat === 'All' ? products : products.filter(p => p.category === cat);
+        renderCategoryButtons();
+        const filtered = (cat === 'All') ? products : products.filter(p => p.category === cat);
         renderProducts(filtered);
     }
 
     function filterProducts() {
         const term = document.getElementById("search").value.toLowerCase();
-        const filtered = products.filter(p => p.name.toLowerCase().includes(term) || p.category.toLowerCase().includes(term));
+        if (term === "") {
+            filterByCategory(currentCategory);
+            return;
+        }
+        const filtered = products.filter(p => 
+            p.name.toLowerCase().includes(term) || 
+            p.category.toLowerCase().includes(term)
+        );
         renderProducts(filtered);
-    }
-
-    function renderProducts(list) {
-        const grid = document.getElementById("grid");
-        grid.innerHTML = list.map(p => {
-            const inCart = cart.find(i => i.id === p.id);
-            return `
-            <div class="product-card bg-white p-4 rounded-[20px] flex flex-col">
-                <img src="${p.image || 'https://via.placeholder.com/300?text=EazyLife'}" class="h-48 w-full object-cover rounded-xl mb-4">
-                <span class="text-[10px] font-bold text-teal uppercase tracking-widest">${p.category}</span>
-                <h3 class="font-bold text-gray-800 text-lg mb-2">${p.name}</h3>
-                <p class="text-xs text-gray-500 mb-4 flex-grow">${p.desc || ''}</p>
-                <div class="flex justify-between items-center mt-auto">
-                    <span class="text-xl font-black text-gray-900">₦${p.price.toLocaleString()}</span>
-                    ${inCart ? 
-                        `<div class="flex items-center gap-3 bg-gray-100 rounded-lg p-1">
-                            <button onclick="updateQty(${p.id},-1)" class="w-8 h-8 bg-white rounded shadow-sm">-</button>
-                            <span class="font-bold">${inCart.qty}</span>
-                            <button onclick="updateQty(${p.id},1)" class="w-8 h-8 bg-white rounded shadow-sm">+</button>
-                        </div>` : 
-                        `<button onclick="addToCart(${p.id})" class="bg-dark text-white px-4 py-2 rounded-lg font-bold text-sm">Add</button>`
-                    }
-                </div>
-            </div>`;
-        }).join('');
     }
 
     function addToCart(id) {
         const p = products.find(i => i.id === id);
-        cart.push({...p, qty: 1});
-        updateCart();
+        cart.push({...p, quantity: 1});
+        saveAndSync();
     }
 
-    function updateQty(id, delta) {
+    function changeQty(id, delta) {
         const item = cart.find(i => i.id === id);
-        if(item) {
-            item.qty += delta;
-            if(item.qty <= 0) cart = cart.filter(i => i.id !== id);
-            updateCart();
+        if (item) {
+            item.quantity += delta;
+            if (item.quantity <= 0) cart = cart.filter(i => i.id !== id);
+            saveAndSync();
         }
     }
 
-    function updateCart() {
-        document.getElementById("count").textContent = cart.reduce((a,b) => a + b.qty, 0);
-        filterProducts(); // Refresh buttons
-        const total = cart.reduce((a,b) => a + (b.price * b.qty), 0);
-        document.getElementById("total").textContent = total.toLocaleString();
+    function saveAndSync() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
+        updateCartCount();
+        
+        // Refresh grid to show updated +/- buttons
+        const term = document.getElementById("search").value;
+        if (term) filterProducts(); else filterByCategory(currentCategory);
+        
+        // Update modal if open
+        if (!document.getElementById("cartModal").classList.contains("hidden")) showCart();
+    }
+
+    function updateCartCount() {
+        const totalQty = cart.reduce((a, b) => a + b.quantity, 0);
+        const countEl = document.getElementById("count");
+        countEl.textContent = totalQty;
+        if (totalQty > 0) countEl.classList.add('has-items');
     }
 
     function showCart() {
-        if(cart.length === 0) return alert("Your cart is empty!");
-        document.getElementById("cartItems").innerHTML = cart.map(i => `
-            <div class="flex justify-between items-center border-b pb-3">
-                <div class="flex-1">
-                    <h4 class="font-bold text-sm">${i.name}</h4>
-                    <span class="text-teal font-bold text-sm">₦${(i.price * i.qty).toLocaleString()}</span>
+        if (cart.length === 0) return hideCart();
+        const container = document.getElementById("cartItems");
+        container.innerHTML = cart.map(i => `
+            <div class="flex justify-between items-center border-b border-gray-50 pb-3">
+                <div class="flex-1 pr-4">
+                    <p class="font-bold text-gray-800 text-sm leading-tight">${i.name}</p>
+                    <p class="text-xs text-teal font-bold">₦${(i.price * i.quantity).toLocaleString()}</p>
                 </div>
-                <div class="flex items-center gap-2">
-                    <button onclick="updateQty(${i.id},-1)" class="w-8 h-8 bg-gray-100 rounded">-</button>
-                    <span class="w-4 text-center font-bold">${i.qty}</span>
-                    <button onclick="updateQty(${i.id},1)" class="w-8 h-8 bg-gray-100 rounded">+</button>
+                <div class="flex items-center gap-3 bg-gray-50 p-1 rounded-xl">
+                    <button onclick="changeQty(${i.id},-1)" class="w-7 h-7 bg-white rounded-lg shadow-sm font-bold">-</button>
+                    <span class="font-black text-sm w-4 text-center">${i.quantity}</span>
+                    <button onclick="changeQty(${i.id},1)" class="w-7 h-7 bg-white rounded-lg shadow-sm font-bold">+</button>
                 </div>
-            </div>`).join('');
+            </div>
+        `).join('');
+
+        const total = cart.reduce((a, b) => a + (b.price * b.quantity), 0);
+        document.getElementById("total").textContent = total.toLocaleString();
         document.getElementById("cartModal").classList.remove("hidden");
     }
 
-    function hideCart() { document.getElementById("cartModal").classList.add("hidden"); }
+    function hideCart() { 
+        document.getElementById("cartModal").classList.add("hidden"); 
+    }
 
-    function sendOrder() {
+    function loadUserData() {
+        const user = JSON.parse(localStorage.getItem(USER_KEY)) || {};
+        document.getElementById("custName").value = user.name || "";
+        document.getElementById("custAddr").value = user.addr || "";
+    }
+
+    function previewOrder() {
         const name = document.getElementById("custName").value;
-        if(!name) return alert("Please enter your name");
-        let msg = `*EazyLife Order Request*%0A%0A`;
-        cart.forEach(i => msg += `• ${i.name} (x${i.qty})%0A`);
-        msg += `%0A*Customer:* ${name}%0A*Total:* ₦${document.getElementById("total").textContent}`;
+        const addr = document.getElementById("custAddr").value;
+
+        if (!name || !addr) return alert("Please provide your name and address for delivery/pickup.");
+        
+        localStorage.setItem(USER_KEY, JSON.stringify({name, addr}));
+
+        let msg = `*EAZYLIFE CATALOG - NEW QUOTE*%0A%0A`;
+        cart.forEach(i => {
+            msg += `• ${i.name}%0A  Qty: ${i.quantity} | ₦${(i.price * i.quantity).toLocaleString()}%0A%0A`;
+        });
+        
+        const grandTotal = cart.reduce((a, b) => a + (b.price * b.quantity), 0);
+        msg += `*ESTIMATED TOTAL: ₦${grandTotal.toLocaleString()}*%0A%0A*Customer:* ${name}%0A*Delivery:* ${addr}`;
+        
         window.open(`https://wa.me/2347051548082?text=${msg}`);
+        
+        // Optional: Clear cart after order
+        cart = []; saveAndSync(); hideCart();
     }
 </script>
 </body>
