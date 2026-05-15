@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EazyLife Receipt Generator Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal: #0D9488;
+    --teal-light: #CCFBF1;
+    --teal-dark: #0F766E;
+    --black: #0A0A0A;
+    --gray: #6B7280;
+    --gray-light: #F3F4F6;
+    --border: #E5E7EB;
+    --red: #EF4444;
+    --red-light: #FEE2E2;
+    --white: #FFFFFF;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #F0FDF9;
+    min-height: 100vh;
+    color: var(--black);
+  }
+
+  /* ── FORM PAGE ── */
+  #form-page {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 32px 16px 60px;
+  }
+
+  .form-header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+  .form-header .logo { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+  .form-header .logo span { color: var(--teal); }
+  .form-header p { color: var(--gray); font-size: 13px; margin-top: 4px; letter-spacing: 1.5px; text-transform: uppercase; }
+
+  .card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .card-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--teal);
+    margin-bottom: 16px;
+  }
+
+  .row { display: flex; gap: 12px; }
+  .row .field { flex: 1; }
+
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 12px; font-weight: 500; color: var(--gray); margin-bottom: 6px; }
+  .field input, .field select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--black);
+    background: var(--white);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .field input:focus, .field select:focus { border-color: var(--teal); }
+
+  /* Items */
+  .item-row {
+    display: grid;
+    grid-template-columns: 1fr 70px 100px 36px;
+    gap: 8px;
+    align-items: start;
+    margin-bottom: 10px;
+  }
+  .item-row input {
+    width: 100%;
+    padding: 9px 10px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+  }
+  .item-row input:focus { border-color: var(--teal); }
+
+  .btn-remove {
+    background: none; border: none; cursor: pointer; color: #D1D5DB; font-size: 18px; padding: 8px 4px;
+  }
+  .btn-remove:hover { color: var(--red); }
+
+  .item-header {
+    display: grid; grid-template-columns: 1fr 70px 100px 36px; gap: 8px;
+    font-size: 11px; color: var(--gray); font-weight: 500; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;
+  }
+
+  .btn-add {
+    display: flex; align-items: center; gap: 6px; background: none; border: 1.5px dashed var(--border);
+    border-radius: 8px; padding: 9px 14px; cursor: pointer; font-family: inherit; font-size: 13px;
+    color: var(--teal); font-weight: 500; width: 100%; justify-content: center; margin-top: 4px;
+  }
+
+  /* Payment summary */
+  .payment-grid { display: flex; flex-direction: column; gap: 10px; }
+  .payment-row { display: flex; gap: 12px; align-items: center; }
+  .payment-row label { font-size: 12px; color: var(--gray); width: 100px; flex-shrink: 0; font-weight: 500; }
+  .payment-row input {
+    flex: 1; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 8px;
+    font-family: 'DM Mono', monospace; font-size: 14px; outline: none;
+  }
+
+  /* Signature Pads */
+  .sig-container {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;
+  }
+  .sig-box { text-align: center; }
+  .sig-canvas {
+    background: #fafafa; border: 1.5px solid var(--border); border-radius: 8px;
+    touch-action: none; cursor: crosshair; width: 100%; height: 100px;
+  }
+  .sig-label { font-size: 11px; color: var(--gray); margin-top: 5px; display: block; }
+  .btn-clear { font-size: 10px; color: var(--red); cursor: pointer; border: none; background: none; text-decoration: underline; }
+
+  .btn-generate {
+    width: 100%; padding: 15px; background: var(--teal); color: white; border: none; border-radius: 12px;
+    font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 8px;
+  }
+
+  /* ── RECEIPT PAGE ── */
+  #receipt-page { display: none; background: #F0FDF9; min-height: 100vh; padding: 20px 16px 60px; }
+  .receipt-actions { max-width: 620px; margin: 0 auto 20px; display: flex; gap: 10px; }
+  .btn-back, .btn-print { padding: 10px 20px; border-radius: 8px; font-family: inherit; font-size: 14px; cursor: pointer; border: none; }
+  .btn-back { background: var(--white); border: 1.5px solid var(--border); }
+  .btn-print { background: var(--teal); color: white; flex: 1; }
+
+  #receipt { max-width: 620px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+  .receipt-top { padding: 28px 28px 20px; border-bottom: 1px solid var(--border); }
+  .receipt-logo-row { display: flex; justify-content: space-between; margin-bottom: 20px; }
+  .r-logo { font-size: 26px; font-weight: 700; }
+  .r-logo span { color: var(--teal); }
+  .r-contact { text-align: right; font-size: 11px; color: var(--gray); line-height: 1.6; }
+
+  .receipt-meta { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--border); margin-top: 16px; }
+  .meta-block { padding: 12px 0; }
+  .meta-label { font-size: 10px; text-transform: uppercase; color: var(--gray); font-weight: 600; }
+  .meta-value { font-size: 14px; font-weight: 600; }
+
+  .items-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+  .items-table thead th { background: var(--black); color: white; font-size: 11px; padding: 10px 12px; text-align: left; }
+  .items-table tbody td { padding: 12px 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
+
+  .receipt-totals { display: flex; flex-direction: column; align-items: flex-end; padding: 0 28px 20px; }
+  .total-row { display: flex; justify-content: space-between; width: 220px; padding: 6px 0; font-size: 14px; }
+  .total-row.paid { background: var(--teal-light); padding: 8px 10px; border-radius: 6px; font-weight: 600; color: var(--teal-dark); }
+  .total-row.balance { background: var(--red-light); padding: 8px 10px; border-radius: 6px; font-weight: 600; color: var(--red); margin-top: 4px; }
+
+  /* Signature Display on Receipt */
+  .receipt-signatures {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 40px; padding: 20px 28px; border-top: 1px solid var(--border);
+  }
+  .sig-display { text-align: center; }
+  .sig-img { max-height: 60px; max-width: 150px; display: block; margin: 0 auto; }
+  .sig-line { border-top: 1px solid var(--gray); margin-top: 5px; padding-top: 5px; font-size: 10px; text-transform: uppercase; color: var(--gray); font-weight: 600; }
+
+  .receipt-banner { background: var(--teal-dark); padding: 20px 28px; color: white; text-align: center; }
+  .receipt-footer { padding: 16px 28px 24px; text-align: center; border-top: 1px dashed var(--border); }
+
+  @media print {
+    #form-page, .receipt-actions { display: none !important; }
+    #receipt-page { display: block !important; padding: 0; }
+    #receipt { box-shadow: none; border-radius: 0; width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- FORM PAGE -->
+<div id="form-page">
+  <div class="form-header">
+    <div class="logo">EAZY<span>LIFE</span></div>
+    <p>Robotics & Electronics Solutions</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Customer Info</div>
+    <div class="field">
+      <label>Customer Name</label>
+      <input type="text" id="customerName" placeholder="OLUWATOSIN ADERERA">
+    </div>
+    <div class="row">
+      <div class="field">
+        <label>Receipt Number</label>
+        <input type="text" id="receiptNum">
+      </div>
+      <div class="field">
+        <label>Date</label>
+        <input type="date" id="issueDate">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Products & Services</div>
+    <div id="items-container"></div>
+    <button class="btn-add" onclick="addItem()">＋ Add Item</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Payment & Signatures</div>
+    <div class="payment-grid">
+      <div class="payment-row">
+        <label>Subtotal</label>
+        <input type="text" id="subtotalDisplay" readonly>
+      </div>
+      <div class="payment-row">
+        <label>Paid (₦)</label>
+        <input type="number" id="amountPaid" oninput="updateBalance()">
+      </div>
+      <div class="payment-row">
+        <label>Balance</label>
+        <input type="text" id="balanceDisplay" readonly>
+      </div>
+    </div>
+
+    <div class="sig-container">
+      <div class="sig-box">
+        <label class="sig-label">EazyLife Signature</label>
+        <canvas id="sig-vendor" class="sig-canvas"></canvas>
+        <button class="btn-clear" onclick="clearSig('sig-vendor')">Clear</button>
+      </div>
+      <div class="sig-box">
+        <label class="sig-label">Customer Signature</label>
+        <canvas id="sig-customer" class="sig-canvas"></canvas>
+        <button class="btn-clear" onclick="clearSig('sig-customer')">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-generate" onclick="generateReceipt()">Generate Signed Receipt →</button>
+</div>
+
+<!-- RECEIPT PAGE -->
+<div id="receipt-page">
+  <div class="receipt-actions">
+    <button class="btn-back" onclick="goBack()">← Edit</button>
+    <button class="btn-print" onclick="window.print()">📸 Print / Save PDF</button>
+  </div>
+
+  <div id="receipt">
+    <div class="receipt-top">
+      <div class="receipt-logo-row">
+        <div>
+          <div class="r-logo">EAZY<span>LIFE</span></div>
+          <div class="r-tagline">Robotics & Electronics Solutions</div>
+        </div>
+        <div class="r-contact">
+          6 Ososami Road, Oke-Ado, Ibadan<br>
+          T: +234 705 154 8082<br>
+          CAC: RC-9462420
+        </div>
+      </div>
+      <div class="receipt-meta">
+        <div class="meta-block">
+          <div class="meta-label">Customer</div>
+          <div class="meta-value" id="r-customer">—</div>
+        </div>
+        <div class="meta-block" style="text-align:right">
+          <div class="meta-label">Receipt #</div>
+          <div class="meta-value" id="r-number">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="receipt-body">
+      <table class="items-table">
+        <thead>
+          <tr><th>Description</th><th style="text-align:center">Qty</th><th style="text-align:right">Total (₦)</th></tr>
+        </thead>
+        <tbody id="r-items"></tbody>
+      </table>
+    </div>
+
+    <div class="receipt-totals">
+      <div class="total-row"><span>Subtotal</span><span id="r-subtotal">₦0</span></div>
+      <div class="total-row paid"><span>Amount Paid</span><span id="r-paid">₦0</span></div>
+      <div class="total-row balance" id="r-balance-row"><span>Balance Due</span><span id="r-balance">₦0</span></div>
+    </div>
+
+    <div class="receipt-signatures">
+      <div class="sig-display">
+        <img id="img-sig-vendor" class="sig-img" src="" alt="">
+        <div class="sig-line">Authorized Signatory</div>
+      </div>
+      <div class="sig-display">
+        <img id="img-sig-customer" class="sig-img" src="" alt="">
+        <div class="sig-line">Customer Signature</div>
+      </div>
+    </div>
+
+    <div class="receipt-banner">
+        <div style="font-size:14px; font-weight:700">Project Delivery & Automation</div>
+        <div style="font-size:11px">Arduino • ESP32 • IOT • Smart Home</div>
+    </div>
+
+    <div class="receipt-footer">
+      <div style="color:var(--teal); font-weight:600">Thank you for your patronage!</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Setup Date & Receipt Number
+  const today = new Date();
+  document.getElementById('issueDate').value = today.toISOString().split('T')[0];
+  document.getElementById('receiptNum').value = `EL-${today.getFullYear()}${(today.getMonth()+1).toString().padStart(2,'0')}${today.getDate().toString().padStart(2,'0')}-01`;
+
+  // Canvas Drawing Logic
+  function setupCanvas(id) {
+    const canvas = document.getElementById(id);
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+
+    // Handle high DPI
+    const ratio = window.devicePixelRatio || 1;
+    canvas.width = canvas.offsetWidth * ratio;
+    canvas.height = canvas.offsetHeight * ratio;
+    ctx.scale(ratio, ratio);
+    ctx.strokeStyle = "#0A0A0A";
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+
+    const getPos = (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      return { x: clientX - rect.left, y: clientY - rect.top };
+    };
+
+    const start = (e) => { drawing = true; draw(e); };
+    const stop = () => { drawing = false; ctx.beginPath(); };
+    const draw = (e) => {
+      if (!drawing) return;
+      const pos = getPos(e);
+      ctx.lineTo(pos.x, pos.y);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(pos.x, pos.y);
+      e.preventDefault();
+    };
+
+    canvas.addEventListener('mousedown', start);
+    canvas.addEventListener('mousemove', draw);
+    window.addEventListener('mouseup', stop);
+    canvas.addEventListener('touchstart', start);
+    canvas.addEventListener('touchmove', draw);
+    canvas.addEventListener('touchend', stop);
+  }
+
+  function clearSig(id) {
+    const canvas = document.getElementById(id);
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  // Item Logic
+  let itemCount = 0;
+  function addItem(desc='', qty='1', price='') {
+    itemCount++;
+    const container = document.getElementById('items-container');
+    const div = document.createElement('div');
+    div.className = 'item-row';
+    div.id = `item-${itemCount}`;
+    div.innerHTML = `
+      <input type="text" placeholder="Item/Service" value="${desc}" oninput="calc()">
+      <input type="number" value="${qty}" oninput="calc()">
+      <input type="number" placeholder="Price" value="${price}" oninput="calc()">
+      <button class="btn-remove" onclick="remove(${itemCount})">×</button>
+    `;
+    container.appendChild(div);
+    calc();
+  }
+  function remove(id) { document.getElementById(`item-${id}`).remove(); calc(); }
+
+  function calc() {
+    let sub = 0;
+    document.querySelectorAll('.item-row').forEach(row => {
+      const inputs = row.querySelectorAll('input');
+      sub += (parseFloat(inputs[1].value) || 0) * (parseFloat(inputs[2].value) || 0);
+    });
+    document.getElementById('subtotalDisplay').value = sub.toLocaleString();
+    updateBalance();
+  }
+
+  function updateBalance() {
+    const sub = parseFloat(document.getElementById('subtotalDisplay').value.replace(/,/g,'')) || 0;
+    const paid = parseFloat(document.getElementById('amountPaid').value) || 0;
+    document.getElementById('balanceDisplay').value = (sub - paid).toLocaleString();
+  }
+
+  function generateReceipt() {
+    // Fill Data
+    document.getElementById('r-customer').textContent = document.getElementById('customerName').value.toUpperCase() || 'VALUED CUSTOMER';
+    document.getElementById('r-number').textContent = document.getElementById('receiptNum').value;
+    
+    const tbody = document.getElementById('r-items');
+    tbody.innerHTML = '';
+    document.querySelectorAll('.item-row').forEach(row => {
+      const inputs = row.querySelectorAll('input');
+      const tr = document.createElement('tr');
+      const total = (parseFloat(inputs[1].value)||0) * (parseFloat(inputs[2].value)||0);
+      tr.innerHTML = `<td>${inputs[0].value}</td><td style="text-align:center">${inputs[1].value}</td><td style="text-align:right">${total.toLocaleString()}</td>`;
+      tbody.appendChild(tr);
+    });
+
+    const sub = document.getElementById('subtotalDisplay').value;
+    const paid = (parseFloat(document.getElementById('amountPaid').value)||0).toLocaleString();
+    const bal = parseFloat(document.getElementById('balanceDisplay').value.replace(/,/g,''));
+
+    document.getElementById('r-subtotal').textContent = '₦' + sub;
+    document.getElementById('r-paid').textContent = '₦' + paid;
+    document.getElementById('r-balance').textContent = '₦' + bal.toLocaleString();
+    document.getElementById('r-balance-row').style.display = bal > 0 ? 'flex' : 'none';
+
+    // Move Signatures to Image
+    document.getElementById('img-sig-vendor').src = document.getElementById('sig-vendor').toDataURL();
+    document.getElementById('img-sig-customer').src = document.getElementById('sig-customer').toDataURL();
+
+    document.getElementById('form-page').style.display = 'none';
+    document.getElementById('receipt-page').style.display = 'block';
+    window.scrollTo(0,0);
+  }
+
+  function goBack() {
+    document.getElementById('form-page').style.display = 'block';
+    document.getElementById('receipt-page').style.display = 'none';
+  }
+
+  // Init
+  setupCanvas('sig-vendor');
+  setupCanvas('sig-customer');
+  addItem('Product/Service Name', '1', '');
+</script>
+</body>
+</html>
