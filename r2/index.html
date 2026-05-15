@@ -1,432 +1,1567 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EazyLife Receipt Generator</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>EazyLife Receipt Generator Pro</title>
+
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
 <style>
-  :root {
-    --teal: #0D9488;
-    --teal-light: #CCFBF1;
-    --teal-dark: #0F766E;
-    --black: #0A0A0A;
-    --gray: #6B7280;
-    --border: #E5E7EB;
-    --red: #EF4444;
+
+:root{
+  --teal:#0D9488;
+  --teal-dark:#0F766E;
+  --teal-light:#CCFBF1;
+  --black:#0A0A0A;
+  --gray:#6B7280;
+  --gray-light:#F3F4F6;
+  --border:#E5E7EB;
+  --red:#EF4444;
+  --red-light:#FEE2E2;
+  --white:#FFFFFF;
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  font-family:'DM Sans',sans-serif;
+  background:#F0FDF9;
+  color:var(--black);
+}
+
+#form-page{
+  max-width:720px;
+  margin:auto;
+  padding:32px 16px 60px;
+}
+
+.form-header{
+  text-align:center;
+  margin-bottom:32px;
+}
+
+.logo{
+  font-size:32px;
+  font-weight:700;
+}
+
+.logo span{
+  color:var(--teal);
+}
+
+.form-header p{
+  color:var(--gray);
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:1.5px;
+  margin-top:4px;
+}
+
+.card{
+  background:white;
+  border-radius:18px;
+  border:1px solid var(--border);
+  padding:24px;
+  margin-bottom:18px;
+  box-shadow:0 2px 6px rgba(0,0,0,.04);
+}
+
+.card-title{
+  font-size:12px;
+  color:var(--teal);
+  text-transform:uppercase;
+  letter-spacing:1.5px;
+  margin-bottom:18px;
+  font-weight:700;
+}
+
+.row{
+  display:flex;
+  gap:12px;
+}
+
+.row .field{
+  flex:1;
+}
+
+.field{
+  margin-bottom:14px;
+}
+
+.field label{
+  display:block;
+  margin-bottom:6px;
+  color:var(--gray);
+  font-size:12px;
+  font-weight:500;
+}
+
+.field input,
+.field select{
+  width:100%;
+  padding:11px 12px;
+  border:1.5px solid var(--border);
+  border-radius:10px;
+  font-size:14px;
+  outline:none;
+  transition:.2s;
+  font-family:inherit;
+}
+
+.field input:focus,
+.field select:focus{
+  border-color:var(--teal);
+}
+
+.item-header{
+  display:grid;
+  grid-template-columns:1fr 70px 110px 40px;
+  gap:8px;
+  margin-bottom:10px;
+  font-size:11px;
+  color:var(--gray);
+  text-transform:uppercase;
+  letter-spacing:1px;
+  font-weight:600;
+}
+
+.item-row{
+  display:grid;
+  grid-template-columns:1fr 70px 110px 40px;
+  gap:8px;
+  margin-bottom:12px;
+  align-items:start;
+}
+
+.item-row input{
+  width:100%;
+  padding:10px;
+  border:1.5px solid var(--border);
+  border-radius:10px;
+  outline:none;
+  font-size:13px;
+}
+
+.item-row input:focus{
+  border-color:var(--teal);
+}
+
+.desc-wrap{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.remove-btn{
+  border:none;
+  background:none;
+  font-size:22px;
+  cursor:pointer;
+  color:#bbb;
+}
+
+.remove-btn:hover{
+  color:var(--red);
+}
+
+.btn-add{
+  width:100%;
+  padding:12px;
+  border:1.5px dashed var(--border);
+  border-radius:12px;
+  background:none;
+  color:var(--teal);
+  cursor:pointer;
+  font-weight:600;
+}
+
+.btn-add:hover{
+  background:var(--teal-light);
+  border-color:var(--teal);
+}
+
+.payment-row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:12px;
+}
+
+.payment-row label{
+  width:140px;
+  font-size:12px;
+  color:var(--gray);
+  font-weight:500;
+}
+
+.payment-row input{
+  flex:1;
+  padding:11px 12px;
+  border-radius:10px;
+  border:1.5px solid var(--border);
+  font-family:'DM Mono',monospace;
+}
+
+.payment-row input[readonly]{
+  background:#fafafa;
+}
+
+.signature-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+
+.signature-box{
+  border:1.5px dashed var(--border);
+  border-radius:14px;
+  padding:14px;
+  background:#fafafa;
+}
+
+.signature-box h4{
+  font-size:12px;
+  color:var(--gray);
+  margin-bottom:10px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+
+.signature-preview{
+  height:90px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  color:var(--gray);
+  font-size:12px;
+}
+
+.signature-preview img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+
+.btn-sign{
+  width:100%;
+  margin-top:10px;
+  padding:11px;
+  border:none;
+  border-radius:10px;
+  background:var(--black);
+  color:white;
+  cursor:pointer;
+  font-weight:600;
+}
+
+.btn-sign:hover{
+  background:#222;
+}
+
+.btn-generate{
+  width:100%;
+  padding:16px;
+  border:none;
+  border-radius:14px;
+  background:var(--teal);
+  color:white;
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.btn-generate:hover{
+  background:var(--teal-dark);
+}
+
+/* SIGNATURE MODAL */
+
+.signature-modal{
+  position:fixed;
+  inset:0;
+  background:white;
+  z-index:9999;
+  display:none;
+  flex-direction:column;
+}
+
+.signature-topbar{
+  padding:16px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.signature-actions{
+  display:flex;
+  gap:10px;
+}
+
+.signature-actions button{
+  border:none;
+  padding:10px 16px;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:600;
+}
+
+.btn-clear{
+  background:var(--red-light);
+  color:var(--red);
+}
+
+.btn-save{
+  background:var(--teal);
+  color:white;
+}
+
+.canvas-wrap{
+  flex:1;
+  padding:16px;
+}
+
+#signatureCanvas{
+  width:100%;
+  height:100%;
+  border:2px dashed var(--border);
+  border-radius:18px;
+  background:white;
+  touch-action:none;
+}
+
+/* RECEIPT */
+
+#receipt-page{
+  display:none;
+  padding:20px;
+}
+
+.receipt-actions{
+  max-width:680px;
+  margin:auto auto 18px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.receipt-actions button{
+  border:none;
+  border-radius:10px;
+  padding:12px 18px;
+  cursor:pointer;
+  font-weight:600;
+}
+
+.btn-back{
+  background:white;
+  border:1px solid var(--border)!important;
+}
+
+.btn-action{
+  background:var(--teal);
+  color:white;
+  flex:1;
+}
+
+#receipt{
+  width:680px;
+  max-width:100%;
+  margin:auto;
+  background:white;
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow:0 4px 24px rgba(0,0,0,.08);
+}
+
+.receipt-top{
+  padding:28px;
+  border-bottom:1px solid var(--border);
+}
+
+.receipt-logo-row{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:20px;
+}
+
+.r-logo{
+  font-size:28px;
+  font-weight:700;
+}
+
+.r-logo span{
+  color:var(--teal);
+}
+
+.r-contact{
+  text-align:right;
+  font-size:11px;
+  color:var(--gray);
+  line-height:1.7;
+}
+
+.receipt-title{
+  font-size:24px;
+  font-weight:700;
+  margin-bottom:8px;
+}
+
+.receipt-meta{
+  margin-top:20px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  border-top:1px solid var(--border);
+}
+
+.meta-block{
+  padding-top:14px;
+}
+
+.meta-block:last-child{
+  text-align:right;
+}
+
+.meta-label{
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  color:var(--gray);
+  margin-bottom:4px;
+  font-weight:700;
+}
+
+.meta-value{
+  font-size:14px;
+  font-weight:600;
+}
+
+.receipt-body{
+  padding:0 28px;
+}
+
+.items-table{
+  width:100%;
+  border-collapse:collapse;
+  margin:22px 0;
+}
+
+.items-table thead{
+  background:var(--black);
+}
+
+.items-table thead th{
+  color:white;
+  padding:11px 12px;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  text-align:left;
+}
+
+.items-table tbody td{
+  padding:14px 12px;
+  border-bottom:1px solid var(--border);
+  font-size:14px;
+}
+
+.items-table tbody td:last-child{
+  text-align:right;
+  font-family:'DM Mono',monospace;
+}
+
+.subtext{
+  font-size:11px;
+  color:var(--gray);
+  margin-top:3px;
+}
+
+.receipt-totals{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:6px;
+  padding-bottom:24px;
+}
+
+.total-row{
+  width:240px;
+  display:flex;
+  justify-content:space-between;
+  padding:8px 10px;
+  border-radius:8px;
+}
+
+.subtotal{
+  border-bottom:1px solid var(--border);
+  border-radius:0;
+}
+
+.paid{
+  background:var(--teal-light);
+  color:var(--teal-dark);
+  font-weight:700;
+}
+
+.balance{
+  background:var(--red-light);
+  color:var(--red);
+  font-weight:700;
+}
+
+.receipt-signatures{
+  padding:24px 28px;
+  border-top:1px solid var(--border);
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:28px;
+}
+
+.receipt-signature{
+  text-align:center;
+}
+
+.receipt-signature img{
+  height:90px;
+  object-fit:contain;
+  margin-bottom:8px;
+}
+
+.receipt-signature-line{
+  border-top:1px solid #aaa;
+  padding-top:6px;
+  font-size:12px;
+  color:var(--gray);
+}
+
+.receipt-footer{
+  text-align:center;
+  padding:24px;
+  border-top:1px dashed var(--border);
+}
+
+.footer-thanks{
+  color:var(--teal);
+  font-weight:700;
+  margin-bottom:4px;
+}
+
+.footer-tagline{
+  color:var(--gray);
+  font-size:11px;
+  font-style:italic;
+}
+
+@media(max-width:700px){
+
+  .row{
+    flex-direction:column;
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'DM Sans', sans-serif; background: #F0FDF9; min-height: 100vh; }
-
-  #form-page { max-width: 680px; margin: 0 auto; padding: 32px 16px 60px; }
-
-  .card {
-    background: white;
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 16px;
-    border: 1px solid var(--border);
+  .signature-grid{
+    grid-template-columns:1fr;
   }
-  .card-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--teal); margin-bottom: 16px; }
 
-  .field { margin-bottom: 14px; }
-  .field label { display: block; font-size: 12px; color: var(--gray); margin-bottom: 6px; }
-  .field input, .field select { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px; }
-
-  .item-row {
-    display: grid;
-    grid-template-columns: 1fr 70px 100px 36px;
-    gap: 8px;
-    margin-bottom: 10px;
+  .receipt-meta{
+    grid-template-columns:1fr;
   }
-  .item-row input { padding: 9px 10px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 13px; }
 
-  .btn-add, .btn-signature, .btn-generate {
-    width: 100%; padding: 14px; margin-top: 8px; border-radius: 12px; font-weight: 600; cursor: pointer;
+  .receipt-signatures{
+    grid-template-columns:1fr;
   }
-  .btn-add { border: 1.5px dashed var(--border); color: var(--teal); }
-  .btn-signature, .btn-generate { background: var(--teal); color: white; }
 
-  /* Signature Modal */
-  #signature-modal {
-    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000;
-    align-items: center; justify-content: center; padding: 16px;
+  .receipt-logo-row{
+    flex-direction:column;
+    gap:14px;
   }
-  .modal-content { background: white; border-radius: 16px; width: 100%; max-width: 720px; }
-  canvas { width: 100%; height: 340px; border: 2px solid var(--border); border-radius: 12px; background: #fafafa; }
 
-  /* Receipt */
-  #receipt-page { display: none; background: #F0FDF9; min-height: 100vh; padding: 20px 16px; }
-  #receipt { max-width: 620px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
-
-  .signature-area {
-    display: flex; gap: 40px; padding: 20px 28px; border-top: 1px solid var(--border);
+  .r-contact{
+    text-align:left;
   }
-  .sig-box { flex: 1; text-align: center; }
-  .sig-box img { max-width: 100%; height: 90px; border-bottom: 2px solid #333; }
 
-  @media print {
-    #form-page, #signature-modal, .receipt-actions { display: none !important; }
-    #receipt { box-shadow: none; border-radius: 0; max-width: 100%; }
+}
+
+@media print{
+
+  body{
+    background:white;
   }
+
+  #form-page,
+  .receipt-actions{
+    display:none!important;
+  }
+
+  #receipt-page{
+    display:block!important;
+    padding:0;
+  }
+
+  #receipt{
+    width:100%;
+    border-radius:0;
+    box-shadow:none;
+  }
+
+}
+
 </style>
 </head>
+
 <body>
 
+<!-- FORM -->
+
 <div id="form-page">
-  <div style="text-align:center;margin-bottom:30px;">
-    <div style="font-size:28px;font-weight:700;">EAZY<span style="color:var(--teal);">LIFE</span></div>
-    <p style="color:var(--gray);">Robotics & Electronics Solutions</p>
+
+  <div class="form-header">
+
+    <div class="logo">
+      EAZY<span>LIFE</span>
+    </div>
+
+    <p>
+      Robotics & Electronics Solutions
+    </p>
+
   </div>
 
+  <!-- CUSTOMER -->
+
   <div class="card">
-    <div class="card-title">Customer Info</div>
-    <div class="field"><label>Customer Name</label><input type="text" id="customerName"></div>
-    <div style="display:flex;gap:12px;">
-      <div class="field" style="flex:1"><label>Receipt Number</label><input type="text" id="receiptNum"></div>
-      <div class="field" style="flex:1"><label>Date</label><input type="date" id="issueDate"></div>
+
+    <div class="card-title">
+      Customer Info
     </div>
+
     <div class="field">
-      <label>Payment Method</label>
+
+      <label>
+        Customer Name
+      </label>
+
+      <input type="text" id="customerName">
+
+    </div>
+
+    <div class="row">
+
+      <div class="field">
+
+        <label>
+          Receipt Number
+        </label>
+
+        <input type="text" id="receiptNum">
+
+      </div>
+
+      <div class="field">
+
+        <label>
+          Date of Issue
+        </label>
+
+        <input type="date" id="issueDate">
+
+      </div>
+
+    </div>
+
+    <div class="field">
+
+      <label>
+        Payment Method
+      </label>
+
       <select id="paymentMethod">
         <option>Bank Transfer / Cash</option>
         <option>Bank Transfer</option>
         <option>Cash</option>
         <option>POS / Card</option>
+        <option>USSD Transfer</option>
       </select>
+
     </div>
+
   </div>
 
+  <!-- ITEMS -->
+
   <div class="card">
-    <div class="card-title">Products & Services</div>
+
+    <div class="card-title">
+      Products & Services
+    </div>
+
+    <div class="item-header">
+      <span>Description</span>
+      <span>Qty</span>
+      <span>Amount</span>
+      <span></span>
+    </div>
+
     <div id="items-container"></div>
-    <button class="btn-add" onclick="addItem()">＋ Add Item</button>
+
+    <button class="btn-add" onclick="addItem()">
+      + Add Item
+    </button>
+
   </div>
+
+  <!-- PAYMENT -->
 
   <div class="card">
-    <div class="card-title">Payment Summary</div>
-    <div class="field"><label>Subtotal (₦)</label><input type="text" id="subtotalDisplay" readonly></div>
-    <div class="field"><label>Amount Paid (₦)</label><input type="number" id="amountPaid" oninput="updateBalance()"></div>
-    <div class="field"><label>Balance Due (₦)</label><input type="text" id="balanceDisplay" readonly></div>
 
-    <div style="margin-top:20px;padding:16px;border:2px dashed var(--teal);border-radius:12px;background:var(--teal-light);">
-      <button class="btn-signature" onclick="openSignatureModal()">✍️ Add Signatures</button>
+    <div class="card-title">
+      Payment Summary
     </div>
+
+    <div class="payment-row">
+
+      <label>
+        Subtotal (₦)
+      </label>
+
+      <input type="text" id="subtotalDisplay" readonly>
+
+    </div>
+
+    <div class="payment-row">
+
+      <label>
+        Amount Paid (₦)
+      </label>
+
+      <input type="number" id="amountPaid" oninput="updateBalance()">
+
+    </div>
+
+    <div class="payment-row">
+
+      <label>
+        Balance Due (₦)
+      </label>
+
+      <input type="text" id="balanceDisplay" readonly>
+
+    </div>
+
   </div>
 
-  <button class="btn-generate" onclick="generateReceipt()">Generate Receipt →</button>
-</div>
+  <!-- SIGNATURES -->
 
-<!-- Signature Modal -->
-<div id="signature-modal">
-  <div class="modal-content">
-    <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;">
-      <h3>Signature Pad</h3>
-      <button onclick="closeSignatureModal()" style="font-size:28px;background:none;border:none;">×</button>
+  <div class="card">
+
+    <div class="card-title">
+      Signatures
     </div>
-    <div style="padding:20px;">
-      <div style="margin-bottom:10px;">
-        <button id="tab-customer" onclick="switchTab(0)" style="padding:10px 20px;">Customer</button>
-        <button id="tab-issuer" onclick="switchTab(1)" style="padding:10px 20px;">EazyLife</button>
+
+    <div class="signature-grid">
+
+      <div class="signature-box">
+
+        <h4>
+          Customer Signature
+        </h4>
+
+        <div class="signature-preview" id="customerPreview">
+          No signature yet
+        </div>
+
+        <button class="btn-sign" onclick="openSignaturePad('customer')">
+          Add Customer Signature
+        </button>
+
       </div>
-      <canvas id="sig-canvas"></canvas>
-      <div style="margin-top:12px;display:flex;gap:10px;">
-        <button onclick="clearCanvas()" style="flex:1;padding:12px;">Clear</button>
-        <button onclick="undoStroke()" style="flex:1;padding:12px;">Undo</button>
+
+      <div class="signature-box">
+
+        <h4>
+          Business Signature
+        </h4>
+
+        <div class="signature-preview" id="businessPreview">
+          No signature yet
+        </div>
+
+        <button class="btn-sign" onclick="openSignaturePad('business')">
+          Add Business Signature
+        </button>
+
       </div>
+
     </div>
-    <div style="padding:16px 20px;border-top:1px solid var(--border);display:flex;gap:10px;">
-      <button onclick="closeSignatureModal()" style="flex:1;padding:14px;">Cancel</button>
-      <button onclick="saveSignature()" style="flex:1;padding:14px;background:var(--teal);color:white;">Save</button>
-    </div>
+
   </div>
+
+  <button class="btn-generate" onclick="generateReceipt()">
+    Generate Receipt →
+  </button>
+
 </div>
 
-<!-- RECEIPT -->
+<!-- RECEIPT PAGE -->
+
 <div id="receipt-page">
-  <div style="max-width:620px;margin:0 auto 15px;display:flex;gap:10px;">
-    <button onclick="goBack()">← Edit</button>
-    <button onclick="window.print()" style="flex:1;background:var(--teal);color:white;border:none;padding:12px;border-radius:8px;">Print / Screenshot</button>
+
+  <div class="receipt-actions">
+
+    <button class="btn-back" onclick="goBack()">
+      ← Edit
+    </button>
+
+    <button class="btn-action" onclick="downloadAsImage()">
+      📸 Save JPG
+    </button>
+
+    <button class="btn-action" onclick="downloadPDF()">
+      📄 Save PDF
+    </button>
+
+    <button class="btn-action" onclick="shareReceipt()">
+      📤 Share
+    </button>
+
   </div>
 
   <div id="receipt">
-    <div style="padding:28px 28px 20px;border-bottom:1px solid var(--border);">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+
+    <div class="receipt-top">
+
+      <div class="receipt-logo-row">
+
         <div>
-          <div style="font-size:26px;font-weight:700;">EAZY<span style="color:var(--teal);">LIFE</span></div>
-          <div style="font-size:10px;color:var(--gray);">Robotics & Electronics Solutions</div>
+
+          <div class="r-logo">
+            EAZY<span>LIFE</span>
+          </div>
+
+          <div style="font-size:11px;color:#6B7280;margin-top:4px;">
+            Robotics & Electronics Solutions
+          </div>
+
         </div>
-        <div style="text-align:right;font-size:11px;color:var(--gray);">
+
+        <div class="r-contact">
           6 Ososami Road, Oke-Ado, Ibadan<br>
-          +234 705 154 8082
+          T: +234 705 154 8082<br>
+          E: damzyeazy@gmail.com<br>
+          CAC: RC-9462420
         </div>
+
       </div>
 
-      <h2 style="margin:25px 0 10px;font-size:22px;">OFFICIAL RECEIPT</h2>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;font-size:14px;">
-        <div>
-          <strong>Customer:</strong> <span id="r-customer"></span><br>
-          <strong>Payment:</strong> <span id="r-payment"></span>
-        </div>
-        <div style="text-align:right;">
-          <strong>Receipt No:</strong> <span id="r-number"></span><br>
-          <strong>Date:</strong> <span id="r-date"></span>
-        </div>
+      <div class="receipt-title">
+        OFFICIAL RECEIPT
       </div>
+
+      <div class="receipt-meta">
+
+        <div class="meta-block">
+
+          <div class="meta-label">
+            Customer Name
+          </div>
+
+          <div class="meta-value" id="r-customer">
+            —
+          </div>
+
+          <div class="meta-label" style="margin-top:10px;">
+            Payment Method
+          </div>
+
+          <div class="meta-value" id="r-payment">
+            —
+          </div>
+
+        </div>
+
+        <div class="meta-block">
+
+          <div class="meta-label">
+            Receipt Number
+          </div>
+
+          <div class="meta-value" id="r-number">
+            —
+          </div>
+
+          <div class="meta-label" style="margin-top:10px;">
+            Date of Issue
+          </div>
+
+          <div class="meta-value" id="r-date">
+            —
+          </div>
+
+        </div>
+
+      </div>
+
     </div>
 
-    <div style="padding:0 28px 20px;">
-      <table style="width:100%;border-collapse:collapse;margin:20px 0;">
+    <div class="receipt-body">
+
+      <table class="items-table">
+
         <thead>
-          <tr style="background:#111;color:white;">
-            <th style="padding:12px;text-align:left;">Description</th>
-            <th style="padding:12px;text-align:center;">Qty</th>
-            <th style="padding:12px;text-align:right;">Amount (₦)</th>
+
+          <tr>
+            <th>Description</th>
+            <th style="text-align:center;">Qty</th>
+            <th style="text-align:right;">Amount</th>
           </tr>
+
         </thead>
+
         <tbody id="r-items"></tbody>
+
       </table>
 
-      <div style="text-align:right;line-height:1.8;">
-        <div>Subtotal: <span id="r-subtotal" style="font-family:monospace;"></span></div>
-        <div>Amount Paid: <span id="r-paid" style="font-family:monospace;"></span></div>
-        <div id="r-balance-row" style="background:#fee2e2;padding:10px;border-radius:6px;margin-top:8px;display:none;">
-          Balance Due: <span id="r-balance" style="color:var(--red);font-family:monospace;"></span>
+      <div class="receipt-totals">
+
+        <div class="total-row subtotal">
+          <span>Subtotal</span>
+          <span id="r-subtotal">₦0</span>
         </div>
+
+        <div class="total-row paid">
+          <span>Amount Paid</span>
+          <span id="r-paid">₦0</span>
+        </div>
+
+        <div class="total-row balance" id="balanceRow">
+          <span>Balance Due</span>
+          <span id="r-balance">₦0</span>
+        </div>
+
       </div>
 
-      <!-- Signatures -->
-      <div class="signature-area">
-        <div class="sig-box">
-          <img id="r-sig-customer" src="" style="display:none;">
-          <div style="font-size:11px;color:var(--gray);margin-top:5px;">Customer Signature</div>
-        </div>
-        <div class="sig-box">
-          <img id="r-sig-issuer" src="" style="display:none;">
-          <div style="font-size:11px;color:var(--gray);margin-top:5px;">EazyLife Representative</div>
-        </div>
-      </div>
     </div>
+
+    <!-- SIGNATURES -->
+
+    <div class="receipt-signatures" id="receiptSignatures" style="display:none;">
+
+      <div class="receipt-signature">
+
+        <img id="rCustomerSignature">
+
+        <div class="receipt-signature-line">
+          Customer Signature
+        </div>
+
+      </div>
+
+      <div class="receipt-signature">
+
+        <img id="rBusinessSignature">
+
+        <div class="receipt-signature-line">
+          Authorized Signature
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="receipt-footer">
+
+      <div class="footer-thanks">
+        Thank you for your patronage!
+      </div>
+
+      <div class="footer-tagline">
+        Integrity and Affordability in every circuit.
+      </div>
+
+    </div>
+
   </div>
+
 </div>
 
-<script>
-// ===================== VARIABLES =====================
-let itemCount = 0;
-let customerSig = '';
-let issuerSig = '';
-let currentTab = 0;
-let canvas, ctx, strokes = [];
+<!-- SIGNATURE MODAL -->
 
-// ===================== INIT =====================
-window.onload = function() {
-  const today = new Date();
-  document.getElementById('issueDate').value = today.toISOString().split('T')[0];
-  document.getElementById('receiptNum').value = `EL-\( {today.getFullYear()}- \){String(today.getMonth()+1).padStart(2,'0')}${String(today.getDate()).padStart(2,'0')}-001`;
+<div class="signature-modal" id="signatureModal">
 
-  canvas = document.getElementById('sig-canvas');
-  ctx = canvas.getContext('2d');
-  resizeCanvas();
-  initCanvas();
+  <div class="signature-topbar">
 
-  addItem('Dell Latitude 5490', 'Intel i5 7th Gen, 8GB/256GB SSD (UK Used)', '1', '270000');
-  addItem('Service & Setup Charge', '', '1', '5000');
-  setTimeout(calcSubtotal, 100);
-};
+    <h3 id="signatureTitle">
+      Signature
+    </h3>
 
-function resizeCanvas() {
-  canvas.width = 680;
-  canvas.height = 340;
-}
+    <div class="signature-actions">
 
-// ===================== ITEMS =====================
-function addItem(desc='', sub='', qty='1', amt='') {
-  itemCount++;
-  const div = document.createElement('div');
-  div.className = 'item-row';
-  div.id = `item-${itemCount}`;
-  div.innerHTML = `
-    <div>
-      <input type="text" value="${desc}" oninput="calcSubtotal()">
-      <input type="text" value="${sub}" style="margin-top:6px;font-size:12px;color:#666;" oninput="calcSubtotal()">
+      <button class="btn-clear" onclick="clearSignature()">
+        Clear
+      </button>
+
+      <button class="btn-save" onclick="saveSignature()">
+        Save Signature
+      </button>
+
     </div>
+
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="signatureCanvas"></canvas>
+  </div>
+
+</div>
+
+<!-- LIBRARIES -->
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+<script>
+
+const today = new Date();
+
+document.getElementById('issueDate').value =
+  today.toISOString().split('T')[0];
+
+const pad = n => String(n).padStart(2,'0');
+
+document.getElementById('receiptNum').value =
+  `EL-${today.getFullYear()}-${pad(today.getMonth()+1)}${pad(today.getDate())}-001`;
+
+let itemCount = 0;
+
+let customerSignature = '';
+let businessSignature = '';
+
+function fmt(n){
+
+  return Number(n).toLocaleString('en-NG',{
+    minimumFractionDigits:0,
+    maximumFractionDigits:0
+  });
+
+}
+
+/* ITEMS */
+
+function addItem(desc='',sub='',qty='1',amount=''){
+
+  itemCount++;
+
+  const row = document.createElement('div');
+
+  row.className = 'item-row';
+
+  row.id = `item-${itemCount}`;
+
+  row.innerHTML = `
+    <div class="desc-wrap">
+      <input type="text" placeholder="Product / Service" value="${desc}" oninput="calcSubtotal()">
+      <input type="text" placeholder="Specs / Details" value="${sub}">
+    </div>
+
     <input type="number" value="${qty}" min="1" oninput="calcSubtotal()">
-    <input type="number" value="${amt}" oninput="calcSubtotal()">
-    <button onclick="removeItem(${itemCount})" style="background:none;border:none;font-size:22px;color:#999;cursor:pointer;">×</button>
+
+    <input type="number" value="${amount}" oninput="calcSubtotal()">
+
+    <button class="remove-btn" onclick="removeItem(${itemCount})">
+      ×
+    </button>
   `;
-  document.getElementById('items-container').appendChild(div);
+
+  document.getElementById('items-container').appendChild(row);
+
   calcSubtotal();
+
 }
 
-function removeItem(id) {
+function removeItem(id){
+
   document.getElementById(`item-${id}`)?.remove();
+
   calcSubtotal();
+
 }
 
-function getItems() {
-  return Array.from(document.querySelectorAll('#items-container .item-row')).map(row => {
-    const [descInput, subInput, qtyInput, amtInput] = row.querySelectorAll('input');
+function getItems(){
+
+  return Array.from(
+    document.querySelectorAll('.item-row')
+  ).map(row=>{
+
+    const inputs = row.querySelectorAll('input');
+
     return {
-      desc: descInput.value.trim(),
-      sub: subInput.value.trim(),
-      qty: parseFloat(qtyInput.value) || 1,
-      amount: parseFloat(amtInput.value) || 0
+      desc:inputs[0].value.trim(),
+      sub:inputs[1].value.trim(),
+      qty:parseFloat(inputs[2].value)||1,
+      amount:parseFloat(inputs[3].value)||0
     };
+
   });
+
 }
 
-function calcSubtotal() {
-  const total = getItems().reduce((sum, i) => sum + (i.qty * i.amount), 0);
-  document.getElementById('subtotalDisplay').value = total.toLocaleString('en-NG');
+function subtotalOnly(){
+
+  return getItems().reduce(
+    (s,i)=>s+(i.qty*i.amount),
+    0
+  );
+
+}
+
+function calcSubtotal(){
+
+  const subtotal = subtotalOnly();
+
+  document.getElementById('subtotalDisplay').value =
+    fmt(subtotal);
+
   updateBalance();
+
 }
 
-function updateBalance() {
-  const subtotal = getItems().reduce((sum, i) => sum + (i.qty * i.amount), 0);
-  const paid = parseFloat(document.getElementById('amountPaid').value) || 0;
-  const balance = subtotal - paid;
-  document.getElementById('balanceDisplay').value = balance.toLocaleString('en-NG');
+function updateBalance(){
+
+  const subtotal = subtotalOnly();
+
+  const paid =
+    parseFloat(document.getElementById('amountPaid').value)||0;
+
+  const balance = subtotal-paid;
+
+  document.getElementById('balanceDisplay').value =
+    fmt(balance);
+
 }
 
-// ===================== SIGNATURE =====================
-function initCanvas() {
-  let drawing = false;
-  let lastX, lastY;
+/* SIGNATURES */
 
-  const start = (e) => {
-    drawing = true;
-    const rect = canvas.getBoundingClientRect();
-    lastX = (e.clientX || e.touches[0].clientX) - rect.left;
-    lastY = (e.clientY || e.touches[0].clientY) - rect.top;
-    strokes.push([{x:lastX, y:lastY}]);
-  };
+const modal = document.getElementById('signatureModal');
 
-  const drawFn = (e) => {
-    if (!drawing) return;
-    const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX || e.touches[0].clientX) - rect.left;
-    const y = (e.clientY || e.touches[0].clientY) - rect.top;
+const canvas = document.getElementById('signatureCanvas');
 
-    ctx.beginPath();
-    ctx.moveTo(lastX, lastY);
-    ctx.lineTo(x, y);
-    ctx.strokeStyle = '#111';
-    ctx.lineWidth = 3.5;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    ctx.stroke();
+const ctx = canvas.getContext('2d');
 
-    lastX = x; lastY = y;
-    strokes[strokes.length-1].push({x, y});
-  };
+let drawing = false;
 
-  canvas.addEventListener('mousedown', start);
-  canvas.addEventListener('mousemove', drawFn);
-  canvas.addEventListener('mouseup', () => drawing = false);
-  canvas.addEventListener('mouseout', () => drawing = false);
+let currentSigner = '';
 
-  canvas.addEventListener('touchstart', e => {e.preventDefault(); start(e);});
-  canvas.addEventListener('touchmove', e => {e.preventDefault(); drawFn(e);});
-  canvas.addEventListener('touchend', () => drawing = false);
+function resizeCanvas(){
+
+  const rect = canvas.parentElement.getBoundingClientRect();
+
+  canvas.width = rect.width;
+
+  canvas.height = rect.height;
+
+  ctx.lineWidth = 2.5;
+
+  ctx.lineCap = 'round';
+
+  ctx.strokeStyle = '#111';
+
 }
 
-function clearCanvas() { ctx.clearRect(0,0,canvas.width,canvas.height); strokes = []; }
-function undoStroke() {
-  if (strokes.length === 0) return;
-  strokes.pop();
+window.addEventListener('resize',resizeCanvas);
+
+function openSignaturePad(type){
+
+  currentSigner = type;
+
+  modal.style.display = 'flex';
+
+  document.getElementById('signatureTitle').textContent =
+    type === 'customer'
+      ? 'Customer Signature'
+      : 'Business Signature';
+
+  setTimeout(()=>{
+    resizeCanvas();
+    clearSignature();
+  },30);
+
+}
+
+function clearSignature(){
+
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.strokeStyle = '#111'; ctx.lineWidth = 3.5; ctx.lineCap = "round"; ctx.lineJoin = "round";
-  strokes.forEach(stroke => {
-    if (stroke.length < 1) return;
-    ctx.beginPath();
-    ctx.moveTo(stroke[0].x, stroke[0].y);
-    for (let i = 1; i < stroke.length; i++) ctx.lineTo(stroke[i].x, stroke[i].y);
-    ctx.stroke();
-  });
+
 }
 
-function openSignatureModal() {
-  document.getElementById('signature-modal').style.display = 'flex';
-  clearCanvas();
-  switchTab(0);
-}
-function closeSignatureModal() { document.getElementById('signature-modal').style.display = 'none'; }
+function getPoint(e){
 
-function switchTab(tab) {
-  currentTab = tab;
-  document.getElementById('tab-customer').style.background = tab === 0 ? '#0D9488' : 'transparent';
-  document.getElementById('tab-customer').style.color = tab === 0 ? 'white' : 'black';
-  document.getElementById('tab-issuer').style.background = tab === 1 ? '#0D9488' : 'transparent';
-  document.getElementById('tab-issuer').style.color = tab === 1 ? 'white' : 'black';
-  clearCanvas();
+  const rect = canvas.getBoundingClientRect();
+
+  if(e.touches){
+
+    return {
+      x:e.touches[0].clientX - rect.left,
+      y:e.touches[0].clientY - rect.top
+    };
+
+  }
+
+  return {
+    x:e.clientX - rect.left,
+    y:e.clientY - rect.top
+  };
+
 }
 
-function saveSignature() {
+function startDraw(e){
+
+  drawing = true;
+
+  const p = getPoint(e);
+
+  ctx.beginPath();
+
+  ctx.moveTo(p.x,p.y);
+
+}
+
+function draw(e){
+
+  if(!drawing) return;
+
+  e.preventDefault();
+
+  const p = getPoint(e);
+
+  ctx.lineTo(p.x,p.y);
+
+  ctx.stroke();
+
+}
+
+function stopDraw(){
+
+  drawing = false;
+
+}
+
+canvas.addEventListener('mousedown',startDraw);
+canvas.addEventListener('mousemove',draw);
+canvas.addEventListener('mouseup',stopDraw);
+
+canvas.addEventListener('touchstart',startDraw);
+canvas.addEventListener('touchmove',draw);
+canvas.addEventListener('touchend',stopDraw);
+
+function saveSignature(){
+
   const data = canvas.toDataURL('image/png');
-  if (currentTab === 0) customerSig = data;
-  else issuerSig = data;
-  closeSignatureModal();
+
+  if(currentSigner === 'customer'){
+
+    customerSignature = data;
+
+    renderPreview('customerPreview',data);
+
+  }else{
+
+    businessSignature = data;
+
+    renderPreview('businessPreview',data);
+
+  }
+
+  modal.style.display = 'none';
+
 }
 
-// ===================== GENERATE RECEIPT =====================
-function generateReceipt() {
-  const name = document.getElementById('customerName').value.trim() || '—';
-  const num = document.getElementById('receiptNum').value || '—';
-  const dateVal = document.getElementById('issueDate').value;
-  const date = dateVal ? new Date(dateVal).toLocaleDateString('en-NG', {day:'numeric', month:'long', year:'numeric'}) : '—';
-  const method = document.getElementById('paymentMethod').value;
+function renderPreview(id,data){
+
+  document.getElementById(id).innerHTML =
+    `<img src="${data}">`;
+
+}
+
+/* RECEIPT */
+
+function generateReceipt(){
+
+  const customer =
+    document.getElementById('customerName').value.trim() || '—';
+
+  const number =
+    document.getElementById('receiptNum').value.trim() || '—';
+
+  const payment =
+    document.getElementById('paymentMethod').value;
+
+  const date =
+    document.getElementById('issueDate').value;
 
   const items = getItems();
-  const subtotal = items.reduce((s, i) => s + i.qty * i.amount, 0);
-  const paid = parseFloat(document.getElementById('amountPaid').value) || 0;
-  const balance = subtotal - paid;
 
-  // Fill receipt
-  document.getElementById('r-customer').textContent = name.toUpperCase();
-  document.getElementById('r-number').textContent = num;
-  document.getElementById('r-date').textContent = date;
-  document.getElementById('r-payment').textContent = method;
+  const subtotal = subtotalOnly();
 
-  // Items
+  const paid =
+    parseFloat(document.getElementById('amountPaid').value)||0;
+
+  const balance = subtotal-paid;
+
+  if(balance <= 0){
+
+    if(!customerSignature || !businessSignature){
+
+      alert(
+        'Both signatures are required for fully paid receipts.'
+      );
+
+      return;
+
+    }
+
+  }
+
+  document.getElementById('r-customer').textContent =
+    customer.toUpperCase();
+
+  document.getElementById('r-number').textContent =
+    number;
+
+  document.getElementById('r-payment').textContent =
+    payment;
+
+  document.getElementById('r-date').textContent =
+    new Date(date+'T12:00:00').toLocaleDateString(
+      'en-NG',
+      {
+        day:'numeric',
+        month:'long',
+        year:'numeric'
+      }
+    );
+
   const tbody = document.getElementById('r-items');
+
   tbody.innerHTML = '';
-  items.forEach(item => {
-    if (!item.desc) return;
+
+  items.forEach(item=>{
+
+    if(!item.desc && !item.amount) return;
+
     const tr = document.createElement('tr');
+
     tr.innerHTML = `
-      <td style="padding:12px 8px;border-bottom:1px solid #eee;">
-        ${item.desc}<br>
-        <small style="color:#666;">${item.sub}</small>
+      <td>
+        <div style="font-weight:600;">
+          ${item.desc}
+        </div>
+
+        ${
+          item.sub
+            ? `<div class="subtext">${item.sub}</div>`
+            : ''
+        }
       </td>
-      <td style="padding:12px;text-align:center;border-bottom:1px solid #eee;">${item.qty}</td>
-      <td style="padding:12px;text-align:right;border-bottom:1px solid #eee;font-family:monospace;">
-        ₦${(item.qty * item.amount).toLocaleString('en-NG')}
+
+      <td style="text-align:center;">
+        ${item.qty}
+      </td>
+
+      <td>
+        ₦${fmt(item.qty*item.amount)}
       </td>
     `;
+
     tbody.appendChild(tr);
+
   });
 
-  document.getElementById('r-subtotal').textContent = '₦' + subtotal.toLocaleString('en-NG');
-  document.getElementById('r-paid').textContent = '₦' + paid.toLocaleString('en-NG');
-  document.getElementById('r-balance').textContent = '₦' + Math.max(0, balance).toLocaleString('en-NG');
-  document.getElementById('r-balance-row').style.display = balance > 0 ? 'block' : 'none';
+  document.getElementById('r-subtotal').textContent =
+    '₦'+fmt(subtotal);
 
-  // Signatures
-  const sigCust = document.getElementById('r-sig-customer');
-  const sigIss = document.getElementById('r-sig-issuer');
-  sigCust.src = customerSig; sigCust.style.display = customerSig ? 'block' : 'none';
-  sigIss.src = issuerSig; sigIss.style.display = issuerSig ? 'block' : 'none';
+  document.getElementById('r-paid').textContent =
+    '₦'+fmt(paid);
 
-  document.getElementById('form-page').style.display = 'none';
-  document.getElementById('receipt-page').style.display = 'block';
+  document.getElementById('r-balance').textContent =
+    '₦'+fmt(Math.max(balance,0));
+
+  document.getElementById('balanceRow').style.display =
+    balance > 0 ? 'flex' : 'none';
+
+  const signWrap =
+    document.getElementById('receiptSignatures');
+
+  if(customerSignature && businessSignature){
+
+    signWrap.style.display = 'grid';
+
+    document.getElementById('rCustomerSignature').src =
+      customerSignature;
+
+    document.getElementById('rBusinessSignature').src =
+      businessSignature;
+
+  }else{
+
+    signWrap.style.display = 'none';
+
+  }
+
+  document.getElementById('form-page').style.display =
+    'none';
+
+  document.getElementById('receipt-page').style.display =
+    'block';
+
+  window.scrollTo(0,0);
+
 }
 
-function goBack() {
-  document.getElementById('form-page').style.display = 'block';
-  document.getElementById('receipt-page').style.display = 'none';
+function goBack(){
+
+  document.getElementById('form-page').style.display =
+    'block';
+
+  document.getElementById('receipt-page').style.display =
+    'none';
+
 }
+
+/* EXPORT */
+
+async function captureReceiptCanvas(){
+
+  const receipt =
+    document.getElementById('receipt');
+
+  return await html2canvas(receipt,{
+    scale:3,
+    useCORS:true,
+    backgroundColor:'#ffffff'
+  });
+
+}
+
+async function downloadAsImage(){
+
+  const canvas = await captureReceiptCanvas();
+
+  const link = document.createElement('a');
+
+  link.download = `receipt-${Date.now()}.jpg`;
+
+  link.href = canvas.toDataURL('image/jpeg',1);
+
+  link.click();
+
+}
+
+async function downloadPDF(){
+
+  const canvas = await captureReceiptCanvas();
+
+  const imgData = canvas.toDataURL('image/png');
+
+  const { jsPDF } = window.jspdf;
+
+  const pdf = new jsPDF({
+    orientation:'portrait',
+    unit:'mm',
+    format:'a4'
+  });
+
+  const pageWidth = 210;
+
+  const pageHeight =
+    (canvas.height * pageWidth) / canvas.width;
+
+  pdf.addImage(
+    imgData,
+    'PNG',
+    0,
+    0,
+    pageWidth,
+    pageHeight
+  );
+
+  pdf.save(`receipt-${Date.now()}.pdf`);
+
+}
+
+async function shareReceipt(){
+
+  try{
+
+    const canvas = await captureReceiptCanvas();
+
+    canvas.toBlob(async blob=>{
+
+      const file = new File(
+        [blob],
+        `receipt-${Date.now()}.jpg`,
+        {
+          type:'image/jpeg'
+        }
+      );
+
+      if(
+        navigator.canShare &&
+        navigator.canShare({ files:[file] })
+      ){
+
+        await navigator.share({
+          title:'EazyLife Receipt',
+          text:'Official payment receipt',
+          files:[file]
+        });
+
+      }else{
+
+        alert(
+          'Sharing not supported on this device.'
+        );
+
+      }
+
+    },'image/jpeg',1);
+
+  }catch(err){
+
+    console.error(err);
+
+    alert('Unable to share receipt.');
+
+  }
+
+}
+
+/* DEMO */
+
+addItem(
+  'Dell Latitude 5490',
+  'Intel Core i5 7th Gen, 8GB RAM, 256GB SSD',
+  '1',
+  '270000'
+);
+
+addItem(
+  'Service & Setup Charge',
+  '',
+  '1',
+  '5000'
+);
+
 </script>
+
 </body>
 </html>
