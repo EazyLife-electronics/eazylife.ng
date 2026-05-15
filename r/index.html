@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>EazyLife Receipt Generator</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
-<!-- html2canvas & jsPDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
@@ -56,18 +55,31 @@ html, body { font-family: 'Sora', sans-serif; background: #FAFFFE; color: var(--
 /* ── FORM PAGE ── */
 #form-page { background: #FAFFFE; }
 .form-inner { max-width: 700px; margin: 0 auto; padding: 24px 16px 80px; }
-.brand-header {
-  text-align: center; padding: 0 0 24px;
-}
+
+/* ── BRAND HEADER (Form page) ── */
+.brand-header { text-align: center; padding: 0 0 24px; }
 .brand-header-inner {
   background: linear-gradient(135deg, var(--teal-xdark), var(--teal));
   border-radius: 18px;
   padding: 22px 24px 18px;
-  margin-bottom: 0;
-  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
 }
-.brand-header .logo-img { height: 38px; width: auto; object-fit: contain; display: block; }
-.brand-header .tagline { font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(255,255,255,0.65); margin-top: 0; }
+.brand-logo-row {
+  display: flex; align-items: center; gap: 12px;
+}
+.brand-header .logo-img {
+  height: 38px; width: auto; object-fit: contain; display: block; flex-shrink: 0;
+}
+.brand-name-block { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; }
+.brand-name-text {
+  font-size: 22px; font-weight: 800; color: white; letter-spacing: -0.5px; line-height: 1;
+}
+.brand-header .tagline {
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(255,255,255,0.65);
+}
+
+/* ── FORM SECTIONS ── */
 .section { background: white; border-radius: 18px; border: 1px solid var(--border); padding: 20px; margin-bottom: 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.04); }
 .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--teal); margin-bottom: 16px; }
 .field { margin-bottom: 12px; }
@@ -202,12 +214,19 @@ html, body { font-family: 'Sora', sans-serif; background: #FAFFFE; color: var(--
   background: white; border-radius: 20px; overflow: hidden;
   box-shadow: 0 8px 40px rgba(0,0,0,0.1);
 }
+
+/* ── RECEIPT HEADER ── */
 .r-head { padding: 24px 24px 16px; border-bottom: 1px solid var(--border); }
 .r-logo-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
-.r-logo-img { height: 34px; width: auto; object-fit: contain; display: block; filter: invert(1) brightness(0); }
-.r-logo { font-size: 24px; font-weight: 800; letter-spacing: -0.8px; }
-.r-logo em { color: var(--teal); font-style: normal; }
-.r-tag { font-size: 9px; color: var(--gray); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px; }
+
+/* Logo + Name combined block */
+.r-brand-block { display: flex; align-items: center; gap: 11px; }
+.r-brand-logo { height: 40px; width: auto; object-fit: contain; display: block; flex-shrink: 0; }
+.r-brand-text { display: flex; flex-direction: column; gap: 2px; }
+.r-brand-name { font-size: 20px; font-weight: 800; letter-spacing: -0.6px; color: var(--black); line-height: 1; }
+.r-brand-name em { color: var(--teal); font-style: normal; }
+.r-tag { font-size: 9px; color: var(--gray); letter-spacing: 1.5px; text-transform: uppercase; }
+
 .r-contact-block { text-align: right; font-size: 10.5px; color: var(--gray); line-height: 1.8; }
 .r-title-row { display: flex; justify-content: space-between; align-items: flex-end; }
 .r-title { font-size: 20px; font-weight: 800; letter-spacing: -0.3px; }
@@ -220,6 +239,8 @@ html, body { font-family: 'Sora', sans-serif; background: #FAFFFE; color: var(--
 .paid-stamp-wrap { position: relative; display: inline-block; }
 .paid-stamp { display: none; position: absolute; top: -6px; right: -10px; background: var(--teal); color: white; font-size: 9px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; padding: 4px 10px; border-radius: 5px; transform: rotate(6deg); box-shadow: 0 2px 10px rgba(13,148,136,0.4); white-space: nowrap; }
 .paid-stamp.show { display: block; }
+
+/* ── RECEIPT BODY ── */
 .r-body { padding: 0 24px; }
 .items-tbl { width: 100%; border-collapse: collapse; margin: 16px 0 0; }
 .items-tbl thead tr { background: var(--black); }
@@ -237,6 +258,8 @@ html, body { font-family: 'Sora', sans-serif; background: #FAFFFE; color: var(--
 .tot-row.t-paid { background: var(--teal-light); padding: 8px 10px; border-radius: 7px; font-weight: 700; color: var(--teal-dark); }
 .tot-row.t-balance { background: var(--red-light); padding: 8px 10px; border-radius: 7px; font-weight: 700; color: var(--red); margin-top: 4px; }
 .tot-row span:last-child { font-family: 'DM Mono', monospace; }
+
+/* ── SIGNATURES ── */
 .r-sigs { border-top: 1px solid var(--border); padding: 18px 24px 20px; }
 .r-sigs-title { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--gray); margin-bottom: 14px; }
 .r-sigs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
@@ -245,15 +268,26 @@ html, body { font-family: 'Sora', sans-serif; background: #FAFFFE; color: var(--
 .r-sig-box img { max-height: 64px; max-width: 100%; object-fit: contain; object-position: left bottom; }
 .r-sig-name { font-size: 11px; color: var(--gray); margin-top: 5px; }
 .r-sig-date { font-size: 10px; color: #9CA3AF; margin-top: 1px; }
+
+/* ── WARRANTY ── */
 .r-warranty { border-top: 1px solid var(--border); padding: 14px 24px; }
 .w-lbl { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--gray); margin-bottom: 6px; }
 .w-list { list-style: none; }
 .w-list li { font-size: 11px; color: var(--gray); padding: 1.5px 0; }
 .w-list li::before { content: '• '; color: var(--teal); font-weight: 700; }
+
+/* ── BANNER ── */
 .r-banner { background: linear-gradient(130deg, var(--teal-xdark) 0%, var(--teal) 100%); padding: 20px 24px; }
+.r-banner-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.r-banner-logo { height: 30px; width: auto; object-fit: contain; flex-shrink: 0; }
+.r-banner-name { display: flex; flex-direction: column; gap: 2px; }
+.r-banner-name span { font-size: 16px; font-weight: 800; color: white; letter-spacing: -0.4px; line-height: 1; }
+.r-banner-name small { font-size: 9px; color: rgba(255,255,255,0.55); letter-spacing: 1.8px; text-transform: uppercase; }
 .r-banner h3 { color: white; font-size: 15px; font-weight: 800; margin-bottom: 5px; letter-spacing: -0.2px; }
 .r-banner p { color: rgba(255,255,255,0.75); font-size: 11px; line-height: 1.7; }
 .r-banner p b { color: white; }
+
+/* ── FOOTER ── */
 .r-footer { text-align: center; padding: 14px 24px 22px; border-top: 1px dashed var(--border); }
 .r-thanks { color: var(--teal); font-size: 14px; font-weight: 700; margin-bottom: 3px; }
 .r-slogan { color: var(--gray); font-size: 11px; font-style: italic; }
@@ -264,9 +298,99 @@ html, body { font-family: 'Sora', sans-serif; background: #FAFFFE; color: var(--
   #receipt-page { display: block !important; padding-top: 0 !important; background: white; }
   #receipt { box-shadow: none; border-radius: 0; margin: 0; max-width: 100%; }
 }
+
+/* ── PASSWORD GATE ── */
+#pwd-gate {
+  position: fixed; inset: 0; z-index: 9999;
+  background: linear-gradient(135deg, var(--teal-xdark), var(--teal));
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+#pwd-gate.unlocked { display: none; }
+.pwd-box {
+  background: white; border-radius: 24px;
+  padding: 36px 28px 32px;
+  width: 100%; max-width: 360px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  display: flex; flex-direction: column; align-items: center; gap: 0;
+}
+.pwd-logo-row {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 6px;
+}
+.pwd-logo { height: 36px; width: auto; object-fit: contain; }
+.pwd-brand { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: var(--black); }
+.pwd-brand em { color: var(--teal); font-style: normal; }
+.pwd-tagline {
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--gray); margin-bottom: 28px;
+}
+.pwd-title {
+  font-size: 16px; font-weight: 700; color: var(--black);
+  margin-bottom: 4px; text-align: center;
+}
+.pwd-sub {
+  font-size: 12px; color: var(--gray); text-align: center; margin-bottom: 20px;
+}
+.pwd-input-wrap { width: 100%; position: relative; margin-bottom: 14px; }
+#pwd-input {
+  width: 100%; padding: 13px 44px 13px 16px;
+  border: 2px solid var(--border); border-radius: 12px;
+  font-family: 'Sora', sans-serif; font-size: 15px;
+  color: var(--black); outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  letter-spacing: 2px;
+}
+#pwd-input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,0.12); }
+#pwd-input.error { border-color: var(--red); box-shadow: 0 0 0 3px rgba(239,68,68,0.12); animation: shake 0.35s ease; }
+#pwd-toggle {
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer; color: var(--gray);
+  font-size: 18px; padding: 2px; line-height: 1;
+}
+#pwd-toggle:hover { color: var(--teal); }
+#pwd-btn {
+  width: 100%; padding: 14px;
+  background: var(--teal); color: white; border: none;
+  border-radius: 12px; font-family: 'Sora', sans-serif;
+  font-size: 15px; font-weight: 700; cursor: pointer;
+  box-shadow: 0 4px 16px rgba(13,148,136,0.3);
+  transition: background 0.15s, transform 0.1s;
+}
+#pwd-btn:hover { background: var(--teal-dark); }
+#pwd-btn:active { transform: scale(0.98); }
+#pwd-error {
+  font-size: 12px; color: var(--red); font-weight: 600;
+  margin-top: 10px; min-height: 18px; text-align: center;
+}
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
 </style>
 </head>
 <body>
+
+<!-- ══ PASSWORD GATE ══ -->
+<div id="pwd-gate">
+  <div class="pwd-box">
+    <div class="pwd-logo-row">
+      <img class="pwd-logo" src="https://eazylife.ng/assets/pictures/logo_white.png" alt="EazyLife" crossorigin="anonymous" onerror="this.style.display='none'">
+      <div class="pwd-brand">Eazy<em>Life</em></div>
+    </div>
+    <div class="pwd-tagline">Robotics & Electronics Solutions</div>
+    <div class="pwd-title">Staff Access Only</div>
+    <div class="pwd-sub">Enter your access code to continue</div>
+    <div class="pwd-input-wrap">
+      <input type="password" id="pwd-input" placeholder="Access code" autocomplete="off" autocorrect="off" spellcheck="false" onkeydown="if(event.key==='Enter')checkPwd()">
+      <button id="pwd-toggle" onclick="togglePwdVis()" title="Show/hide">👁</button>
+    </div>
+    <button id="pwd-btn" onclick="checkPwd()">Unlock →</button>
+    <div id="pwd-error"></div>
+  </div>
+</div>
 
 <!-- STEP NAV -->
 <div id="step-nav">
@@ -282,12 +406,20 @@ html, body { font-family: 'Sora', sans-serif; background: #FAFFFE; color: var(--
 <!-- ══ PAGE 1: FORM ══ -->
 <div class="page active" id="form-page">
   <div class="form-inner">
+
+    <!-- Brand Header: logo + name always together -->
     <div class="brand-header">
       <div class="brand-header-inner">
-        <img class="logo-img" src="https://eazylife.ng/assets/pictures/logo_white.png" alt="EazyLife Logo" crossorigin="anonymous">
-        <div class="tagline">Robotics & Electronics Solutions</div>
+        <div class="brand-logo-row">
+          <img class="logo-img" src="https://eazylife.ng/assets/pictures/logo_white.png" alt="EazyLife Logo" crossorigin="anonymous">
+          <div class="brand-name-block">
+            <div class="brand-name-text">EazyLife</div>
+            <div class="tagline">Robotics & Electronics Solutions</div>
+          </div>
+        </div>
       </div>
     </div>
+
     <div class="section">
       <div class="section-label">Customer Info</div>
       <div class="field"><label>Customer Name</label><input type="text" id="f-name" placeholder="e.g. OLUWATOSIN ADERERA"></div>
@@ -305,18 +437,21 @@ html, body { font-family: 'Sora', sans-serif; background: #FAFFFE; color: var(--
         </select>
       </div>
     </div>
+
     <div class="section">
       <div class="section-label">Products & Services</div>
       <div class="item-hdr"><span>Description</span><span>Qty</span><span>Amount (₦)</span><span></span></div>
       <div id="items-wrap"></div>
       <button class="btn-add-item" onclick="addItem()">＋ Add Item</button>
     </div>
+
     <div class="section">
       <div class="section-label">Payment Summary</div>
       <div class="pay-row"><label>Subtotal (₦)</label><input type="text" id="f-sub" readonly placeholder="Auto-calculated"></div>
       <div class="pay-row"><label>Amount Paid (₦)</label><input type="number" id="f-paid" placeholder="0" oninput="updateBalance()"></div>
       <div class="pay-row"><label>Balance Due (₦)</label><input type="text" id="f-bal" readonly placeholder="Auto-calculated"></div>
     </div>
+
     <button class="btn-continue" onclick="goToSigs()">Continue to Signatures →</button>
   </div>
 </div>
@@ -361,31 +496,34 @@ html, body { font-family: 'Sora', sans-serif; background: #FAFFFE; color: var(--
   <div class="export-bar">
     <button class="btn-edit-r" onclick="goToSigs()">← Edit</button>
     <div class="export-actions">
-      <button class="btn-export btn-save-jpg" onclick="doExport('save','jpg')">
-        ⬇ Save JPG
-      </button>
-      <button class="btn-export btn-save-pdf" onclick="doExport('save','pdf')">
-        ⬇ Save PDF
-      </button>
-      <button class="btn-export btn-share-jpg" onclick="doExport('share','jpg')">
-        ↗ Share JPG
-      </button>
-      <button class="btn-export btn-share-pdf" onclick="doExport('share','pdf')">
-        ↗ Share PDF
-      </button>
+      <button class="btn-export btn-save-jpg" onclick="doExport('save','jpg')">⬇ Save JPG</button>
+      <button class="btn-export btn-save-pdf" onclick="doExport('save','pdf')">⬇ Save PDF</button>
+      <button class="btn-export btn-share-jpg" onclick="doExport('share','jpg')">↗ Share JPG</button>
+      <button class="btn-export btn-share-pdf" onclick="doExport('share','pdf')">↗ Share PDF</button>
     </div>
   </div>
 
   <!-- RECEIPT BODY -->
   <div id="receipt">
     <div class="r-head">
+
+      <!-- Logo + Company Name always together -->
       <div class="r-logo-row">
-        <div>
-          <img class="r-logo-img" src="https://eazylife.ng/assets/pictures/logo_white.png" alt="EazyLife" crossorigin="anonymous">
-          <div class="r-tag">Robotics & Electronics Solutions</div>
+        <div class="r-brand-block">
+          <img class="r-brand-logo" src="https://eazylife.ng/assets/pictures/logo_white.png" alt="EazyLife" crossorigin="anonymous" id="r-brand-logo-img">
+          <div class="r-brand-text">
+            <div class="r-brand-name">Eazy<em>Life</em></div>
+            <div class="r-tag">Robotics & Electronics Solutions</div>
+          </div>
         </div>
-        <div class="r-contact-block">6 Ososami Road, Oke-Ado, Ibadan<br>T: +234 705 154 8082<br>E: damzyeazy@gmail.com<br>CAC: RC-9462420</div>
+        <div class="r-contact-block">
+          6 Ososami Road, Oke-Ado, Ibadan<br>
+          T: +234 705 154 8082<br>
+          E: damzyeazy@gmail.com<br>
+          CAC: RC-9462420
+        </div>
       </div>
+
       <div class="r-title-row">
         <div class="paid-stamp-wrap">
           <div class="r-title">OFFICIAL RECEIPT</div>
@@ -393,6 +531,7 @@ html, body { font-family: 'Sora', sans-serif; background: #FAFFFE; color: var(--
         </div>
         <div class="r-website">www.eazylife.ng</div>
       </div>
+
       <div class="r-meta-grid">
         <div class="meta-cell">
           <div class="meta-lbl">Customer Name</div><div class="meta-val" id="r-name">—</div>
@@ -404,6 +543,7 @@ html, body { font-family: 'Sora', sans-serif; background: #FAFFFE; color: var(--
         </div>
       </div>
     </div>
+
     <div class="r-body">
       <table class="items-tbl">
         <thead><tr><th>Description</th><th>Qty</th><th>Amount (₦)</th></tr></thead>
@@ -415,6 +555,7 @@ html, body { font-family: 'Sora', sans-serif; background: #FAFFFE; color: var(--
         <div class="tot-row t-balance" id="r-bal-row"><span>Balance Due</span><span id="r-bal">₦0</span></div>
       </div>
     </div>
+
     <div class="r-sigs">
       <div class="r-sigs-title">Authorised Signatures</div>
       <div class="r-sigs-grid">
@@ -432,6 +573,7 @@ html, body { font-family: 'Sora', sans-serif; background: #FAFFFE; color: var(--
         </div>
       </div>
     </div>
+
     <div class="r-warranty">
       <div class="w-lbl">Warranty & Policy</div>
       <ul class="w-list">
@@ -440,13 +582,20 @@ html, body { font-family: 'Sora', sans-serif; background: #FAFFFE; color: var(--
         <li>Always keep this receipt for verification.</li>
       </ul>
     </div>
+
+    <!-- Banner: logo + name + tagline always visible -->
     <div class="r-banner">
-      <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;">
-        <img src="https://eazylife.ng/assets/pictures/logo_white.png" alt="EazyLife" crossorigin="anonymous" style="height:28px;width:auto;object-fit:contain;flex-shrink:0;">
+      <div class="r-banner-brand">
+        <img class="r-banner-logo" src="https://eazylife.ng/assets/pictures/logo_white.png" alt="EazyLife" crossorigin="anonymous" id="r-banner-logo-img">
+        <div class="r-banner-name">
+          <span>EazyLife</span>
+          <small>Robotics & Electronics Solutions</small>
+        </div>
       </div>
       <h3>Build Your Future with EazyLife</h3>
       <p>We design & build custom <b>Arduino & ESP32</b> automation systems, smart home solutions, and final year projects. Visit our website for more engineering services.</p>
     </div>
+
     <div class="r-footer">
       <div class="r-thanks">Thank you for your patronage!</div>
       <div class="r-slogan">Integrity and Affordability in every circuit.</div>
@@ -481,15 +630,71 @@ html, body { font-family: 'Sora', sans-serif; background: #FAFFFE; color: var(--
 </div>
 
 <script>
+// ── PASSWORD GATE ─────────────────────────────────────────────────
+// Hashed passwords for each day: index 0 = Sunday (day 1 = Mercy1) … index 6 = Saturday (day 7 = Mercy7)
+// Plaintext is NEVER stored here — only SHA-256 digests.
+const PWD_HASHES = [
+  '71068ddcb7f073f8c66a4870d0af95af2268642453494acbe30fad5ab2126821', // Sunday    → Mercy1
+  '4d34e8f6dc24767db5f869ed715dd08e96caf57d19edd6c47b4ec2d28f8032d5', // Monday    → Mercy2
+  '8f9a4c296c1d0ebbb0065ed7c71181aee8ff0561a8544854f2bc509dda234ef9', // Tuesday   → Mercy3
+  '0257f1091766cc4a02ba501b44c43cbb33754e1667d13bb98b7efc87575c60b6', // Wednesday → Mercy4
+  '0e494a94c9dedc60e6a2769e2858341c94288250cc4162d5e518f1a10c675cc1', // Thursday  → Mercy5
+  'e000f947c38d248f32a140dd3265943d20ddc1a202a292813b2705ed995825b4', // Friday    → Mercy6
+  '69749f7ffedfb7b10ca0b351966860c1188b9a74cf8094a421a5170a44562345', // Saturday  → Mercy7
+];
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+async function checkPwd() {
+  const input = document.getElementById('pwd-input').value.trim();
+  const errEl = document.getElementById('pwd-error');
+  const inputEl = document.getElementById('pwd-input');
+  if (!input) { errEl.textContent = 'Please enter your access code.'; return; }
+
+  const hashed = await sha256(input);
+  const todayIndex = new Date().getDay(); // 0=Sun … 6=Sat
+  const todayHash = PWD_HASHES[todayIndex];
+
+  if (hashed === todayHash) {
+    document.getElementById('pwd-gate').classList.add('unlocked');
+    errEl.textContent = '';
+  } else {
+    errEl.textContent = 'Incorrect code. Try again.';
+    inputEl.classList.add('error');
+    inputEl.value = '';
+    setTimeout(() => inputEl.classList.remove('error'), 600);
+    inputEl.focus();
+  }
+}
+
+function togglePwdVis() {
+  const inp = document.getElementById('pwd-input');
+  const btn = document.getElementById('pwd-toggle');
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+  else { inp.type = 'password'; btn.textContent = '👁'; }
+}
+
 // ── INIT ──────────────────────────────────────────────────────────
 const today = new Date();
 const pad = n => String(n).padStart(2,'0');
 document.getElementById('f-date').value = today.toISOString().split('T')[0];
 document.getElementById('f-num').value = `EL-${today.getFullYear()}-${pad(today.getMonth()+1)}${pad(today.getDate())}-001`;
 
+// ── LOGO FALLBACK ─────────────────────────────────────────────────
+// If logo fails to load, hide the broken image — the company name text is ALWAYS visible beside it
+document.querySelectorAll('img[src*="eazylife.ng"]').forEach(img => {
+  img.onerror = function() {
+    this.style.display = 'none';
+    // The company name text beside the logo will still be visible
+  };
+});
+
 // ── ITEMS ─────────────────────────────────────────────────────────
 let ic = 0;
-function addItem(desc='',sub='',qty='1',amt='') {
+function addItem(desc='', sub='', qty='1', amt='') {
   ic++;
   const id = ic;
   const d = document.createElement('div');
@@ -568,7 +773,6 @@ function setupCanvas(who) {
   const overlay = document.getElementById('sig-overlay');
   const area = overlay.querySelector('.sig-canvas-area');
 
-  // Remove old canvas, create fresh
   let old = document.getElementById('sig-canvas');
   old.remove();
   const c = document.createElement('canvas');
@@ -740,7 +944,6 @@ function hideLoading() {
 
 async function captureReceiptCanvas() {
   const el = document.getElementById('receipt');
-  // Pre-load logo as base64 to avoid CORS issues during canvas capture
   const logoImgs = el.querySelectorAll('img[src*="eazylife.ng"]');
   await Promise.all(Array.from(logoImgs).map(img => {
     if (img.complete && img.naturalWidth > 0) return Promise.resolve();
@@ -759,26 +962,21 @@ async function captureReceiptCanvas() {
 
 async function doExport(action, format) {
   const fname = receiptFilename();
-
   try {
     showLoading(action === 'save' ? `Saving ${format.toUpperCase()}…` : `Preparing ${format.toUpperCase()} to share…`);
-    await new Promise(r => setTimeout(r, 80)); // let UI update
+    await new Promise(r => setTimeout(r, 80));
 
     const canvas = await captureReceiptCanvas();
 
     if (format === 'jpg') {
       const jpgBlob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.95));
-
       if (action === 'save') {
-        // Download
         const url = URL.createObjectURL(jpgBlob);
         const a = document.createElement('a');
         a.href = url; a.download = fname + '.jpg';
         a.click();
         setTimeout(() => URL.revokeObjectURL(url), 2000);
-
       } else {
-        // Share
         if (navigator.share && navigator.canShare) {
           const file = new File([jpgBlob], fname+'.jpg', { type: 'image/jpeg' });
           if (navigator.canShare({ files: [file] })) {
@@ -787,28 +985,22 @@ async function doExport(action, format) {
             return;
           }
         }
-        // Fallback: open in new tab
         const url = URL.createObjectURL(jpgBlob);
         window.open(url, '_blank');
         setTimeout(() => URL.revokeObjectURL(url), 5000);
       }
-
     } else {
-      // PDF
       const { jsPDF } = window.jspdf;
       const imgW = canvas.width;
       const imgH = canvas.height;
-      const pxPerMm = imgW / 210; // A4 width = 210mm
+      const pxPerMm = imgW / 210;
       const pdfH = imgH / pxPerMm;
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [210, pdfH] });
       const imgData = canvas.toDataURL('image/jpeg', 0.95);
       pdf.addImage(imgData, 'JPEG', 0, 0, 210, pdfH);
-
       if (action === 'save') {
         pdf.save(fname + '.pdf');
-
       } else {
-        // Share PDF
         const pdfBlob = pdf.output('blob');
         const file = new File([pdfBlob], fname+'.pdf', { type: 'application/pdf' });
         if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -816,13 +1008,11 @@ async function doExport(action, format) {
           await navigator.share({ files: [file], title: 'EazyLife Receipt' });
           return;
         }
-        // Fallback: download
         pdf.save(fname + '.pdf');
       }
     }
 
     hideLoading();
-
   } catch (err) {
     hideLoading();
     if (err.name !== 'AbortError') {
@@ -830,26 +1020,6 @@ async function doExport(action, format) {
     }
   }
 }
-
-// ── LOGO FALLBACK ─────────────────────────────────────────────────
-// If logo can't load (offline / CORS), show text fallback
-document.querySelectorAll('img[src*="eazylife.ng"]').forEach(img => {
-  img.onerror = function() {
-    if (this.classList.contains('r-logo-img')) {
-      const span = document.createElement('div');
-      span.innerHTML = 'EAZY<span style="color:var(--teal)">LIFE</span>';
-      span.style.cssText = 'font-size:24px;font-weight:800;letter-spacing:-0.8px;font-family:Sora,sans-serif;';
-      this.replaceWith(span);
-    } else if (this.classList.contains('logo-img')) {
-      const span = document.createElement('div');
-      span.innerHTML = 'EAZY<span style="color:#5EEAD4">LIFE</span>';
-      span.style.cssText = 'font-size:26px;font-weight:800;letter-spacing:-1px;color:white;font-family:Sora,sans-serif;';
-      this.replaceWith(span);
-    } else {
-      this.style.display = 'none';
-    }
-  };
-});
 
 // ── START ─────────────────────────────────────────────────────────
 addItem();
