@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>EazyLife Receipt Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root {
+  --teal: #0D9488;
+  --teal-light: #CCFBF1;
+  --teal-dark: #0F766E;
+  --teal-xdark: #134E4A;
+  --black: #0A0A0A;
+  --ink: #1C1C1E;
+  --gray: #6B7280;
+  --gray-light: #F5F5F7;
+  --border: #E5E7EB;
+  --red: #EF4444;
+  --red-light: #FEE2E2;
+  --white: #FFFFFF;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { font-family: 'Sora', sans-serif; background: #FAFFFE; color: var(--black); min-height: 100%; overflow-x: hidden; }
+
+/* ── STEP NAV ── */
+#step-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  background: rgba(250,255,254,0.96); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border); padding: 10px 16px;
+}
+.steps { max-width: 700px; margin: 0 auto; display: flex; align-items: center; }
+.step { display: flex; align-items: center; gap: 7px; flex: 1; }
+.step-num {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--border); color: var(--gray);
+  font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all 0.3s;
+}
+.step-label { font-size: 11px; color: var(--gray); font-weight: 500; white-space: nowrap; }
+.step.active .step-num { background: var(--teal); color: white; box-shadow: 0 0 0 3px rgba(13,148,136,0.18); }
+.step.active .step-label { color: var(--teal); font-weight: 700; }
+.step.done .step-num { background: var(--teal-dark); color: white; font-size: 0; }
+.step.done .step-num::after { content: '✓'; font-size: 12px; }
+.step-line { flex: 1; height: 2px; background: var(--border); margin: 0 6px; border-radius: 2px; transition: background 0.3s; }
+.step-line.done { background: var(--teal); }
+
+/* ── PAGES ── */
+.page { display: none; padding-top: 54px; min-height: 100vh; }
+.page.active { display: block; }
+
+/* ── FORM PAGE ── */
+#form-page { background: #FAFFFE; }
+.form-inner { max-width: 700px; margin: 0 auto; padding: 24px 16px 80px; }
+
+/* ── BRAND HEADER (Form page) ── */
+.brand-header { text-align: center; padding: 0 0 24px; }
+.brand-header-inner {
+  background: linear-gradient(135deg, var(--teal-xdark), var(--teal));
+  border-radius: 18px;
+  padding: 22px 24px 18px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.brand-logo-row {
+  display: flex; align-items: center; gap: 12px;
+}
+.brand-header .logo-img {
+  height: 38px; width: auto; object-fit: contain; display: block; flex-shrink: 0;
+}
+.brand-name-block { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; }
+.brand-name-text {
+  font-size: 22px; font-weight: 800; color: white; letter-spacing: -0.5px; line-height: 1;
+}
+.brand-header .tagline {
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(255,255,255,0.65);
+}
+
+/* ── FORM SECTIONS ── */
+.section { background: white; border-radius: 18px; border: 1px solid var(--border); padding: 20px; margin-bottom: 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.04); }
+.section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--teal); margin-bottom: 16px; }
+.field { margin-bottom: 12px; }
+.field label { display: block; font-size: 11px; font-weight: 600; color: var(--gray); margin-bottom: 5px; }
+.field input, .field select { width: 100%; padding: 11px 13px; border: 1.5px solid var(--border); border-radius: 10px; font-family: 'Sora', sans-serif; font-size: 14px; color: var(--black); background: white; outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
+.field input:focus, .field select:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,0.1); }
+.row { display: flex; gap: 10px; }
+.row .field { flex: 1; }
+.item-hdr { display: grid; grid-template-columns: 1fr 60px 100px 30px; gap: 8px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--gray); margin-bottom: 8px; padding: 0 2px; }
+.item-row { display: grid; grid-template-columns: 1fr 60px 100px 30px; gap: 8px; align-items: start; margin-bottom: 8px; }
+.item-inputs { display: flex; flex-direction: column; gap: 5px; }
+.item-row input { width: 100%; padding: 9px 10px; border: 1.5px solid var(--border); border-radius: 9px; font-family: 'Sora', sans-serif; font-size: 13px; outline: none; transition: border-color 0.15s; }
+.item-row input.sub { font-size: 11px; color: var(--gray); background: var(--gray-light); border-color: transparent; }
+.item-row input:focus { border-color: var(--teal); }
+.item-row input.sub:focus { border-color: var(--teal); background: white; }
+.btn-rm { background: none; border: none; cursor: pointer; color: #D1D5DB; font-size: 22px; padding: 6px 2px; line-height: 1; transition: color 0.15s; align-self: flex-start; }
+.btn-rm:hover { color: var(--red); }
+.btn-add-item { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 10px; border: 1.5px dashed var(--border); border-radius: 10px; background: none; cursor: pointer; font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 600; color: var(--teal); margin-top: 4px; transition: all 0.15s; }
+.btn-add-item:hover { border-color: var(--teal); background: var(--teal-light); }
+.pay-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.pay-row label { font-size: 11px; font-weight: 600; color: var(--gray); width: 115px; flex-shrink: 0; }
+.pay-row input { flex: 1; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 10px; font-family: 'DM Mono', monospace; font-size: 14px; outline: none; transition: border-color 0.15s; }
+.pay-row input:focus { border-color: var(--teal); }
+.pay-row input[readonly] { background: var(--gray-light); color: var(--gray); cursor: not-allowed; }
+.btn-continue { width: 100%; padding: 15px; background: var(--teal); color: white; border: none; border-radius: 14px; font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.15s, transform 0.1s; box-shadow: 0 4px 16px rgba(13,148,136,0.3); }
+.btn-continue:hover { background: var(--teal-dark); }
+.btn-continue:active { transform: scale(0.99); }
+
+/* ── SIGNATURE OVERLAY ── */
+#sig-overlay { display: none; position: fixed; inset: 0; z-index: 1000; background: var(--ink); flex-direction: column; }
+#sig-overlay.open { display: flex; }
+.sig-overlay-header { padding: 16px 20px 12px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.sig-who { display: flex; flex-direction: column; gap: 2px; }
+.sig-who-name { font-size: 18px; font-weight: 700; color: white; letter-spacing: -0.3px; }
+.sig-who-sub { font-size: 11px; color: rgba(255,255,255,0.45); }
+.sig-header-actions { display: flex; gap: 10px; }
+.btn-sig-clear { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); padding: 8px 16px; border-radius: 8px; font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+.btn-sig-clear:hover { background: rgba(255,255,255,0.14); }
+.btn-sig-done { background: var(--teal); color: white; border: none; padding: 8px 20px; border-radius: 8px; font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; }
+.btn-sig-done:hover { background: var(--teal-dark); }
+.sig-canvas-area { flex: 1; position: relative; overflow: hidden; }
+#sig-canvas { width: 100%; height: 100%; display: block; cursor: crosshair; touch-action: none; }
+.sig-watermark { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); font-family: 'Caveat', cursive; font-size: 32px; color: rgba(255,255,255,0.06); pointer-events: none; white-space: nowrap; transition: opacity 0.3s; }
+.sig-watermark.hidden { opacity: 0; }
+.sig-baseline { position: absolute; bottom: 80px; left: 32px; right: 32px; height: 1px; background: rgba(255,255,255,0.1); }
+.sig-baseline::after { content: 'Sign above the line'; position: absolute; bottom: -18px; left: 0; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.18); }
+.sig-footer-hint { padding: 14px 20px; text-align: center; font-size: 11px; color: rgba(255,255,255,0.3); border-top: 1px solid rgba(255,255,255,0.06); flex-shrink: 0; }
+
+/* ── SIG PAGE ── */
+#sig-page { background: #FAFFFE; }
+.sig-page-inner { max-width: 700px; margin: 0 auto; padding: 24px 16px 80px; }
+.sig-page-header { text-align: center; margin-bottom: 24px; }
+.sig-page-header h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+.sig-page-header p { color: var(--gray); font-size: 13px; margin-top: 4px; }
+.summary-card { background: white; border: 1px solid var(--border); border-radius: 18px; padding: 18px 20px; margin-bottom: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.04); }
+.summary-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--gray); margin-bottom: 12px; }
+.sum-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--gray-light); font-size: 13px; }
+.sum-row:last-child { border: none; }
+.sum-lbl { color: var(--gray); }
+.sum-val { font-weight: 600; font-family: 'DM Mono', monospace; }
+.sum-val.green { color: var(--teal-dark); }
+.sum-val.red { color: var(--red); }
+.sig-slots { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.sig-slot { background: white; border: 1.5px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,0.04); cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s; }
+.sig-slot:hover { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,0.1); }
+.sig-slot.signed { border-color: var(--teal); }
+.sig-slot-head { padding: 12px 14px 8px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.sig-slot-title { font-size: 12px; font-weight: 700; }
+.sig-slot-badge { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px; background: var(--gray-light); color: var(--gray); transition: all 0.2s; }
+.sig-slot.signed .sig-slot-badge { background: var(--teal-light); color: var(--teal-dark); }
+.sig-slot-preview { height: 90px; display: flex; align-items: center; justify-content: center; background: #FAFFFE; padding: 8px; }
+.sig-slot-preview img { max-height: 78px; max-width: 100%; object-fit: contain; }
+.sig-slot-empty { font-family: 'Caveat', cursive; font-size: 16px; color: #CBD5E1; display: flex; align-items: center; gap: 6px; }
+.sig-tap-hint { font-size: 10px; color: var(--gray); text-align: center; padding: 7px; border-top: 1px solid var(--border); }
+.sig-actions { display: flex; gap: 10px; }
+.btn-back { padding: 13px 20px; border-radius: 14px; background: white; border: 1.5px solid var(--border); font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; color: var(--black); }
+.btn-gen { flex: 1; padding: 14px; background: var(--teal); color: white; border: none; border-radius: 14px; font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 16px rgba(13,148,136,0.3); transition: background 0.15s, transform 0.1s; }
+.btn-gen:hover { background: var(--teal-dark); }
+.btn-gen:active { transform: scale(0.99); }
+.btn-gen:disabled { background: #9CA3AF; box-shadow: none; cursor: not-allowed; }
+
+/* ── RECEIPT PAGE ── */
+#receipt-page { background: #F0FDF9; }
+
+/* ── EXPORT ACTION BAR ── */
+.export-bar {
+  max-width: 700px; margin: 0 auto;
+  padding: 14px 16px 0;
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+.btn-edit-r {
+  padding: 11px 16px; border-radius: 10px;
+  background: white; border: 1.5px solid var(--border);
+  font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 500;
+  cursor: pointer; color: var(--black); white-space: nowrap;
+}
+.export-actions { display: flex; gap: 8px; flex: 1; flex-wrap: wrap; }
+.btn-export {
+  flex: 1; min-width: 120px;
+  padding: 11px 10px; border-radius: 10px;
+  font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 700;
+  cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: opacity 0.15s, transform 0.1s;
+  white-space: nowrap;
+}
+.btn-export:active { transform: scale(0.97); opacity: 0.85; }
+.btn-save-jpg { background: var(--teal); color: white; }
+.btn-save-pdf { background: var(--teal-dark); color: white; }
+.btn-share-jpg { background: var(--black); color: white; }
+.btn-share-pdf { background: #374151; color: white; }
+
+/* Loading spinner overlay */
+#export-loading {
+  display: none;
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(0,0,0,0.55);
+  align-items: center; justify-content: center;
+  flex-direction: column; gap: 14px;
+}
+#export-loading.show { display: flex; }
+.spinner {
+  width: 44px; height: 44px; border: 4px solid rgba(255,255,255,0.2);
+  border-top-color: var(--teal); border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-txt { color: white; font-size: 14px; font-weight: 600; }
+
+/* ── THE RECEIPT ── */
+#receipt {
+  max-width: 680px; margin: 18px auto 40px;
+  background: white; border-radius: 20px; overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.1);
+}
+
+/* ── RECEIPT HEADER ── */
+.r-head { padding: 24px 24px 16px; border-bottom: 1px solid var(--border); }
+.r-logo-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+
+/* Logo + Name combined block */
+.r-brand-block { display: flex; align-items: center; gap: 11px; }
+.r-brand-logo { height: 40px; width: auto; object-fit: contain; display: block; flex-shrink: 0; }
+.r-brand-text { display: flex; flex-direction: column; gap: 2px; }
+.r-brand-name { font-size: 20px; font-weight: 800; letter-spacing: -0.6px; color: var(--black); line-height: 1; }
+.r-brand-name em { color: var(--teal); font-style: normal; }
+.r-tag { font-size: 9px; color: var(--gray); letter-spacing: 1.5px; text-transform: uppercase; }
+
+.r-contact-block { text-align: right; font-size: 10.5px; color: var(--gray); line-height: 1.8; }
+.r-title-row { display: flex; justify-content: space-between; align-items: flex-end; }
+.r-title { font-size: 20px; font-weight: 800; letter-spacing: -0.3px; }
+.r-website { font-size: 11px; color: var(--teal); font-weight: 600; }
+.r-meta-grid { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--border); margin-top: 14px; }
+.meta-cell { padding: 12px 0; }
+.meta-cell:nth-child(2) { text-align: right; }
+.meta-lbl { font-size: 9px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--gray); font-weight: 700; margin-bottom: 3px; }
+.meta-val { font-size: 13px; font-weight: 700; }
+.paid-stamp-wrap { position: relative; display: inline-block; }
+.paid-stamp { display: none; position: absolute; top: -6px; right: -10px; background: var(--teal); color: white; font-size: 9px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; padding: 4px 10px; border-radius: 5px; transform: rotate(6deg); box-shadow: 0 2px 10px rgba(13,148,136,0.4); white-space: nowrap; }
+.paid-stamp.show { display: block; }
+
+/* ── RECEIPT BODY ── */
+.r-body { padding: 0 24px; }
+.items-tbl { width: 100%; border-collapse: collapse; margin: 16px 0 0; }
+.items-tbl thead tr { background: var(--black); }
+.items-tbl thead th { color: white; font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; padding: 9px 10px; font-weight: 700; text-align: left; }
+.items-tbl thead th:nth-child(2) { text-align: center; }
+.items-tbl thead th:last-child { text-align: right; }
+.items-tbl tbody tr { border-bottom: 1px solid var(--border); }
+.items-tbl tbody td { padding: 11px 10px; vertical-align: top; font-size: 13px; }
+.items-tbl tbody td:nth-child(2) { text-align: center; color: var(--gray); font-size: 12px; }
+.items-tbl tbody td:last-child { text-align: right; font-family: 'DM Mono', monospace; font-size: 12px; }
+.t-sub { font-size: 10px; color: var(--gray); margin-top: 3px; line-height: 1.5; }
+.r-totals { display: flex; flex-direction: column; align-items: flex-end; padding: 14px 24px 18px; gap: 4px; }
+.tot-row { display: flex; justify-content: space-between; width: 220px; padding: 5px 0; font-size: 13px; }
+.tot-row.line { border-bottom: 1px solid var(--border); padding-bottom: 9px; margin-bottom: 2px; }
+.tot-row.t-paid { background: var(--teal-light); padding: 8px 10px; border-radius: 7px; font-weight: 700; color: var(--teal-dark); }
+.tot-row.t-balance { background: var(--red-light); padding: 8px 10px; border-radius: 7px; font-weight: 700; color: var(--red); margin-top: 4px; }
+.tot-row span:last-child { font-family: 'DM Mono', monospace; }
+
+/* ── SIGNATURES ── */
+.r-sigs { border-top: 1px solid var(--border); padding: 18px 24px 20px; }
+.r-sigs-title { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--gray); margin-bottom: 14px; }
+.r-sigs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.r-sig-lbl { font-size: 10px; font-weight: 700; color: var(--gray); margin-bottom: 6px; }
+.r-sig-box { border-bottom: 1.5px solid var(--black); height: 70px; display: flex; align-items: flex-end; padding-bottom: 4px; }
+.r-sig-box img { max-height: 64px; max-width: 100%; object-fit: contain; object-position: left bottom; }
+.r-sig-name { font-size: 11px; color: var(--gray); margin-top: 5px; }
+.r-sig-date { font-size: 10px; color: #9CA3AF; margin-top: 1px; }
+
+/* ── WARRANTY ── */
+.r-warranty { border-top: 1px solid var(--border); padding: 14px 24px; }
+.w-lbl { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--gray); margin-bottom: 6px; }
+.w-list { list-style: none; }
+.w-list li { font-size: 11px; color: var(--gray); padding: 1.5px 0; }
+.w-list li::before { content: '• '; color: var(--teal); font-weight: 700; }
+
+/* ── BANNER ── */
+.r-banner { background: linear-gradient(130deg, var(--teal-xdark) 0%, var(--teal) 100%); padding: 20px 24px; }
+.r-banner-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.r-banner-logo { height: 30px; width: auto; object-fit: contain; flex-shrink: 0; }
+.r-banner-name { display: flex; flex-direction: column; gap: 2px; }
+.r-banner-name span { font-size: 16px; font-weight: 800; color: white; letter-spacing: -0.4px; line-height: 1; }
+.r-banner-name small { font-size: 9px; color: rgba(255,255,255,0.55); letter-spacing: 1.8px; text-transform: uppercase; }
+.r-banner h3 { color: white; font-size: 15px; font-weight: 800; margin-bottom: 5px; letter-spacing: -0.2px; }
+.r-banner p { color: rgba(255,255,255,0.75); font-size: 11px; line-height: 1.7; }
+.r-banner p b { color: white; }
+
+/* ── FOOTER ── */
+.r-footer { text-align: center; padding: 14px 24px 22px; border-top: 1px dashed var(--border); }
+.r-thanks { color: var(--teal); font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+.r-slogan { color: var(--gray); font-size: 11px; font-style: italic; }
+
+@media print {
+  #step-nav, .export-bar { display: none; }
+  #form-page, #sig-page { display: none !important; }
+  #receipt-page { display: block !important; padding-top: 0 !important; background: white; }
+  #receipt { box-shadow: none; border-radius: 0; margin: 0; max-width: 100%; }
+}
+
+/* ── PASSWORD GATE ── */
+#pwd-gate {
+  position: fixed; inset: 0; z-index: 9999;
+  background: linear-gradient(135deg, var(--teal-xdark), var(--teal));
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+#pwd-gate.unlocked { display: none; }
+.pwd-box {
+  background: white; border-radius: 24px;
+  padding: 36px 28px 32px;
+  width: 100%; max-width: 360px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  display: flex; flex-direction: column; align-items: center; gap: 0;
+}
+.pwd-logo-row {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 6px;
+}
+.pwd-logo { height: 36px; width: auto; object-fit: contain; }
+.pwd-brand { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: var(--black); }
+.pwd-brand em { color: var(--teal); font-style: normal; }
+.pwd-tagline {
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--gray); margin-bottom: 28px;
+}
+.pwd-title {
+  font-size: 16px; font-weight: 700; color: var(--black);
+  margin-bottom: 4px; text-align: center;
+}
+.pwd-sub {
+  font-size: 12px; color: var(--gray); text-align: center; margin-bottom: 20px;
+}
+.pwd-input-wrap { width: 100%; position: relative; margin-bottom: 14px; }
+#pwd-input {
+  width: 100%; padding: 13px 44px 13px 16px;
+  border: 2px solid var(--border); border-radius: 12px;
+  font-family: 'Sora', sans-serif; font-size: 15px;
+  color: var(--black); outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  letter-spacing: 2px;
+}
+#pwd-input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,0.12); }
+#pwd-input.error { border-color: var(--red); box-shadow: 0 0 0 3px rgba(239,68,68,0.12); animation: shake 0.35s ease; }
+#pwd-toggle {
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer; color: var(--gray);
+  font-size: 18px; padding: 2px; line-height: 1;
+}
+#pwd-toggle:hover { color: var(--teal); }
+#pwd-btn {
+  width: 100%; padding: 14px;
+  background: var(--teal); color: white; border: none;
+  border-radius: 12px; font-family: 'Sora', sans-serif;
+  font-size: 15px; font-weight: 700; cursor: pointer;
+  box-shadow: 0 4px 16px rgba(13,148,136,0.3);
+  transition: background 0.15s, transform 0.1s;
+}
+#pwd-btn:hover { background: var(--teal-dark); }
+#pwd-btn:active { transform: scale(0.98); }
+#pwd-error {
+  font-size: 12px; color: var(--red); font-weight: 600;
+  margin-top: 10px; min-height: 18px; text-align: center;
+}
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ PASSWORD GATE ══ -->
+<div id="pwd-gate">
+  <div class="pwd-box">
+    <div class="pwd-logo-row">
+      <img class="pwd-logo" src="https://eazylife.ng/assets/pictures/logo_white.png" alt="EazyLife" crossorigin="anonymous" onerror="this.style.display='none'">
+      <div class="pwd-brand">Eazy<em>Life</em></div>
+    </div>
+    <div class="pwd-tagline">Robotics & Electronics Solutions</div>
+    <div class="pwd-title">Staff Access Only</div>
+    <div class="pwd-sub">Enter your access code to continue</div>
+    <div class="pwd-input-wrap">
+      <input type="password" id="pwd-input" placeholder="Access code" autocomplete="off" autocorrect="off" spellcheck="false" onkeydown="if(event.key==='Enter')checkPwd()">
+      <button id="pwd-toggle" onclick="togglePwdVis()" title="Show/hide">👁</button>
+    </div>
+    <button id="pwd-btn" onclick="checkPwd()">Unlock →</button>
+    <div id="pwd-error"></div>
+  </div>
+</div>
+
+<!-- STEP NAV -->
+<div id="step-nav">
+  <div class="steps">
+    <div class="step active" id="sn1"><div class="step-num">1</div><div class="step-label">Details</div></div>
+    <div class="step-line" id="sl1"></div>
+    <div class="step" id="sn2"><div class="step-num">2</div><div class="step-label">Signatures</div></div>
+    <div class="step-line" id="sl2"></div>
+    <div class="step" id="sn3"><div class="step-num">3</div><div class="step-label">Receipt</div></div>
+  </div>
+</div>
+
+<!-- ══ PAGE 1: FORM ══ -->
+<div class="page active" id="form-page">
+  <div class="form-inner">
+
+    <!-- Brand Header: logo + name always together -->
+    <div class="brand-header">
+      <div class="brand-header-inner">
+        <div class="brand-logo-row">
+          <img class="logo-img" src="https://eazylife.ng/assets/pictures/logo_white.png" alt="EazyLife Logo" crossorigin="anonymous">
+          <div class="brand-name-block">
+            <div class="brand-name-text">EazyLife</div>
+            <div class="tagline">Robotics & Electronics Solutions</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Customer Info</div>
+      <div class="field"><label>Customer Name</label><input type="text" id="f-name" placeholder="e.g. OLUWATOSIN ADERERA"></div>
+      <div class="row">
+        <div class="field"><label>Receipt Number</label><input type="text" id="f-num" placeholder="EL-2026-0515-001"></div>
+        <div class="field"><label>Date of Issue</label><input type="date" id="f-date"></div>
+      </div>
+      <div class="field"><label>Payment Method</label>
+        <select id="f-method">
+          <option>Bank Transfer / Cash</option>
+          <option>Bank Transfer</option>
+          <option>Cash</option>
+          <option>POS / Card</option>
+          <option>USSD Transfer</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Products & Services</div>
+      <div class="item-hdr"><span>Description</span><span>Qty</span><span>Amount (₦)</span><span></span></div>
+      <div id="items-wrap"></div>
+      <button class="btn-add-item" onclick="addItem()">＋ Add Item</button>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Payment Summary</div>
+      <div class="pay-row"><label>Subtotal (₦)</label><input type="text" id="f-sub" readonly placeholder="Auto-calculated"></div>
+      <div class="pay-row"><label>Amount Paid (₦)</label><input type="number" id="f-paid" placeholder="0" oninput="updateBalance()"></div>
+      <div class="pay-row"><label>Balance Due (₦)</label><input type="text" id="f-bal" readonly placeholder="Auto-calculated"></div>
+    </div>
+
+    <button class="btn-continue" onclick="goToSigs()">Continue to Signatures →</button>
+  </div>
+</div>
+
+<!-- ══ PAGE 2: SIGNATURES ══ -->
+<div class="page" id="sig-page">
+  <div class="sig-page-inner">
+    <div class="sig-page-header">
+      <h2>Signatures</h2>
+      <p>Tap each box to open the fullscreen signing pad</p>
+    </div>
+    <div class="summary-card">
+      <div class="summary-title">Receipt Summary</div>
+      <div class="sum-row"><span class="sum-lbl">Customer</span><span class="sum-val" id="s-name">—</span></div>
+      <div class="sum-row"><span class="sum-lbl">Subtotal</span><span class="sum-val" id="s-sub">—</span></div>
+      <div class="sum-row"><span class="sum-lbl">Amount Paid</span><span class="sum-val green" id="s-paid">—</span></div>
+      <div class="sum-row"><span class="sum-lbl">Balance Due</span><span class="sum-val red" id="s-bal">—</span></div>
+    </div>
+    <div class="sig-slots">
+      <div class="sig-slot" id="slot-seller" onclick="openSig('seller')">
+        <div class="sig-slot-head"><div class="sig-slot-title">EazyLife Rep</div><div class="sig-slot-badge" id="badge-seller">Unsigned</div></div>
+        <div class="sig-slot-preview" id="preview-seller"><div class="sig-slot-empty">✍️ Tap to sign</div></div>
+        <div class="sig-tap-hint">Tap to open signing pad</div>
+      </div>
+      <div class="sig-slot" id="slot-customer" onclick="openSig('customer')">
+        <div class="sig-slot-head"><div class="sig-slot-title">Customer</div><div class="sig-slot-badge" id="badge-customer">Unsigned</div></div>
+        <div class="sig-slot-preview" id="preview-customer"><div class="sig-slot-empty">✍️ Tap to sign</div></div>
+        <div class="sig-tap-hint">Tap to open signing pad</div>
+      </div>
+    </div>
+    <div class="sig-actions">
+      <button class="btn-back" onclick="goToForm()">← Back</button>
+      <button class="btn-gen" id="btn-gen" onclick="generateReceipt()" disabled>Generate Receipt →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PAGE 3: RECEIPT ══ -->
+<div class="page" id="receipt-page">
+
+  <!-- 4-ACTION EXPORT BAR -->
+  <div class="export-bar">
+    <button class="btn-edit-r" onclick="goToSigs()">← Edit</button>
+    <div class="export-actions">
+      <button class="btn-export btn-save-jpg" onclick="doExport('save','jpg')">⬇ Save JPG</button>
+      <button class="btn-export btn-save-pdf" onclick="doExport('save','pdf')">⬇ Save PDF</button>
+      <button class="btn-export btn-share-jpg" onclick="doExport('share','jpg')">↗ Share JPG</button>
+      <button class="btn-export btn-share-pdf" onclick="doExport('share','pdf')">↗ Share PDF</button>
+    </div>
+  </div>
+
+  <!-- RECEIPT BODY -->
+  <div id="receipt">
+    <div class="r-head">
+
+      <!-- Logo + Company Name always together -->
+      <div class="r-logo-row">
+        <div class="r-brand-block">
+          <img class="r-brand-logo" src="https://eazylife.ng/assets/pictures/logo_white.png" alt="EazyLife" crossorigin="anonymous" id="r-brand-logo-img">
+          <div class="r-brand-text">
+            <div class="r-brand-name">Eazy<em>Life</em></div>
+            <div class="r-tag">Robotics & Electronics Solutions</div>
+          </div>
+        </div>
+        <div class="r-contact-block">
+          6 Ososami Road, Oke-Ado, Ibadan<br>
+          T: +234 705 154 8082<br>
+          E: damzyeazy@gmail.com<br>
+          CAC: RC-9462420
+        </div>
+      </div>
+
+      <div class="r-title-row">
+        <div class="paid-stamp-wrap">
+          <div class="r-title">OFFICIAL RECEIPT</div>
+          <div class="paid-stamp" id="paid-stamp">✓ Fully Paid</div>
+        </div>
+        <div class="r-website">www.eazylife.ng</div>
+      </div>
+
+      <div class="r-meta-grid">
+        <div class="meta-cell">
+          <div class="meta-lbl">Customer Name</div><div class="meta-val" id="r-name">—</div>
+          <div class="meta-lbl" style="margin-top:10px">Payment Method</div><div class="meta-val" id="r-method">—</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-lbl">Receipt Number</div><div class="meta-val" id="r-num">—</div>
+          <div class="meta-lbl" style="margin-top:10px">Date of Issue</div><div class="meta-val" id="r-date">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="r-body">
+      <table class="items-tbl">
+        <thead><tr><th>Description</th><th>Qty</th><th>Amount (₦)</th></tr></thead>
+        <tbody id="r-items"></tbody>
+      </table>
+      <div class="r-totals">
+        <div class="tot-row line"><span>Subtotal</span><span id="r-sub">₦0</span></div>
+        <div class="tot-row t-paid"><span>Amount Paid</span><span id="r-paid">₦0</span></div>
+        <div class="tot-row t-balance" id="r-bal-row"><span>Balance Due</span><span id="r-bal">₦0</span></div>
+      </div>
+    </div>
+
+    <div class="r-sigs">
+      <div class="r-sigs-title">Authorised Signatures</div>
+      <div class="r-sigs-grid">
+        <div class="r-sig-col">
+          <div class="r-sig-lbl">EazyLife Representative</div>
+          <div class="r-sig-box"><img id="rs-seller" src="" alt=""></div>
+          <div class="r-sig-name">EazyLife Robotics & Electronics</div>
+          <div class="r-sig-date" id="rs-date1">—</div>
+        </div>
+        <div class="r-sig-col">
+          <div class="r-sig-lbl">Customer</div>
+          <div class="r-sig-box"><img id="rs-customer" src="" alt=""></div>
+          <div class="r-sig-name" id="rs-cname">—</div>
+          <div class="r-sig-date" id="rs-date2">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="r-warranty">
+      <div class="w-lbl">Warranty & Policy</div>
+      <ul class="w-list">
+        <li>7-day return policy for technical defects.</li>
+        <li>Software and physical damage void warranty.</li>
+        <li>Always keep this receipt for verification.</li>
+      </ul>
+    </div>
+
+    <!-- Banner: logo + name + tagline always visible -->
+    <div class="r-banner">
+      <div class="r-banner-brand">
+        <img class="r-banner-logo" src="https://eazylife.ng/assets/pictures/logo_white.png" alt="EazyLife" crossorigin="anonymous" id="r-banner-logo-img">
+        <div class="r-banner-name">
+          <span>EazyLife</span>
+          <small>Robotics & Electronics Solutions</small>
+        </div>
+      </div>
+      <h3>Build Your Future with EazyLife</h3>
+      <p>We design & build custom <b>Arduino & ESP32</b> automation systems, smart home solutions, and final year projects. Visit our website for more engineering services.</p>
+    </div>
+
+    <div class="r-footer">
+      <div class="r-thanks">Thank you for your patronage!</div>
+      <div class="r-slogan">Integrity and Affordability in every circuit.</div>
+    </div>
+  </div>
+</div>
+
+<!-- FULLSCREEN SIG OVERLAY -->
+<div id="sig-overlay">
+  <div class="sig-overlay-header">
+    <div class="sig-who">
+      <div class="sig-who-name" id="sig-who-name">Sign Here</div>
+      <div class="sig-who-sub" id="sig-who-sub">Draw your signature below</div>
+    </div>
+    <div class="sig-header-actions">
+      <button class="btn-sig-clear" onclick="clearSig()">Clear</button>
+      <button class="btn-sig-done" onclick="doneSig()">Done ✓</button>
+    </div>
+  </div>
+  <div class="sig-canvas-area">
+    <canvas id="sig-canvas"></canvas>
+    <div class="sig-watermark" id="sig-watermark">Sign here…</div>
+    <div class="sig-baseline"></div>
+  </div>
+  <div class="sig-footer-hint">Use your finger or stylus • Sign naturally</div>
+</div>
+
+<!-- EXPORT LOADING OVERLAY -->
+<div id="export-loading">
+  <div class="spinner"></div>
+  <div class="loading-txt" id="loading-txt">Preparing…</div>
+</div>
+
+<script>
+// ── PASSWORD GATE ─────────────────────────────────────────────────
+// Hashed passwords for each day: index 0 = Sunday (day 1 = Mercy1) … index 6 = Saturday (day 7 = Mercy7)
+// Plaintext is NEVER stored here — only SHA-256 digests.
+const PWD_HASHES = [
+  '71068ddcb7f073f8c66a4870d0af95af2268642453494acbe30fad5ab2126821', // Sunday    → Mercy1
+  '4d34e8f6dc24767db5f869ed715dd08e96caf57d19edd6c47b4ec2d28f8032d5', // Monday    → Mercy2
+  '8f9a4c296c1d0ebbb0065ed7c71181aee8ff0561a8544854f2bc509dda234ef9', // Tuesday   → Mercy3
+  '0257f1091766cc4a02ba501b44c43cbb33754e1667d13bb98b7efc87575c60b6', // Wednesday → Mercy4
+  '0e494a94c9dedc60e6a2769e2858341c94288250cc4162d5e518f1a10c675cc1', // Thursday  → Mercy5
+  'e000f947c38d248f32a140dd3265943d20ddc1a202a292813b2705ed995825b4', // Friday    → Mercy6
+  '69749f7ffedfb7b10ca0b351966860c1188b9a74cf8094a421a5170a44562345', // Saturday  → Mercy7
+];
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+async function checkPwd() {
+  const input = document.getElementById('pwd-input').value.trim();
+  const errEl = document.getElementById('pwd-error');
+  const inputEl = document.getElementById('pwd-input');
+  if (!input) { errEl.textContent = 'Please enter your access code.'; return; }
+
+  const hashed = await sha256(input);
+  const todayIndex = new Date().getDay(); // 0=Sun … 6=Sat
+  const todayHash = PWD_HASHES[todayIndex];
+
+  if (hashed === todayHash) {
+    document.getElementById('pwd-gate').classList.add('unlocked');
+    errEl.textContent = '';
+  } else {
+    errEl.textContent = 'Incorrect code. Try again.';
+    inputEl.classList.add('error');
+    inputEl.value = '';
+    setTimeout(() => inputEl.classList.remove('error'), 600);
+    inputEl.focus();
+  }
+}
+
+function togglePwdVis() {
+  const inp = document.getElementById('pwd-input');
+  const btn = document.getElementById('pwd-toggle');
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+  else { inp.type = 'password'; btn.textContent = '👁'; }
+}
+
+// ── INIT ──────────────────────────────────────────────────────────
+const today = new Date();
+const pad = n => String(n).padStart(2,'0');
+document.getElementById('f-date').value = today.toISOString().split('T')[0];
+document.getElementById('f-num').value = `EL-${today.getFullYear()}-${pad(today.getMonth()+1)}${pad(today.getDate())}-001`;
+
+// ── LOGO FALLBACK ─────────────────────────────────────────────────
+// If logo fails to load, hide the broken image — the company name text is ALWAYS visible beside it
+document.querySelectorAll('img[src*="eazylife.ng"]').forEach(img => {
+  img.onerror = function() {
+    this.style.display = 'none';
+    // The company name text beside the logo will still be visible
+  };
+});
+
+// ── ITEMS ─────────────────────────────────────────────────────────
+let ic = 0;
+function addItem(desc='', sub='', qty='1', amt='') {
+  ic++;
+  const id = ic;
+  const d = document.createElement('div');
+  d.className = 'item-row'; d.id = `ir-${id}`;
+  d.innerHTML = `
+    <div class="item-inputs">
+      <input type="text" placeholder="Product / Service name" value="${desc}" oninput="calc()">
+      <input type="text" class="sub" placeholder="Specs / details (optional)" value="${sub}">
+    </div>
+    <input type="number" placeholder="1" value="${qty}" min="1" oninput="calc()">
+    <input type="number" placeholder="0" value="${amt}" oninput="calc()">
+    <button class="btn-rm" onclick="rmItem(${id})">×</button>`;
+  document.getElementById('items-wrap').appendChild(d);
+  calc();
+}
+function rmItem(id) { document.getElementById(`ir-${id}`)?.remove(); calc(); }
+function getItems() {
+  return Array.from(document.querySelectorAll('#items-wrap .item-row')).map(r => {
+    const ins = r.querySelectorAll('input');
+    return { desc: ins[0].value.trim(), sub: ins[1].value.trim(), qty: parseFloat(ins[2].value)||1, amt: parseFloat(ins[3].value)||0 };
+  });
+}
+function calc() {
+  const s = getItems().reduce((a,i) => a + i.qty*i.amt, 0);
+  document.getElementById('f-sub').value = fmt(s);
+  updateBalance(); return s;
+}
+function updateBalance() {
+  const s = getItems().reduce((a,i) => a + i.qty*i.amt, 0);
+  const p = parseFloat(document.getElementById('f-paid').value)||0;
+  document.getElementById('f-bal').value = fmt(s - p);
+}
+const fmt = n => n.toLocaleString('en-NG',{minimumFractionDigits:0,maximumFractionDigits:0});
+
+// ── NAV ───────────────────────────────────────────────────────────
+function setStep(n) {
+  [1,2,3].forEach(i => {
+    const s = document.getElementById(`sn${i}`);
+    s.classList.remove('active','done');
+    if (i < n) s.classList.add('done');
+    if (i === n) s.classList.add('active');
+    if (i < 3) document.getElementById(`sl${i}`).classList.toggle('done', i < n);
+  });
+}
+function showPage(id, step) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  setStep(step); window.scrollTo(0,0);
+}
+function goToForm() { showPage('form-page',1); }
+function goToSigs() {
+  const s = calc();
+  const p = parseFloat(document.getElementById('f-paid').value)||0;
+  const b = s - p;
+  document.getElementById('s-name').textContent = document.getElementById('f-name').value.trim()||'—';
+  document.getElementById('s-sub').textContent = '₦'+fmt(s);
+  document.getElementById('s-paid').textContent = '₦'+fmt(p);
+  document.getElementById('s-bal').textContent = b > 0 ? '₦'+fmt(b) : '₦0 (Fully Paid)';
+  showPage('sig-page',2);
+}
+
+// ── FULLSCREEN SIGNATURE ──────────────────────────────────────────
+let currentSigTarget = null;
+const sigData = { seller: null, customer: null };
+let sigCtx = null, sigDrawing = false, hasSigMark = false;
+
+function openSig(who) {
+  currentSigTarget = who;
+  document.getElementById('sig-who-name').textContent = who === 'seller' ? 'EazyLife Representative' : 'Customer Signature';
+  document.getElementById('sig-who-sub').textContent = who === 'seller' ? 'Authorised signatory for EazyLife' : 'Hand device to customer to sign';
+  document.getElementById('sig-overlay').classList.add('open');
+  requestAnimationFrame(() => { setupCanvas(who); });
+}
+
+function setupCanvas(who) {
+  const overlay = document.getElementById('sig-overlay');
+  const area = overlay.querySelector('.sig-canvas-area');
+
+  let old = document.getElementById('sig-canvas');
+  old.remove();
+  const c = document.createElement('canvas');
+  c.id = 'sig-canvas';
+  c.style.cssText = 'width:100%;height:100%;display:block;cursor:crosshair;touch-action:none;';
+  area.prepend(c);
+
+  const W = area.clientWidth, H = area.clientHeight;
+  const dpr = window.devicePixelRatio || 1;
+  c.width = W * dpr; c.height = H * dpr;
+  c.style.width = W+'px'; c.style.height = H+'px';
+
+  sigCtx = c.getContext('2d');
+  sigCtx.scale(dpr, dpr);
+  sigCtx.strokeStyle = '#FFFFFF';
+  sigCtx.lineWidth = 3;
+  sigCtx.lineCap = 'round';
+  sigCtx.lineJoin = 'round';
+
+  hasSigMark = false;
+  const wm = document.getElementById('sig-watermark');
+  wm.classList.remove('hidden');
+
+  if (sigData[who]) {
+    const img = new Image();
+    img.onload = () => { sigCtx.drawImage(img, 0, 0, W, H); hasSigMark = true; wm.classList.add('hidden'); };
+    img.src = sigData[who];
+  }
+
+  function pos(e) {
+    const r = c.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    return { x: src.clientX - r.left, y: src.clientY - r.top };
+  }
+  function start(e) {
+    e.preventDefault(); sigDrawing = true;
+    const {x,y} = pos(e); sigCtx.beginPath(); sigCtx.moveTo(x,y);
+    if (!hasSigMark) { hasSigMark = true; wm.classList.add('hidden'); }
+  }
+  function move(e) {
+    e.preventDefault(); if (!sigDrawing) return;
+    const {x,y} = pos(e); sigCtx.lineTo(x,y); sigCtx.stroke();
+    sigCtx.beginPath(); sigCtx.moveTo(x,y);
+  }
+  function stop(e) { e.preventDefault(); sigDrawing = false; sigCtx.beginPath(); }
+
+  c.addEventListener('mousedown', start);
+  c.addEventListener('mousemove', move);
+  c.addEventListener('mouseup', stop);
+  c.addEventListener('mouseleave', stop);
+  c.addEventListener('touchstart', start, {passive:false});
+  c.addEventListener('touchmove', move, {passive:false});
+  c.addEventListener('touchend', stop, {passive:false});
+}
+
+function clearSig() {
+  const c = document.getElementById('sig-canvas');
+  sigCtx.clearRect(0, 0, c.clientWidth, c.clientHeight);
+  hasSigMark = false;
+  document.getElementById('sig-watermark').classList.remove('hidden');
+  sigData[currentSigTarget] = null;
+  updateSlot(currentSigTarget, null);
+  checkSigs();
+}
+
+function doneSig() {
+  if (!hasSigMark) { alert('Please draw your signature before tapping Done.'); return; }
+  const c = document.getElementById('sig-canvas');
+  sigData[currentSigTarget] = c.toDataURL('image/png');
+  updateSlot(currentSigTarget, sigData[currentSigTarget]);
+  document.getElementById('sig-overlay').classList.remove('open');
+  checkSigs();
+}
+
+function updateSlot(who, dataUrl) {
+  const slot = document.getElementById(`slot-${who}`);
+  const preview = document.getElementById(`preview-${who}`);
+  const badge = document.getElementById(`badge-${who}`);
+  if (dataUrl) {
+    slot.classList.add('signed');
+    badge.textContent = '✓ Signed';
+    preview.innerHTML = `<img src="${dataUrl}" style="max-height:78px;max-width:100%;object-fit:contain;filter:invert(1) brightness(0);">`;
+  } else {
+    slot.classList.remove('signed');
+    badge.textContent = 'Unsigned';
+    preview.innerHTML = `<div class="sig-slot-empty">✍️ Tap to sign</div>`;
+  }
+}
+
+function checkSigs() {
+  document.getElementById('btn-gen').disabled = !(sigData.seller && sigData.customer);
+}
+
+// ── GENERATE RECEIPT ──────────────────────────────────────────────
+function generateReceipt() {
+  const name = document.getElementById('f-name').value.trim()||'—';
+  const num  = document.getElementById('f-num').value.trim()||'—';
+  const dateVal = document.getElementById('f-date').value;
+  const dateStr = dateVal ? new Date(dateVal+'T12:00:00').toLocaleDateString('en-NG',{day:'numeric',month:'long',year:'numeric'}) : '—';
+  const method = document.getElementById('f-method').value;
+  const items = getItems();
+  const sub = items.reduce((a,i) => a + i.qty*i.amt, 0);
+  const paid = parseFloat(document.getElementById('f-paid').value)||0;
+  const bal = sub - paid;
+
+  document.getElementById('r-name').textContent = name.toUpperCase();
+  document.getElementById('r-num').textContent = num;
+  document.getElementById('r-date').textContent = dateStr;
+  document.getElementById('r-method').textContent = method;
+
+  const tbody = document.getElementById('r-items');
+  tbody.innerHTML = '';
+  items.forEach(it => {
+    if (!it.desc && !it.amt) return;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><div style="font-weight:600">${it.desc||'—'}</div>${it.sub?`<div class="t-sub">${it.sub}</div>`:''}</td><td>${it.qty}</td><td>${fmt(it.qty*it.amt)}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('r-sub').textContent = '₦'+fmt(sub);
+  document.getElementById('r-paid').textContent = '₦'+fmt(paid);
+  document.getElementById('r-bal').textContent = '₦'+fmt(Math.max(0,bal));
+  document.getElementById('r-bal-row').style.display = bal > 0 ? 'flex' : 'none';
+  document.getElementById('paid-stamp').classList.toggle('show', bal <= 0);
+
+  // Convert dark-canvas sigs to black-on-transparent
+  function sigToBlack(dataUrl, cb) {
+    const img = new Image();
+    img.onload = () => {
+      const cv = document.createElement('canvas');
+      cv.width = img.width; cv.height = img.height;
+      const ctx = cv.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      const id = ctx.getImageData(0,0,cv.width,cv.height);
+      const d = id.data;
+      for (let i = 0; i < d.length; i+=4) {
+        const br = (d[i]+d[i+1]+d[i+2])/3;
+        if (br > 80) { d[i]=0; d[i+1]=0; d[i+2]=0; d[i+3]=255; }
+        else { d[i+3]=0; }
+      }
+      ctx.putImageData(id,0,0);
+      cb(cv.toDataURL('image/png'));
+    };
+    img.src = dataUrl;
+  }
+
+  sigToBlack(sigData.seller, url => { document.getElementById('rs-seller').src = url; });
+  sigToBlack(sigData.customer, url => { document.getElementById('rs-customer').src = url; });
+  document.getElementById('rs-cname').textContent = name;
+  document.getElementById('rs-date1').textContent = dateStr;
+  document.getElementById('rs-date2').textContent = dateStr;
+
+  showPage('receipt-page', 3);
+}
+
+// ── EXPORT ENGINE ─────────────────────────────────────────────────
+const receiptFilename = () => {
+  const num = document.getElementById('r-num').textContent.replace(/[^A-Za-z0-9-]/g,'') || 'receipt';
+  return `EazyLife-${num}`;
+};
+
+function showLoading(msg) {
+  document.getElementById('loading-txt').textContent = msg;
+  document.getElementById('export-loading').classList.add('show');
+}
+function hideLoading() {
+  document.getElementById('export-loading').classList.remove('show');
+}
+
+async function captureReceiptCanvas() {
+  const el = document.getElementById('receipt');
+  const logoImgs = el.querySelectorAll('img[src*="eazylife.ng"]');
+  await Promise.all(Array.from(logoImgs).map(img => {
+    if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+    return new Promise(res => { img.onload = res; img.onerror = res; });
+  }));
+  const canvas = await html2canvas(el, {
+    scale: 4,
+    useCORS: true,
+    allowTaint: false,
+    backgroundColor: '#ffffff',
+    logging: false,
+    imageTimeout: 8000,
+  });
+  return canvas;
+}
+
+async function doExport(action, format) {
+  const fname = receiptFilename();
+  try {
+    showLoading(action === 'save' ? `Saving ${format.toUpperCase()}…` : `Preparing ${format.toUpperCase()} to share…`);
+    await new Promise(r => setTimeout(r, 80));
+
+    const canvas = await captureReceiptCanvas();
+
+    if (format === 'jpg') {
+      const jpgBlob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.95));
+      if (action === 'save') {
+        const url = URL.createObjectURL(jpgBlob);
+        const a = document.createElement('a');
+        a.href = url; a.download = fname + '.jpg';
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+      } else {
+        if (navigator.share && navigator.canShare) {
+          const file = new File([jpgBlob], fname+'.jpg', { type: 'image/jpeg' });
+          if (navigator.canShare({ files: [file] })) {
+            hideLoading();
+            await navigator.share({ files: [file], title: 'EazyLife Receipt' });
+            return;
+          }
+        }
+        const url = URL.createObjectURL(jpgBlob);
+        window.open(url, '_blank');
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
+      }
+    } else {
+      const { jsPDF } = window.jspdf;
+      const imgW = canvas.width;
+      const imgH = canvas.height;
+      const pxPerMm = imgW / 210;
+      const pdfH = imgH / pxPerMm;
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [210, pdfH] });
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      pdf.addImage(imgData, 'JPEG', 0, 0, 210, pdfH);
+      if (action === 'save') {
+        pdf.save(fname + '.pdf');
+      } else {
+        const pdfBlob = pdf.output('blob');
+        const file = new File([pdfBlob], fname+'.pdf', { type: 'application/pdf' });
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+          hideLoading();
+          await navigator.share({ files: [file], title: 'EazyLife Receipt' });
+          return;
+        }
+        pdf.save(fname + '.pdf');
+      }
+    }
+
+    hideLoading();
+  } catch (err) {
+    hideLoading();
+    if (err.name !== 'AbortError') {
+      alert('Could not export: ' + err.message);
+    }
+  }
+}
+
+// ── START ─────────────────────────────────────────────────────────
+addItem();
+</script>
+</body>
+</html>
