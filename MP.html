@@ -724,6 +724,171 @@ Make names short (1-3 syllables preferred), memorable, easy to spell and pronoun
       errDiv.classList.add('visible');
     } finally {
       btn.classList.remove('loading');
+<script type="module">
+  import { GoogleGenAI } from '@google/generative-ai';
+
+  // Automatically create a Google API key input panel on page load
+  window.addEventListener('DOMContentLoaded', () => {
+    const container = document.querySelector('.container');
+    const keyPanel = document.createElement('div');
+    keyPanel.className = 'panel';
+    keyPanel.style.marginBottom = '24px';
+    keyPanel.innerHTML = `
+      <div class="panel-title" style="color: var(--accent2)">🔑 Gemini API Configuration</div>
+      <label>Enter Google Gemini API Key (Saved locally in your browser)</label>
+      <div class="check-input-row">
+        <input type="password" id="apiKeyInput" placeholder="AIzaSy..." />
+        <button class="btn-check" id="saveKeyBtn">Save Key</button>
+      </div>
+      <div id="keyStatus" style="font-size: 11px; margin-top: 8px; color: var(--muted)"></div>
+    `;
+    container.insertBefore(keyPanel, container.children[1]);
+
+    // Bind save event listener
+    document.getElementById('saveKeyBtn').addEventListener('click', saveApiKey);
+
+    // Load key if it exists
+    const savedKey = localStorage.getItem('gemini_user_key');
+    if (savedKey) {
+      document.getElementById('apiKeyInput').value = savedKey;
+      document.getElementById('keyStatus').textContent = "✦ Gemini Key loaded successfully from local storage.";
+      document.getElementById('keyStatus').style.color = "var(--green)";
+    }
+  });
+
+  function saveApiKey() {
+    const key = document.getElementById('apiKeyInput').value.trim();
+    if (!key) {
+      localStorage.removeItem('gemini_user_key');
+      document.getElementById('keyStatus').textContent = "Key removed.";
+      document.getElementById('keyStatus').style.color = "var(--red)";
+      return;
+    }
+    localStorage.setItem('gemini_user_key', key);
+    document.getElementById('keyStatus').textContent = "✦ Gemini Key saved locally!";
+    document.getElementById('keyStatus').style.color = "var(--green)";
+  }
+
+  // Style tag toggle UI behavior
+  document.querySelectorAll('.style-tag').forEach(tag => {
+    tag.addEventListener('click', () => {
+      document.querySelectorAll('.style-tag').forEach(t => t.classList.remove('active'));
+      tag.classList.add('active');
+    });
+  });
+
+  function getRarenessColor(score) {
+    if (score >= 80) return '#22c55e';
+    if (score >= 55) return '#eab308';
+    return '#ef4444';
+  }
+
+  function getRarenessLabel(score) {
+    if (score >= 85) return 'Legendary';
+    if (score >= 70) return 'Very Rare';
+    if (score >= 55) return 'Uncommon';
+    if (score >= 40) return 'Common';
+    return 'Generic';
+  }
+
+  function buildRing(score) {
+    const r = 22;
+    const circ = 2 * Math.PI * r;
+    const offset = circ - (score / 100) * circ;
+    const color = getRarenessColor(score);
+    return `
+      <div class="rareness-ring">
+        <svg viewBox="0 0 56 56">
+          <circle class="ring-bg" cx="28" cy="28" r="${r}" stroke-dasharray="${circ}" stroke-dashoffset="0"/>
+          <circle class="ring-fill" cx="28" cy="28" r="${r}" stroke="${color}"
+            stroke-dasharray="${circ}" stroke-dashoffset="${offset}"/>
+        </svg>
+        <div class="rareness-num" style="color:${color}">${score}</div>
+      </div>
+      <div class="rareness-label" style="color:${color}">${getRarenessLabel(score)}</div>
+    `;
+  }
+
+  // Calls Gemini directly via browser SDK using local storage key
+  async function callGemini(prompt, systemPrompt) {
+    const userKey = localStorage.getItem('gemini_user_key');
+    if (!userKey) {
+      throw new Error("Missing API Key. Please input your Google Gemini API key at the top of the page first.");
+    }
+
+    // Initialize the Google Gen AI client with browser compatibility flag
+    const ai = new GoogleGenAI({ apiKey: userKey, dangerouslyAllowBrowser: true });
+    
+    // Using gemini-1.5-flash for lighting fast, low-latency name generation
+    const response = await ai.models.generateContent({
+      model: 'gemini-1.5-flash',
+      contents: prompt,
+      config: {
+        systemInstruction: systemPrompt,
+        // Force the model to return syntactically valid JSON directly
+        responseMimeType: "application/json"
+      }
+    });
+
+    if (!response.text) {
+      throw new Error("No response received from Gemini API.");
+    }
+    return response.text;
+  }
+
+  async function generateNames() {
+    const niche = document.getElementById('niche').value.trim();
+    const audience = document.getElementById('audience').value.trim();
+    const keywords = document.getElementById('keywords').value.trim();
+    const style = document.querySelector('.style-tag.active')?.dataset.style || 'Invented/coined words';
+
+    if (!niche) { alert('Please describe what you will sell.'); return; }
+
+    const btn = document.getElementById('generateBtn');
+    const errDiv = document.getElementById('genError');
+    btn.classList.add('loading');
+    btn.disabled = true;
+    errDiv.classList.remove('visible');
+
+    const prompt = `Generate 6 unique, rare, brandable marketplace names for an online marketplace.
+
+Niche: ${niche}
+Target audience: ${audience || 'general'}
+Brand keywords/vibe: ${keywords || 'modern, trustworthy'}
+Name style: ${style}
+
+Return a JSON array containing exactly 6 objects structured exactly like this:
+[
+  {
+    "name": "ExampleName",
+    "meaning": "One sentence explaining origin/concept/why it works",
+    "tags": ["tag1", "tag2"],
+    "rareness": 85
+  }
+]
+
+rareness score guide:
+- 90-100: Completely invented, never-before-seen word
+- 70-89: Very unusual combination, hard to find online
+- 50-69: Uncommon but recognizable roots
+- 30-49: Somewhat common pattern
+- 0-29: Generic/overused
+
+Make names short (1-3 syllables preferred), memorable, easy to spell and pronounce.`;
+
+    const system = "You are a creative brand naming expert specializing in marketplace names. Output raw JSON arrays matching the requested format perfectly.";
+
+    try {
+      const rawJson = await callGemini(prompt, system);
+      const names = JSON.parse(rawJson.trim());
+      renderNames(names);
+      document.getElementById('resultsPanel').style.display = 'block';
+      document.getElementById('resultsPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (e) {
+      errDiv.textContent = e.message || "Something went wrong generating names. Please try again.";
+      errDiv.classList.add('visible');
+    } finaly {
+      btn.classList.remove('loading');
       btn.disabled = false;
     }
   }
@@ -768,30 +933,29 @@ Make names short (1-3 syllables preferred), memorable, easy to spell and pronoun
 
     const prompt = `Analyse this marketplace name for uniqueness and brandability: "${name}"
 
-Return ONLY a JSON object (no markdown, no backticks):
+Return a JSON object structured exactly like this:
 {
-  "overallScore": <0-100>,
+  "overallScore": 75,
   "verdict": "One sentence overall verdict",
   "criteria": {
-    "memorability": { "score": <0-100>, "note": "brief note" },
-    "pronounceability": { "score": <0-100>, "note": "brief note" },
-    "length": { "score": <0-100>, "note": "brief note" },
-    "uniqueness": { "score": <0-100>, "note": "brief note" },
-    "domainFriendly": { "score": <0-100>, "note": "brief note" },
-    "googleable": { "score": <0-100>, "note": "brief note" }
+    "memorability": { "score": 80, "note": "brief note" },
+    "pronounceability": { "score": 85, "note": "brief note" },
+    "length": { "score": 90, "note": "brief note" },
+    "uniqueness": { "score": 60, "note": "brief note" },
+    "domainFriendly": { "score": 70, "note": "brief note" },
+    "googleable": { "score": 65, "note": "brief note" }
   },
   "tips": "2-3 sentences of improvement suggestions or what makes it work"
 }`;
 
-    const system = "You are a brand naming expert. Return only valid JSON, nothing else.";
+    const system = "You are a brand naming expert. Output raw JSON objects matching the requested format perfectly.";
 
     try {
-      const raw = await callClaude(prompt, system);
-      const clean = raw.replace(/```json|```/g, '').trim();
-      const data = JSON.parse(clean);
+      const rawJson = await callGemini(prompt, system);
+      const data = JSON.parse(rawJson.trim());
       renderCheckResult(name, data);
     } catch (e) {
-      errDiv.textContent = "Couldn't analyse this name. Try again.";
+      errDiv.textContent = e.message || "Couldn't analyse this name. Try again.";
       errDiv.classList.add('visible');
     } finally {
       btn.disabled = false;
@@ -846,10 +1010,16 @@ Return ONLY a JSON object (no markdown, no backticks):
     div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
+  // Global event bindings for buttons inside the UI
+  window.generateNames = generateNames;
+  window.checkRareness = checkRareness;
+
   // Enter key support
   document.getElementById('checkName').addEventListener('keydown', e => {
     if (e.key === 'Enter') checkRareness();
   });
+</script>
+
 </script>
 </body>
 </html>
