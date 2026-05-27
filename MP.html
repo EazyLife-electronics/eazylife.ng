@@ -1,856 +1,608 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Marketplace Name Lab</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #0a0a0f;
-    --surface: #111118;
-    --card: #16161f;
-    --border: #2a2a3a;
-    --accent: #ff6b35;
-    --accent2: #7c3aed;
-    --text: #e8e8f0;
-    --muted: #6b6b80;
-    --green: #22c55e;
-    --yellow: #eab308;
-    --red: #ef4444;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Space Mono', monospace;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* Background grid */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(255,107,53,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,107,53,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .container {
-    position: relative;
-    z-index: 1;
-    max-width: 860px;
-    margin: 0 auto;
-    padding: 48px 24px 80px;
-  }
-
-  header {
-    text-align: center;
-    margin-bottom: 52px;
-  }
-
-  .badge {
-    display: inline-block;
-    background: rgba(255,107,53,0.1);
-    border: 1px solid rgba(255,107,53,0.3);
-    color: var(--accent);
-    font-size: 11px;
-    letter-spacing: 3px;
-    padding: 6px 16px;
-    border-radius: 2px;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-  }
-
-  h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(36px, 7vw, 68px);
-    font-weight: 800;
-    line-height: 1;
-    letter-spacing: -2px;
-    background: linear-gradient(135deg, #fff 0%, #a0a0b8 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 16px;
-  }
-
-  h1 span {
-    background: linear-gradient(135deg, var(--accent), #ff9f1c);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .subtitle {
-    color: var(--muted);
-    font-size: 13px;
-    letter-spacing: 1px;
-    line-height: 1.7;
-  }
-
-  /* Panel */
-  .panel {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 28px;
-    margin-bottom: 24px;
-  }
-
-  .panel-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .panel-title::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
-
-  /* Form */
-  .form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 16px;
-  }
-
-  @media (max-width: 600px) {
-    .form-grid { grid-template-columns: 1fr; }
-  }
-
-  label {
-    display: block;
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 8px;
-  }
-
-  input, select, textarea {
-    width: 100%;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-family: 'Space Mono', monospace;
-    font-size: 13px;
-    padding: 12px 14px;
-    border-radius: 6px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-
-  input:focus, select:focus, textarea:focus {
-    border-color: var(--accent);
-  }
-
-  select option { background: var(--surface); }
-
-  textarea { resize: none; height: 72px; line-height: 1.5; }
-
-  .full { grid-column: 1 / -1; }
-
-  /* Tags */
-  .tag-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 16px;
-  }
-
-  .style-tag {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--muted);
-    font-size: 11px;
-    letter-spacing: 1px;
-    padding: 6px 14px;
-    border-radius: 100px;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-family: 'Space Mono', monospace;
-  }
-
-  .style-tag.active, .style-tag:hover {
-    background: rgba(255,107,53,0.12);
-    border-color: var(--accent);
-    color: var(--accent);
-  }
-
-  /* Button */
-  .btn-generate {
-    width: 100%;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    font-family: 'Syne', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    padding: 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .btn-generate:hover { background: #e55a28; transform: translateY(-1px); }
-  .btn-generate:active { transform: translateY(0); }
-  .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-  .btn-generate .spinner {
-    display: none;
-    width: 18px; height: 18px;
-    border: 2px solid rgba(255,255,255,0.3);
-    border-top-color: white;
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    margin: 0 auto;
-  }
-
-  .btn-generate.loading .btn-text { display: none; }
-  .btn-generate.loading .spinner { display: block; }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* Results */
-  .results-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
-  }
-
-  .name-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 20px 22px;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
-    transition: border-color 0.2s, transform 0.2s;
-    cursor: pointer;
-    animation: fadeUp 0.4s ease both;
-  }
-
-  .name-card:hover { border-color: var(--accent); transform: translateX(4px); }
-
-  .name-card.selected {
-    border-color: var(--accent);
-    background: rgba(255,107,53,0.06);
-  }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .name-card:nth-child(2) { animation-delay: 0.05s; }
-  .name-card:nth-child(3) { animation-delay: 0.1s; }
-  .name-card:nth-child(4) { animation-delay: 0.15s; }
-  .name-card:nth-child(5) { animation-delay: 0.2s; }
-  .name-card:nth-child(6) { animation-delay: 0.25s; }
-
-  .name-main {
-    flex: 1;
-  }
-
-  .name-text {
-    font-family: 'Syne', sans-serif;
-    font-size: 22px;
-    font-weight: 800;
-    color: var(--text);
-    margin-bottom: 4px;
-    letter-spacing: -0.5px;
-  }
-
-  .name-meaning {
-    font-size: 12px;
-    color: var(--muted);
-    line-height: 1.5;
-  }
-
-  .name-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 8px;
-  }
-
-  .name-tag {
-    font-size: 10px;
-    letter-spacing: 1px;
-    padding: 3px 9px;
-    border-radius: 100px;
-    background: rgba(124,58,237,0.15);
-    border: 1px solid rgba(124,58,237,0.3);
-    color: #a78bfa;
-  }
-
-  /* Rareness meter */
-  .rareness-col {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    min-width: 72px;
-  }
-
-  .rareness-ring {
-    position: relative;
-    width: 56px;
-    height: 56px;
-  }
-
-  .rareness-ring svg {
-    transform: rotate(-90deg);
-    width: 56px;
-    height: 56px;
-  }
-
-  .rareness-ring circle {
-    fill: none;
-    stroke-width: 4;
-    stroke-linecap: round;
-  }
-
-  .ring-bg { stroke: var(--border); }
-
-  .ring-fill {
-    transition: stroke-dashoffset 1s ease;
-  }
-
-  .rareness-num {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Syne', sans-serif;
-    font-size: 13px;
-    font-weight: 800;
-  }
-
-  .rareness-label {
-    font-size: 9px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
-  /* Check panel */
-  .check-panel {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 28px;
-    margin-bottom: 24px;
-  }
-
-  .check-input-row {
-    display: flex;
-    gap: 10px;
-  }
-
-  .check-input-row input { flex: 1; }
-
-  .btn-check {
-    background: var(--accent2);
-    color: white;
-    border: none;
-    font-family: 'Syne', sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    padding: 12px 20px;
-    border-radius: 6px;
-    cursor: pointer;
-    white-space: nowrap;
-    letter-spacing: 1px;
-    transition: all 0.2s;
-  }
-
-  .btn-check:hover { background: #6d28d9; }
-  .btn-check:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  .check-result {
-    margin-top: 20px;
-    display: none;
-  }
-
-  .check-result.visible { display: block; }
-
-  .score-bar-wrap {
-    background: var(--surface);
-    border-radius: 100px;
-    height: 10px;
-    overflow: hidden;
-    margin: 12px 0;
-  }
-
-  .score-bar {
-    height: 100%;
-    border-radius: 100px;
-    transition: width 1s ease;
-    background: linear-gradient(90deg, var(--accent2), var(--accent));
-  }
-
-  .criteria-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 16px;
-  }
-
-  @media (max-width: 500px) { .criteria-grid { grid-template-columns: 1fr; } }
-
-  .criterion {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 12px 14px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .crit-icon { font-size: 18px; }
-
-  .crit-info { flex: 1; }
-  .crit-name { font-size: 11px; color: var(--muted); letter-spacing: 1px; margin-bottom: 2px; }
-  .crit-val { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; }
-
-  .good { color: var(--green); }
-  .warn { color: var(--yellow); }
-  .bad { color: var(--red); }
-
-  .generate-tip {
-    background: rgba(124,58,237,0.08);
-    border: 1px solid rgba(124,58,237,0.2);
-    border-radius: 8px;
-    padding: 14px 16px;
-    font-size: 12px;
-    color: var(--muted);
-    line-height: 1.7;
-    margin-top: 16px;
-  }
-
-  .generate-tip strong { color: #a78bfa; }
-
-  /* Error */
-  .error-msg {
-    background: rgba(239,68,68,0.08);
-    border: 1px solid rgba(239,68,68,0.25);
-    border-radius: 8px;
-    padding: 14px 16px;
-    font-size: 12px;
-    color: #f87171;
-    margin-top: 16px;
-    display: none;
-  }
-
-  .error-msg.visible { display: block; }
-
-  .empty-state {
-    text-align: center;
-    padding: 48px 20px;
-    color: var(--muted);
-    font-size: 12px;
-    letter-spacing: 1px;
-  }
-
-  .empty-state .icon { font-size: 36px; margin-bottom: 12px; opacity: 0.4; }
-
-  /* How it works */
-  .how-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-bottom: 24px;
-  }
-
-  @media (max-width: 600px) { .how-grid { grid-template-columns: 1fr; } }
-
-  .how-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 18px;
-    text-align: center;
-  }
-
-  .how-num {
-    font-family: 'Syne', sans-serif;
-    font-size: 32px;
-    font-weight: 800;
-    color: var(--accent);
-    opacity: 0.6;
-    line-height: 1;
-    margin-bottom: 8px;
-  }
-
-  .how-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    margin-bottom: 4px;
-  }
-
-  .how-desc { font-size: 11px; color: var(--muted); line-height: 1.6; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NicheMarket Namer // AI Brand Generator</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+
+  <script type="importmap">
+    {
+      "imports": {
+        "@google/generative-ai": "https://esm.run/@google/generative-ai"
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --surface: #131a2c;
+      --surface-card: #1c263e;
+      --border: #263554;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      
+      /* Vibrant Cyber-Synth Color Palette */
+      --accent: #38bdf8;       /* Electric Sky Blue */
+      --accent2: #a855f7;      /* Neon Purple */
+      --green: #22c55e;        /* Success Emerald */
+      --yellow: #eab308;       /* Warning Amber */
+      --red: #ef4444;          /* Danger Coral */
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.5;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 680px;
+    }
+
+    header {
+      margin-bottom: 32px;
+      text-align: center;
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 36px;
+      line-height: 1.1;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -1px;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .panel-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    label {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    input, textarea {
+      width: 100%;
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 14px;
+      padding: 12px;
+      margin-bottom: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, textarea:focus {
+      border-color: var(--accent);
+    }
+
+    textarea {
+      height: 80px;
+      resize: none;
+    }
+
+    .style-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .style-tag {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 13px;
+      text-align: center;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .style-tag:hover {
+      border-color: var(--accent);
+    }
+
+    .style-tag.active {
+      background: linear-gradient(135deg, rgba(56,189,248,0.1), rgba(168,85,247,0.1));
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-main {
+      width: 100%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none;
+      border-radius: 8px;
+      color: #000;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 15px;
+      padding: 14px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      position: relative;
+    }
+
+    .btn-main:hover {
+      opacity: 0.9;
+    }
+
+    .btn-main.loading {
+      color: transparent;
+      pointer-events: none;
+    }
+
+    .btn-main.loading::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      top: calc(50% - 10px);
+      left: calc(50% - 10px);
+      border: 3px solid transparent;
+      border-top-color: #000;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .error-msg {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid var(--red);
+      color: var(--red);
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 13px;
+      margin-top: 12px;
+      display: none;
+    }
+
+    .error-msg.visible {
+      display: block;
+    }
+
+    .name-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .name-card {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s;
+      animation: fadeIn 0.4s ease forwards;
+      opacity: 0;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .name-card:hover {
+      border-color: var(--accent2);
+      transform: translateX(4px);
+    }
+
+    .name-card.selected {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.03);
+    }
+
+    .rareness-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 64px;
+    }
+
+    .rareness-ring {
+      position: relative;
+      width: 48px;
+      height: 48px;
+    }
+
+    .rareness-ring svg {
+      transform: rotate(-90deg);
+      width: 100%;
+      height: 100%;
+    }
+
+    .rareness-ring circle {
+      fill: none;
+      stroke-width: 4px;
+    }
+
+    .rareness-ring .ring-bg {
+      stroke: var(--surface);
+    }
+
+    .rareness-ring .ring-fill {
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.5s ease;
+    }
+
+    .rareness-num {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .rareness-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 4px;
+      font-weight: 700;
+    }
+
+    .name-main {
+      flex: 1;
+    }
+
+    .name-text {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 20px;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .name-meaning {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .name-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .name-tag {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .check-input-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .check-input-row input {
+      margin-bottom: 0;
+    }
+
+    .btn-check {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 0 20px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .btn-check:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .check-result {
+      margin-top: 20px;
+      border-top: 1px dashed var(--border);
+      padding-top: 20px;
+      display: none;
+    }
+
+    .check-result.visible {
+      display: block;
+    }
+
+    .score-bar-wrap {
+      background: var(--surface);
+      height: 6px;
+      border-radius: 3px;
+      width: 100%;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+
+    .score-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      border-radius: 3px;
+      width: 0;
+      transition: width 0.6s cubic-bezier(0.1, 1, 0.1, 1);
+    }
+
+    .criteria-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .criterion {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .crit-icon {
+      font-size: 16px;
+      margin-top: 2px;
+    }
+
+    .crit-name {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .crit-val {
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 1px;
+    }
+
+    .crit-val.good { color: var(--green); }
+    .crit-val.warn { color: var(--yellow); }
+    .crit-val.bad { color: var(--red); }
+  </style>
 </head>
 <body>
-<div class="container">
 
-  <header>
-    <div class="badge">✦ AI-Powered</div>
-    <h1>Marketplace<br><span>Name Lab</span></h1>
-    <p class="subtitle">Generate rare, memorable names for your online marketplace<br>+ test any name's uniqueness with our rareness scorer</p>
-  </header>
+  <div class="container">
+    <header>
+      <h1>NicheMarket Namer</h1>
+      <p>Generate highly distinctive, premium names using Google Gemini AI</p>
+    </header>
 
-  <!-- How it works -->
-  <div class="how-grid">
-    <div class="how-card">
-      <div class="how-num">01</div>
-      <div class="how-title">Describe Your Market</div>
-      <div class="how-desc">Tell us your niche, vibe & audience to shape the name</div>
-    </div>
-    <div class="how-card">
-      <div class="how-num">02</div>
-      <div class="how-title">AI Generates Names</div>
-      <div class="how-desc">Claude crafts unique, brandable names with meanings</div>
-    </div>
-    <div class="how-card">
-      <div class="how-num">03</div>
-      <div class="how-title">Test Rareness</div>
-      <div class="how-desc">Score any name on memorability, length & uniqueness</div>
-    </div>
-  </div>
-
-  <!-- Generator Panel -->
-  <div class="panel">
-    <div class="panel-title">Generate Names</div>
-
-    <div class="form-grid">
-      <div>
-        <label>What will you sell?</label>
-        <input type="text" id="niche" placeholder="e.g. handmade crafts, tech gadgets…" />
+    <div class="panel">
+      <div class="panel-title" style="color: var(--accent)">🔮 Marketplace Parameters</div>
+      
+      <label>What are you planning to sell?</label>
+      <textarea id="niche" placeholder="e.g., handcrafted leather shoes, premium mechanical keyboard keycaps, vintage African art..."></textarea>
+      
+      <label>Target Audience (Optional)</label>
+      <input type="text" id="audience" placeholder="e.g., Gen-Z tech enthusiasts, high-end interior designers" />
+      
+      <label>Keywords / Vibe Rules (Optional)</label>
+      <input type="text" id="keywords" placeholder="e.g., minimalist, rugged, cyber, ancient, sleek" />
+      
+      <label>Linguistic Name Style</label>
+      <div class="style-grid">
+        <div class="style-tag active" data-style="Invented/coined words">Coined (Zalando, Etsy)</div>
+        <div class="style-tag" data-style="Blended compound words">Blended (FedEx, StubHub)</div>
+        <div class="style-tag" data-style="Metaphorical & Real words">Metaphor (Amazon, Target)</div>
+        <div class="style-tag" data-style="Slightly misspelled/Modernized words">Altered (Lyft, Reddit)</div>
       </div>
-      <div>
-        <label>Target Audience</label>
-        <input type="text" id="audience" placeholder="e.g. young professionals, parents…" />
-      </div>
-      <div class="full">
-        <label>Brand vibe / keywords (optional)</label>
-        <textarea id="keywords" placeholder="e.g. fast, trustworthy, modern, African-inspired, eco-friendly…"></textarea>
-      </div>
+
+      <button class="btn-main" id="generateBtn" onclick="generateNames()">Generate Premium Names</button>
+      <div class="error-msg" id="genError"></div>
     </div>
 
-    <label style="margin-bottom:10px">Name Style</label>
-    <div class="tag-row" id="styleTags">
-      <span class="style-tag active" data-style="Invented/coined words">Invented Words</span>
-      <span class="style-tag" data-style="Compound words">Compound</span>
-      <span class="style-tag" data-style="Evocative/metaphorical">Metaphorical</span>
-      <span class="style-tag" data-style="Short 1-2 syllables">Ultra Short</span>
-      <span class="style-tag" data-style="Playful/fun">Playful</span>
-      <span class="style-tag" data-style="Professional/corporate">Professional</span>
-      <span class="style-tag" data-style="Foreign language inspired">Global Flair</span>
+    <div class="panel" id="resultsPanel" style="display: none;">
+      <div class="panel-title" style="color: var(--accent2)">✨ Generated Identity Sets</div>
+      <p style="font-size:12px; color:var(--muted); margin-bottom:16px;">Select any custom option below to execute deep metric analysis.</p>
+      <div class="name-list" id="nameList"></div>
     </div>
 
-    <button class="btn-generate" id="generateBtn" onclick="generateNames()">
-      <span class="btn-text">✦ Generate Names</span>
-      <div class="spinner"></div>
-    </button>
-    <div class="error-msg" id="genError"></div>
-  </div>
-
-  <!-- Results -->
-  <div class="panel" id="resultsPanel" style="display:none">
-    <div class="results-header">
-      <div class="panel-title" style="margin-bottom:0">Results</div>
-      <span style="font-size:11px;color:var(--muted)">Click a name to test it ↓</span>
-    </div>
-    <div id="nameList"></div>
-  </div>
-
-  <!-- Rareness Checker -->
-  <div class="check-panel">
-    <div class="panel-title">Rareness Checker</div>
-    <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Test any marketplace name — yours or generated above — for uniqueness & brandability.</p>
-    <div class="check-input-row">
-      <input type="text" id="checkName" placeholder="Enter a name to test…" />
-      <button class="btn-check" id="checkBtn" onclick="checkRareness()">Analyse</button>
-    </div>
-    <div class="error-msg" id="checkError"></div>
-    <div class="check-result" id="checkResult"></div>
-  </div>
-
-  <!-- How to generate rare names tip -->
-  <div class="generate-tip">
-    <strong>💡 How to generate rare names:</strong><br>
-    Rare names combine <strong>unexpected word roots</strong> (Latin, Greek, Swahili, Japanese) with <strong>short syllables</strong> (≤3), avoid common suffixes like <em>-ify, -hub, -mart</em>, and carry a <strong>double meaning</strong>. Coin new words by blending two concepts — e.g. "Velo" (speed) + "Ora" (time) = <strong>Velora</strong>. Aim for names that are easy to spell, say aloud, and Google.
-  </div>
-
-</div>
-
-<script>
-  // Style tag toggle
-  document.querySelectorAll('.style-tag').forEach(tag => {
-    tag.addEventListener('click', () => {
-      document.querySelectorAll('.style-tag').forEach(t => t.classList.remove('active'));
-      tag.classList.add('active');
-    });
-  });
-
-  function getRarenessColor(score) {
-    if (score >= 80) return '#22c55e';
-    if (score >= 55) return '#eab308';
-    return '#ef4444';
-  }
-
-  function getRarenessLabel(score) {
-    if (score >= 85) return 'Legendary';
-    if (score >= 70) return 'Very Rare';
-    if (score >= 55) return 'Uncommon';
-    if (score >= 40) return 'Common';
-    return 'Generic';
-  }
-
-  function buildRing(score) {
-    const r = 22;
-    const circ = 2 * Math.PI * r;
-    const offset = circ - (score / 100) * circ;
-    const color = getRarenessColor(score);
-    return `
-      <div class="rareness-ring">
-        <svg viewBox="0 0 56 56">
-          <circle class="ring-bg" cx="28" cy="28" r="${r}" stroke-dasharray="${circ}" stroke-dashoffset="0"/>
-          <circle class="ring-fill" cx="28" cy="28" r="${r}" stroke="${color}"
-            stroke-dasharray="${circ}" stroke-dashoffset="${offset}"/>
-        </svg>
-        <div class="rareness-num" style="color:${color}">${score}</div>
-      </div>
-      <div class="rareness-label" style="color:${color}">${getRarenessLabel(score)}</div>
-    `;
-  }
-
-  async function callClaude(prompt, systemPrompt) {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1000,
-        system: systemPrompt,
-        messages: [{ role: "user", content: prompt }]
-      })
-    });
-    if (!response.ok) throw new Error("API error: " + response.status);
-    const data = await response.json();
-    return data.content.map(b => b.text || "").join("");
-  }
-
-  async function generateNames() {
-    const niche = document.getElementById('niche').value.trim();
-    const audience = document.getElementById('audience').value.trim();
-    const keywords = document.getElementById('keywords').value.trim();
-    const style = document.querySelector('.style-tag.active')?.dataset.style || 'Invented/coined words';
-
-    if (!niche) { alert('Please describe what you will sell.'); return; }
-
-    const btn = document.getElementById('generateBtn');
-    const errDiv = document.getElementById('genError');
-    btn.classList.add('loading');
-    btn.disabled = true;
-    errDiv.classList.remove('visible');
-
-    const prompt = `Generate 6 unique, rare, brandable marketplace names for an online marketplace.
-
-Niche: ${niche}
-Target audience: ${audience || 'general'}
-Brand keywords/vibe: ${keywords || 'modern, trustworthy'}
-Name style: ${style}
-
-Return ONLY a JSON array of 6 objects. No markdown, no explanation, no backticks. Each object:
-{
-  "name": "...",
-  "meaning": "One sentence explaining origin/concept/why it works",
-  "tags": ["tag1", "tag2"],
-  "rareness": <integer 0-100>
-}
-
-rareness score guide:
-- 90-100: Completely invented, never-before-seen word
-- 70-89: Very unusual combination, hard to find online
-- 50-69: Uncommon but recognizable roots
-- 30-49: Somewhat common pattern
-- 0-29: Generic/overused
-
-Make names short (1-3 syllables preferred), memorable, easy to spell and pronounce.`;
-
-    const system = "You are a creative brand naming expert specializing in marketplace names. Always return valid JSON only, nothing else. No markdown.";
-
-    try {
-      const raw = await callClaude(prompt, system);
-      const clean = raw.replace(/```json|```/g, '').trim();
-      const names = JSON.parse(clean);
-      renderNames(names);
-      document.getElementById('resultsPanel').style.display = 'block';
-      document.getElementById('resultsPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } catch (e) {
-      errDiv.textContent = "Something went wrong generating names. Please try again.";
-      errDiv.classList.add('visible');
-    } finally {
-      btn.classList.remove('loading');
-<script type="module">
-  import { GoogleGenAI } from '@google/generative-ai';
-
-  // Automatically create a Google API key input panel on page load
-  window.addEventListener('DOMContentLoaded', () => {
-    const container = document.querySelector('.container');
-    const keyPanel = document.createElement('div');
-    keyPanel.className = 'panel';
-    keyPanel.style.marginBottom = '24px';
-    keyPanel.innerHTML = `
-      <div class="panel-title" style="color: var(--accent2)">🔑 Gemini API Configuration</div>
-      <label>Enter Google Gemini API Key (Saved locally in your browser)</label>
+    <div class="panel check-panel">
+      <div class="panel-title" style="color: var(--accent)">🔍 Custom Evaluation Hub</div>
+      <label>Test any custom platform or chosen name</label>
       <div class="check-input-row">
-        <input type="password" id="apiKeyInput" placeholder="AIzaSy..." />
-        <button class="btn-check" id="saveKeyBtn">Save Key</button>
+        <input type="text" id="checkName" placeholder="Type a brand name..." />
+        <button class="btn-check" id="checkBtn" onclick="checkRareness()">Analyse</button>
       </div>
-      <div id="keyStatus" style="font-size: 11px; margin-top: 8px; color: var(--muted)"></div>
-    `;
-    container.insertBefore(keyPanel, container.children[1]);
+      <div class="error-msg" id="checkError"></div>
+      
+      <div class="check-result" id="checkResult"></div>
+    </div>
+  </div>
 
-    // Bind save event listener
-    document.getElementById('saveKeyBtn').addEventListener('click', saveApiKey);
+  <script type="module">
+    import { GoogleGenAI } from '@google/generative-ai';
 
-    // Load key if it exists
-    const savedKey = localStorage.getItem('gemini_user_key');
-    if (savedKey) {
-      document.getElementById('apiKeyInput').value = savedKey;
-      document.getElementById('keyStatus').textContent = "✦ Gemini Key loaded successfully from local storage.";
-      document.getElementById('keyStatus').style.color = "var(--green)";
-    }
-  });
+    // Automatically create a Google API key input panel on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      const container = document.querySelector('.container');
+      const keyPanel = document.createElement('div');
+      keyPanel.className = 'panel';
+      keyPanel.style.marginBottom = '24px';
+      keyPanel.innerHTML = `
+        <div class="panel-title" style="color: var(--accent2)">🔑 Gemini API Configuration</div>
+        <label>Enter Google Gemini API Key (Saved locally in your browser)</label>
+        <div class="check-input-row">
+          <input type="password" id="apiKeyInput" placeholder="AIzaSy..." />
+          <button class="btn-check" id="saveKeyBtn">Save Key</button>
+        </div>
+        <div id="keyStatus" style="font-size: 11px; margin-top: 8px; color: var(--muted)"></div>
+      `;
+      container.insertBefore(keyPanel, container.children[1]);
 
-  function saveApiKey() {
-    const key = document.getElementById('apiKeyInput').value.trim();
-    if (!key) {
-      localStorage.removeItem('gemini_user_key');
-      document.getElementById('keyStatus').textContent = "Key removed.";
-      document.getElementById('keyStatus').style.color = "var(--red)";
-      return;
-    }
-    localStorage.setItem('gemini_user_key', key);
-    document.getElementById('keyStatus').textContent = "✦ Gemini Key saved locally!";
-    document.getElementById('keyStatus').style.color = "var(--green)";
-  }
+      // Bind save event listener
+      document.getElementById('saveKeyBtn').addEventListener('click', saveApiKey);
 
-  // Style tag toggle UI behavior
-  document.querySelectorAll('.style-tag').forEach(tag => {
-    tag.addEventListener('click', () => {
-      document.querySelectorAll('.style-tag').forEach(t => t.classList.remove('active'));
-      tag.classList.add('active');
-    });
-  });
-
-  function getRarenessColor(score) {
-    if (score >= 80) return '#22c55e';
-    if (score >= 55) return '#eab308';
-    return '#ef4444';
-  }
-
-  function getRarenessLabel(score) {
-    if (score >= 85) return 'Legendary';
-    if (score >= 70) return 'Very Rare';
-    if (score >= 55) return 'Uncommon';
-    if (score >= 40) return 'Common';
-    return 'Generic';
-  }
-
-  function buildRing(score) {
-    const r = 22;
-    const circ = 2 * Math.PI * r;
-    const offset = circ - (score / 100) * circ;
-    const color = getRarenessColor(score);
-    return `
-      <div class="rareness-ring">
-        <svg viewBox="0 0 56 56">
-          <circle class="ring-bg" cx="28" cy="28" r="${r}" stroke-dasharray="${circ}" stroke-dashoffset="0"/>
-          <circle class="ring-fill" cx="28" cy="28" r="${r}" stroke="${color}"
-            stroke-dasharray="${circ}" stroke-dashoffset="${offset}"/>
-        </svg>
-        <div class="rareness-num" style="color:${color}">${score}</div>
-      </div>
-      <div class="rareness-label" style="color:${color}">${getRarenessLabel(score)}</div>
-    `;
-  }
-
-  // Calls Gemini directly via browser SDK using local storage key
-  async function callGemini(prompt, systemPrompt) {
-    const userKey = localStorage.getItem('gemini_user_key');
-    if (!userKey) {
-      throw new Error("Missing API Key. Please input your Google Gemini API key at the top of the page first.");
-    }
-
-    // Initialize the Google Gen AI client with browser compatibility flag
-    const ai = new GoogleGenAI({ apiKey: userKey, dangerouslyAllowBrowser: true });
-    
-    // Using gemini-1.5-flash for lighting fast, low-latency name generation
-    const response = await ai.models.generateContent({
-      model: 'gemini-1.5-flash',
-      contents: prompt,
-      config: {
-        systemInstruction: systemPrompt,
-        // Force the model to return syntactically valid JSON directly
-        responseMimeType: "application/json"
+      // Load key if it exists
+      const savedKey = localStorage.getItem('gemini_user_key');
+      if (savedKey) {
+        document.getElementById('apiKeyInput').value = savedKey;
+        document.getElementById('keyStatus').textContent = "✦ Gemini Key loaded successfully from local storage.";
+        document.getElementById('keyStatus').style.color = "var(--green)";
       }
     });
 
-    if (!response.text) {
-      throw new Error("No response received from Gemini API.");
+    function saveApiKey() {
+      const key = document.getElementById('apiKeyInput').value.trim();
+      if (!key) {
+        localStorage.removeItem('gemini_user_key');
+        document.getElementById('keyStatus').textContent = "Key removed.";
+        document.getElementById('keyStatus').style.color = "var(--red)";
+        return;
+      }
+      localStorage.setItem('gemini_user_key', key);
+      document.getElementById('keyStatus').textContent = "✦ Gemini Key saved locally!";
+      document.getElementById('keyStatus').style.color = "var(--green)";
     }
-    return response.text;
-  }
 
-  async function generateNames() {
-    const niche = document.getElementById('niche').value.trim();
-    const audience = document.getElementById('audience').value.trim();
-    const keywords = document.getElementById('keywords').value.trim();
-    const style = document.querySelector('.style-tag.active')?.dataset.style || 'Invented/coined words';
+    // Style tag toggle UI behavior
+    document.querySelectorAll('.style-tag').forEach(tag => {
+      tag.addEventListener('click', () => {
+        document.querySelectorAll('.style-tag').forEach(t => t.classList.remove('active'));
+        tag.classList.add('active');
+      });
+    });
 
-    if (!niche) { alert('Please describe what you will sell.'); return; }
+    function getRarenessColor(score) {
+      if (score >= 80) return '#22c55e';
+      if (score >= 55) return '#eab308';
+      return '#ef4444';
+    }
 
-    const btn = document.getElementById('generateBtn');
-    const errDiv = document.getElementById('genError');
-    btn.classList.add('loading');
-    btn.disabled = true;
-    errDiv.classList.remove('visible');
+    function getRarenessLabel(score) {
+      if (score >= 85) return 'Legendary';
+      if (score >= 70) return 'Very Rare';
+      if (score >= 55) return 'Uncommon';
+      if (score >= 40) return 'Common';
+      return 'Generic';
+    }
 
-    const prompt = `Generate 6 unique, rare, brandable marketplace names for an online marketplace.
+    function buildRing(score) {
+      const r = 22;
+      const circ = 2 * Math.PI * r;
+      const offset = circ - (score / 100) * circ;
+      const color = getRarenessColor(score);
+      return `
+        <div class="rareness-ring">
+          <svg viewBox="0 0 56 56">
+            <circle class="ring-bg" cx="28" cy="28" r="${r}" stroke-dasharray="${circ}" stroke-dashoffset="0"/>
+            <circle class="ring-fill" cx="28" cy="28" r="${r}" stroke="${color}"
+              stroke-dasharray="${circ}" stroke-dashoffset="${offset}"/>
+          </svg>
+          <div class="rareness-num" style="color:${color}">${score}</div>
+        </div>
+        <div class="rareness-label" style="color:${color}">${getRarenessLabel(score)}</div>
+      `;
+    }
+
+    // Calls Gemini directly via browser SDK using local storage key
+    async function callGemini(prompt, systemPrompt) {
+      const userKey = localStorage.getItem('gemini_user_key');
+      if (!userKey) {
+        throw new Error("Missing API Key. Please input your Google Gemini API key at the top of the page first.");
+      }
+
+      // Initialize the Google Gen AI client with browser compatibility flag
+      const ai = new GoogleGenAI({ apiKey: userKey, dangerouslyAllowBrowser: true });
+      
+      // Using gemini-1.5-flash for lighting fast, low-latency name generation
+      const response = await ai.models.generateContent({
+        model: 'gemini-1.5-flash',
+        contents: prompt,
+        config: {
+          systemInstruction: systemPrompt,
+          responseMimeType: "application/json"
+        }
+      });
+
+      if (!response.text) {
+        throw new Error("No response received from Gemini API.");
+      }
+      return response.text;
+    }
+
+    async function generateNames() {
+      const niche = document.getElementById('niche').value.trim();
+      const audience = document.getElementById('audience').value.trim();
+      const keywords = document.getElementById('keywords').value.trim();
+      const style = document.querySelector('.style-tag.active')?.dataset.style || 'Invented/coined words';
+
+      if (!niche) { alert('Please describe what you will sell.'); return; }
+
+      const btn = document.getElementById('generateBtn');
+      const errDiv = document.getElementById('genError');
+      btn.classList.add('loading');
+      btn.disabled = true;
+      errDiv.classList.remove('visible');
+
+      const prompt = `Generate 6 unique, rare, brandable marketplace names for an online marketplace.
 
 Niche: ${niche}
 Target audience: ${audience || 'general'}
@@ -876,62 +628,62 @@ rareness score guide:
 
 Make names short (1-3 syllables preferred), memorable, easy to spell and pronounce.`;
 
-    const system = "You are a creative brand naming expert specializing in marketplace names. Output raw JSON arrays matching the requested format perfectly.";
+      const system = "You are a creative brand naming expert specializing in marketplace names. Output raw JSON arrays matching the requested format perfectly.";
 
-    try {
-      const rawJson = await callGemini(prompt, system);
-      const names = JSON.parse(rawJson.trim());
-      renderNames(names);
-      document.getElementById('resultsPanel').style.display = 'block';
-      document.getElementById('resultsPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } catch (e) {
-      errDiv.textContent = e.message || "Something went wrong generating names. Please try again.";
-      errDiv.classList.add('visible');
-    } finaly {
-      btn.classList.remove('loading');
-      btn.disabled = false;
+      try {
+        const rawJson = await callGemini(prompt, system);
+        const names = JSON.parse(rawJson.trim());
+        renderNames(names);
+        document.getElementById('resultsPanel').style.display = 'block';
+        document.getElementById('resultsPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } catch (e) {
+        errDiv.textContent = e.message || "Something went wrong generating names. Please try again.";
+        errDiv.classList.add('visible');
+      } finally {
+        btn.classList.remove('loading');
+        btn.disabled = false;
+      }
     }
-  }
 
-  function renderNames(names) {
-    const list = document.getElementById('nameList');
-    list.innerHTML = '';
-    names.forEach((n, i) => {
-      const card = document.createElement('div');
-      card.className = 'name-card';
-      card.style.animationDelay = (i * 0.06) + 's';
-      card.innerHTML = `
-        <div class="rareness-col">${buildRing(n.rareness)}</div>
-        <div class="name-main">
-          <div class="name-text">${n.name}</div>
-          <div class="name-meaning">${n.meaning}</div>
-          <div class="name-tags">${(n.tags || []).map(t => `<span class="name-tag">${t}</span>`).join('')}</div>
-        </div>
-      `;
-      card.addEventListener('click', () => {
-        document.querySelectorAll('.name-card').forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
-        document.getElementById('checkName').value = n.name;
-        document.getElementById('checkResult').classList.remove('visible');
-        document.querySelector('.check-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    function renderNames(names) {
+      const list = document.getElementById('nameList');
+      list.innerHTML = '';
+      names.forEach((n, i) => {
+        const card = document.createElement('div');
+        card.className = 'name-card';
+        card.style.animationDelay = (i * 0.06) + 's';
+        card.innerHTML = `
+          <div class="rareness-col">${buildRing(n.rareness)}</div>
+          <div class="name-main">
+            <div class="name-text">${n.name}</div>
+            <div class="name-meaning">${n.meaning}</div>
+            <div class="name-tags">${(n.tags || []).map(t => `<span class="name-tag">${t}</span>`).join('')}</div>
+          </div>
+        `;
+        card.addEventListener('click', () => {
+          document.querySelectorAll('.name-card').forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected');
+          document.getElementById('checkName').value = n.name;
+          document.getElementById('checkResult').classList.remove('visible');
+          document.querySelector('.check-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+        list.appendChild(card);
       });
-      list.appendChild(card);
-    });
-  }
+    }
 
-  async function checkRareness() {
-    const name = document.getElementById('checkName').value.trim();
-    if (!name) { alert('Enter a name to check.'); return; }
+    async function checkRareness() {
+      const name = document.getElementById('checkName').value.trim();
+      if (!name) { alert('Enter a name to check.'); return; }
 
-    const btn = document.getElementById('checkBtn');
-    const errDiv = document.getElementById('checkError');
-    const resultDiv = document.getElementById('checkResult');
-    btn.disabled = true;
-    btn.textContent = '…';
-    errDiv.classList.remove('visible');
-    resultDiv.classList.remove('visible');
+      const btn = document.getElementById('checkBtn');
+      const errDiv = document.getElementById('checkError');
+      const resultDiv = document.getElementById('checkResult');
+      btn.disabled = true;
+      btn.textContent = '…';
+      errDiv.classList.remove('visible');
+      resultDiv.classList.remove('visible');
 
-    const prompt = `Analyse this marketplace name for uniqueness and brandability: "${name}"
+      const prompt = `Analyse this marketplace name for uniqueness and brandability: "${name}"
 
 Return a JSON object structured exactly like this:
 {
@@ -948,78 +700,76 @@ Return a JSON object structured exactly like this:
   "tips": "2-3 sentences of improvement suggestions or what makes it work"
 }`;
 
-    const system = "You are a brand naming expert. Output raw JSON objects matching the requested format perfectly.";
+      const system = "You are a brand naming expert. Output raw JSON objects matching the requested format perfectly.";
 
-    try {
-      const rawJson = await callGemini(prompt, system);
-      const data = JSON.parse(rawJson.trim());
-      renderCheckResult(name, data);
-    } catch (e) {
-      errDiv.textContent = e.message || "Couldn't analyse this name. Try again.";
-      errDiv.classList.add('visible');
-    } finally {
-      btn.disabled = false;
-      btn.textContent = 'Analyse';
+      try {
+        const rawJson = await callGemini(prompt, system);
+        const data = JSON.parse(rawJson.trim());
+        renderCheckResult(name, data);
+      } catch (e) {
+        errDiv.textContent = e.message || "Couldn't analyse this name. Try again.";
+        errDiv.classList.add('visible');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Analyse';
+      }
     }
-  }
 
-  function renderCheckResult(name, data) {
-    const div = document.getElementById('checkResult');
-    const score = data.overallScore;
-    const color = getRarenessColor(score);
-    const label = getRarenessLabel(score);
+    function renderCheckResult(name, data) {
+      const div = document.getElementById('checkResult');
+      const score = data.overallScore;
+      const color = getRarenessColor(score);
+      const label = getRarenessLabel(score);
 
-    const criteriaIcons = {
-      memorability: '🧠',
-      pronounceability: '🗣️',
-      length: '📏',
-      uniqueness: '✨',
-      domainFriendly: '🌐',
-      googleable: '🔍'
-    };
+      const criteriaIcons = {
+        memorability: '🧠',
+        pronounceability: '🗣️',
+        length: '📏',
+        uniqueness: '✨',
+        domainFriendly: '🌐',
+        googleable: '🔍'
+      };
 
-    const criteriaHTML = Object.entries(data.criteria || {}).map(([key, val]) => {
-      const cls = val.score >= 70 ? 'good' : val.score >= 45 ? 'warn' : 'bad';
-      return `
-        <div class="criterion">
-          <div class="crit-icon">${criteriaIcons[key] || '•'}</div>
-          <div class="crit-info">
-            <div class="crit-name">${key}</div>
-            <div class="crit-val ${cls}">${val.score}/100</div>
-            <div style="font-size:10px;color:var(--muted);margin-top:2px">${val.note}</div>
+      const criteriaHTML = Object.entries(data.criteria || {}).map(([key, val]) => {
+        const cls = val.score >= 70 ? 'good' : val.score >= 45 ? 'warn' : 'bad';
+        return `
+          <div class="criterion">
+            <div class="crit-icon">${criteriaIcons[key] || '•'}</div>
+            <div class="crit-info">
+              <div class="crit-name">${key}</div>
+              <div class="crit-val ${cls}">${val.score}/100</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px">${val.note}</div>
+            </div>
+          </div>`;
+      }).join('');
+
+      div.innerHTML = `
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
+          <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--text)">"${name}"</div>
+          <div style="text-align:center">
+            <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:${color}">${score}</div>
+            <div style="font-size:11px;letter-spacing:2px;color:${color};text-transform:uppercase">${label}</div>
           </div>
-        </div>`;
-    }).join('');
-
-    div.innerHTML = `
-      <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
-        <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--text)">"${name}"</div>
-        <div style="text-align:center">
-          <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:${color}">${score}</div>
-          <div style="font-size:11px;letter-spacing:2px;color:${color};text-transform:uppercase">${label}</div>
         </div>
-      </div>
-      <div class="score-bar-wrap"><div class="score-bar" style="width:${score}%"></div></div>
-      <p style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6">${data.verdict}</p>
-      <div class="criteria-grid">${criteriaHTML}</div>
-      <div style="margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:12px;color:var(--muted);line-height:1.7">
-        <strong style="color:var(--text);font-family:'Syne',sans-serif">💬 Expert Tips</strong><br>${data.tips}
-      </div>
-    `;
-    div.classList.add('visible');
-    div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
+        <div class="score-bar-wrap"><div class="score-bar" style="width:${score}%"></div></div>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6">${data.verdict}</p>
+        <div class="criteria-grid">${criteriaHTML}</div>
+        <div style="margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:12px;color:var(--muted);line-height:1.7">
+          <strong style="color:var(--text);font-family:'Syne',sans-serif">💬 Expert Tips</strong><br>${data.tips}
+        </div>
+      `;
+      div.classList.add('visible');
+      div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
 
-  // Global event bindings for buttons inside the UI
-  window.generateNames = generateNames;
-  window.checkRareness = checkRareness;
+    // Global event bindings for buttons inside the UI
+    window.generateNames = generateNames;
+    window.checkRareness = checkRareness;
 
-  // Enter key support
-  document.getElementById('checkName').addEventListener('keydown', e => {
-    if (e.key === 'Enter') checkRareness();
-  });
-</script>
-
-</script>
+    // Enter key support
+    document.getElementById('checkName').addEventListener('keydown', e => {
+      if (e.key === 'Enter') checkRareness();
+    });
+  </script>
 </body>
 </html>
