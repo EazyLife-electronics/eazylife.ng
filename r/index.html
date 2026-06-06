@@ -950,7 +950,7 @@ async function captureReceiptCanvas() {
     return new Promise(res => { img.onload = res; img.onerror = res; });
   }));
   const canvas = await html2canvas(el, {
-    scale: 2,
+    scale: 6,
     useCORS: true,
     allowTaint: false,
     backgroundColor: '#ffffff',
