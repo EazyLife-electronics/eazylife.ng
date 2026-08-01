@@ -220,6 +220,7 @@
     .review-card p.text { font-size: 0.88rem; color: var(--text); margin-bottom: 12px; }
     .review-card .who { font-size: 0.78rem; font-weight: 700; color: var(--dark); }
     .review-card .who span { display: block; font-weight: 500; color: var(--text-light); font-size: 0.74rem; }
+    .follow-heading { color: var(--dark); }
 
     .review-form-wrap { background: #fafbfc; border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
     .review-form-wrap h3 { font-size: 1rem; font-weight: 800; color: var(--dark); margin-bottom: 6px; }
@@ -270,6 +271,11 @@
     :root[data-theme="dark"] .hero { background: linear-gradient(180deg, #163330 0%, var(--dm-bg) 100%); }
     :root[data-theme="dark"] .hero-badge { background: var(--dm-surface); border-color: var(--dm-border); color: var(--dm-text); }
     :root[data-theme="dark"] .section-title { color: var(--dm-text); }
+    :root[data-theme="dark"] .hero h1,
+    :root[data-theme="dark"] .hero-slide h4,
+    :root[data-theme="dark"] .follow-heading { color: var(--dm-text); }
+    :root[data-theme="dark"] .hero-slide p { color: var(--dm-text-light); }
+    :root[data-theme="dark"] .hero-slide { background: var(--dm-surface); border-color: var(--dm-border); }
     :root[data-theme="dark"] .section-sub { color: var(--dm-text-light); }
     :root[data-theme="dark"] #shop-preview { background: var(--dm-bg); }
     :root[data-theme="dark"] .product-card,
@@ -505,7 +511,7 @@
         </div>
       </div>
       <div>
-        <h3 style="font-size:1rem;font-weight:700;color:var(--dark);margin-bottom:16px;">Follow Us Online</h3>
+        <h3 class="follow-heading" style="font-size:1rem;font-weight:700;margin-bottom:16px;">Follow Us Online</h3>
         <div class="social-cards">
           <a href="https://wa.me/2347051548082?text=Hello%20EazyLife,%20I%20am%20interested%20in%20your%20services." target="_blank" rel="noopener" class="social-card sc-wa">
             <div class="social-card-left"><div class="social-card-icon"><i class="fab fa-whatsapp"></i></div><div><h4>WhatsApp</h4><p>Chat with us directly</p></div></div>
