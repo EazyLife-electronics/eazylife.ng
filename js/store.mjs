@@ -4,8 +4,6 @@
 //   products/{id}   -> { name, price, promoPrice, category, image, inStock, desc }
 //   orders/{id}     -> { items[], customerName, phone, address, total, status, createdAt }
 //   settings/site   -> { whatsapp, tagline, aboutText, ... }
-//   heroes/{id}     -> { title, subtitle, image, ctaText, linkType, linkValue, order }
-//   reviews/{id}    -> { name, title, stars, text, approved }
 
 import { initFirebase } from './firebase.mjs';
 import {
@@ -17,11 +15,13 @@ const { db } = initFirebase();
 
 /* ---------------- PRODUCTS ---------------- */
 
+// One-time fetch (used by shop.html on load)
 export async function getProducts() {
   const snap = await getDocs(collection(db, 'products'));
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
+// Live subscription (used by admin dashboard so edits reflect instantly)
 export function watchProducts(callback) {
   return onSnapshot(collection(db, 'products'), (snap) => {
     const products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -43,6 +43,8 @@ export async function deleteProduct(id) {
 
 /* ---------------- ORDERS ---------------- */
 
+// Customer submits an order from the cart. No login required to write —
+// see firestore.rules: orders can be created by anyone, but only read/edited by admin.
 export async function placeOrder(order) {
   return addDoc(collection(db, 'orders'), {
     ...order,
@@ -51,6 +53,7 @@ export async function placeOrder(order) {
   });
 }
 
+// Admin-only: live list of orders, newest first
 export function watchOrders(callback) {
   const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
   return onSnapshot(q, (snap) => {
@@ -64,6 +67,7 @@ export async function updateOrderStatus(id, status) {
 }
 
 /* ---------------- HEROES ---------------- */
+// heroes/{id} -> { title, subtitle, image, ctaText, linkType: 'category'|'product'|'url', linkValue, order }
 
 export async function getHeroes() {
   const q = query(collection(db, 'heroes'), orderBy('order', 'asc'));
@@ -91,7 +95,9 @@ export async function deleteHero(id) {
 }
 
 /* ---------------- REVIEWS ---------------- */
+// reviews/{id} -> { name, title, stars, text, approved }
 
+// Public: only approved reviews, for the homepage testimonials section
 export async function getApprovedReviews() {
   const snap = await getDocs(collection(db, 'reviews'));
   return snap.docs
@@ -99,6 +105,7 @@ export async function getApprovedReviews() {
     .filter(r => r.approved === true);
 }
 
+// Admin: all reviews regardless of approval state, live
 export function watchReviews(callback) {
   return onSnapshot(collection(db, 'reviews'), (snap) => {
     callback(snap.docs.map(d => ({ id: d.id, ...d.data() })));
@@ -115,6 +122,29 @@ export async function updateReview(id, updates) {
 
 export async function deleteReview(id) {
   return deleteDoc(doc(db, 'reviews', id));
+}
+
+/* ---------------- SOURCING REQUESTS ---------------- */
+// requests/{id} -> { name, phone, need, budget, category, status, createdAt }
+// Customer service flow: "can't find what you want" from the shop, or budget-based custom sourcing.
+
+export async function placeRequest(request) {
+  return addDoc(collection(db, 'requests'), {
+    ...request,
+    status: 'new',
+    createdAt: serverTimestamp()
+  });
+}
+
+export function watchRequests(callback) {
+  const q = query(collection(db, 'requests'), orderBy('createdAt', 'desc'));
+  return onSnapshot(q, (snap) => {
+    callback(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+  });
+}
+
+export async function updateRequestStatus(id, status) {
+  return updateDoc(doc(db, 'requests', id), { status });
 }
 
 /* ---------------- SETTINGS ---------------- */
