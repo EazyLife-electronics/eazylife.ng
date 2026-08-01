@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EazyLife Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root { --teal: #00B09B; --lime: #8DC63F; }
+        body { font-family: 'DM Sans', sans-serif; }
+        h1, h2, .font-syne { font-family: 'Syne', sans-serif; }
+        .bg-eazylife { background: linear-gradient(135deg, #00B09B, #8DC63F); }
+        .tab-active { background: #111827 !important; color: white !important; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+<div id="loginScreen" class="min-h-screen flex items-center justify-center p-6">
+    <div class="bg-white w-full max-w-sm rounded-[24px] shadow-xl p-8">
+        <h1 class="font-syne font-extrabold text-2xl text-center mb-1">EazyLife</h1>
+        <p class="text-center text-gray-400 text-sm mb-6">Admin Dashboard</p>
+        <input id="loginEmail" type="email" placeholder="Admin email" class="w-full p-3 mb-3 rounded-xl bg-gray-50 border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
+        <input id="loginPassword" type="password" placeholder="Password" class="w-full p-3 mb-4 rounded-xl bg-gray-50 border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
+        <button id="loginBtn" class="bg-eazylife text-white w-full py-3 rounded-xl font-bold text-sm shadow-lg">Log In</button>
+        <p id="loginError" class="text-red-500 text-xs text-center mt-3 hidden"></p>
+    </div>
+</div>
+
+<div id="dashboard" class="hidden">
+    <header class="bg-white border-b sticky top-0 z-40 p-4 shadow-sm flex justify-between items-center">
+        <h1 class="font-syne font-extrabold text-lg">EazyLife <span class="text-[#00B09B]">Admin</span></h1>
+        <button id="logoutBtn" class="text-gray-400 text-xs font-bold hover:text-gray-700">
+            <i class="fas fa-sign-out-alt"></i> Log out
+        </button>
+    </header>
+
+    <div class="max-w-4xl mx-auto p-4">
+        <div class="flex gap-2 mb-6 overflow-x-auto no-scrollbar">
+            <button data-tab="products" class="tab-btn tab-active px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Products</button>
+            <button data-tab="orders" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Orders</button>
+            <button data-tab="settings" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Settings</button>
+        </div>
+
+        <div id="panel-products" class="tab-panel">
+            <div class="bg-white p-6 rounded-[24px] shadow-sm mb-6">
+                <h2 id="formTitle" class="font-black text-lg mb-4">Add Product</h2>
+                <form id="productForm" class="space-y-3">
+                    <input type="hidden" id="editId">
+                    <input id="pName" placeholder="Product name" required class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
+                    <div class="grid grid-cols-2 gap-3">
+                        <input id="pCategory" placeholder="Category (e.g. Laptops)" required class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
+                        <select id="pInStock" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none">
+                            <option value="true">In Stock</option>
+                            <option value="false">Out of Stock</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <input id="pPrice" type="number" placeholder="Price (₦)" required class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
+                        <input id="pPromoPrice" type="number" placeholder="Promo price (optional)" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
+                    </div>
+                    <input id="pImage" placeholder="Image URL" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
+                    <textarea id="pDesc" placeholder="Short description" rows="2" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]"></textarea>
+                    <div class="flex gap-2 pt-1">
+                        <button type="submit" class="flex-1 bg-gray-900 text-white py-3 rounded-xl font-bold text-sm">Save Product</button>
+                        <button type="button" id="resetFormBtn" class="bg-gray-100 text-gray-500 px-4 rounded-xl font-bold text-sm">Reset</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="flex justify-between items-center mb-3">
+                <input id="productSearch" placeholder="Search products..." class="w-full max-w-xs p-3 bg-white rounded-xl border border-gray-200 text-sm outline-none">
+                <span class="text-xs text-gray-400 font-bold ml-3" id="productCount">0 items</span>
+            </div>
+            <div id="productList" class="grid gap-3"></div>
+        </div>
+
+        <div id="panel-orders" class="tab-panel hidden">
+            <div id="orderList" class="grid gap-3"></div>
+        </div>
+
+        <div id="panel-settings" class="tab-panel hidden">
+            <div class="bg-white p-6 rounded-[24px] shadow-sm">
+                <h2 class="font-black text-lg mb-4">Site Settings</h2>
+                <form id="settingsForm" class="space-y-3">
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-gray-400">WhatsApp Number (with country code, no +)</label>
+                        <input id="s_whatsapp" placeholder="2347051548082" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-gray-400">Tagline</label>
+                        <input id="s_tagline" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-gray-400">About Text</label>
+                        <textarea id="s_about" rows="3" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"></textarea>
+                    </div>
+                    <button type="submit" class="bg-gray-900 text-white w-full py-3 rounded-xl font-bold text-sm">Save Settings</button>
+                </form>
+                <p id="settingsMsg" class="text-center text-xs text-green-600 font-bold mt-3 hidden">Saved!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="js/admin-app.mjs"></script>
+</body>
+</html>
