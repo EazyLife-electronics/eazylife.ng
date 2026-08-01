@@ -40,6 +40,7 @@
         <div class="flex gap-2 mb-6 overflow-x-auto no-scrollbar">
             <button data-tab="products" class="tab-btn tab-active px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Products</button>
             <button data-tab="heroes" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Heroes</button>
+            <button data-tab="reviews" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Reviews</button>
             <button data-tab="orders" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Orders</button>
             <button data-tab="settings" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Settings</button>
         </div>
@@ -106,6 +107,30 @@
                 </form>
             </div>
             <div id="heroList" class="grid gap-3"></div>
+        </div>
+
+        <div id="panel-reviews" class="tab-panel hidden">
+            <div class="bg-white p-6 rounded-[24px] shadow-sm mb-6">
+                <h2 class="font-black text-lg mb-1">Add Review</h2>
+                <p class="text-xs text-gray-400 mb-4">Paste in a review you received by email (Formspree). New reviews are unapproved until you toggle them live.</p>
+                <form id="reviewAddForm" class="space-y-3">
+                    <input id="rvName" placeholder="Customer name (e.g. Adebayo T.)" required class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
+                    <input id="rvTitle" placeholder="Title (e.g. Student, Ibadan)" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
+                    <select id="rvStars" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none">
+                        <option value="5">★★★★★ (5)</option>
+                        <option value="4">★★★★☆ (4)</option>
+                        <option value="3">★★★☆☆ (3)</option>
+                        <option value="2">★★☆☆☆ (2)</option>
+                        <option value="1">★☆☆☆☆ (1)</option>
+                    </select>
+                    <textarea id="rvText" placeholder="Review text" required rows="3" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]"></textarea>
+                    <label class="flex items-center gap-2 text-xs text-gray-500 font-bold px-1">
+                        <input type="checkbox" id="rvApproved" checked> Publish immediately (approved)
+                    </label>
+                    <button type="submit" class="bg-gray-900 text-white w-full py-3 rounded-xl font-bold text-sm">Save Review</button>
+                </form>
+            </div>
+            <div id="reviewList" class="grid gap-3"></div>
         </div>
 
         <div id="panel-orders" class="tab-panel hidden">
