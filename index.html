@@ -249,7 +249,7 @@
     @media (min-width: 720px) {
       .hero h1 { font-size: 2.9rem; }
       .product-grid { grid-template-columns: repeat(4, 1fr); }
-      .services-strip { grid-template-columns: repeat(2, 1fr); }
+      .services-strip { grid-template-columns: repeat(3, 1fr); }
       .trust-grid { grid-template-columns: repeat(2, 1fr); }
       .testimonials-grid { grid-template-columns: repeat(2, 1fr); }
       .form-row { grid-template-columns: 1fr 1fr; }
@@ -330,17 +330,29 @@
           <a href="https://wa.me/2347051548082?text=Hello%20EazyLife,%20I%20need%20help%20with%20repairs." target="_blank" class="service-link">Book a repair <i class="fas fa-arrow-right"></i></a>
         </div>
         <div class="service-card">
-          <div class="service-tag">Partner Network</div>
+          <div class="service-icon"><i class="fas fa-magnifying-glass-dollar"></i></div>
+          <h3>Tell Us Your Budget</h3>
+          <p>Don't see the exact phone or laptop you want? Give us your budget — we source it, even beyond what's currently in stock. Delivery stays fast either way.</p>
+          <a href="shop.html" class="service-link">Make a request <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><i class="fas fa-chalkboard-user"></i></div>
+          <h3>On-Site Training & Consultancy</h3>
+          <p>Need hands-on embedded systems training or technical consultancy at your location? We deliver this directly, ourselves.</p>
+          <a href="https://wa.me/2347051548082?text=Hello%20EazyLife,%20I%20am%20interested%20in%20on-site%20training%20or%20consultancy." target="_blank" class="service-link">Ask us <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="service-card">
+          <div class="service-tag" id="componentsTag">Partner Network</div>
           <div class="service-icon"><i class="fas fa-layer-group"></i></div>
           <h3>Electronic Components</h3>
-          <p>Need sensors, modules or other components beyond our own stock? We connect you with a trusted components partner.</p>
+          <p id="componentsText">Need sensors, modules or other components beyond our own stock? We connect you with a trusted components partner.</p>
           <a href="https://wa.me/2347051548082?text=Hello%20EazyLife,%20I%20am%20looking%20for%20electronic%20components." target="_blank" class="service-link">Ask us <i class="fas fa-arrow-right"></i></a>
         </div>
         <div class="service-card">
-          <div class="service-tag">Partner Network</div>
+          <div class="service-tag" id="trainingTag">Partner Network</div>
           <div class="service-icon"><i class="fas fa-graduation-cap"></i></div>
-          <h3>Industrial Training</h3>
-          <p>Looking for IT / SIWES or embedded systems training? We refer you to a vetted training partner.</p>
+          <h3>Industrial Training Placement</h3>
+          <p id="trainingText">Looking for IT / SIWES placement? We refer you to a vetted training partner.</p>
           <a href="https://wa.me/2347051548082?text=Hello%20EazyLife,%20I%20am%20interested%20in%20industrial%20training." target="_blank" class="service-link">Ask us <i class="fas fa-arrow-right"></i></a>
         </div>
       </div>
@@ -577,12 +589,19 @@
       }
     }
 
-    // ── ABOUT TEXT (dynamic from settings, falls back to static copy already in the HTML) ──
+    // ── ABOUT TEXT + REFERRAL MODE TOGGLE (dynamic from settings) ──
     async function loadAboutText() {
       try {
         const settings = await getSettings();
         if (settings.aboutText) {
           document.getElementById('aboutText').textContent = settings.aboutText;
+        }
+        const referralMode = settings.referralMode !== false; // defaults to true
+        if (!referralMode) {
+          document.getElementById('componentsTag').textContent = 'Direct';
+          document.getElementById('componentsText').textContent = "Need sensors, modules or other components beyond our own stock? We source them directly for you — fast delivery regardless.";
+          document.getElementById('trainingTag').textContent = 'Direct';
+          document.getElementById('trainingText').textContent = "Looking for IT / SIWES placement? We arrange this directly — no third party involved.";
         }
       } catch (err) {
         console.error('Settings failed to load, using static about text:', err);
