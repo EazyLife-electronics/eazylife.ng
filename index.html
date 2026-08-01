@@ -1258,13 +1258,13 @@
       observer.observe(el);
     });
 
-    // ── LOAD REVIEWS FROM reviews.json ──
+
+    // ── LOAD REVIEWS FROM FIRESTORE (managed in the admin dashboard) ──
     async function loadReviews() {
       const grid = document.getElementById('reviewsGrid');
       try {
-        const res = await fetch('https://eazylife.ng/reviews.json');
-        if (!res.ok) throw new Error('Not found');
-        const reviews = await res.json();
+        const { getApprovedReviews } = await import('./js/store.mjs');
+        const reviews = await getApprovedReviews();
 
         let html = '';
         if (reviews.length === 0) {
