@@ -17,6 +17,7 @@
 </head>
 <body class="bg-gray-50 min-h-screen">
 
+<!-- LOGIN SCREEN -->
 <div id="loginScreen" class="min-h-screen flex items-center justify-center p-6">
     <div class="bg-white w-full max-w-sm rounded-[24px] shadow-xl p-8">
         <h1 class="font-syne font-extrabold text-2xl text-center mb-1">EazyLife</h1>
@@ -28,6 +29,7 @@
     </div>
 </div>
 
+<!-- DASHBOARD (shown after login) -->
 <div id="dashboard" class="hidden">
     <header class="bg-white border-b sticky top-0 z-40 p-4 shadow-sm flex justify-between items-center">
         <h1 class="font-syne font-extrabold text-lg">EazyLife <span class="text-[#00B09B]">Admin</span></h1>
@@ -37,14 +39,17 @@
     </header>
 
     <div class="max-w-4xl mx-auto p-4">
+        <!-- TABS -->
         <div class="flex gap-2 mb-6 overflow-x-auto no-scrollbar">
             <button data-tab="products" class="tab-btn tab-active px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Products</button>
             <button data-tab="heroes" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Heroes</button>
             <button data-tab="reviews" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Reviews</button>
+            <button data-tab="requests" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Requests</button>
             <button data-tab="orders" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Orders</button>
             <button data-tab="settings" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Settings</button>
         </div>
 
+        <!-- PRODUCTS PANEL -->
         <div id="panel-products" class="tab-panel">
             <div class="bg-white p-6 rounded-[24px] shadow-sm mb-6">
                 <h2 id="formTitle" class="font-black text-lg mb-4">Add Product</h2>
@@ -78,6 +83,7 @@
             <div id="productList" class="grid gap-3"></div>
         </div>
 
+        <!-- ORDERS PANEL -->
         <div id="panel-heroes" class="tab-panel hidden">
             <div class="bg-white p-6 rounded-[24px] shadow-sm mb-6">
                 <h2 id="heroFormTitle" class="font-black text-lg mb-1">Add Hero Slide</h2>
@@ -98,7 +104,7 @@
                     </div>
                     <div id="hLinkValueWrap">
                         <input id="hLinkValue" placeholder="Category name, product, or full URL" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
-                        <p class="text-[10px] text-gray-400 mt-1 px-1">For "Links to Category": type the exact category name (e.g. Laptops). For "Links to Product": paste a product ID from the Products tab.</p>
+                        <p class="text-[10px] text-gray-400 mt-1 px-1">For "Links to Category": type the exact category name (e.g. Laptops). For "Links to Product": pick from the list below once saved once, or paste a product ID from the Products tab.</p>
                     </div>
                     <div class="flex gap-2 pt-1">
                         <button type="submit" class="flex-1 bg-gray-900 text-white py-3 rounded-xl font-bold text-sm">Save Hero</button>
@@ -133,10 +139,16 @@
             <div id="reviewList" class="grid gap-3"></div>
         </div>
 
+        <div id="panel-requests" class="tab-panel hidden">
+            <p class="text-xs text-gray-400 mb-4 px-1">"Can't find what you want" and budget-based sourcing requests from the shop. Move each through New → Contacted → Fulfilled.</p>
+            <div id="requestList" class="grid gap-3"></div>
+        </div>
+
         <div id="panel-orders" class="tab-panel hidden">
             <div id="orderList" class="grid gap-3"></div>
         </div>
 
+        <!-- SETTINGS PANEL -->
         <div id="panel-settings" class="tab-panel hidden">
             <div class="bg-white p-6 rounded-[24px] shadow-sm">
                 <h2 class="font-black text-lg mb-4">Site Settings</h2>
@@ -152,6 +164,16 @@
                     <div>
                         <label class="text-[10px] font-black uppercase text-gray-400">About Text</label>
                         <textarea id="s_about" rows="3" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"></textarea>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <label class="flex items-center gap-2 text-sm font-bold text-gray-800">
+                            <input type="checkbox" id="s_referralMode">
+                            Referral mode for Components & Training
+                        </label>
+                        <p class="text-[11px] text-gray-400 mt-2 leading-relaxed">
+                            <b>ON:</b> homepage says you connect customers with a trusted partner (current setup).<br>
+                            <b>OFF:</b> homepage says you source it directly yourself — no mention of a partner. Flip this the moment you're ready, no code changes needed.
+                        </p>
                     </div>
                     <button type="submit" class="bg-gray-900 text-white w-full py-3 rounded-xl font-bold text-sm">Save Settings</button>
                 </form>
