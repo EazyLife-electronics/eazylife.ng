@@ -4,6 +4,7 @@
 //   products/{id}   -> { name, price, promoPrice, category, image, inStock, desc }
 //   orders/{id}     -> { items[], customerName, phone, address, total, status, createdAt }
 //   settings/site   -> { whatsapp, tagline, aboutText, ... }
+//   heroes/{id}     -> { title, subtitle, image, ctaText, linkType, linkValue, order }
 
 import { initFirebase } from './firebase.mjs';
 import {
@@ -15,13 +16,11 @@ const { db } = initFirebase();
 
 /* ---------------- PRODUCTS ---------------- */
 
-// One-time fetch (used by shop.html on load)
 export async function getProducts() {
   const snap = await getDocs(collection(db, 'products'));
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
-// Live subscription (used by admin dashboard so edits reflect instantly)
 export function watchProducts(callback) {
   return onSnapshot(collection(db, 'products'), (snap) => {
     const products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -43,8 +42,6 @@ export async function deleteProduct(id) {
 
 /* ---------------- ORDERS ---------------- */
 
-// Customer submits an order from the cart. No login required to write —
-// see firestore.rules: orders can be created by anyone, but only read/edited by admin.
 export async function placeOrder(order) {
   return addDoc(collection(db, 'orders'), {
     ...order,
@@ -53,7 +50,6 @@ export async function placeOrder(order) {
   });
 }
 
-// Admin-only: live list of orders, newest first
 export function watchOrders(callback) {
   const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
   return onSnapshot(q, (snap) => {
@@ -64,6 +60,33 @@ export function watchOrders(callback) {
 
 export async function updateOrderStatus(id, status) {
   return updateDoc(doc(db, 'orders', id), { status });
+}
+
+/* ---------------- HEROES ---------------- */
+
+export async function getHeroes() {
+  const q = query(collection(db, 'heroes'), orderBy('order', 'asc'));
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+export function watchHeroes(callback) {
+  const q = query(collection(db, 'heroes'), orderBy('order', 'asc'));
+  return onSnapshot(q, (snap) => {
+    callback(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+  });
+}
+
+export async function addHero(hero) {
+  return addDoc(collection(db, 'heroes'), hero);
+}
+
+export async function updateHero(id, updates) {
+  return updateDoc(doc(db, 'heroes', id), updates);
+}
+
+export async function deleteHero(id) {
+  return deleteDoc(doc(db, 'heroes', id));
 }
 
 /* ---------------- SETTINGS ---------------- */
