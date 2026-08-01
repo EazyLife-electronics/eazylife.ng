@@ -490,13 +490,27 @@
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // Formspree review submission — unchanged behavior (goes to your email for manual approval in admin)
+// Formspree review submission (email backup) + direct Firestore write (shows in admin instantly, unapproved)
     document.getElementById('reviewForm').addEventListener('submit', async function (e) {
       e.preventDefault();
       const form = e.target;
       const data = new FormData(form);
       try {
         const res = await fetch(form.action, { method: 'POST', body: data, headers: { 'Accept': 'application/json' } });
+
+        try {
+          const { addReview } = await import('./js/store.mjs');
+          await addReview({
+            name: data.get('name') || '',
+            title: data.get('title') || '',
+            stars: parseInt(data.get('stars'), 10) || 0,
+            text: data.get('review') || '',
+            approved: false
+          });
+        } catch (fsErr) {
+          console.error('Firestore review save failed (email copy still sent):', fsErr);
+        }
+
         if (res.ok) {
           form.style.display = 'none';
           document.getElementById('formSuccess').classList.add('show');
