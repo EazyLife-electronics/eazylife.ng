@@ -125,8 +125,32 @@
             return;
         }
         loadUserData();
-        updateUI();
+        applyIncomingLink();
         document.getElementById("search").addEventListener("keyup", filterProducts);
+    }
+
+    // Handles hero-carousel links from the homepage: shop.html?category=Laptops or shop.html?product=abc123
+    function applyIncomingLink() {
+        const params = new URLSearchParams(window.location.search);
+        const categoryParam = params.get('category');
+        const productParam = params.get('product');
+
+        if (productParam) {
+            const p = products.find(i => i.id === productParam);
+            if (p) {
+                currentCategory = p.category;
+                renderCategoryButtons();
+                renderProducts([p]);
+                updateCartCount();
+                return;
+            }
+        }
+        if (categoryParam && products.some(p => p.category === categoryParam)) {
+            updateUI(); // builds category buttons first
+            filterByCategory(categoryParam);
+            return;
+        }
+        updateUI();
     }
 
     function updateUI() {
