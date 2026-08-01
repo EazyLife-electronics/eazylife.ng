@@ -3,6 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>
+    (function () {
+      var saved = localStorage.getItem('eazylife-theme');
+      var theme = saved || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
   <title>EazyLife | Robotics & Electronics Solutions — Ibadan, Nigeria</title>
   <meta name="description" content="EazyLife Robotics & Electronics Solutions — Premium laptops, custom Arduino/ESP32 embedded systems, and professional device repairs in Ibadan, Nigeria. CAC Registered RC-9462420." />
   <meta name="keywords" content="laptop Ibadan, electronics Ibadan, Arduino Nigeria, ESP32 Ibadan, laptop repair Ibadan, robotics Nigeria, embedded systems Nigeria, HP Dell laptop Ibadan" />
@@ -254,6 +261,44 @@
       .form-row { grid-template-columns: 1fr 1fr; }
       .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; }
     }
+    :root[data-theme="dark"] {
+      --dm-bg: #10181a; --dm-surface: #1a2422; --dm-surface-2: #202b29;
+      --dm-text: #eef2f0; --dm-text-light: #9fb0ac; --dm-border: #2c3a37;
+    }
+    :root[data-theme="dark"] body { background: var(--dm-bg); color: var(--dm-text); }
+    :root[data-theme="dark"] .nav { background: rgba(16,24,26,0.92); border-bottom-color: var(--dm-border); }
+    :root[data-theme="dark"] .hero { background: linear-gradient(180deg, #163330 0%, var(--dm-bg) 100%); }
+    :root[data-theme="dark"] .hero-badge { background: var(--dm-surface); border-color: var(--dm-border); color: var(--dm-text); }
+    :root[data-theme="dark"] .section-title { color: var(--dm-text); }
+    :root[data-theme="dark"] .section-sub { color: var(--dm-text-light); }
+    :root[data-theme="dark"] #shop-preview { background: var(--dm-bg); }
+    :root[data-theme="dark"] .product-card,
+    :root[data-theme="dark"] .service-card,
+    :root[data-theme="dark"] .review-card,
+    :root[data-theme="dark"] .contact-item,
+    :root[data-theme="dark"] .social-card,
+    :root[data-theme="dark"] .review-form-wrap { background: var(--dm-surface); border-color: var(--dm-border); }
+    :root[data-theme="dark"] .product-card img { background: var(--dm-surface-2); }
+    :root[data-theme="dark"] .product-card h4,
+    :root[data-theme="dark"] .service-card h3,
+    :root[data-theme="dark"] .review-card .who,
+    :root[data-theme="dark"] .contact-item h4,
+    :root[data-theme="dark"] .social-card h4,
+    :root[data-theme="dark"] .review-form-wrap h3,
+    :root[data-theme="dark"] .form-group label { color: var(--dm-text); }
+    :root[data-theme="dark"] .product-card .price,
+    :root[data-theme="dark"] .service-card p,
+    :root[data-theme="dark"] .review-card p.text,
+    :root[data-theme="dark"] .contact-item p,
+    :root[data-theme="dark"] .social-card p,
+    :root[data-theme="dark"] .review-form-wrap > p { color: var(--dm-text-light); }
+    :root[data-theme="dark"] .form-group input,
+    :root[data-theme="dark"] .form-group select,
+    :root[data-theme="dark"] .form-group textarea { background: var(--dm-surface-2); border-color: var(--dm-border); color: var(--dm-text); }
+    :root[data-theme="dark"] .btn-outline { background: var(--dm-surface); color: var(--dm-text); border-color: var(--dm-border); }
+    :root[data-theme="dark"] footer.site-footer { border-top-color: var(--dm-border); color: var(--dm-text-light); }
+    .theme-toggle { width: 38px; height: 38px; border-radius: 999px; border: 1.5px solid var(--border); background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.95rem; color: var(--dark); }
+    :root[data-theme="dark"] .theme-toggle { background: var(--dm-surface); border-color: var(--dm-border); color: var(--dm-text); }
   </style>
 </head>
 <body>
@@ -261,8 +306,9 @@
   <!-- NAV -->
   <nav class="nav">
     <div class="nav-inner">
-      <a href="#" class="nav-logo"><img src="assets/pictures/logo_green.png" alt="EazyLife" style="height:34px;width:auto;display:block;"></a>
+      <a href="#" class="nav-logo"><img id="navLogo" src="assets/pictures/logo_black_transparent.png" alt="EazyLife" style="height:34px;width:auto;display:block;"></a>
       <div class="nav-actions">
+        <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode" type="button"><i class="fas fa-moon"></i></button>
         <a href="shop.html" class="btn btn-outline"><i class="fas fa-shopping-basket"></i> Shop</a>
         <a href="https://wa.me/2347051548082" target="_blank" class="btn btn-wa"><i class="fab fa-whatsapp"></i></a>
       </div>
@@ -488,6 +534,36 @@
 
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    function applyThemeVisuals() {
+      var theme = document.documentElement.getAttribute('data-theme');
+      var logo = document.getElementById('navLogo');
+      var toggleIcon = document.querySelector('#themeToggle i');
+      if (theme === 'dark') {
+        logo.src = 'assets/pictures/logo_white_transparent.png';
+        if (toggleIcon) { toggleIcon.className = 'fas fa-sun'; }
+      } else {
+        logo.src = 'assets/pictures/logo_black_transparent.png';
+        if (toggleIcon) { toggleIcon.className = 'fas fa-moon'; }
+      }
+    }
+    applyThemeVisuals();
+
+    document.getElementById('themeToggle').addEventListener('click', function () {
+      var current = document.documentElement.getAttribute('data-theme');
+      var next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('eazylife-theme', next);
+      applyThemeVisuals();
+    });
+
+    // If the person hasn't manually chosen a theme, keep following the system preference live
+    if (window.matchMedia && !localStorage.getItem('eazylife-theme')) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+        document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+        applyThemeVisuals();
+      });
+    }
 
     // Formspree review submission (email backup) + direct Firestore write (shows in admin instantly, unapproved)
     document.getElementById('reviewForm').addEventListener('submit', async function (e) {
