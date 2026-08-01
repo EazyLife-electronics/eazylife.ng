@@ -5,6 +5,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   watchProducts, addProduct, updateProduct, deleteProduct,
+  watchHeroes, addHero, updateHero, deleteHero,
   watchOrders, updateOrderStatus,
   getSettings, saveSettings
 } from '../../js/store.mjs';
@@ -12,7 +13,9 @@ import {
 const { auth } = initFirebase();
 
 let allProducts = [];
+let allHeroes = [];
 let unsubProducts = null;
+let unsubHeroes = null;
 let unsubOrders = null;
 
 /* ---------------- AUTH ---------------- */
@@ -41,6 +44,7 @@ onAuthStateChanged(auth, (user) => {
     document.getElementById('dashboard').classList.add('hidden');
     document.getElementById('loginScreen').classList.remove('hidden');
     if (unsubProducts) unsubProducts();
+    if (unsubHeroes) unsubHeroes();
     if (unsubOrders) unsubOrders();
   }
 });
@@ -49,6 +53,10 @@ function startDashboard() {
   unsubProducts = watchProducts((products) => {
     allProducts = products;
     renderProductList();
+  });
+  unsubHeroes = watchHeroes((heroes) => {
+    allHeroes = heroes;
+    renderHeroList();
   });
   unsubOrders = watchOrders(renderOrderList);
   loadSettingsForm();
@@ -137,6 +145,7 @@ function renderProductList() {
           ${p.promoPrice > 0 ? `<span class="text-red-500">(promo ₦${p.promoPrice.toLocaleString()})</span>` : ''}
           ${p.inStock === false ? '<span class="text-red-400">· OUT OF STOCK</span>' : ''}
         </p>
+        <p class="text-[9px] text-gray-300 font-mono select-all">ID: ${p.id}</p>
       </div>
       <div class="flex flex-col gap-1 flex-shrink-0">
         <button data-edit="${p.id}" class="text-[10px] bg-gray-100 hover:bg-black hover:text-white px-3 py-1 rounded-md font-bold transition-all">EDIT</button>
@@ -150,6 +159,82 @@ function renderProductList() {
 }
 
 document.getElementById('productSearch').addEventListener('keyup', renderProductList);
+
+/* ---------------- HEROES ---------------- */
+
+const heroForm = document.getElementById('heroForm');
+heroForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const editId = document.getElementById('heroEditId').value;
+
+  const hero = {
+    title: document.getElementById('hTitle').value.trim(),
+    subtitle: document.getElementById('hSubtitle').value.trim(),
+    image: document.getElementById('hImage').value.trim(),
+    ctaText: document.getElementById('hCtaText').value.trim(),
+    linkType: document.getElementById('hLinkType').value,
+    linkValue: document.getElementById('hLinkValue').value.trim(),
+    order: parseInt(document.getElementById('hOrder').value, 10) || 0
+  };
+
+  try {
+    if (editId) {
+      await updateHero(editId, hero);
+    } else {
+      await addHero(hero);
+    }
+    resetHeroForm();
+  } catch (err) {
+    alert('Failed to save hero slide: ' + err.message);
+  }
+});
+
+document.getElementById('heroResetBtn').addEventListener('click', resetHeroForm);
+
+function resetHeroForm() {
+  heroForm.reset();
+  document.getElementById('heroEditId').value = '';
+  document.getElementById('heroFormTitle').textContent = 'Add Hero Slide';
+}
+
+function editHero(id) {
+  const h = allHeroes.find(x => x.id === id);
+  if (!h) return;
+  document.getElementById('heroEditId').value = h.id;
+  document.getElementById('hTitle').value = h.title || '';
+  document.getElementById('hSubtitle').value = h.subtitle || '';
+  document.getElementById('hImage').value = h.image || '';
+  document.getElementById('hCtaText').value = h.ctaText || '';
+  document.getElementById('hLinkType').value = h.linkType || 'category';
+  document.getElementById('hLinkValue').value = h.linkValue || '';
+  document.getElementById('hOrder').value = h.order ?? 0;
+  document.getElementById('heroFormTitle').textContent = 'Editing: ' + h.title;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function removeHero(id) {
+  if (!confirm('Delete this hero slide?')) return;
+  await deleteHero(id);
+}
+
+function renderHeroList() {
+  document.getElementById('heroList').innerHTML = allHeroes.map(h => `
+    <div class="bg-white p-4 rounded-2xl border border-gray-100 flex items-center gap-4 shadow-sm">
+      <img src="${h.image || 'https://via.placeholder.com/60x40'}" class="w-16 h-10 rounded-lg object-cover bg-gray-100 flex-shrink-0">
+      <div class="flex-grow min-w-0">
+        <h4 class="font-bold text-xs text-gray-800 leading-tight truncate">${h.title}</h4>
+        <p class="text-[10px] text-gray-400 font-bold uppercase">Order ${h.order ?? 0} · ${h.linkType} → ${h.linkValue}</p>
+      </div>
+      <div class="flex flex-col gap-1 flex-shrink-0">
+        <button data-hedit="${h.id}" class="text-[10px] bg-gray-100 hover:bg-black hover:text-white px-3 py-1 rounded-md font-bold transition-all">EDIT</button>
+        <button data-hdel="${h.id}" class="text-[10px] bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-3 py-1 rounded-md font-bold transition-all">DEL</button>
+      </div>
+    </div>
+  `).join('') || `<p class="text-center text-gray-400 text-sm py-10">No hero slides yet — add one above. The homepage carousel stays hidden until you add at least one.</p>`;
+
+  document.querySelectorAll('[data-hedit]').forEach(b => b.addEventListener('click', () => editHero(b.dataset.hedit)));
+  document.querySelectorAll('[data-hdel]').forEach(b => b.addEventListener('click', () => removeHero(b.dataset.hdel)));
+}
 
 /* ---------------- ORDERS ---------------- */
 
