@@ -102,8 +102,50 @@
     </div>
 </div>
 
+<!-- REQUEST MODAL — "can't find what you want" / budget-based sourcing -->
+<div id="requestModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-end md:items-center justify-center">
+    <div class="bg-white w-full max-w-md rounded-t-[32px] md:rounded-[24px] shadow-2xl p-6 overflow-y-auto max-h-[90vh]">
+
+        <div id="requestStep">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="font-syne font-extrabold text-2xl text-gray-900">Tell Us What You Need</h2>
+                <button onclick="hideRequestModal()" class="text-gray-400 p-2 text-3xl">&times;</button>
+            </div>
+            <p class="text-sm text-gray-500 mb-5">Give us your budget and what you're after — we'll source it, even if it's not in our current catalog.</p>
+
+            <div class="space-y-3 mb-6">
+                <input id="reqName" placeholder="Full Name" class="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl text-sm outline-none">
+                <input id="reqPhone" placeholder="Phone / WhatsApp Number" class="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl text-sm outline-none">
+                <select id="reqCategory" class="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl text-sm outline-none">
+                    <option value="">What kind of item? (optional)</option>
+                    <option value="Laptop">Laptop</option>
+                    <option value="Phone">Phone</option>
+                    <option value="Component">Electronic Component</option>
+                    <option value="Other">Other</option>
+                </select>
+                <input id="reqBudget" type="number" placeholder="Your Budget (₦, optional)" class="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl text-sm outline-none">
+                <textarea id="reqNeed" placeholder="Describe what you're looking for" rows="3" class="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl text-sm outline-none"></textarea>
+            </div>
+
+            <button onclick="submitRequest()" id="requestSubmitBtn" class="bg-gray-900 text-white w-full py-4 rounded-2xl font-black text-lg shadow-xl hover:bg-black transition-all flex items-center justify-center gap-2">
+                <i class="fas fa-paper-plane"></i> Send Request
+            </button>
+        </div>
+
+        <div id="requestConfirmStep" class="hidden text-center py-6">
+            <div class="text-5xl text-teal mb-4"><i class="fas fa-circle-check"></i></div>
+            <h2 class="font-syne font-extrabold text-2xl text-gray-900 mb-2">Got It!</h2>
+            <p class="text-gray-500 text-sm mb-8">We've received your request and will reach out shortly with options that fit your budget.</p>
+            <a id="reqWaConfirmLink" href="#" target="_blank" class="bg-[#25D366] text-white w-full py-3 rounded-2xl font-bold text-sm shadow-lg hover:bg-[#1ebd57] transition-all flex items-center justify-center gap-2 mb-3">
+                <i class="fab fa-whatsapp"></i> Also message us on WhatsApp (optional)
+            </a>
+            <button onclick="hideRequestModal()" class="text-gray-400 text-sm font-bold">Close</button>
+        </div>
+    </div>
+</div>
+
 <script type="module">
-    import { getProducts, placeOrder, getSettings } from './js/store.mjs';
+    import { getProducts, placeOrder, placeRequest, getSettings } from './js/store.mjs';
 
     const CKEY = "eazylife_cart_v2";
     const UKEY = "eazylife_user_v2";
@@ -163,7 +205,13 @@
         const grid = document.getElementById("grid");
         grid.innerHTML = "";
         if (list.length === 0) {
-            grid.innerHTML = `<div class="col-span-full text-center py-20 text-gray-400 font-bold">Product not found.</div>`;
+            grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-400 font-bold">Nothing matched — but we can still help.</div>`;
+            grid.innerHTML += `
+                <div onclick="showRequestModal()" class="product-card col-span-full" style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; cursor:pointer; background:#f0fdfb; border:1.5px dashed #00B09B; padding:24px;">
+                    <i class="fas fa-magnifying-glass-dollar" style="font-size:1.8rem; color:#00B09B; margin-bottom:10px;"></i>
+                    <h3 style="font-size:0.9rem; font-weight:800; color:#1a2e2b; margin-bottom:4px;">Can't find what you want?</h3>
+                    <p style="font-size:0.78rem; color:#777;">Tell us your budget and what you need — we'll source it directly.</p>
+                </div>`;
             return;
         }
         list.forEach(p => {
@@ -190,6 +238,12 @@
                     </div>
                 </div>`;
         });
+        grid.innerHTML += `
+            <div onclick="showRequestModal()" class="product-card" style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; cursor:pointer; background:#f0fdfb; border:1.5px dashed #00B09B;">
+                <i class="fas fa-magnifying-glass-dollar" style="font-size:1.6rem; color:#00B09B; margin-bottom:8px;"></i>
+                <h3 style="font-size:0.82rem; font-weight:800; color:#1a2e2b; margin-bottom:4px;">Can't find what you want?</h3>
+                <p style="font-size:0.72rem; color:#777; margin-bottom:0;">Tell us your budget — we'll source it.</p>
+            </div>`;
     }
 
     function renderCategoryButtons() {
@@ -308,6 +362,7 @@
                 total
             });
 
+            // Build an optional WhatsApp confirmation link (not required — order already saved)
             let msg = `*EAZYLIFE - NEW ORDER*%0A%0A`;
             cart.forEach(i => { msg += `• ${i.name}%0A  Qty: ${i.quantity} | ₦${(i.price * i.quantity).toLocaleString()}%0A%0A`; });
             msg += `*TOTAL: ₦${total.toLocaleString()}*%0A%0A*Name:* ${name}%0A*Phone:* ${phone}%0A*Address:* ${addr}`;
@@ -328,12 +383,63 @@
         }
     }
 
+    function showRequestModal() {
+        document.getElementById('requestStep').classList.remove('hidden');
+        document.getElementById('requestConfirmStep').classList.add('hidden');
+        document.getElementById('requestModal').classList.remove('hidden');
+    }
+
+    function hideRequestModal() {
+        document.getElementById('requestModal').classList.add('hidden');
+    }
+
+    async function submitRequest() {
+        const name = document.getElementById('reqName').value.trim();
+        const phone = document.getElementById('reqPhone').value.trim();
+        const category = document.getElementById('reqCategory').value;
+        const budget = document.getElementById('reqBudget').value.trim();
+        const need = document.getElementById('reqNeed').value.trim();
+
+        if (!name || !phone || !need) return alert("Please share your name, phone, and what you're looking for.");
+
+        const btn = document.getElementById('requestSubmitBtn');
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Sending...`;
+
+        try {
+            await placeRequest({
+                name, phone, need,
+                category: category || null,
+                budget: budget ? parseInt(budget, 10) : null
+            });
+
+            let msg = `*EAZYLIFE - CUSTOM REQUEST*%0A%0A*Looking for:* ${need}%0A`;
+            if (category) msg += `*Category:* ${category}%0A`;
+            if (budget) msg += `*Budget:* ₦${parseInt(budget, 10).toLocaleString()}%0A`;
+            msg += `%0A*Name:* ${name}%0A*Phone:* ${phone}`;
+            document.getElementById('reqWaConfirmLink').href = `https://wa.me/${whatsappNumber}?text=${msg}`;
+
+            document.getElementById('requestStep').classList.add('hidden');
+            document.getElementById('requestConfirmStep').classList.remove('hidden');
+        } catch (e) {
+            console.error(e);
+            alert("Something went wrong sending your request. Please try again or message us on WhatsApp.");
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fas fa-paper-plane"></i> Send Request`;
+        }
+    }
+
+    // Expose functions used by inline onclick handlers (module scripts are not global by default)
     window.addToCart = addToCart;
     window.changeQty = changeQty;
     window.showCart = showCart;
     window.hideCart = hideCart;
     window.filterByCategory = filterByCategory;
     window.submitOrder = submitOrder;
+    window.showRequestModal = showRequestModal;
+    window.hideRequestModal = hideRequestModal;
+    window.submitRequest = submitRequest;
 
     init();
 </script>
