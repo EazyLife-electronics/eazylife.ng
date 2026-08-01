@@ -6,6 +6,7 @@ import {
 import {
   watchProducts, addProduct, updateProduct, deleteProduct,
   watchHeroes, addHero, updateHero, deleteHero,
+  watchReviews, addReview, updateReview, deleteReview,
   watchOrders, updateOrderStatus,
   getSettings, saveSettings
 } from '../../js/store.mjs';
@@ -14,8 +15,10 @@ const { auth } = initFirebase();
 
 let allProducts = [];
 let allHeroes = [];
+let allReviews = [];
 let unsubProducts = null;
 let unsubHeroes = null;
+let unsubReviews = null;
 let unsubOrders = null;
 
 /* ---------------- AUTH ---------------- */
@@ -45,6 +48,7 @@ onAuthStateChanged(auth, (user) => {
     document.getElementById('loginScreen').classList.remove('hidden');
     if (unsubProducts) unsubProducts();
     if (unsubHeroes) unsubHeroes();
+    if (unsubReviews) unsubReviews();
     if (unsubOrders) unsubOrders();
   }
 });
@@ -57,6 +61,10 @@ function startDashboard() {
   unsubHeroes = watchHeroes((heroes) => {
     allHeroes = heroes;
     renderHeroList();
+  });
+  unsubReviews = watchReviews((reviews) => {
+    allReviews = reviews;
+    renderReviewList();
   });
   unsubOrders = watchOrders(renderOrderList);
   loadSettingsForm();
@@ -234,6 +242,61 @@ function renderHeroList() {
 
   document.querySelectorAll('[data-hedit]').forEach(b => b.addEventListener('click', () => editHero(b.dataset.hedit)));
   document.querySelectorAll('[data-hdel]').forEach(b => b.addEventListener('click', () => removeHero(b.dataset.hdel)));
+}
+
+/* ---------------- REVIEWS ---------------- */
+
+document.getElementById('reviewAddForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const review = {
+    name: document.getElementById('rvName').value.trim(),
+    title: document.getElementById('rvTitle').value.trim(),
+    stars: parseInt(document.getElementById('rvStars').value, 10),
+    text: document.getElementById('rvText').value.trim(),
+    approved: document.getElementById('rvApproved').checked
+  };
+  try {
+    await addReview(review);
+    e.target.reset();
+    document.getElementById('rvApproved').checked = true;
+  } catch (err) {
+    alert('Failed to save review: ' + err.message);
+  }
+});
+
+async function toggleReviewApproval(id, current) {
+  await updateReview(id, { approved: !current });
+}
+
+async function removeReview(id) {
+  if (!confirm('Delete this review permanently?')) return;
+  await deleteReview(id);
+}
+
+function renderReviewList() {
+  document.getElementById('reviewList').innerHTML = allReviews.map(r => `
+    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+      <div class="flex justify-between items-start mb-2">
+        <div>
+          <p class="font-bold text-sm text-gray-800">${r.name}</p>
+          <p class="text-xs text-gray-400">${r.title || ''} · ${'★'.repeat(r.stars || 0)}${'☆'.repeat(5 - (r.stars || 0))}</p>
+        </div>
+        <span class="text-[10px] font-bold uppercase px-2 py-1 rounded-full ${r.approved ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}">${r.approved ? 'Live' : 'Hidden'}</span>
+      </div>
+      <p class="text-xs text-gray-600 mb-3">"${r.text}"</p>
+      <div class="flex gap-2">
+        <button data-toggle="${r.id}" data-current="${r.approved}" class="toggle-review-btn text-[10px] ${r.approved ? 'bg-gray-100 text-gray-600' : 'bg-gray-900 text-white'} px-3 py-1.5 rounded-md font-bold">
+          ${r.approved ? 'Deactivate' : 'Approve'}
+        </button>
+        <button data-rvdel="${r.id}" class="text-[10px] bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-3 py-1.5 rounded-md font-bold transition-all">Delete</button>
+      </div>
+    </div>
+  `).join('') || `<p class="text-center text-gray-400 text-sm py-10">No reviews yet — add one above.</p>`;
+
+  document.querySelectorAll('.toggle-review-btn').forEach(btn => {
+    btn.addEventListener('click', () => toggleReviewApproval(btn.dataset.toggle, btn.dataset.current === 'true'));
+  });
+  document.querySelectorAll('[data-rvdel]').forEach(b => b.addEventListener('click', () => removeReview(b.dataset.rvdel)));
 }
 
 /* ---------------- ORDERS ---------------- */
