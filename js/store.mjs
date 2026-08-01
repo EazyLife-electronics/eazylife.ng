@@ -5,6 +5,7 @@
 //   orders/{id}     -> { items[], customerName, phone, address, total, status, createdAt }
 //   settings/site   -> { whatsapp, tagline, aboutText, ... }
 //   heroes/{id}     -> { title, subtitle, image, ctaText, linkType, linkValue, order }
+//   reviews/{id}    -> { name, title, stars, text, approved }
 
 import { initFirebase } from './firebase.mjs';
 import {
@@ -87,6 +88,33 @@ export async function updateHero(id, updates) {
 
 export async function deleteHero(id) {
   return deleteDoc(doc(db, 'heroes', id));
+}
+
+/* ---------------- REVIEWS ---------------- */
+
+export async function getApprovedReviews() {
+  const snap = await getDocs(collection(db, 'reviews'));
+  return snap.docs
+    .map(d => ({ id: d.id, ...d.data() }))
+    .filter(r => r.approved === true);
+}
+
+export function watchReviews(callback) {
+  return onSnapshot(collection(db, 'reviews'), (snap) => {
+    callback(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+  });
+}
+
+export async function addReview(review) {
+  return addDoc(collection(db, 'reviews'), review);
+}
+
+export async function updateReview(id, updates) {
+  return updateDoc(doc(db, 'reviews', id), updates);
+}
+
+export async function deleteReview(id) {
+  return deleteDoc(doc(db, 'reviews', id));
 }
 
 /* ---------------- SETTINGS ---------------- */
