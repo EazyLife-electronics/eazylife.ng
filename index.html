@@ -315,6 +315,10 @@
       <a href="#" class="nav-logo"><img id="navLogo" src="assets/pictures/logo_black_transparent.png" alt="EazyLife" style="height:34px;width:auto;display:block;"></a>
       <div class="nav-actions">
         <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode" type="button"><i class="fas fa-moon"></i></button>
+        <a href="shop.html#cart" id="navCartBtn" class="btn btn-outline" style="position:relative; display:none;">
+          <i class="fas fa-shopping-basket"></i>
+          <span id="navCartCount" style="background:var(--teal); color:#fff; border-radius:999px; padding:1px 7px; font-size:0.68rem; font-weight:800;">0</span>
+        </a>
         <a href="shop.html" class="btn btn-outline"><i class="fas fa-shopping-basket"></i> Shop</a>
         <a href="https://wa.me/2347051548082" target="_blank" class="btn btn-wa"><i class="fab fa-whatsapp"></i></a>
       </div>
@@ -554,6 +558,19 @@
       }
     }
     applyThemeVisuals();
+
+    // Read the shared cart (same localStorage key shop.html uses) so someone who wandered
+    // back to the homepage is reminded they left items waiting.
+    (function showCartReminder() {
+      try {
+        var cart = JSON.parse(localStorage.getItem('eazylife_cart_v2')) || [];
+        var totalQty = cart.reduce(function (a, b) { return a + (b.quantity || 0); }, 0);
+        if (totalQty > 0) {
+          document.getElementById('navCartCount').textContent = totalQty;
+          document.getElementById('navCartBtn').style.display = 'inline-flex';
+        }
+      } catch (e) { /* no cart yet, nothing to show */ }
+    })();
 
     document.getElementById('themeToggle').addEventListener('click', function () {
       var current = document.documentElement.getAttribute('data-theme');
