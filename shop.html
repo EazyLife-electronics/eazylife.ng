@@ -388,9 +388,9 @@
                     <p class="text-xs text-teal font-bold">₦${(i.price * i.quantity).toLocaleString()}</p>
                 </div>
                 <div class="flex items-center gap-3 bg-gray-50 dark:bg-[#1c2925] p-1 rounded-xl">
-                    <button onclick="changeQty('${i.id}',-1)" class="w-7 h-7 bg-white dark:bg-[#182420] rounded-lg shadow-sm font-bold">-</button>
-                    <span class="font-black text-sm w-4 text-center">${i.quantity}</span>
-                    <button onclick="changeQty('${i.id}',1)" class="w-7 h-7 bg-white dark:bg-[#182420] rounded-lg shadow-sm font-bold">+</button>
+                    <button onclick="changeQty('${i.id}',-1)" class="w-7 h-7 bg-white dark:bg-[#182420] dark:text-gray-100 rounded-lg shadow-sm font-bold">-</button>
+                    <span class="font-black text-sm w-4 text-center dark:text-gray-100">${i.quantity}</span>
+                    <button onclick="changeQty('${i.id}',1)" class="w-7 h-7 bg-white dark:bg-[#182420] dark:text-gray-100 rounded-lg shadow-sm font-bold">+</button>
                 </div>
             </div>
         `).join('');
