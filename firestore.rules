@@ -3,16 +3,11 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Products: anyone can read (shop needs this), only a logged-in admin can write.
     match /products/{productId} {
       allow read: if true;
       allow write: if request.auth != null;
     }
 
-    // Orders: anyone can CREATE an order (checkout doesn't require login),
-    // but only the admin can read the order list or change its status.
-    // No public update/delete — a customer can place an order but never edit/cancel
-    // someone else's, and can't read other customers' orders.
     match /orders/{orderId} {
       allow create: if request.resource.data.keys().hasAll(['items', 'customerName', 'phone', 'total'])
                     && request.resource.data.total is number
@@ -20,27 +15,24 @@ service cloud.firestore {
       allow read, update, delete: if request.auth != null;
     }
 
-    // Site settings (tagline, whatsapp number, colors, etc): public read, admin write.
     match /settings/{docId} {
       allow read: if true;
       allow write: if request.auth != null;
     }
 
-    // Homepage hero slides: public read, only admin can add/edit/reorder.
     match /heroes/{heroId} {
       allow read: if true;
       allow write: if request.auth != null;
     }
 
-    // Customer reviews: public read (client filters to approved only),
-    // only admin can add/approve/deactivate/delete.
     match /reviews/{reviewId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow create: if request.resource.data.keys().hasAll(['name', 'text'])
+                    && request.resource.data.name is string
+                    && request.resource.data.text is string;
+      allow update, delete: if request.auth != null;
     }
 
-    // Sourcing / "can't find what you want" requests: anyone can create one,
-    // only the admin can read the list or update its status.
     match /requests/{requestId} {
       allow create: if request.resource.data.keys().hasAll(['name', 'phone', 'need'])
                     && request.resource.data.name is string
