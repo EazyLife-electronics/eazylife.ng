@@ -14,6 +14,11 @@ import {
 
 const { auth } = initFirebase();
 
+// Used by the image picker to list files from assets/products/ and assets/heroes/ on GitHub.
+// Update BRANCH if you later switch which branch GitHub Pages deploys from.
+const GITHUB_REPO = 'EazyLife-electronics/eazylife.ng';
+const GITHUB_BRANCH = 'firebase-v2';
+
 let allProducts = [];
 let allHeroes = [];
 let allReviews = [];
@@ -60,6 +65,7 @@ function startDashboard() {
   unsubProducts = watchProducts((products) => {
     allProducts = products;
     renderProductList();
+    refreshHeroLinkOptions();
   });
   unsubHeroes = watchHeroes((heroes) => {
     allHeroes = heroes;
@@ -85,6 +91,74 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     document.getElementById(`panel-${tab}`).classList.remove('hidden');
   });
 });
+
+/* ---------------- IMAGE PICKER (shared by Products + Heroes) ---------------- */
+// Lists images from assets/products/ or assets/heroes/ on GitHub so a non-technical
+// manager can click a thumbnail instead of typing/copying an image URL.
+
+let pickerTargetInput = null;
+
+function updateImagePreview(inputId, previewId) {
+  const val = document.getElementById(inputId).value.trim();
+  const img = document.getElementById(previewId);
+  if (val) {
+    img.src = val.startsWith('http') ? val : '../' + val;
+    img.classList.remove('hidden');
+  } else {
+    img.classList.add('hidden');
+  }
+}
+
+document.getElementById('pImage').addEventListener('input', () => updateImagePreview('pImage', 'pImagePreview'));
+document.getElementById('hImage').addEventListener('input', () => updateImagePreview('hImage', 'hImagePreview'));
+
+async function openImagePicker(folder, targetInputId) {
+  pickerTargetInput = targetInputId;
+  const modal = document.getElementById('imagePickerModal');
+  const grid = document.getElementById('pickerGrid');
+  const hint = document.getElementById('pickerHint');
+  hint.textContent = `Showing images from assets/${folder}/ — upload more there on GitHub anytime.`;
+  grid.innerHTML = `<p class="col-span-3 text-center text-gray-400 text-sm py-10">Loading images...</p>`;
+  modal.classList.remove('hidden');
+
+  try {
+    const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/assets/${folder}?ref=${GITHUB_BRANCH}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Folder not found — has it been created yet?');
+    const files = (await res.json()).filter(f => f.type === 'file' && /\.(jpe?g|png|webp|gif)$/i.test(f.name));
+
+    if (files.length === 0) {
+      grid.innerHTML = `<p class="col-span-3 text-center text-gray-400 text-sm py-10">No images in assets/${folder}/ yet. Upload some on GitHub, then come back.</p>`;
+      return;
+    }
+
+    grid.innerHTML = files.map(f => `
+      <button type="button" data-picker-path="${f.path}" data-picker-url="${f.download_url}"
+              class="picker-thumb rounded-lg overflow-hidden border border-gray-200 hover:border-[#00B09B] aspect-square bg-gray-50">
+        <img src="${f.download_url}" class="w-full h-full object-cover" loading="lazy">
+      </button>
+    `).join('');
+
+    document.querySelectorAll('.picker-thumb').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const path = btn.dataset.pickerPath; // e.g. assets/products/laptop1.jpg — works directly from index.html/shop.html
+        document.getElementById(pickerTargetInput).value = path;
+        const previewId = pickerTargetInput === 'pImage' ? 'pImagePreview' : 'hImagePreview';
+        updateImagePreview(pickerTargetInput, previewId);
+        closeImagePicker();
+      });
+    });
+  } catch (err) {
+    grid.innerHTML = `<p class="col-span-3 text-center text-red-400 text-sm py-10">Couldn't load images: ${err.message}</p>`;
+  }
+}
+
+function closeImagePicker() {
+  document.getElementById('imagePickerModal').classList.add('hidden');
+}
+
+window.openImagePicker = openImagePicker;
+window.closeImagePicker = closeImagePicker;
 
 /* ---------------- PRODUCTS ---------------- */
 
@@ -121,6 +195,7 @@ function resetForm() {
   productForm.reset();
   document.getElementById('editId').value = '';
   document.getElementById('formTitle').textContent = 'Add Product';
+  updateImagePreview('pImage', 'pImagePreview');
 }
 
 function editProduct(id) {
@@ -135,6 +210,7 @@ function editProduct(id) {
   document.getElementById('pDesc').value = p.desc || '';
   document.getElementById('pInStock').value = p.inStock === false ? 'false' : 'true';
   document.getElementById('formTitle').textContent = 'Editing: ' + p.name;
+  updateImagePreview('pImage', 'pImagePreview');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -175,6 +251,38 @@ document.getElementById('productSearch').addEventListener('keyup', renderProduct
 /* ---------------- HEROES ---------------- */
 
 const heroForm = document.getElementById('heroForm');
+const hLinkTypeEl = document.getElementById('hLinkType');
+const hLinkValueCategoryEl = document.getElementById('hLinkValueCategory');
+const hLinkValueProductEl = document.getElementById('hLinkValueProduct');
+const hLinkValueUrlEl = document.getElementById('hLinkValueUrl');
+
+function refreshHeroLinkOptions() {
+  const categories = [...new Set(allProducts.map(p => p.category).filter(Boolean))];
+  hLinkValueCategoryEl.innerHTML = categories.length
+    ? categories.map(c => `<option value="${c}">${c}</option>`).join('')
+    : `<option value="">No categories yet — add a product first</option>`;
+
+  hLinkValueProductEl.innerHTML = allProducts.length
+    ? allProducts.map(p => `<option value="${p.id}">${p.name}</option>`).join('')
+    : `<option value="">No products yet</option>`;
+}
+
+function updateHeroLinkTypeVisibility() {
+  const type = hLinkTypeEl.value;
+  hLinkValueCategoryEl.classList.toggle('hidden', type !== 'category');
+  hLinkValueProductEl.classList.toggle('hidden', type !== 'product');
+  hLinkValueUrlEl.classList.toggle('hidden', type !== 'url');
+}
+hLinkTypeEl.addEventListener('change', updateHeroLinkTypeVisibility);
+updateHeroLinkTypeVisibility();
+
+function getHeroLinkValue() {
+  const type = hLinkTypeEl.value;
+  if (type === 'category') return hLinkValueCategoryEl.value;
+  if (type === 'product') return hLinkValueProductEl.value;
+  return hLinkValueUrlEl.value.trim();
+}
+
 heroForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   const editId = document.getElementById('heroEditId').value;
@@ -184,8 +292,8 @@ heroForm.addEventListener('submit', async (e) => {
     subtitle: document.getElementById('hSubtitle').value.trim(),
     image: document.getElementById('hImage').value.trim(),
     ctaText: document.getElementById('hCtaText').value.trim(),
-    linkType: document.getElementById('hLinkType').value,
-    linkValue: document.getElementById('hLinkValue').value.trim(),
+    linkType: hLinkTypeEl.value,
+    linkValue: getHeroLinkValue(),
     order: parseInt(document.getElementById('hOrder').value, 10) || 0
   };
 
@@ -207,6 +315,8 @@ function resetHeroForm() {
   heroForm.reset();
   document.getElementById('heroEditId').value = '';
   document.getElementById('heroFormTitle').textContent = 'Add Hero Slide';
+  updateHeroLinkTypeVisibility();
+  updateImagePreview('hImage', 'hImagePreview');
 }
 
 function editHero(id) {
@@ -217,10 +327,14 @@ function editHero(id) {
   document.getElementById('hSubtitle').value = h.subtitle || '';
   document.getElementById('hImage').value = h.image || '';
   document.getElementById('hCtaText').value = h.ctaText || '';
-  document.getElementById('hLinkType').value = h.linkType || 'category';
-  document.getElementById('hLinkValue').value = h.linkValue || '';
+  hLinkTypeEl.value = h.linkType || 'category';
+  updateHeroLinkTypeVisibility();
+  if (h.linkType === 'product') hLinkValueProductEl.value = h.linkValue || '';
+  else if (h.linkType === 'url') hLinkValueUrlEl.value = h.linkValue || '';
+  else hLinkValueCategoryEl.value = h.linkValue || '';
   document.getElementById('hOrder').value = h.order ?? 0;
   document.getElementById('heroFormTitle').textContent = 'Editing: ' + h.title;
+  updateImagePreview('hImage', 'hImagePreview');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
