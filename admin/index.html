@@ -69,7 +69,13 @@
                         <input id="pPrice" type="number" placeholder="Price (₦)" required class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
                         <input id="pPromoPrice" type="number" placeholder="Promo price (optional)" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
                     </div>
-                    <input id="pImage" placeholder="Image URL" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
+                    <div>
+                        <div class="flex gap-2">
+                            <input id="pImage" placeholder="Image URL (or browse below)" class="flex-1 p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
+                            <button type="button" onclick="openImagePicker('products','pImage')" class="bg-gray-100 text-gray-700 px-4 rounded-xl font-bold text-xs whitespace-nowrap">Browse</button>
+                        </div>
+                        <img id="pImagePreview" class="hidden mt-2 h-16 rounded-lg object-cover border border-gray-200">
+                    </div>
                     <textarea id="pDesc" placeholder="Short description" rows="2" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]"></textarea>
                     <div class="flex gap-2 pt-1">
                         <button type="submit" class="flex-1 bg-gray-900 text-white py-3 rounded-xl font-bold text-sm">Save Product</button>
@@ -94,7 +100,13 @@
                     <input type="hidden" id="heroEditId">
                     <input id="hTitle" placeholder="Title (e.g. HP EliteBook Deals)" required class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
                     <input id="hSubtitle" placeholder="Subtitle (short, one line)" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
-                    <input id="hImage" placeholder="Image URL" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
+                    <div>
+                        <div class="flex gap-2">
+                            <input id="hImage" placeholder="Image URL (or browse below)" class="flex-1 p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
+                            <button type="button" onclick="openImagePicker('heroes','hImage')" class="bg-gray-100 text-gray-700 px-4 rounded-xl font-bold text-xs whitespace-nowrap">Browse</button>
+                        </div>
+                        <img id="hImagePreview" class="hidden mt-2 h-16 rounded-lg object-cover border border-gray-200">
+                    </div>
                     <input id="hCtaText" placeholder="Button text (e.g. Shop Laptops)" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
                     <div class="grid grid-cols-2 gap-3">
                         <select id="hLinkType" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none">
@@ -105,8 +117,10 @@
                         <input id="hOrder" type="number" placeholder="Order (0 = first)" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none">
                     </div>
                     <div id="hLinkValueWrap">
-                        <input id="hLinkValue" placeholder="Category name, product, or full URL" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
-                        <p class="text-[10px] text-gray-400 mt-1 px-1">For "Links to Category": type the exact category name (e.g. Laptops). For "Links to Product": pick from the list below once saved once, or paste a product ID from the Products tab.</p>
+                        <select id="hLinkValueCategory" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"></select>
+                        <select id="hLinkValueProduct" class="hidden w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"></select>
+                        <input id="hLinkValueUrl" placeholder="https://..." class="hidden w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
+                        <p class="text-[10px] text-gray-400 mt-1 px-1">Pulled straight from your real products/categories — no typing or copying IDs needed.</p>
                     </div>
                     <div class="flex gap-2 pt-1">
                         <button type="submit" class="flex-1 bg-gray-900 text-white py-3 rounded-xl font-bold text-sm">Save Hero</button>
@@ -181,6 +195,20 @@
                 </form>
                 <p id="settingsMsg" class="text-center text-xs text-green-600 font-bold mt-3 hidden">Saved!</p>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- IMAGE PICKER MODAL — shared by Products and Heroes forms -->
+<div id="imagePickerModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] flex items-end md:items-center justify-center">
+    <div class="bg-white w-full max-w-lg rounded-t-[28px] md:rounded-[24px] shadow-2xl p-5 max-h-[85vh] flex flex-col">
+        <div class="flex justify-between items-center mb-3">
+            <h3 class="font-black text-base text-gray-800">Choose an Image</h3>
+            <button onclick="closeImagePicker()" class="text-gray-400 text-2xl p-1">&times;</button>
+        </div>
+        <p id="pickerHint" class="text-xs text-gray-400 mb-3"></p>
+        <div id="pickerGrid" class="grid grid-cols-3 gap-2 overflow-y-auto pr-1" style="flex:1;">
+            <p class="col-span-3 text-center text-gray-400 text-sm py-10">Loading images...</p>
         </div>
     </div>
 </div>
