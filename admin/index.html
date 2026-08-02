@@ -57,26 +57,36 @@
                 <h2 id="formTitle" class="font-black text-lg mb-4">Add Product</h2>
                 <form id="productForm" class="space-y-3">
                     <input type="hidden" id="editId">
-                    <input id="pName" placeholder="Product name" required class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
+                    <input id="pName" placeholder="Product name (e.g. HP EliteBook 840 G5)" required class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
                     <div class="grid grid-cols-2 gap-3">
+                        <input id="pBrand" placeholder="Brand (e.g. HP)" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
                         <input id="pCategory" placeholder="Category (e.g. Laptops)" required class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
-                        <select id="pInStock" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none">
-                            <option value="true">In Stock</option>
-                            <option value="false">Out of Stock</option>
-                        </select>
                     </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <input id="pPrice" type="number" placeholder="Price (₦)" required class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
-                        <input id="pPromoPrice" type="number" placeholder="Promo price (optional)" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
-                    </div>
-                    <div>
-                        <div class="flex gap-2">
-                            <input id="pImage" placeholder="Image URL (or browse below)" class="flex-1 p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
-                            <button type="button" onclick="openImagePicker('products','pImage')" class="bg-gray-100 text-gray-700 px-4 rounded-xl font-bold text-xs whitespace-nowrap">Browse</button>
+                    <textarea id="pDesc" placeholder="Short description (applies to all variants)" rows="2" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]"></textarea>
+                    <label class="flex items-center gap-2 text-xs font-bold text-gray-500 px-1">
+                        <input type="checkbox" id="pInStock" checked> Product visible in shop
+                    </label>
+
+                    <!-- VARIANTS -->
+                    <div class="bg-gray-50 rounded-xl p-3 mt-2">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-xs font-black uppercase text-gray-500">Variants (color / RAM / storage / price)</h3>
+                            <button type="button" id="addVariantBtn" class="text-[11px] bg-gray-900 text-white px-3 py-1 rounded-lg font-bold">+ Add Variant</button>
                         </div>
-                        <img id="pImagePreview" class="hidden mt-2 h-16 rounded-lg object-cover border border-gray-200">
+                        <p class="text-[10px] text-gray-400 mb-2 px-1">Every product needs at least one variant — this is what customers actually pick and pay for.</p>
+                        <div id="variantRows" class="space-y-2"></div>
                     </div>
-                    <textarea id="pDesc" placeholder="Short description" rows="2" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]"></textarea>
+
+                    <!-- UPGRADES -->
+                    <div class="bg-gray-50 rounded-xl p-3">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-xs font-black uppercase text-gray-500">Optional Upgrades (RAM/ROM add-ons)</h3>
+                            <button type="button" id="addUpgradeBtn" class="text-[11px] bg-gray-900 text-white px-3 py-1 rounded-lg font-bold">+ Add Upgrade</button>
+                        </div>
+                        <p class="text-[10px] text-gray-400 mb-2 px-1">Optional — only add these if this specific device can be upgraded for an extra fee.</p>
+                        <div id="upgradeRows" class="space-y-2"></div>
+                    </div>
+
                     <div class="flex gap-2 pt-1">
                         <button type="submit" class="flex-1 bg-gray-900 text-white py-3 rounded-xl font-bold text-sm">Save Product</button>
                         <button type="button" id="resetFormBtn" class="bg-gray-100 text-gray-500 px-4 rounded-xl font-bold text-sm">Reset</button>
@@ -180,6 +190,14 @@
                     <div>
                         <label class="text-[10px] font-black uppercase text-gray-400">About Text</label>
                         <textarea id="s_about" rows="3" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"></textarea>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <label class="text-[10px] font-black uppercase text-gray-400 mb-2 block">Delivery Fee (cascading discount)</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <input id="s_deliveryFee" type="number" placeholder="Fee per item (₦)" class="w-full p-3 bg-white rounded-xl border border-gray-200 text-sm outline-none">
+                            <input id="s_deliveryDiscount" type="number" placeholder="Discount per extra item (%)" class="w-full p-3 bg-white rounded-xl border border-gray-200 text-sm outline-none">
+                        </div>
+                        <p class="text-[11px] text-gray-400 mt-2 leading-relaxed">Each extra item adds its full fee, then the whole running total takes another discount — so the more someone buys, the cheaper delivery gets per item. E.g. ₦750 fee with 10% discount: 1 item = ₦750, 4 items ≈ ₦2,376 (not ₦3,000).</p>
                     </div>
                     <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
                         <label class="flex items-center gap-2 text-sm font-bold text-gray-800">

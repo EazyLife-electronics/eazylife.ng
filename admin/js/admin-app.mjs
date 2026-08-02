@@ -109,7 +109,6 @@ function updateImagePreview(inputId, previewId) {
   }
 }
 
-document.getElementById('pImage').addEventListener('input', () => updateImagePreview('pImage', 'pImagePreview'));
 document.getElementById('hImage').addEventListener('input', () => updateImagePreview('hImage', 'hImagePreview'));
 
 async function openImagePicker(folder, targetInputId) {
@@ -143,7 +142,9 @@ async function openImagePicker(folder, targetInputId) {
       btn.addEventListener('click', () => {
         const path = btn.dataset.pickerPath; // e.g. assets/products/laptop1.jpg — works directly from index.html/shop.html
         document.getElementById(pickerTargetInput).value = path;
-        const previewId = pickerTargetInput === 'pImage' ? 'pImagePreview' : 'hImagePreview';
+        const previewId = pickerTargetInput.endsWith('_image')
+          ? pickerTargetInput.replace('_image', '_preview')
+          : 'hImagePreview';
         updateImagePreview(pickerTargetInput, previewId);
         closeImagePicker();
       });
@@ -163,18 +164,114 @@ window.closeImagePicker = closeImagePicker;
 /* ---------------- PRODUCTS ---------------- */
 
 const productForm = document.getElementById('productForm');
+let variantRowCounter = 0;
+let upgradeRowCounter = 0;
+
+function variantRowHTML(rowId, v = {}) {
+  return `
+    <div class="variant-row bg-white border border-gray-200 rounded-xl p-3" data-row-id="${rowId}">
+      <div class="grid grid-cols-2 gap-2 mb-2">
+        <input id="v${rowId}_color" placeholder="Color" value="${v.color || ''}" class="p-2 bg-gray-50 rounded-lg border border-gray-200 text-xs outline-none">
+        <input id="v${rowId}_processor" placeholder="Processor" value="${v.processor || ''}" class="p-2 bg-gray-50 rounded-lg border border-gray-200 text-xs outline-none">
+      </div>
+      <div class="grid grid-cols-2 gap-2 mb-2">
+        <input id="v${rowId}_ram" placeholder="RAM (e.g. 16GB)" value="${v.ram || ''}" class="p-2 bg-gray-50 rounded-lg border border-gray-200 text-xs outline-none">
+        <input id="v${rowId}_rom" placeholder="Storage (e.g. 512GB)" value="${v.rom || ''}" class="p-2 bg-gray-50 rounded-lg border border-gray-200 text-xs outline-none">
+      </div>
+      <div class="grid grid-cols-2 gap-2 mb-2">
+        <input id="v${rowId}_price" type="number" placeholder="Price (₦)" value="${v.price || ''}" class="p-2 bg-gray-50 rounded-lg border border-gray-200 text-xs outline-none">
+        <input id="v${rowId}_promo" type="number" placeholder="Promo price" value="${v.promoPrice || ''}" class="p-2 bg-gray-50 rounded-lg border border-gray-200 text-xs outline-none">
+      </div>
+      <div class="flex gap-2 mb-2">
+        <input id="v${rowId}_image" placeholder="Image URL" value="${v.image || ''}" class="flex-1 p-2 bg-gray-50 rounded-lg border border-gray-200 text-xs outline-none">
+        <button type="button" onclick="openImagePicker('products','v${rowId}_image')" class="bg-gray-100 text-gray-700 px-3 rounded-lg font-bold text-[10px] whitespace-nowrap">Browse</button>
+      </div>
+      <img id="v${rowId}_preview" class="${v.image ? '' : 'hidden'} mb-2 h-12 rounded-lg object-cover border border-gray-200" src="${v.image ? (v.image.startsWith('http') ? v.image : '../' + v.image) : ''}">
+      <div class="flex justify-between items-center">
+        <label class="flex items-center gap-2 text-[11px] font-bold text-gray-500">
+          <input type="checkbox" id="v${rowId}_instock" ${v.inStock === false ? '' : 'checked'}> In stock
+        </label>
+        <button type="button" class="remove-variant-btn text-red-500 text-[11px] font-bold" data-row-id="${rowId}">Remove</button>
+      </div>
+    </div>`;
+}
+
+function upgradeRowHTML(rowId, u = {}) {
+  return `
+    <div class="upgrade-row bg-white border border-gray-200 rounded-xl p-3 flex gap-2 items-center" data-row-id="${rowId}">
+      <input id="u${rowId}_name" placeholder="Upgrade name (e.g. RAM upgrade to 16GB)" value="${u.name || ''}" class="flex-1 p-2 bg-gray-50 rounded-lg border border-gray-200 text-xs outline-none">
+      <input id="u${rowId}_price" type="number" placeholder="+₦" value="${u.price || ''}" class="w-24 p-2 bg-gray-50 rounded-lg border border-gray-200 text-xs outline-none">
+      <button type="button" class="remove-upgrade-btn text-red-500 text-[11px] font-bold" data-row-id="${rowId}">Remove</button>
+    </div>`;
+}
+
+function addVariantRow(data) {
+  variantRowCounter++;
+  const rowId = variantRowCounter;
+  document.getElementById('variantRows').insertAdjacentHTML('beforeend', variantRowHTML(rowId, data));
+  document.getElementById(`v${rowId}_image`).addEventListener('input', () => updateImagePreview(`v${rowId}_image`, `v${rowId}_preview`));
+  document.querySelector(`.remove-variant-btn[data-row-id="${rowId}"]`).addEventListener('click', (e) => {
+    document.querySelector(`.variant-row[data-row-id="${rowId}"]`).remove();
+  });
+}
+
+function addUpgradeRow(data) {
+  upgradeRowCounter++;
+  const rowId = upgradeRowCounter;
+  document.getElementById('upgradeRows').insertAdjacentHTML('beforeend', upgradeRowHTML(rowId, data));
+  document.querySelector(`.remove-upgrade-btn[data-row-id="${rowId}"]`).addEventListener('click', () => {
+    document.querySelector(`.upgrade-row[data-row-id="${rowId}"]`).remove();
+  });
+}
+
+document.getElementById('addVariantBtn').addEventListener('click', () => addVariantRow());
+addVariantRow(); // start the form with one row visible instead of an empty box
+document.getElementById('addUpgradeBtn').addEventListener('click', () => addUpgradeRow());
+
+function collectVariants() {
+  return [...document.querySelectorAll('.variant-row')].map(row => {
+    const rowId = row.dataset.rowId;
+    return {
+      id: 'v' + Date.now() + '_' + rowId,
+      color: document.getElementById(`v${rowId}_color`).value.trim(),
+      processor: document.getElementById(`v${rowId}_processor`).value.trim(),
+      ram: document.getElementById(`v${rowId}_ram`).value.trim(),
+      rom: document.getElementById(`v${rowId}_rom`).value.trim(),
+      price: parseInt(document.getElementById(`v${rowId}_price`).value, 10) || 0,
+      promoPrice: parseInt(document.getElementById(`v${rowId}_promo`).value, 10) || 0,
+      image: document.getElementById(`v${rowId}_image`).value.trim(),
+      inStock: document.getElementById(`v${rowId}_instock`).checked
+    };
+  });
+}
+
+function collectUpgrades() {
+  return [...document.querySelectorAll('.upgrade-row')].map(row => {
+    const rowId = row.dataset.rowId;
+    return {
+      id: 'u' + Date.now() + '_' + rowId,
+      name: document.getElementById(`u${rowId}_name`).value.trim(),
+      price: parseInt(document.getElementById(`u${rowId}_price`).value, 10) || 0
+    };
+  }).filter(u => u.name);
+}
+
 productForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   const editId = document.getElementById('editId').value;
 
+  const variants = collectVariants();
+  if (variants.length === 0) return alert('Add at least one variant — that\'s what customers actually buy.');
+  if (variants.some(v => !v.price)) return alert('Every variant needs a price.');
+
   const product = {
     name: document.getElementById('pName').value.trim(),
+    brand: document.getElementById('pBrand').value.trim(),
     category: document.getElementById('pCategory').value.trim(),
-    price: parseInt(document.getElementById('pPrice').value, 10),
-    promoPrice: parseInt(document.getElementById('pPromoPrice').value, 10) || 0,
-    image: document.getElementById('pImage').value.trim(),
     desc: document.getElementById('pDesc').value.trim(),
-    inStock: document.getElementById('pInStock').value === 'true'
+    inStock: document.getElementById('pInStock').checked,
+    variants,
+    upgrades: collectUpgrades()
   };
 
   try {
@@ -195,7 +292,10 @@ function resetForm() {
   productForm.reset();
   document.getElementById('editId').value = '';
   document.getElementById('formTitle').textContent = 'Add Product';
-  updateImagePreview('pImage', 'pImagePreview');
+  document.getElementById('variantRows').innerHTML = '';
+  document.getElementById('upgradeRows').innerHTML = '';
+  document.getElementById('pInStock').checked = true;
+  addVariantRow(); // always start with one empty variant row
 }
 
 function editProduct(id) {
@@ -203,14 +303,18 @@ function editProduct(id) {
   if (!p) return;
   document.getElementById('editId').value = p.id;
   document.getElementById('pName').value = p.name || '';
+  document.getElementById('pBrand').value = p.brand || '';
   document.getElementById('pCategory').value = p.category || '';
-  document.getElementById('pPrice').value = p.price || '';
-  document.getElementById('pPromoPrice').value = p.promoPrice || '';
-  document.getElementById('pImage').value = p.image || '';
   document.getElementById('pDesc').value = p.desc || '';
-  document.getElementById('pInStock').value = p.inStock === false ? 'false' : 'true';
+  document.getElementById('pInStock').checked = p.inStock !== false;
+
+  document.getElementById('variantRows').innerHTML = '';
+  document.getElementById('upgradeRows').innerHTML = '';
+  (p.variants || []).forEach(v => addVariantRow(v));
+  (p.upgrades || []).forEach(u => addUpgradeRow(u));
+  if ((p.variants || []).length === 0) addVariantRow();
+
   document.getElementById('formTitle').textContent = 'Editing: ' + p.name;
-  updateImagePreview('pImage', 'pImagePreview');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -219,28 +323,38 @@ async function removeProduct(id) {
   await deleteProduct(id);
 }
 
+function priceRangeLabel(p) {
+  const prices = (p.variants || []).map(v => (v.promoPrice > 0 ? v.promoPrice : v.price) || 0).filter(Boolean);
+  if (prices.length === 0) return '—';
+  const min = Math.min(...prices), max = Math.max(...prices);
+  return min === max ? `₦${min.toLocaleString()}` : `₦${min.toLocaleString()} – ₦${max.toLocaleString()}`;
+}
+
 function renderProductList() {
   const term = document.getElementById('productSearch').value.toLowerCase();
   const filtered = allProducts.filter(p => (p.name || '').toLowerCase().includes(term));
   document.getElementById('productCount').textContent = `${allProducts.length} items`;
 
-  document.getElementById('productList').innerHTML = filtered.map(p => `
+  document.getElementById('productList').innerHTML = filtered.map(p => {
+    const thumb = (p.variants && p.variants[0] && p.variants[0].image) || 'https://via.placeholder.com/60';
+    const variantCount = (p.variants || []).length;
+    return `
     <div class="bg-white p-4 rounded-2xl border border-gray-100 flex items-center gap-4 shadow-sm">
-      <img src="${p.image || 'https://via.placeholder.com/60'}" class="w-12 h-12 rounded-lg object-cover bg-gray-100">
+      <img src="${thumb.startsWith('http') ? thumb : '../' + thumb}" class="w-12 h-12 rounded-lg object-cover bg-gray-100">
       <div class="flex-grow min-w-0">
         <h4 class="font-bold text-xs text-gray-800 leading-tight truncate">${p.name}</h4>
-        <p class="text-[10px] text-gray-400 font-bold uppercase">${p.category} · ₦${(p.price || 0).toLocaleString()}
-          ${p.promoPrice > 0 ? `<span class="text-red-500">(promo ₦${p.promoPrice.toLocaleString()})</span>` : ''}
-          ${p.inStock === false ? '<span class="text-red-400">· OUT OF STOCK</span>' : ''}
+        <p class="text-[10px] text-gray-400 font-bold uppercase">${p.brand ? p.brand + ' · ' : ''}${p.category} · ${priceRangeLabel(p)}
+          ${p.inStock === false ? '<span class="text-red-400">· HIDDEN</span>' : ''}
         </p>
+        <p class="text-[10px] text-gray-400">${variantCount} variant${variantCount === 1 ? '' : 's'}${(p.upgrades || []).length ? ` · ${p.upgrades.length} upgrade option${p.upgrades.length === 1 ? '' : 's'}` : ''}</p>
         <p class="text-[9px] text-gray-300 font-mono select-all">ID: ${p.id}</p>
       </div>
       <div class="flex flex-col gap-1 flex-shrink-0">
         <button data-edit="${p.id}" class="text-[10px] bg-gray-100 hover:bg-black hover:text-white px-3 py-1 rounded-md font-bold transition-all">EDIT</button>
         <button data-del="${p.id}" class="text-[10px] bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-3 py-1 rounded-md font-bold transition-all">DEL</button>
       </div>
-    </div>
-  `).join('') || `<p class="text-center text-gray-400 text-sm py-10">No products yet — add your first one above.</p>`;
+    </div>`;
+  }).join('') || `<p class="text-center text-gray-400 text-sm py-10">No products yet — add your first one above.</p>`;
 
   document.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => editProduct(b.dataset.edit)));
   document.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => removeProduct(b.dataset.del)));
@@ -491,7 +605,9 @@ async function loadSettingsForm() {
   document.getElementById('s_whatsapp').value = settings.whatsapp || '';
   document.getElementById('s_tagline').value = settings.tagline || '';
   document.getElementById('s_about').value = settings.aboutText || '';
-  document.getElementById('s_referralMode').checked = settings.referralMode !== false; // defaults to true (current setup)
+  document.getElementById('s_referralMode').checked = settings.referralMode !== false; // defaults to true
+  document.getElementById('s_deliveryFee').value = settings.deliveryFeePerItem ?? 750;
+  document.getElementById('s_deliveryDiscount').value = settings.deliveryDiscountPercent ?? 10;
 }
 
 document.getElementById('settingsForm').addEventListener('submit', async (e) => {
@@ -500,7 +616,9 @@ document.getElementById('settingsForm').addEventListener('submit', async (e) => 
     whatsapp: document.getElementById('s_whatsapp').value.trim(),
     tagline: document.getElementById('s_tagline').value.trim(),
     aboutText: document.getElementById('s_about').value.trim(),
-    referralMode: document.getElementById('s_referralMode').checked
+    referralMode: document.getElementById('s_referralMode').checked,
+    deliveryFeePerItem: parseInt(document.getElementById('s_deliveryFee').value, 10) || 0,
+    deliveryDiscountPercent: parseFloat(document.getElementById('s_deliveryDiscount').value) || 0
   });
   const msg = document.getElementById('settingsMsg');
   msg.classList.remove('hidden');
