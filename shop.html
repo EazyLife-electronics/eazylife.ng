@@ -119,6 +119,17 @@
                    class="w-full pl-12 pr-4 py-4 rounded-2xl border-none shadow-sm focus:ring-2 focus:ring-[#00B09B] outline-none dark:text-gray-100">
         </div>
         <div id="catFilters" class="flex gap-2 overflow-x-auto no-scrollbar pb-2"></div>
+        <div class="flex gap-2 mt-1">
+            <select id="brandFilter" class="flex-1 p-2.5 rounded-xl border-none shadow-sm text-xs outline-none dark:bg-[#182420] dark:text-gray-100">
+                <option value="All">All Brands</option>
+            </select>
+            <select id="sortSelect" class="flex-1 p-2.5 rounded-xl border-none shadow-sm text-xs outline-none dark:bg-[#182420] dark:text-gray-100">
+                <option value="default">Sort: Featured</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="name-asc">Name: A–Z</option>
+            </select>
+        </div>
     </div>
 
     <div id="loader" class="flex flex-col items-center justify-center py-20 text-gray-400">
@@ -128,6 +139,49 @@
 
     <div id="grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"></div>
 </main>
+
+<!-- PRODUCT DETAIL MODAL — pick variant + upgrades, price updates live -->
+<div id="productModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-end md:items-center justify-center">
+    <div class="bg-white dark:bg-[#182420] w-full max-w-md rounded-t-[32px] md:rounded-[24px] shadow-2xl p-6 overflow-y-auto max-h-[90vh]">
+        <div class="flex justify-between items-start mb-3">
+            <div>
+                <h2 id="pmName" class="font-syne font-extrabold text-xl text-gray-900 dark:text-gray-100 leading-tight"></h2>
+                <p id="pmMeta" class="text-xs text-gray-400 mt-1"></p>
+            </div>
+            <button onclick="hideProductModal()" class="text-gray-400 p-1 text-3xl">&times;</button>
+        </div>
+        <img id="pmImage" class="w-full h-40 object-contain rounded-xl bg-gray-50 dark:bg-[#1c2925] mb-4">
+        <p id="pmDesc" class="text-sm text-gray-500 dark:text-gray-400 mb-4"></p>
+
+        <div class="mb-4">
+            <label class="text-[10px] font-black uppercase text-gray-400 mb-1 block">Choose Option</label>
+            <select id="pmVariant" class="w-full p-3 bg-gray-50 dark:bg-[#1c2925] dark:text-gray-100 border border-gray-200 dark:border-[#2a3835] rounded-xl text-sm outline-none"></select>
+        </div>
+
+        <div id="pmUpgradesWrap" class="mb-4 hidden">
+            <label class="text-[10px] font-black uppercase text-gray-400 mb-2 block">Optional Upgrades</label>
+            <div id="pmUpgrades" class="space-y-2"></div>
+        </div>
+
+        <div class="flex items-center justify-between mb-5 bg-gray-50 dark:bg-[#1c2925] rounded-xl p-3">
+            <span class="text-xs font-bold text-gray-500 dark:text-gray-400">Quantity</span>
+            <div class="flex items-center gap-3">
+                <button onclick="changePmQty(-1)" class="w-8 h-8 bg-white dark:bg-[#182420] dark:text-gray-100 rounded-lg shadow-sm font-bold">-</button>
+                <span id="pmQty" class="font-black text-sm w-4 text-center dark:text-gray-100">1</span>
+                <button onclick="changePmQty(1)" class="w-8 h-8 bg-white dark:bg-[#182420] dark:text-gray-100 rounded-lg shadow-sm font-bold">+</button>
+            </div>
+        </div>
+
+        <div class="flex justify-between items-center mb-4 px-1">
+            <span class="font-bold text-gray-500 dark:text-gray-400 text-sm">Price</span>
+            <span class="text-2xl font-black text-teal">₦<span id="pmPrice">0</span></span>
+        </div>
+
+        <button onclick="addPmToCart()" class="bg-gray-900 text-white w-full py-4 rounded-2xl font-black text-lg shadow-xl hover:bg-black transition-all flex items-center justify-center gap-2">
+            <i class="fas fa-shopping-basket"></i> Add to Cart
+        </button>
+    </div>
+</div>
 
 <!-- CART / CHECKOUT MODAL -->
 <div id="cartModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-end md:items-center justify-center">
@@ -148,8 +202,16 @@
                 <textarea id="custAddr" placeholder="Delivery Address or Office" class="w-full bg-white dark:bg-[#182420] dark:text-gray-100 border-none p-3 rounded-xl shadow-sm text-sm outline-none" rows="2"></textarea>
             </div>
 
-            <div class="flex justify-between items-center px-2">
-                <span class="font-bold text-gray-500 dark:text-gray-400">Estimated Total</span>
+            <div class="flex justify-between items-center px-2 text-sm">
+                <span class="text-gray-500 dark:text-gray-400">Subtotal</span>
+                <span class="font-bold text-gray-800 dark:text-gray-100">₦<span id="subtotal">0</span></span>
+            </div>
+            <div class="flex justify-between items-center px-2 text-sm mt-1">
+                <span class="text-gray-500 dark:text-gray-400">Delivery Fee</span>
+                <span class="font-bold text-gray-800 dark:text-gray-100">₦<span id="deliveryFeeDisplay">0</span></span>
+            </div>
+            <div class="flex justify-between items-center px-2 mt-2 pt-2 border-t border-gray-100 dark:border-[#2a3835]">
+                <span class="font-bold text-gray-500 dark:text-gray-400">Total</span>
                 <span class="text-2xl font-black text-teal">₦<span id="total">0</span></span>
             </div>
 
@@ -217,6 +279,7 @@
 
 <script type="module">
     import { getProducts, placeOrder, placeRequest, getSettings } from './js/store.mjs';
+    import { calcCascadingFee, variantUnitPrice, productPriceRange, variantLabel } from './js/pricing.mjs';
 
     const CKEY = "eazylife_cart_v2";
     const UKEY = "eazylife_user_v2";
@@ -224,13 +287,23 @@
     let products = [];
     let cart = JSON.parse(localStorage.getItem(CKEY)) || [];
     let currentCategory = 'All';
+    let currentBrand = 'All';
+    let currentSort = 'default';
     let whatsappNumber = '2347051548082'; // fallback if settings doc isn't set yet
+    let deliveryFeePerItem = 750;
+    let deliveryDiscountRate = 0.10;
+
+    // Product detail modal state
+    let pmProduct = null;
+    let pmQty = 1;
 
     async function init() {
         try {
             const [prods, settings] = await Promise.all([getProducts(), getSettings()]);
             products = prods;
             if (settings.whatsapp) whatsappNumber = settings.whatsapp;
+            if (settings.deliveryFeePerItem != null) deliveryFeePerItem = settings.deliveryFeePerItem;
+            if (settings.deliveryDiscountPercent != null) deliveryDiscountRate = settings.deliveryDiscountPercent / 100;
             document.getElementById("loader").classList.add("hidden");
         } catch (e) {
             document.getElementById("loader").innerHTML = `<p class="text-red-500">Failed to load catalog. Check your connection.</p>`;
@@ -238,11 +311,14 @@
             return;
         }
         loadUserData();
+        renderBrandOptions();
         applyIncomingLink();
         if (window.location.hash === '#cart' && cart.length > 0) {
             showCart();
         }
-        document.getElementById("search").addEventListener("keyup", filterProducts);
+        document.getElementById("search").addEventListener("keyup", renderFilteredGrid);
+        document.getElementById("brandFilter").addEventListener("change", (e) => { currentBrand = e.target.value; renderFilteredGrid(); });
+        document.getElementById("sortSelect").addEventListener("change", (e) => { currentSort = e.target.value; renderFilteredGrid(); });
     }
 
     // Handles hero-carousel links from the homepage: shop.html?category=Laptops or shop.html?product=abc123
@@ -251,73 +327,22 @@
         const categoryParam = params.get('category');
         const productParam = params.get('product');
 
+        if (categoryParam && products.some(p => p.category === categoryParam)) {
+            currentCategory = categoryParam;
+        }
+        renderCategoryButtons();
+        renderFilteredGrid();
+
         if (productParam) {
             const p = products.find(i => i.id === productParam);
-            if (p) {
-                currentCategory = p.category;
-                renderCategoryButtons();
-                renderProducts([p]);
-                updateCartCount();
-                return;
-            }
+            if (p) openProductModal(productParam);
         }
-        if (categoryParam && products.some(p => p.category === categoryParam)) {
-            updateUI(); // builds category buttons first
-            filterByCategory(categoryParam);
-            return;
-        }
-        updateUI();
     }
 
-    function updateUI() {
-        renderCategoryButtons();
-        filterByCategory(currentCategory);
-        updateCartCount();
-    }
-
-    function renderProducts(list) {
-        const grid = document.getElementById("grid");
-        grid.innerHTML = "";
-        if (list.length === 0) {
-            grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-400 font-bold">Nothing matched — but we can still help.</div>`;
-            grid.innerHTML += `
-                <div onclick="showRequestModal()" class="product-card request-tile col-span-full" style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; cursor:pointer; padding:24px;">
-                    <i class="fas fa-magnifying-glass-dollar" style="font-size:1.8rem; color:#00B09B; margin-bottom:10px;"></i>
-                    <h3 style="font-size:0.9rem; font-weight:800; margin-bottom:4px;">Can't find what you want?</h3>
-                    <p style="font-size:0.78rem; color:#777;">Tell us your budget and what you need — we'll source it directly.</p>
-                </div>`;
-            return;
-        }
-        list.forEach(p => {
-            const inCart = cart.find(i => i.id === p.id);
-            const displayPrice = (p.promoPrice && p.promoPrice > 0) ? p.promoPrice : p.price;
-            grid.innerHTML += `
-                <div class="product-card bg-white dark:bg-[#182420] dark:border-[#2a3835] p-3 rounded-[24px] shadow-sm flex flex-col">
-                    <img src="${p.image || 'https://via.placeholder.com/300?text=' + encodeURIComponent(p.name)}" class="h-32 md:h-40 w-full object-contain rounded-xl mb-3 bg-gray-50 dark:bg-[#1c2925]">
-                    <span class="text-[9px] font-black uppercase text-teal tracking-wider mb-1">${p.category}</span>
-                    <h3 class="font-bold text-gray-800 dark:text-gray-100 leading-tight text-xs md:text-sm flex-grow mb-2">${p.name}</h3>
-                    <div class="mb-3">
-                        <span class="text-gray-900 dark:text-gray-100 font-black text-sm md:text-base">₦${displayPrice.toLocaleString()}</span>
-                    </div>
-                    <div class="mt-auto">
-                        ${inCart ? `
-                            <div class="flex items-center justify-between bg-teal-50 dark:bg-[#1c2925] rounded-xl p-1 border border-teal-100 dark:border-[#2a3835]">
-                                <button onclick="changeQty('${p.id}',-1)" class="w-8 h-8 bg-white dark:bg-[#182420] rounded-lg shadow-sm font-bold text-teal">-</button>
-                                <span class="font-bold text-sm text-teal-800 dark:text-teal-300">${inCart.quantity}</span>
-                                <button onclick="changeQty('${p.id}',1)" class="w-8 h-8 bg-white dark:bg-[#182420] rounded-lg shadow-sm font-bold text-teal">+</button>
-                            </div>
-                        ` : `
-                            <button onclick="addToCart('${p.id}')" class="bg-gray-900 text-white w-full py-2.5 rounded-xl font-bold text-xs hover:bg-black transition-colors">Add to Cart</button>
-                        `}
-                    </div>
-                </div>`;
-        });
-        grid.innerHTML += `
-            <div onclick="showRequestModal()" class="product-card request-tile" style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; cursor:pointer;">
-                <i class="fas fa-magnifying-glass-dollar" style="font-size:1.6rem; color:#00B09B; margin-bottom:8px;"></i>
-                <h3 style="font-size:0.82rem; font-weight:800; margin-bottom:4px;">Can't find what you want?</h3>
-                <p style="font-size:0.72rem; color:#777; margin-bottom:0;">Tell us your budget — we'll source it.</p>
-            </div>`;
+    function renderBrandOptions() {
+        const brands = [...new Set(products.map(p => p.brand).filter(Boolean))].sort();
+        document.getElementById('brandFilter').innerHTML =
+            `<option value="All">All Brands</option>` + brands.map(b => `<option value="${b}">${b}</option>`).join('');
     }
 
     function renderCategoryButtons() {
@@ -333,32 +358,183 @@
     function filterByCategory(cat) {
         currentCategory = cat;
         renderCategoryButtons();
-        const filtered = (cat === 'All') ? products : products.filter(p => p.category === cat);
-        renderProducts(filtered);
+        renderFilteredGrid();
     }
 
-    function filterProducts() {
+    function getFilteredSortedProducts() {
         const term = document.getElementById("search").value.toLowerCase();
-        if (term === "") { filterByCategory(currentCategory); return; }
-        const filtered = products.filter(p =>
-            p.name.toLowerCase().includes(term) || p.category.toLowerCase().includes(term)
-        );
-        renderProducts(filtered);
+        let list = products.filter(p => {
+            const matchesCategory = currentCategory === 'All' || p.category === currentCategory;
+            const matchesBrand = currentBrand === 'All' || p.brand === currentBrand;
+            const matchesSearch = !term || p.name.toLowerCase().includes(term) ||
+                (p.category || '').toLowerCase().includes(term) || (p.brand || '').toLowerCase().includes(term);
+            return matchesCategory && matchesBrand && matchesSearch;
+        });
+
+        if (currentSort === 'price-asc') list = [...list].sort((a, b) => productPriceRange(a).min - productPriceRange(b).min);
+        else if (currentSort === 'price-desc') list = [...list].sort((a, b) => productPriceRange(b).min - productPriceRange(a).min);
+        else if (currentSort === 'name-asc') list = [...list].sort((a, b) => a.name.localeCompare(b.name));
+
+        return list;
     }
 
-    function addToCart(id) {
-        const p = products.find(i => i.id === id);
-        const inCart = cart.find(i => i.id === id);
-        if (inCart) inCart.quantity++;
-        else cart.push({ id: p.id, name: p.name, price: (p.promoPrice > 0 ? p.promoPrice : p.price), quantity: 1 });
-        saveAndSync();
+    function renderFilteredGrid() {
+        renderProducts(getFilteredSortedProducts());
     }
 
-    function changeQty(id, delta) {
-        const item = cart.find(i => i.id === id);
+    function requestTileHTML(full) {
+        return `
+            <div onclick="showRequestModal()" class="product-card request-tile ${full ? 'col-span-full' : ''}"
+                 style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; cursor:pointer; ${full ? 'padding:24px;' : ''}">
+                <i class="fas fa-magnifying-glass-dollar" style="font-size:${full ? '1.8rem' : '1.6rem'}; color:#00B09B; margin-bottom:${full ? '10px' : '8px'};"></i>
+                <h3 style="font-size:${full ? '0.9rem' : '0.82rem'}; font-weight:800; margin-bottom:4px;">Can't find what you want?</h3>
+                <p style="font-size:${full ? '0.78rem' : '0.72rem'}; color:#777; margin-bottom:0;">Tell us your budget — we'll source it.</p>
+            </div>`;
+    }
+
+    function renderProducts(list) {
+        const grid = document.getElementById("grid");
+        grid.innerHTML = "";
+        if (list.length === 0) {
+            grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-400 font-bold">Nothing matched — but we can still help.</div>`;
+            grid.innerHTML += requestTileHTML(true);
+            return;
+        }
+        list.forEach(p => {
+            const range = productPriceRange(p);
+            const priceLabel = range.min === range.max ? `₦${range.min.toLocaleString()}` : `From ₦${range.min.toLocaleString()}`;
+            const thumb = (p.variants && p.variants[0] && p.variants[0].image) || '';
+            const outOfStock = p.inStock === false || (p.variants || []).every(v => v.inStock === false);
+            grid.innerHTML += `
+                <div class="product-card bg-white dark:bg-[#182420] dark:border-[#2a3835] p-3 rounded-[24px] shadow-sm flex flex-col">
+                    <img src="${thumb || 'https://via.placeholder.com/300?text=' + encodeURIComponent(p.name)}" class="h-32 md:h-40 w-full object-contain rounded-xl mb-3 bg-gray-50 dark:bg-[#1c2925]">
+                    <span class="text-[9px] font-black uppercase text-teal tracking-wider mb-1">${p.brand ? p.brand + ' · ' : ''}${p.category}</span>
+                    <h3 class="font-bold text-gray-800 dark:text-gray-100 leading-tight text-xs md:text-sm flex-grow mb-2">${p.name}</h3>
+                    <div class="mb-3">
+                        <span class="text-gray-900 dark:text-gray-100 font-black text-sm md:text-base">${priceLabel}</span>
+                    </div>
+                    <div class="mt-auto">
+                        ${outOfStock ? `
+                            <button disabled class="bg-gray-200 dark:bg-[#2a3835] text-gray-400 w-full py-2.5 rounded-xl font-bold text-xs cursor-not-allowed">Out of Stock</button>
+                        ` : `
+                            <button onclick="openProductModal('${p.id}')" class="bg-gray-900 text-white w-full py-2.5 rounded-xl font-bold text-xs hover:bg-black transition-colors">View Options</button>
+                        `}
+                    </div>
+                </div>`;
+        });
+        grid.innerHTML += requestTileHTML(false);
+    }
+
+    /* ---------------- PRODUCT DETAIL MODAL ---------------- */
+
+    function openProductModal(productId) {
+        const p = products.find(x => x.id === productId);
+        if (!p) return;
+        pmProduct = p;
+        pmQty = 1;
+        document.getElementById('pmName').textContent = p.name;
+        document.getElementById('pmMeta').textContent = [p.brand, p.category].filter(Boolean).join(' · ');
+        document.getElementById('pmDesc').textContent = p.desc || '';
+
+        const variantSel = document.getElementById('pmVariant');
+        variantSel.innerHTML = (p.variants || []).map(v => `
+            <option value="${v.id}" ${v.inStock === false ? 'disabled' : ''}>
+                ${variantLabel(v)} — ₦${variantUnitPrice(v).toLocaleString()}${v.inStock === false ? ' (Out of stock)' : ''}
+            </option>
+        `).join('');
+        variantSel.onchange = updateProductModalPrice;
+
+        const upgrades = p.upgrades || [];
+        const upgradesWrap = document.getElementById('pmUpgradesWrap');
+        if (upgrades.length > 0) {
+            upgradesWrap.classList.remove('hidden');
+            document.getElementById('pmUpgrades').innerHTML = upgrades.map((u, i) => `
+                <label class="flex items-center justify-between bg-white dark:bg-[#182420] border border-gray-200 dark:border-[#2a3835] rounded-lg p-2.5 text-xs dark:text-gray-100">
+                    <span class="flex items-center gap-2"><input type="checkbox" class="pm-upgrade-check" data-upgrade-idx="${i}"> ${u.name}</span>
+                    <span class="font-bold text-teal">+₦${(u.price || 0).toLocaleString()}</span>
+                </label>
+            `).join('');
+            document.querySelectorAll('.pm-upgrade-check').forEach(cb => cb.addEventListener('change', updateProductModalPrice));
+        } else {
+            upgradesWrap.classList.add('hidden');
+            document.getElementById('pmUpgrades').innerHTML = '';
+        }
+
+        document.getElementById('pmQty').textContent = pmQty;
+        updateProductModalPrice();
+        document.getElementById('productModal').classList.remove('hidden');
+    }
+
+    function getSelectedVariant() {
+        if (!pmProduct) return null;
+        const id = document.getElementById('pmVariant').value;
+        return (pmProduct.variants || []).find(v => v.id === id);
+    }
+
+    function getSelectedUpgrades() {
+        if (!pmProduct) return [];
+        return [...document.querySelectorAll('.pm-upgrade-check:checked')]
+            .map(cb => pmProduct.upgrades[parseInt(cb.dataset.upgradeIdx, 10)]);
+    }
+
+    function updateProductModalPrice() {
+        const v = getSelectedVariant();
+        const img = document.getElementById('pmImage');
+        img.src = (v && v.image) || (pmProduct.variants[0] && pmProduct.variants[0].image) || 'https://via.placeholder.com/300?text=' + encodeURIComponent(pmProduct.name);
+
+        const base = variantUnitPrice(v);
+        const upgradesTotal = getSelectedUpgrades().reduce((a, u) => a + (u.price || 0), 0);
+        const unit = base + upgradesTotal;
+        document.getElementById('pmPrice').textContent = (unit * pmQty).toLocaleString();
+    }
+
+    function changePmQty(delta) {
+        pmQty = Math.max(1, pmQty + delta);
+        document.getElementById('pmQty').textContent = pmQty;
+        updateProductModalPrice();
+    }
+
+    function hideProductModal() {
+        document.getElementById('productModal').classList.add('hidden');
+        pmProduct = null;
+    }
+
+    function addPmToCart() {
+        const v = getSelectedVariant();
+        if (!v) return alert('Please choose an option.');
+        const upgrades = getSelectedUpgrades();
+        const unitPrice = variantUnitPrice(v) + upgrades.reduce((a, u) => a + (u.price || 0), 0);
+        const upgradeIds = upgrades.map(u => u.id).sort().join(',');
+        const lineId = `${pmProduct.id}::${v.id}::${upgradeIds}`;
+
+        const existing = cart.find(i => i.lineId === lineId);
+        if (existing) {
+            existing.quantity += pmQty;
+        } else {
+            cart.push({
+                lineId,
+                productId: pmProduct.id,
+                productName: pmProduct.name,
+                variantLabel: variantLabel(v),
+                upgradeNames: upgrades.map(u => u.name),
+                unitPrice,
+                image: v.image || '',
+                quantity: pmQty
+            });
+        }
+        localStorage.setItem(CKEY, JSON.stringify(cart));
+        updateCartCount();
+        hideProductModal();
+        showCart();
+    }
+
+    /* ---------------- CART ---------------- */
+
+    function changeQty(lineId, delta) {
+        const item = cart.find(i => i.lineId === lineId);
         if (item) {
             item.quantity += delta;
-            if (item.quantity <= 0) cart = cart.filter(i => i.id !== id);
+            if (item.quantity <= 0) cart = cart.filter(i => i.lineId !== lineId);
             saveAndSync();
         }
     }
@@ -366,8 +542,6 @@
     function saveAndSync() {
         localStorage.setItem(CKEY, JSON.stringify(cart));
         updateCartCount();
-        const term = document.getElementById("search").value;
-        if (term) filterProducts(); else filterByCategory(currentCategory);
         if (!document.getElementById("cartModal").classList.contains("hidden")) showCart();
     }
 
@@ -378,6 +552,13 @@
         if (totalQty > 0) countEl.classList.add('has-items');
     }
 
+    function cartTotals() {
+        const subtotal = cart.reduce((a, b) => a + (b.unitPrice * b.quantity), 0);
+        const totalQty = cart.reduce((a, b) => a + b.quantity, 0);
+        const deliveryFee = calcCascadingFee(deliveryFeePerItem, totalQty, deliveryDiscountRate);
+        return { subtotal, deliveryFee, total: subtotal + deliveryFee };
+    }
+
     function showCart() {
         if (cart.length === 0) return hideCart();
         document.getElementById("cartStep").classList.remove("hidden");
@@ -386,18 +567,21 @@
         container.innerHTML = cart.map(i => `
             <div class="flex justify-between items-center border-b border-gray-50 dark:border-[#2a3835] pb-3">
                 <div class="flex-1 pr-4">
-                    <p class="font-bold text-gray-800 dark:text-gray-100 text-sm leading-tight">${i.name}</p>
-                    <p class="text-xs text-teal font-bold">₦${(i.price * i.quantity).toLocaleString()}</p>
+                    <p class="font-bold text-gray-800 dark:text-gray-100 text-sm leading-tight">${i.productName}</p>
+                    <p class="text-[11px] text-gray-400">${i.variantLabel}${i.upgradeNames.length ? ' · ' + i.upgradeNames.join(', ') : ''}</p>
+                    <p class="text-xs text-teal font-bold">₦${(i.unitPrice * i.quantity).toLocaleString()}</p>
                 </div>
                 <div class="flex items-center gap-3 bg-gray-50 dark:bg-[#1c2925] p-1 rounded-xl">
-                    <button onclick="changeQty('${i.id}',-1)" class="w-7 h-7 bg-white dark:bg-[#182420] dark:text-gray-100 rounded-lg shadow-sm font-bold">-</button>
+                    <button onclick="changeQty('${i.lineId}',-1)" class="w-7 h-7 bg-white dark:bg-[#182420] dark:text-gray-100 rounded-lg shadow-sm font-bold">-</button>
                     <span class="font-black text-sm w-4 text-center dark:text-gray-100">${i.quantity}</span>
-                    <button onclick="changeQty('${i.id}',1)" class="w-7 h-7 bg-white dark:bg-[#182420] dark:text-gray-100 rounded-lg shadow-sm font-bold">+</button>
+                    <button onclick="changeQty('${i.lineId}',1)" class="w-7 h-7 bg-white dark:bg-[#182420] dark:text-gray-100 rounded-lg shadow-sm font-bold">+</button>
                 </div>
             </div>
         `).join('');
-        const total = cart.reduce((a, b) => a + (b.price * b.quantity), 0);
-        document.getElementById("total").textContent = total.toLocaleString();
+        const totals = cartTotals();
+        document.getElementById("subtotal").textContent = totals.subtotal.toLocaleString();
+        document.getElementById("deliveryFeeDisplay").textContent = totals.deliveryFee.toLocaleString();
+        document.getElementById("total").textContent = totals.total.toLocaleString();
         document.getElementById("cartModal").classList.remove("hidden");
     }
 
@@ -425,21 +609,32 @@
 
         localStorage.setItem(UKEY, JSON.stringify({ name, phone, addr }));
 
-        const total = cart.reduce((a, b) => a + (b.price * b.quantity), 0);
+        const totals = cartTotals();
 
         try {
             await placeOrder({
-                items: cart.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity })),
+                items: cart.map(i => ({
+                    productId: i.productId,
+                    name: i.productName,
+                    variant: i.variantLabel,
+                    upgrades: i.upgradeNames,
+                    price: i.unitPrice,
+                    quantity: i.quantity
+                })),
                 customerName: name,
                 phone,
                 address: addr,
-                total
+                subtotal: totals.subtotal,
+                deliveryFee: totals.deliveryFee,
+                total: totals.total
             });
 
             // Build an optional WhatsApp confirmation link (not required — order already saved)
             let msg = `*EAZYLIFE - NEW ORDER*%0A%0A`;
-            cart.forEach(i => { msg += `• ${i.name}%0A  Qty: ${i.quantity} | ₦${(i.price * i.quantity).toLocaleString()}%0A%0A`; });
-            msg += `*TOTAL: ₦${total.toLocaleString()}*%0A%0A*Name:* ${name}%0A*Phone:* ${phone}%0A*Address:* ${addr}`;
+            cart.forEach(i => {
+                msg += `• ${i.productName} (${i.variantLabel}${i.upgradeNames.length ? ', ' + i.upgradeNames.join(', ') : ''})%0A  Qty: ${i.quantity} | ₦${(i.unitPrice * i.quantity).toLocaleString()}%0A%0A`;
+            });
+            msg += `Subtotal: ₦${totals.subtotal.toLocaleString()}%0ADelivery: ₦${totals.deliveryFee.toLocaleString()}%0A*TOTAL: ₦${totals.total.toLocaleString()}*%0A%0A*Name:* ${name}%0A*Phone:* ${phone}%0A*Address:* ${addr}`;
             document.getElementById("waConfirmLink").href = `https://wa.me/${whatsappNumber}?text=${msg}`;
 
             cart = [];
@@ -456,6 +651,8 @@
             submitBtn.innerHTML = `<i class="fas fa-check-circle"></i> Place Order`;
         }
     }
+
+    /* ---------------- REQUEST MODAL ("can't find what you want") ---------------- */
 
     function showRequestModal() {
         document.getElementById('requestStep').classList.remove('hidden');
@@ -505,11 +702,14 @@
     }
 
     // Expose functions used by inline onclick handlers (module scripts are not global by default)
-    window.addToCart = addToCart;
+    window.filterByCategory = filterByCategory;
+    window.openProductModal = openProductModal;
+    window.hideProductModal = hideProductModal;
+    window.changePmQty = changePmQty;
+    window.addPmToCart = addPmToCart;
     window.changeQty = changeQty;
     window.showCart = showCart;
     window.hideCart = hideCart;
-    window.filterByCategory = filterByCategory;
     window.submitOrder = submitOrder;
     window.showRequestModal = showRequestModal;
     window.hideRequestModal = hideRequestModal;
