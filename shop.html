@@ -4,7 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EazyLife | Official Catalog</title>
+    <script>
+        (function () {
+            var saved = localStorage.getItem('eazylife-theme');
+            var theme = saved || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            if (theme === 'dark') document.documentElement.classList.add('dark');
+        })();
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { darkMode: 'class' }</script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
@@ -18,34 +26,95 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         #count.has-items { animation: pulse 0.5s ease-in-out; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+        .dark body { background: #0f1715; }
+        .dark .product-card { background: #182420; border-color: #2a3835; }
+        .dark #search { background: #1c2925; color: #eef2f0; }
+        .dark #search::placeholder { color: #7d8f8b; }
+        .nav-menu { position: relative; }
+        .nav-menu-panel { position: absolute; top: calc(100% + 8px); left: 0; background: #fff; border: 1px solid #eee; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); padding: 8px; min-width: 170px; z-index: 60; }
+        .dark .nav-menu-panel { background: #182420; border-color: #2a3835; }
+        .nav-menu-panel a { display: block; padding: 10px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; color: #1a2e2b; }
+        .dark .nav-menu-panel a { color: #eef2f0; }
+        .nav-menu-panel a:hover { background: #f0fdfb; }
+        .dark .nav-menu-panel a:hover { background: #1c2925; }
+        .request-tile { background: #f0fdfb; border: 1.5px dashed #00B09B; }
+        .dark .request-tile { background: #16302c; }
+        .request-tile h3 { color: #1a2e2b; }
+        .dark .request-tile h3 { color: #eef2f0; }
     </style>
 </head>
-<body class="bg-gray-50 pb-24">
+<body class="bg-gray-50 dark:bg-[#0f1715] pb-24">
 
-<header class="bg-white/90 backdrop-blur-md border-b sticky top-0 z-50 p-4 shadow-sm">
+<header class="bg-white/90 dark:bg-[#0f1715]/90 backdrop-blur-md border-b dark:border-[#2a3835] sticky top-0 z-50 p-4 shadow-sm">
     <div class="max-w-6xl mx-auto flex justify-between items-center">
         <a href="index.html" class="flex items-center gap-2">
-            <img src="assets/pictures/logo_black_transparent.png" class="h-9" alt="EazyLife">
+            <img id="navLogo" src="assets/pictures/logo_black_transparent.png" class="h-9" alt="EazyLife">
         </a>
-        <button onclick="showCart()" class="bg-eazylife text-white px-5 py-2 rounded-full font-bold text-sm flex items-center gap-2 shadow-lg hover:opacity-90 transition-all">
-            <i class="fas fa-shopping-basket"></i>
-            <span>Cart</span>
-            <span id="count" class="bg-white text-teal-600 rounded-full px-2 py-0.5 text-xs">0</span>
-        </button>
+        <div class="flex items-center gap-2">
+            <button id="themeToggle" type="button" aria-label="Toggle dark mode" class="w-10 h-10 rounded-full border border-gray-200 dark:border-[#2a3835] dark:bg-[#182420] flex items-center justify-center text-gray-700 dark:text-gray-200">
+                <i class="fas fa-moon"></i>
+            </button>
+            <div class="nav-menu">
+                <button id="navMenuBtn" type="button" aria-label="Open menu" class="w-10 h-10 rounded-full border border-gray-200 dark:border-[#2a3835] dark:bg-[#182420] flex items-center justify-center text-gray-700 dark:text-gray-200">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div id="navMenuPanel" class="nav-menu-panel hidden">
+                    <a href="index.html"><i class="fas fa-house fa-fw"></i> Home</a>
+                    <a href="index.html#services"><i class="fas fa-layer-group fa-fw"></i> Services</a>
+                    <a href="index.html#contact"><i class="fas fa-address-card fa-fw"></i> Contact</a>
+                </div>
+            </div>
+            <button onclick="showCart()" class="bg-eazylife text-white px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 shadow-lg hover:opacity-90 transition-all">
+                <i class="fas fa-shopping-basket"></i>
+                <span id="count" class="bg-white text-teal-600 rounded-full px-2 py-0.5 text-xs">0</span>
+            </button>
+            <a href="https://wa.me/2347051548082" target="_blank" class="w-10 h-10 rounded-full bg-[#25D366] text-white flex items-center justify-center">
+                <i class="fab fa-whatsapp"></i>
+            </a>
+        </div>
     </div>
 </header>
 
+<script>
+    function applyShopThemeVisuals() {
+        var isDark = document.documentElement.classList.contains('dark');
+        var logo = document.getElementById('navLogo');
+        var icon = document.querySelector('#themeToggle i');
+        logo.src = isDark ? 'assets/pictures/logo_white_transparent.png' : 'assets/pictures/logo_black_transparent.png';
+        if (icon) icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+    }
+    applyShopThemeVisuals();
+
+    document.getElementById('themeToggle').addEventListener('click', function () {
+        var isDark = document.documentElement.classList.toggle('dark');
+        localStorage.setItem('eazylife-theme', isDark ? 'dark' : 'light');
+        applyShopThemeVisuals();
+    });
+
+    var menuBtn = document.getElementById('navMenuBtn');
+    var menuPanel = document.getElementById('navMenuPanel');
+    menuBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        menuPanel.classList.toggle('hidden');
+    });
+    document.addEventListener('click', function (e) {
+        if (!menuPanel.classList.contains('hidden') && !menuPanel.contains(e.target) && e.target !== menuBtn) {
+            menuPanel.classList.add('hidden');
+        }
+    });
+</script>
+
 <main class="p-4 max-w-6xl mx-auto">
     <div class="mt-4 mb-8">
-        <h1 class="text-3xl font-black text-gray-900 tracking-tight">Tech <span class="text-teal">Catalog</span></h1>
-        <p class="text-gray-500 text-sm">Genuine Laptops & Embedded Systems.</p>
+        <h1 class="text-3xl font-black text-gray-900 dark:text-gray-100 tracking-tight">Tech <span class="text-teal">Catalog</span></h1>
+        <p class="text-gray-500 dark:text-gray-400 text-sm">Genuine Laptops & Embedded Systems.</p>
     </div>
 
-    <div class="sticky top-[76px] z-40 bg-gray-50/95 pt-2 pb-4">
+    <div class="sticky top-[76px] z-40 bg-gray-50/95 dark:bg-[#0f1715]/95 pt-2 pb-4">
         <div class="relative mb-4">
             <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
             <input id="search" placeholder="Search laptops, Arduino, sensors..."
-                   class="w-full pl-12 pr-4 py-4 rounded-2xl border-none shadow-sm focus:ring-2 focus:ring-[#00B09B] outline-none">
+                   class="w-full pl-12 pr-4 py-4 rounded-2xl border-none shadow-sm focus:ring-2 focus:ring-[#00B09B] outline-none dark:text-gray-100">
         </div>
         <div id="catFilters" class="flex gap-2 overflow-x-auto no-scrollbar pb-2"></div>
     </div>
@@ -60,25 +129,25 @@
 
 <!-- CART / CHECKOUT MODAL -->
 <div id="cartModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-end md:items-center justify-center">
-    <div class="bg-white w-full max-w-md rounded-t-[32px] md:rounded-[24px] shadow-2xl p-6 overflow-y-auto max-h-[90vh]">
+    <div class="bg-white dark:bg-[#182420] w-full max-w-md rounded-t-[32px] md:rounded-[24px] shadow-2xl p-6 overflow-y-auto max-h-[90vh]">
 
         <!-- Step 1: cart items + details -->
         <div id="cartStep">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="font-syne font-extrabold text-2xl text-gray-900">Your Order</h2>
+                <h2 class="font-syne font-extrabold text-2xl text-gray-900 dark:text-gray-100">Your Order</h2>
                 <button onclick="hideCart()" class="text-gray-400 p-2 text-3xl">&times;</button>
             </div>
 
             <div id="cartItems" class="space-y-4 mb-8"></div>
 
-            <div class="bg-gray-100 p-4 rounded-2xl mb-6 space-y-3">
-                <input id="custName" placeholder="Full Name" class="w-full bg-white border-none p-3 rounded-xl shadow-sm text-sm outline-none">
-                <input id="custPhone" placeholder="Phone / WhatsApp Number" class="w-full bg-white border-none p-3 rounded-xl shadow-sm text-sm outline-none">
-                <textarea id="custAddr" placeholder="Delivery Address or Office" class="w-full bg-white border-none p-3 rounded-xl shadow-sm text-sm outline-none" rows="2"></textarea>
+            <div class="bg-gray-100 dark:bg-[#1c2925] p-4 rounded-2xl mb-6 space-y-3">
+                <input id="custName" placeholder="Full Name" class="w-full bg-white dark:bg-[#182420] dark:text-gray-100 border-none p-3 rounded-xl shadow-sm text-sm outline-none">
+                <input id="custPhone" placeholder="Phone / WhatsApp Number" class="w-full bg-white dark:bg-[#182420] dark:text-gray-100 border-none p-3 rounded-xl shadow-sm text-sm outline-none">
+                <textarea id="custAddr" placeholder="Delivery Address or Office" class="w-full bg-white dark:bg-[#182420] dark:text-gray-100 border-none p-3 rounded-xl shadow-sm text-sm outline-none" rows="2"></textarea>
             </div>
 
             <div class="flex justify-between items-center px-2">
-                <span class="font-bold text-gray-500">Estimated Total</span>
+                <span class="font-bold text-gray-500 dark:text-gray-400">Estimated Total</span>
                 <span class="text-2xl font-black text-teal">₦<span id="total">0</span></span>
             </div>
 
@@ -92,8 +161,8 @@
         <!-- Step 2: confirmation (shown after order is written to Firestore) -->
         <div id="confirmStep" class="hidden text-center py-6">
             <div class="text-5xl text-teal mb-4"><i class="fas fa-circle-check"></i></div>
-            <h2 class="font-syne font-extrabold text-2xl text-gray-900 mb-2">Order Received!</h2>
-            <p class="text-gray-500 text-sm mb-8">We've got your order and will reach out shortly to confirm delivery. Thank you for choosing EazyLife.</p>
+            <h2 class="font-syne font-extrabold text-2xl text-gray-900 dark:text-gray-100 mb-2">Order Received!</h2>
+            <p class="text-gray-500 dark:text-gray-400 text-sm mb-8">We've got your order and will reach out shortly to confirm delivery. Thank you for choosing EazyLife.</p>
             <a id="waConfirmLink" href="#" target="_blank" class="bg-[#25D366] text-white w-full py-3 rounded-2xl font-bold text-sm shadow-lg hover:bg-[#1ebd57] transition-all flex items-center justify-center gap-2 mb-3">
                 <i class="fab fa-whatsapp"></i> Also confirm on WhatsApp (optional)
             </a>
@@ -104,27 +173,27 @@
 
 <!-- REQUEST MODAL — "can't find what you want" / budget-based sourcing -->
 <div id="requestModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-end md:items-center justify-center">
-    <div class="bg-white w-full max-w-md rounded-t-[32px] md:rounded-[24px] shadow-2xl p-6 overflow-y-auto max-h-[90vh]">
+    <div class="bg-white dark:bg-[#182420] w-full max-w-md rounded-t-[32px] md:rounded-[24px] shadow-2xl p-6 overflow-y-auto max-h-[90vh]">
 
         <div id="requestStep">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="font-syne font-extrabold text-2xl text-gray-900">Tell Us What You Need</h2>
+                <h2 class="font-syne font-extrabold text-2xl text-gray-900 dark:text-gray-100">Tell Us What You Need</h2>
                 <button onclick="hideRequestModal()" class="text-gray-400 p-2 text-3xl">&times;</button>
             </div>
-            <p class="text-sm text-gray-500 mb-5">Give us your budget and what you're after — we'll source it, even if it's not in our current catalog.</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-5">Give us your budget and what you're after — we'll source it, even if it's not in our current catalog.</p>
 
             <div class="space-y-3 mb-6">
-                <input id="reqName" placeholder="Full Name" class="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl text-sm outline-none">
-                <input id="reqPhone" placeholder="Phone / WhatsApp Number" class="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl text-sm outline-none">
-                <select id="reqCategory" class="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl text-sm outline-none">
+                <input id="reqName" placeholder="Full Name" class="w-full bg-gray-50 dark:bg-[#1c2925] dark:text-gray-100 border border-gray-200 dark:border-[#2a3835] p-3 rounded-xl text-sm outline-none">
+                <input id="reqPhone" placeholder="Phone / WhatsApp Number" class="w-full bg-gray-50 dark:bg-[#1c2925] dark:text-gray-100 border border-gray-200 dark:border-[#2a3835] p-3 rounded-xl text-sm outline-none">
+                <select id="reqCategory" class="w-full bg-gray-50 dark:bg-[#1c2925] dark:text-gray-100 border border-gray-200 dark:border-[#2a3835] p-3 rounded-xl text-sm outline-none">
                     <option value="">What kind of item? (optional)</option>
                     <option value="Laptop">Laptop</option>
                     <option value="Phone">Phone</option>
                     <option value="Component">Electronic Component</option>
                     <option value="Other">Other</option>
                 </select>
-                <input id="reqBudget" type="number" placeholder="Your Budget (₦, optional)" class="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl text-sm outline-none">
-                <textarea id="reqNeed" placeholder="Describe what you're looking for" rows="3" class="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl text-sm outline-none"></textarea>
+                <input id="reqBudget" type="number" placeholder="Your Budget (₦, optional)" class="w-full bg-gray-50 dark:bg-[#1c2925] dark:text-gray-100 border border-gray-200 dark:border-[#2a3835] p-3 rounded-xl text-sm outline-none">
+                <textarea id="reqNeed" placeholder="Describe what you're looking for" rows="3" class="w-full bg-gray-50 dark:bg-[#1c2925] dark:text-gray-100 border border-gray-200 dark:border-[#2a3835] p-3 rounded-xl text-sm outline-none"></textarea>
             </div>
 
             <button onclick="submitRequest()" id="requestSubmitBtn" class="bg-gray-900 text-white w-full py-4 rounded-2xl font-black text-lg shadow-xl hover:bg-black transition-all flex items-center justify-center gap-2">
@@ -134,8 +203,8 @@
 
         <div id="requestConfirmStep" class="hidden text-center py-6">
             <div class="text-5xl text-teal mb-4"><i class="fas fa-circle-check"></i></div>
-            <h2 class="font-syne font-extrabold text-2xl text-gray-900 mb-2">Got It!</h2>
-            <p class="text-gray-500 text-sm mb-8">We've received your request and will reach out shortly with options that fit your budget.</p>
+            <h2 class="font-syne font-extrabold text-2xl text-gray-900 dark:text-gray-100 mb-2">Got It!</h2>
+            <p class="text-gray-500 dark:text-gray-400 text-sm mb-8">We've received your request and will reach out shortly with options that fit your budget.</p>
             <a id="reqWaConfirmLink" href="#" target="_blank" class="bg-[#25D366] text-white w-full py-3 rounded-2xl font-bold text-sm shadow-lg hover:bg-[#1ebd57] transition-all flex items-center justify-center gap-2 mb-3">
                 <i class="fab fa-whatsapp"></i> Also message us on WhatsApp (optional)
             </a>
@@ -168,6 +237,9 @@
         }
         loadUserData();
         applyIncomingLink();
+        if (window.location.hash === '#cart' && cart.length > 0) {
+            showCart();
+        }
         document.getElementById("search").addEventListener("keyup", filterProducts);
     }
 
@@ -207,9 +279,9 @@
         if (list.length === 0) {
             grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-400 font-bold">Nothing matched — but we can still help.</div>`;
             grid.innerHTML += `
-                <div onclick="showRequestModal()" class="product-card col-span-full" style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; cursor:pointer; background:#f0fdfb; border:1.5px dashed #00B09B; padding:24px;">
+                <div onclick="showRequestModal()" class="product-card request-tile col-span-full" style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; cursor:pointer; padding:24px;">
                     <i class="fas fa-magnifying-glass-dollar" style="font-size:1.8rem; color:#00B09B; margin-bottom:10px;"></i>
-                    <h3 style="font-size:0.9rem; font-weight:800; color:#1a2e2b; margin-bottom:4px;">Can't find what you want?</h3>
+                    <h3 style="font-size:0.9rem; font-weight:800; margin-bottom:4px;">Can't find what you want?</h3>
                     <p style="font-size:0.78rem; color:#777;">Tell us your budget and what you need — we'll source it directly.</p>
                 </div>`;
             return;
@@ -218,19 +290,19 @@
             const inCart = cart.find(i => i.id === p.id);
             const displayPrice = (p.promoPrice && p.promoPrice > 0) ? p.promoPrice : p.price;
             grid.innerHTML += `
-                <div class="product-card bg-white p-3 rounded-[24px] shadow-sm flex flex-col">
-                    <img src="${p.image || 'https://via.placeholder.com/300?text=' + encodeURIComponent(p.name)}" class="h-32 md:h-40 w-full object-contain rounded-xl mb-3 bg-gray-50">
+                <div class="product-card bg-white dark:bg-[#182420] dark:border-[#2a3835] p-3 rounded-[24px] shadow-sm flex flex-col">
+                    <img src="${p.image || 'https://via.placeholder.com/300?text=' + encodeURIComponent(p.name)}" class="h-32 md:h-40 w-full object-contain rounded-xl mb-3 bg-gray-50 dark:bg-[#1c2925]">
                     <span class="text-[9px] font-black uppercase text-teal tracking-wider mb-1">${p.category}</span>
-                    <h3 class="font-bold text-gray-800 leading-tight text-xs md:text-sm flex-grow mb-2">${p.name}</h3>
+                    <h3 class="font-bold text-gray-800 dark:text-gray-100 leading-tight text-xs md:text-sm flex-grow mb-2">${p.name}</h3>
                     <div class="mb-3">
-                        <span class="text-gray-900 font-black text-sm md:text-base">₦${displayPrice.toLocaleString()}</span>
+                        <span class="text-gray-900 dark:text-gray-100 font-black text-sm md:text-base">₦${displayPrice.toLocaleString()}</span>
                     </div>
                     <div class="mt-auto">
                         ${inCart ? `
-                            <div class="flex items-center justify-between bg-teal-50 rounded-xl p-1 border border-teal-100">
-                                <button onclick="changeQty('${p.id}',-1)" class="w-8 h-8 bg-white rounded-lg shadow-sm font-bold text-teal">-</button>
-                                <span class="font-bold text-sm text-teal-800">${inCart.quantity}</span>
-                                <button onclick="changeQty('${p.id}',1)" class="w-8 h-8 bg-white rounded-lg shadow-sm font-bold text-teal">+</button>
+                            <div class="flex items-center justify-between bg-teal-50 dark:bg-[#1c2925] rounded-xl p-1 border border-teal-100 dark:border-[#2a3835]">
+                                <button onclick="changeQty('${p.id}',-1)" class="w-8 h-8 bg-white dark:bg-[#182420] rounded-lg shadow-sm font-bold text-teal">-</button>
+                                <span class="font-bold text-sm text-teal-800 dark:text-teal-300">${inCart.quantity}</span>
+                                <button onclick="changeQty('${p.id}',1)" class="w-8 h-8 bg-white dark:bg-[#182420] rounded-lg shadow-sm font-bold text-teal">+</button>
                             </div>
                         ` : `
                             <button onclick="addToCart('${p.id}')" class="bg-gray-900 text-white w-full py-2.5 rounded-xl font-bold text-xs hover:bg-black transition-colors">Add to Cart</button>
@@ -239,9 +311,9 @@
                 </div>`;
         });
         grid.innerHTML += `
-            <div onclick="showRequestModal()" class="product-card" style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; cursor:pointer; background:#f0fdfb; border:1.5px dashed #00B09B;">
+            <div onclick="showRequestModal()" class="product-card request-tile" style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; cursor:pointer;">
                 <i class="fas fa-magnifying-glass-dollar" style="font-size:1.6rem; color:#00B09B; margin-bottom:8px;"></i>
-                <h3 style="font-size:0.82rem; font-weight:800; color:#1a2e2b; margin-bottom:4px;">Can't find what you want?</h3>
+                <h3 style="font-size:0.82rem; font-weight:800; margin-bottom:4px;">Can't find what you want?</h3>
                 <p style="font-size:0.72rem; color:#777; margin-bottom:0;">Tell us your budget — we'll source it.</p>
             </div>`;
     }
@@ -250,7 +322,7 @@
         const cats = ['All', ...new Set(products.map(p => p.category))];
         document.getElementById("catFilters").innerHTML = cats.map(c => `
             <button onclick="filterByCategory('${c}')"
-                    class="whitespace-nowrap px-5 py-2 rounded-full border text-xs font-bold transition-all ${currentCategory === c ? 'active-cat' : 'bg-white text-gray-500 border-gray-200'}">
+                    class="whitespace-nowrap px-5 py-2 rounded-full border text-xs font-bold transition-all ${currentCategory === c ? 'active-cat' : 'bg-white dark:bg-[#182420] text-gray-500 dark:text-gray-300 border-gray-200 dark:border-[#2a3835]'}">
                 ${c}
             </button>
         `).join('');
@@ -310,15 +382,15 @@
         document.getElementById("confirmStep").classList.add("hidden");
         const container = document.getElementById("cartItems");
         container.innerHTML = cart.map(i => `
-            <div class="flex justify-between items-center border-b border-gray-50 pb-3">
+            <div class="flex justify-between items-center border-b border-gray-50 dark:border-[#2a3835] pb-3">
                 <div class="flex-1 pr-4">
-                    <p class="font-bold text-gray-800 text-sm leading-tight">${i.name}</p>
+                    <p class="font-bold text-gray-800 dark:text-gray-100 text-sm leading-tight">${i.name}</p>
                     <p class="text-xs text-teal font-bold">₦${(i.price * i.quantity).toLocaleString()}</p>
                 </div>
-                <div class="flex items-center gap-3 bg-gray-50 p-1 rounded-xl">
-                    <button onclick="changeQty('${i.id}',-1)" class="w-7 h-7 bg-white rounded-lg shadow-sm font-bold">-</button>
+                <div class="flex items-center gap-3 bg-gray-50 dark:bg-[#1c2925] p-1 rounded-xl">
+                    <button onclick="changeQty('${i.id}',-1)" class="w-7 h-7 bg-white dark:bg-[#182420] rounded-lg shadow-sm font-bold">-</button>
                     <span class="font-black text-sm w-4 text-center">${i.quantity}</span>
-                    <button onclick="changeQty('${i.id}',1)" class="w-7 h-7 bg-white rounded-lg shadow-sm font-bold">+</button>
+                    <button onclick="changeQty('${i.id}',1)" class="w-7 h-7 bg-white dark:bg-[#182420] rounded-lg shadow-sm font-bold">+</button>
                 </div>
             </div>
         `).join('');
