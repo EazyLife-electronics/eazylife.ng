@@ -1,0 +1,31 @@
+name: Remove obsolete files
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: firebase-v2
+
+      - name: Delete obsolete files
+        run: |
+          rm -f index2.html MP.html receipt.html
+          rm -f admin/admin.html admin/admin.js
+          rm -rf css data images r2 r3
+          rm -f eazy_products.json reviews.json
+          rm -f assets/pictures/file.txt assets/pictures/header.jpg assets/pictures/logo_white.jpg
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && echo "Nothing to remove" || git commit -m "Remove obsolete files (automated cleanup)"
+          git push
