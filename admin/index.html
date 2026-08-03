@@ -9,6 +9,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root { --teal: #00B09B; --lime: #8DC63F; }
         body { font-family: 'DM Sans', sans-serif; }
@@ -93,6 +94,18 @@
                     </div>
                 </form>
             </div>
+
+            <div class="flex gap-2 mb-3">
+                <button type="button" id="exportExcelBtn" class="flex-1 bg-white border border-gray-200 text-gray-700 py-2.5 rounded-xl font-bold text-xs">
+                    <i class="fas fa-file-export"></i> Export to Excel
+                </button>
+                <label class="flex-1 bg-white border border-gray-200 text-gray-700 py-2.5 rounded-xl font-bold text-xs text-center cursor-pointer">
+                    <i class="fas fa-file-import"></i> Import from Excel
+                    <input type="file" id="importExcelInput" accept=".xlsx,.xls" class="hidden">
+                </label>
+            </div>
+            <p id="importStatus" class="text-[11px] font-bold text-teal-600 mb-2 px-1 hidden"></p>
+            <p class="text-[10px] text-gray-400 mb-3 px-1">Export gives you an Excel file with your current catalog. Edit it (or add new rows with the Product ID left blank), then import it back — matching IDs update existing products, blank IDs create new ones.</p>
 
             <div class="flex justify-between items-center mb-3">
                 <input id="productSearch" placeholder="Search products..." class="w-full max-w-xs p-3 bg-white rounded-xl border border-gray-200 text-sm outline-none">
