@@ -362,6 +362,162 @@ function renderProductList() {
 
 document.getElementById('productSearch').addEventListener('keyup', renderProductList);
 
+/* ---------------- EXCEL EXPORT / IMPORT ---------------- */
+
+function exportProductsToExcel() {
+  const productRows = [];
+  const upgradeRows = [];
+
+  allProducts.forEach(p => {
+    (p.variants || []).forEach(v => {
+      productRows.push({
+        'Product ID': p.id,
+        'Product Name': p.name,
+        'Brand': p.brand || '',
+        'Category': p.category || '',
+        'Description': p.desc || '',
+        'Product In Stock': p.inStock !== false,
+        'Variant ID': v.id,
+        'Color': v.color || '',
+        'RAM': v.ram || '',
+        'Storage': v.rom || '',
+        'Processor': v.processor || '',
+        'Price': v.price || 0,
+        'Promo Price': v.promoPrice || 0,
+        'Image': v.image || '',
+        'Variant In Stock': v.inStock !== false
+      });
+    });
+    (p.upgrades || []).forEach(u => {
+      upgradeRows.push({
+        'Product ID': p.id,
+        'Product Name': p.name,
+        'Upgrade Name': u.name,
+        'Upgrade Price': u.price || 0
+      });
+    });
+  });
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(productRows), 'Products');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(upgradeRows), 'Upgrades');
+  XLSX.writeFile(wb, `eazylife-products-${new Date().toISOString().slice(0, 10)}.xlsx`);
+}
+
+document.getElementById('exportExcelBtn').addEventListener('click', exportProductsToExcel);
+
+function showImportStatus(text) {
+  const el = document.getElementById('importStatus');
+  el.textContent = text;
+  el.classList.remove('hidden');
+}
+
+function truthy(val) {
+  return val !== false && val !== 'FALSE' && val !== 'false' && val !== 0;
+}
+
+document.getElementById('importExcelInput').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  showImportStatus('Reading file...');
+
+  try {
+    const data = await file.arrayBuffer();
+    const wb = XLSX.read(data);
+    const productSheet = wb.Sheets['Products'];
+    const upgradeSheet = wb.Sheets['Upgrades'];
+    if (!productSheet) throw new Error('No "Products" sheet found in this file.');
+
+    const productRows = XLSX.utils.sheet_to_json(productSheet);
+    const upgradeRows = upgradeSheet ? XLSX.utils.sheet_to_json(upgradeSheet) : [];
+
+    // Group rows into products, keyed by Product ID when present, otherwise by Product Name
+    // (so multiple blank-ID rows sharing the same name become variants of one new product).
+    const groups = new Map();
+    productRows.forEach(row => {
+      const id = (row['Product ID'] || '').toString().trim();
+      const name = (row['Product Name'] || '').toString().trim();
+      if (!name) return;
+      const key = id || ('NEW::' + name);
+
+      if (!groups.has(key)) {
+        groups.set(key, {
+          id: id || null,
+          name,
+          brand: (row['Brand'] || '').toString().trim(),
+          category: (row['Category'] || '').toString().trim(),
+          desc: (row['Description'] || '').toString().trim(),
+          inStock: truthy(row['Product In Stock']),
+          variants: [],
+          upgrades: []
+        });
+      }
+      const group = groups.get(key);
+      const variantId = (row['Variant ID'] || '').toString().trim() || ('v' + Date.now() + '_' + Math.random().toString(36).slice(2, 8));
+      group.variants.push({
+        id: variantId,
+        color: (row['Color'] || '').toString().trim(),
+        ram: (row['RAM'] || '').toString().trim(),
+        rom: (row['Storage'] || '').toString().trim(),
+        processor: (row['Processor'] || '').toString().trim(),
+        price: parseInt(row['Price'], 10) || 0,
+        promoPrice: parseInt(row['Promo Price'], 10) || 0,
+        image: (row['Image'] || '').toString().trim(),
+        inStock: truthy(row['Variant In Stock'])
+      });
+    });
+
+    upgradeRows.forEach(row => {
+      const id = (row['Product ID'] || '').toString().trim();
+      const name = (row['Product Name'] || '').toString().trim();
+      const key = id || ('NEW::' + name);
+      const group = groups.get(key);
+      if (!group) return; // upgrade refers to a product not present in the Products sheet
+      const upgradeName = (row['Upgrade Name'] || '').toString().trim();
+      if (!upgradeName) return;
+      group.upgrades.push({
+        id: 'u' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+        name: upgradeName,
+        price: parseInt(row['Upgrade Price'], 10) || 0
+      });
+    });
+
+    let updated = 0, created = 0, failed = 0;
+    let i = 0;
+    for (const group of groups.values()) {
+      i++;
+      showImportStatus(`Saving ${i} of ${groups.size}...`);
+      const productData = {
+        name: group.name,
+        brand: group.brand,
+        category: group.category,
+        desc: group.desc,
+        inStock: group.inStock,
+        variants: group.variants,
+        upgrades: group.upgrades
+      };
+      try {
+        if (group.id) {
+          await updateProduct(group.id, productData);
+          updated++;
+        } else {
+          await addProduct(productData);
+          created++;
+        }
+      } catch (err) {
+        console.error('Failed to save', group.name, err);
+        failed++;
+      }
+    }
+
+    showImportStatus(`Done: ${updated} updated, ${created} created${failed ? `, ${failed} failed (see console)` : ''}.`);
+  } catch (err) {
+    showImportStatus('Import failed: ' + err.message);
+  } finally {
+    e.target.value = ''; // allow re-importing the same file again later if needed
+  }
+});
+
 /* ---------------- HEROES ---------------- */
 
 const heroForm = document.getElementById('heroForm');
