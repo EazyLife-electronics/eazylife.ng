@@ -416,6 +416,21 @@ function truthy(val) {
   return val !== false && val !== 'FALSE' && val !== 'false' && val !== 0;
 }
 
+// Mobile spreadsheet apps (Google Sheets, Excel mobile, WPS, etc.) often don't
+// update a worksheet's stored !ref range when new rows/cols are typed in, which
+// makes XLSX.utils.sheet_to_json() silently ignore anything outside the original
+// exported range. Recompute the real used range from actual cell keys instead.
+function getEffectiveRange(sheet) {
+  let maxR = 0, maxC = 0;
+  Object.keys(sheet).forEach(key => {
+    if (key[0] === '!') return;
+    const { r, c } = XLSX.utils.decode_cell(key);
+    if (r > maxR) maxR = r;
+    if (c > maxC) maxC = c;
+  });
+  return { s: { r: 0, c: 0 }, e: { r: maxR, c: maxC } };
+}
+
 document.getElementById('importExcelInput').addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -428,8 +443,9 @@ document.getElementById('importExcelInput').addEventListener('change', async (e)
     const upgradeSheet = wb.Sheets['Upgrades'];
     if (!productSheet) throw new Error('No "Products" sheet found in this file.');
 
-    const productRows = XLSX.utils.sheet_to_json(productSheet);
-    const upgradeRows = upgradeSheet ? XLSX.utils.sheet_to_json(upgradeSheet) : [];
+    const productRows = XLSX.utils.sheet_to_json(productSheet, { range: getEffectiveRange(productSheet) });
+    const upgradeRows = upgradeSheet ? XLSX.utils.sheet_to_json(upgradeSheet, { range: getEffectiveRange(upgradeSheet) }) : [];
+    showImportStatus(`Parsed ${productRows.length} product row(s), ${upgradeRows.length} upgrade row(s)...`);
 
     // Group rows into products, keyed by Product ID when present, otherwise by Product Name
     // (so multiple blank-ID rows sharing the same name become variants of one new product).
