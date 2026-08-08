@@ -43,14 +43,35 @@ export async function deleteProduct(id) {
 
 /* ---------------- ORDERS ---------------- */
 
+// Short, friendly tracking code — avoids ambiguous characters (0/O, 1/I/l) so it's easy
+// to read aloud or type back in. Used as the actual Firestore document ID (not just a field)
+// so a customer can fetch their one order directly without needing any "list" permission —
+// see firestore.rules: get is public, list (browsing all orders) stays admin-only.
+function generateTrackingCode() {
+  const alphabet = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  let code = 'EZ-';
+  for (let i = 0; i < 6; i++) code += alphabet[Math.floor(Math.random() * alphabet.length)];
+  return code;
+}
+
 // Customer submits an order from the cart. No login required to write —
-// see firestore.rules: orders can be created by anyone, but only read/edited by admin.
+// see firestore.rules: orders can be created by anyone, but only read/edited by admin
+// (except fetching a single order by its exact tracking code, which is public).
 export async function placeOrder(order) {
-  return addDoc(collection(db, 'orders'), {
+  const trackingCode = generateTrackingCode();
+  await setDoc(doc(db, 'orders', trackingCode), {
     ...order,
+    trackingCode,
     status: 'new',
     createdAt: serverTimestamp()
   });
+  return trackingCode;
+}
+
+// Public: fetch one order by its tracking code (also its doc ID). Returns null if not found.
+export async function getOrderByTrackingCode(code) {
+  const snap = await getDoc(doc(db, 'orders', code.trim().toUpperCase()));
+  return snap.exists() ? { id: snap.id, ...snap.data() } : null;
 }
 
 // Admin-only: live list of orders, newest first
