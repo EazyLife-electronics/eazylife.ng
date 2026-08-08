@@ -741,6 +741,28 @@ function renderRequestList(requests) {
 const STATUS_FLOW = ['new', 'confirmed', 'delivered'];
 const STATUS_COLORS = { new: 'bg-yellow-100 text-yellow-700', confirmed: 'bg-blue-100 text-blue-700', delivered: 'bg-green-100 text-green-700' };
 
+// Nigerian numbers can arrive as 0805..., 234805..., or +234805... — WhatsApp's wa.me links
+// need the country-code form with no plus and no leading zero.
+function normalizeForWhatsApp(phone) {
+  let digits = (phone || '').replace(/\D/g, '');
+  if (digits.startsWith('0')) digits = '234' + digits.slice(1);
+  else if (!digits.startsWith('234') && digits.length === 10) digits = '234' + digits;
+  return digits;
+}
+
+function orderMessageTemplate(order) {
+  const name = order.customerName || 'there';
+  const code = order.trackingCode || order.id;
+  const itemsList = (order.items || []).map(i => i.name).join(', ');
+  const trackUrl = `https://eazylife.ng/track.html?code=${code}`;
+  const templates = {
+    new: `Hi ${name}, thanks for your order with EazyLife! We're confirming your order (${code}) for ${itemsList} and will update you shortly. Track anytime: ${trackUrl}`,
+    confirmed: `Hi ${name}, good news — your order (${code}) is confirmed and on its way! We'll reach out again once it's close to delivery. Track: ${trackUrl}`,
+    delivered: `Hi ${name}, your order (${code}) has been delivered. Thank you for shopping with EazyLife — we'd love a quick review if you have a moment!`
+  };
+  return templates[order.status] || templates.new;
+}
+
 function renderOrderList(orders) {
   document.getElementById('orderList').innerHTML = orders.map(o => {
     const itemsHtml = (o.items || []).map(i => `${i.name} × ${i.quantity}`).join(', ');
@@ -752,14 +774,25 @@ function renderOrderList(orders) {
           <div>
             <p class="font-bold text-sm text-gray-800">${o.customerName || 'Unknown'}</p>
             <p class="text-xs text-gray-400">${o.phone || ''} · ${created}</p>
+            <p class="text-[10px] font-mono text-teal-600 font-bold mt-0.5">${o.trackingCode || o.id}</p>
           </div>
           <span class="text-[10px] font-bold uppercase px-2 py-1 rounded-full ${STATUS_COLORS[o.status] || 'bg-gray-100 text-gray-500'}">${o.status || 'new'}</span>
         </div>
         <p class="text-xs text-gray-600 mb-1">${itemsHtml}</p>
         <p class="text-xs text-gray-400 mb-3">${o.address || ''}</p>
-        <div class="flex justify-between items-center">
+        <div class="flex justify-between items-center mb-2">
           <span class="font-black text-sm text-[#00B09B]">₦${(o.total || 0).toLocaleString()}</span>
-          ${nextStatus ? `<button data-order="${o.id}" data-next="${nextStatus}" class="advance-order-btn text-[10px] bg-gray-900 text-white px-3 py-1.5 rounded-md font-bold">Mark ${nextStatus}</button>` : ''}
+          <div class="flex gap-2">
+            <button data-msg-toggle="${o.id}" class="text-[10px] bg-gray-100 text-gray-700 px-3 py-1.5 rounded-md font-bold"><i class="fas fa-comment-dots"></i> Message</button>
+            ${nextStatus ? `<button data-order="${o.id}" data-next="${nextStatus}" class="advance-order-btn text-[10px] bg-gray-900 text-white px-3 py-1.5 rounded-md font-bold">Mark ${nextStatus}</button>` : ''}
+          </div>
+        </div>
+        <div id="msgBox-${o.id}" class="hidden mt-3 pt-3 border-t border-gray-100">
+          <textarea id="msgText-${o.id}" rows="4" class="w-full p-2.5 bg-gray-50 rounded-lg border border-gray-200 text-xs outline-none mb-2">${orderMessageTemplate(o)}</textarea>
+          <div class="flex gap-2">
+            <button data-wa-send="${o.id}" data-phone="${o.phone || ''}" class="flex-1 bg-[#25D366] text-white text-[11px] font-bold py-2 rounded-lg"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+            <button data-sms-send="${o.id}" data-phone="${o.phone || ''}" class="flex-1 bg-gray-700 text-white text-[11px] font-bold py-2 rounded-lg"><i class="fas fa-comment-sms"></i> SMS</button>
+          </div>
         </div>
       </div>
     `;
@@ -767,6 +800,31 @@ function renderOrderList(orders) {
 
   document.querySelectorAll('.advance-order-btn').forEach(btn => {
     btn.addEventListener('click', () => updateOrderStatus(btn.dataset.order, btn.dataset.next));
+  });
+
+  document.querySelectorAll('[data-msg-toggle]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.getElementById(`msgBox-${btn.dataset.msgToggle}`).classList.toggle('hidden');
+    });
+  });
+
+  document.querySelectorAll('[data-wa-send]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const text = document.getElementById(`msgText-${btn.dataset.waSend}`).value;
+      const phone = normalizeForWhatsApp(btn.dataset.phone);
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
+    });
+  });
+
+  document.querySelectorAll('[data-sms-send]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const text = document.getElementById(`msgText-${btn.dataset.smsSend}`).value;
+      const phone = btn.dataset.phone.trim();
+      // sms: URI body param isn't perfectly standardized across iOS/Android — if it opens
+      // the messages app without the text pre-filled on a given phone, that's a platform quirk,
+      // not a bug here; the composed text above is still there to copy-paste manually.
+      window.location.href = `sms:${phone}?body=${encodeURIComponent(text)}`;
+    });
   });
 }
 
