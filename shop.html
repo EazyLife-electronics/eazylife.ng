@@ -211,15 +211,13 @@
                 <span class="text-gray-500 dark:text-gray-400">Subtotal</span>
                 <span class="font-bold text-gray-800 dark:text-gray-100">₦<span id="subtotal">0</span></span>
             </div>
-            <div class="px-2 mt-1">
-                <div class="flex justify-between items-center text-sm">
-                    <span class="text-gray-500 dark:text-gray-400">Delivery Fee</span>
+            <div class="flex justify-between items-center px-2 text-sm mt-1">
+                <span class="text-gray-500 dark:text-gray-400">Delivery Fee</span>
+                <span class="flex items-center gap-1.5">
+                    <span id="deliveryNaive" class="hidden text-[11px] text-gray-400 line-through"></span>
+                    <span id="deliverySavingsPercent" class="hidden text-[10px] font-black text-teal"></span>
                     <span class="font-bold text-gray-800 dark:text-gray-100">₦<span id="deliveryFeeDisplay">0</span></span>
-                </div>
-                <div id="deliverySavingsWrap" class="hidden flex justify-between items-center mt-0.5 gap-2">
-                    <span id="deliveryExpression" class="text-[10px] text-gray-400 line-through truncate"></span>
-                    <span id="deliverySavingsPercent" class="text-[10px] font-black text-teal whitespace-nowrap"></span>
-                </div>
+                </span>
             </div>
             <div class="flex justify-between items-center px-2 mt-2 pt-2 border-t border-gray-100 dark:border-[#2a3835]">
                 <span class="font-bold text-gray-500 dark:text-gray-400">Total</span>
@@ -624,13 +622,16 @@
             deliveryFeePerItem,
             deliveryDiscountRate
         );
-        const savingsWrap = document.getElementById("deliverySavingsWrap");
+        const naiveEl = document.getElementById("deliveryNaive");
+        const pctEl = document.getElementById("deliverySavingsPercent");
         if (breakdown.savings > 0) {
-            document.getElementById("deliveryExpression").textContent = `₦${breakdown.expression} = ₦${breakdown.naiveTotal.toLocaleString()}`;
-            document.getElementById("deliverySavingsPercent").textContent = `-${breakdown.savingsPercent.toFixed(1)}%`;
-            savingsWrap.classList.remove("hidden");
+            naiveEl.textContent = `₦${breakdown.naiveTotal.toLocaleString()}`;
+            pctEl.textContent = `-${breakdown.savingsPercent.toFixed(1)}%`;
+            naiveEl.classList.remove("hidden");
+            pctEl.classList.remove("hidden");
         } else {
-            savingsWrap.classList.add("hidden");
+            naiveEl.classList.add("hidden");
+            pctEl.classList.add("hidden");
         }
 
         document.getElementById("cartModal").classList.remove("hidden");
