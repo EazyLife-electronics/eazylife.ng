@@ -583,8 +583,10 @@
         if (!v) return alert('Please choose an option.');
         const upgrades = getSelectedUpgrades();
         const upgradesTotal = upgrades.reduce((a, u) => a + (u.price || 0), 0);
-        const unitPrice = variantUnitPrice(v) + upgradesTotal;
-        const originalUnitPrice = (v.price || 0) + upgradesTotal;
+        const unitBasePrice = variantUnitPrice(v);
+        const originalUnitBasePrice = v.price || 0;
+        const unitPrice = unitBasePrice + upgradesTotal;
+        const originalUnitPrice = originalUnitBasePrice + upgradesTotal;
         const upgradeIds = upgrades.map(u => u.id).sort().join(',');
         const lineId = `${pmProduct.id}::${v.id}::${upgradeIds}`;
 
@@ -599,6 +601,9 @@
                 productName: pmProduct.name,
                 variantLabel: variantLabel(v),
                 upgradeNames: upgrades.map(u => u.name),
+                upgradeItems: upgrades.map(u => ({ name: u.name, price: u.price || 0 })),
+                unitBasePrice,
+                originalUnitBasePrice,
                 unitPrice,
                 originalUnitPrice,
                 unitDeliveryFee: (v.deliveryFee != null && v.deliveryFee !== '') ? v.deliveryFee : null,
@@ -662,11 +667,17 @@
             const origLineTotal = (i.originalUnitPrice != null ? i.originalUnitPrice : i.unitPrice) * i.quantity;
             const lineTotal = i.unitPrice * i.quantity;
             const lineHasPromo = origLineTotal > lineTotal;
+            const baseUnit = i.unitBasePrice != null ? i.unitBasePrice : i.unitPrice;
+            const baseOrigUnit = i.originalUnitBasePrice != null ? i.originalUnitBasePrice : baseUnit;
+            const baseHasPromo = baseOrigUnit > baseUnit;
+            const upgradeItems = i.upgradeItems || [];
             return `
             <div class="flex justify-between items-center border-b border-gray-50 dark:border-[#2a3835] pb-3">
                 <div class="flex-1 pr-4">
                     <p class="font-bold text-gray-800 dark:text-gray-100 text-sm leading-tight">${i.productName}</p>
                     <p class="text-[11px] text-gray-400">${i.variantLabel}${i.upgradeNames.length ? ' · ' + i.upgradeNames.join(', ') : ''}</p>
+                    <p class="text-[10px] text-gray-400"><i class="fas fa-tag mr-1"></i>Item ${baseHasPromo ? `<span class="line-through">₦${baseOrigUnit.toLocaleString()}</span> ` : ''}₦${baseUnit.toLocaleString()}/unit</p>
+                    ${upgradeItems.map(u => `<p class="text-[10px] text-gray-400">+ ${u.name} ₦${(u.price || 0).toLocaleString()}/unit</p>`).join('')}
                     <p class="text-[10px] text-gray-400"><i class="fas fa-truck-fast mr-1"></i>Delivery ₦${(i.unitDeliveryFee != null ? i.unitDeliveryFee : deliveryFeePerItem).toLocaleString()}/unit</p>
                     <p class="text-xs font-bold flex items-center gap-1.5">
                         ${lineHasPromo ? `<span class="text-gray-400 text-[10px] line-through">₦${origLineTotal.toLocaleString()}</span><span class="text-[9px] font-black text-teal">-${(((origLineTotal - lineTotal) / origLineTotal) * 100).toFixed(0)}%</span>` : ''}
