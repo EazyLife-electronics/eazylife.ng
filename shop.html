@@ -175,7 +175,11 @@
 
         <div class="flex justify-between items-center mb-1 px-1">
             <span class="font-bold text-gray-500 dark:text-gray-400 text-sm">Price</span>
-            <span class="text-2xl font-black text-teal">₦<span id="pmPrice">0</span></span>
+            <span class="flex items-center gap-1.5">
+                <span id="pmOriginalPrice" class="hidden text-xs text-gray-400 line-through"></span>
+                <span id="pmDiscountPercent" class="hidden text-[10px] font-black text-teal"></span>
+                <span class="text-2xl font-black text-teal">₦<span id="pmPrice">0</span></span>
+            </span>
         </div>
         <div class="flex justify-between items-center mb-4 px-1">
             <span class="text-[11px] text-gray-400"><i class="fas fa-truck-fast mr-1"></i>Delivery</span>
@@ -209,7 +213,11 @@
 
             <div class="flex justify-between items-center px-2 text-sm">
                 <span class="text-gray-500 dark:text-gray-400">Subtotal</span>
-                <span class="font-bold text-gray-800 dark:text-gray-100">₦<span id="subtotal">0</span></span>
+                <span class="flex items-center gap-1.5">
+                    <span id="subtotalOriginal" class="hidden text-[11px] text-gray-400 line-through"></span>
+                    <span id="subtotalSavingsPercent" class="hidden text-[10px] font-black text-teal"></span>
+                    <span class="font-bold text-gray-800 dark:text-gray-100">₦<span id="subtotal">0</span></span>
+                </span>
             </div>
             <div class="flex justify-between items-center px-2 text-sm mt-1">
                 <span class="text-gray-500 dark:text-gray-400">Delivery Fee</span>
@@ -293,7 +301,7 @@
 
 <script type="module">
     import { getProducts, placeOrder, placeRequest, getSettings } from './js/store.mjs';
-    import { calcGroupedDeliveryFee, buildDeliveryFeeSummary, resolveDeliveryFee, variantUnitPrice, productPriceRange, variantLabel } from './js/pricing.mjs';
+    import { calcGroupedDeliveryFee, buildDeliveryFeeSummary, resolveDeliveryFee, variantUnitPrice, productPriceRange, productOriginalPriceRange, hasPromo, variantDiscountPercent, productHasPromo, buildPriceSavingsSummary, variantLabel } from './js/pricing.mjs';
 
     const CKEY = "eazylife_cart_v2";
     const UKEY = "eazylife_user_v2";
@@ -417,14 +425,22 @@
         list.forEach(p => {
             const range = productPriceRange(p);
             const priceLabel = range.min === range.max ? `₦${range.min.toLocaleString()}` : `From ₦${range.min.toLocaleString()}`;
+            const promo = productHasPromo(p);
+            const origRange = productOriginalPriceRange(p);
+            const origPriceLabel = origRange.min === origRange.max ? `₦${origRange.min.toLocaleString()}` : `From ₦${origRange.min.toLocaleString()}`;
+            const maxDiscountPercent = promo ? Math.max(...(p.variants || []).map(variantDiscountPercent)) : 0;
             const thumb = (p.variants && p.variants[0] && p.variants[0].image) || '';
             const outOfStock = p.inStock === false || (p.variants || []).every(v => v.inStock === false);
             grid.innerHTML += `
                 <div class="product-card bg-white dark:bg-[#182420] dark:border-[#2a3835] p-3 rounded-[24px] shadow-sm flex flex-col">
-                    <img src="${thumb || 'https://via.placeholder.com/300?text=' + encodeURIComponent(p.name)}" class="h-32 md:h-40 w-full object-contain rounded-xl mb-3 bg-gray-50 dark:bg-[#1c2925]">
+                    <div class="relative mb-3">
+                        <img src="${thumb || 'https://via.placeholder.com/300?text=' + encodeURIComponent(p.name)}" class="h-32 md:h-40 w-full object-contain rounded-xl bg-gray-50 dark:bg-[#1c2925]">
+                        ${promo ? `<span class="absolute top-1.5 left-1.5 bg-[#00B09B] text-white text-[9px] font-black px-1.5 py-0.5 rounded-md shadow">-${Math.round(maxDiscountPercent)}%</span>` : ''}
+                    </div>
                     <span class="text-[9px] font-black uppercase text-teal tracking-wider mb-1">${p.brand ? p.brand + ' · ' : ''}${p.category}</span>
                     <h3 class="font-bold text-gray-800 dark:text-gray-100 leading-tight text-xs md:text-sm flex-grow mb-2">${p.name}</h3>
-                    <div class="mb-3">
+                    <div class="mb-3 flex items-baseline gap-1.5 flex-wrap">
+                        ${promo ? `<span class="text-gray-400 text-[10px] line-through">${origPriceLabel}</span>` : ''}
                         <span class="text-gray-900 dark:text-gray-100 font-black text-sm md:text-base">${priceLabel}</span>
                     </div>
                     <div class="mt-auto">
@@ -453,7 +469,7 @@
         const variantSel = document.getElementById('pmVariant');
         variantSel.innerHTML = (p.variants || []).map(v => `
             <option value="${v.id}" ${v.inStock === false ? 'disabled' : ''}>
-                ${variantLabel(v)} — ₦${variantUnitPrice(v).toLocaleString()}${v.inStock === false ? ' (Out of stock)' : ''}
+                ${variantLabel(v)} — ₦${variantUnitPrice(v).toLocaleString()}${hasPromo(v) ? ` (was ₦${v.price.toLocaleString()}, -${Math.round(variantDiscountPercent(v))}%)` : ''}${v.inStock === false ? ' (Out of stock)' : ''}
             </option>
         `).join('');
         variantSel.onchange = updateProductModalPrice;
@@ -499,8 +515,23 @@
         const base = variantUnitPrice(v);
         const upgradesTotal = getSelectedUpgrades().reduce((a, u) => a + (u.price || 0), 0);
         const unit = base + upgradesTotal;
-        document.getElementById('pmPrice').textContent = (unit * pmQty).toLocaleString();
+        const actualTotal = unit * pmQty;
+        document.getElementById('pmPrice').textContent = actualTotal.toLocaleString();
         document.getElementById('pmDeliveryFee').textContent = resolveDeliveryFee(v, deliveryFeePerItem).toLocaleString();
+
+        const origUnit = (v ? (v.price || 0) : 0) + upgradesTotal;
+        const origTotal = origUnit * pmQty;
+        const origEl = document.getElementById('pmOriginalPrice');
+        const pctEl = document.getElementById('pmDiscountPercent');
+        if (v && hasPromo(v) && origTotal > actualTotal) {
+            origEl.textContent = `₦${origTotal.toLocaleString()}`;
+            pctEl.textContent = `-${(((origTotal - actualTotal) / origTotal) * 100).toFixed(1)}%`;
+            origEl.classList.remove('hidden');
+            pctEl.classList.remove('hidden');
+        } else {
+            origEl.classList.add('hidden');
+            pctEl.classList.add('hidden');
+        }
     }
 
     function changePmQty(delta) {
@@ -518,7 +549,9 @@
         const v = getSelectedVariant();
         if (!v) return alert('Please choose an option.');
         const upgrades = getSelectedUpgrades();
-        const unitPrice = variantUnitPrice(v) + upgrades.reduce((a, u) => a + (u.price || 0), 0);
+        const upgradesTotal = upgrades.reduce((a, u) => a + (u.price || 0), 0);
+        const unitPrice = variantUnitPrice(v) + upgradesTotal;
+        const originalUnitPrice = (v.price || 0) + upgradesTotal;
         const upgradeIds = upgrades.map(u => u.id).sort().join(',');
         const lineId = `${pmProduct.id}::${v.id}::${upgradeIds}`;
 
@@ -534,6 +567,7 @@
                 variantLabel: variantLabel(v),
                 upgradeNames: upgrades.map(u => u.name),
                 unitPrice,
+                originalUnitPrice,
                 unitDeliveryFee: (v.deliveryFee != null && v.deliveryFee !== '') ? v.deliveryFee : null,
                 deliveryRoute: v.deliveryRoute === 'separate' ? 'separate' : 'general',
                 image: v.image || '',
@@ -591,13 +625,20 @@
         document.getElementById("cartStep").classList.remove("hidden");
         document.getElementById("confirmStep").classList.add("hidden");
         const container = document.getElementById("cartItems");
-        container.innerHTML = cart.map(i => `
+        container.innerHTML = cart.map(i => {
+            const origLineTotal = (i.originalUnitPrice != null ? i.originalUnitPrice : i.unitPrice) * i.quantity;
+            const lineTotal = i.unitPrice * i.quantity;
+            const lineHasPromo = origLineTotal > lineTotal;
+            return `
             <div class="flex justify-between items-center border-b border-gray-50 dark:border-[#2a3835] pb-3">
                 <div class="flex-1 pr-4">
                     <p class="font-bold text-gray-800 dark:text-gray-100 text-sm leading-tight">${i.productName}</p>
                     <p class="text-[11px] text-gray-400">${i.variantLabel}${i.upgradeNames.length ? ' · ' + i.upgradeNames.join(', ') : ''}</p>
                     <p class="text-[10px] text-gray-400"><i class="fas fa-truck-fast mr-1"></i>Delivery ₦${(i.unitDeliveryFee != null ? i.unitDeliveryFee : deliveryFeePerItem).toLocaleString()}/unit</p>
-                    <p class="text-xs text-teal font-bold">₦${(i.unitPrice * i.quantity).toLocaleString()}</p>
+                    <p class="text-xs font-bold flex items-center gap-1.5">
+                        ${lineHasPromo ? `<span class="text-gray-400 text-[10px] line-through">₦${origLineTotal.toLocaleString()}</span><span class="text-[9px] font-black text-teal">-${(((origLineTotal - lineTotal) / origLineTotal) * 100).toFixed(0)}%</span>` : ''}
+                        <span class="text-teal">₦${lineTotal.toLocaleString()}</span>
+                    </p>
                 </div>
                 <div class="flex items-center gap-3 bg-gray-50 dark:bg-[#1c2925] p-1 rounded-xl">
                     <button onclick="changeQty('${i.lineId}',-1)" class="w-7 h-7 bg-white dark:bg-[#182420] dark:text-gray-100 rounded-lg shadow-sm font-bold">-</button>
@@ -605,11 +646,29 @@
                     <button onclick="changeQty('${i.lineId}',1)" class="w-7 h-7 bg-white dark:bg-[#182420] dark:text-gray-100 rounded-lg shadow-sm font-bold">+</button>
                 </div>
             </div>
-        `).join('');
+        `;
+        }).join('');
         const totals = cartTotals();
         document.getElementById("subtotal").textContent = totals.subtotal.toLocaleString();
         document.getElementById("deliveryFeeDisplay").textContent = totals.deliveryFee.toLocaleString();
         document.getElementById("total").textContent = totals.total.toLocaleString();
+
+        const priceSavings = buildPriceSavingsSummary(cart.map(item => ({
+            unitPrice: item.unitPrice,
+            originalUnitPrice: item.originalUnitPrice,
+            quantity: item.quantity
+        })));
+        const subOrigEl = document.getElementById("subtotalOriginal");
+        const subPctEl = document.getElementById("subtotalSavingsPercent");
+        if (priceSavings.savings > 0) {
+            subOrigEl.textContent = `₦${priceSavings.naiveTotal.toLocaleString()}`;
+            subPctEl.textContent = `-${priceSavings.savingsPercent.toFixed(1)}%`;
+            subOrigEl.classList.remove("hidden");
+            subPctEl.classList.remove("hidden");
+        } else {
+            subOrigEl.classList.add("hidden");
+            subPctEl.classList.add("hidden");
+        }
 
         const breakdown = buildDeliveryFeeSummary(
             cart.map(item => ({
