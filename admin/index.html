@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EazyLife Admin</title>
+    <link rel="icon" type="image/png" href="../assets/pictures/icon_dark.png" />
+    <link rel="apple-touch-icon" href="../assets/pictures/icon_dark.png" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        :root { --teal: #00B09B; --lime: #8DC63F; }
+        body { font-family: 'DM Sans', sans-serif; }
+        h1, h2, .font-syne { font-family: 'Poppins', sans-serif; }
+        .bg-eazylife { background: linear-gradient(135deg, #00B09B, #8DC63F); }
+        .tab-active { background: #111827 !important; color: white !important; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen" class="min-h-screen flex items-center justify-center p-6">
+    <div class="bg-white w-full max-w-sm rounded-[24px] shadow-xl p-8">
+        <h1 class="font-syne font-extrabold text-2xl text-center mb-1">EazyLife</h1>
+        <p class="text-center text-gray-400 text-sm mb-6">Admin Dashboard</p>
+        <input id="loginEmail" type="email" placeholder="Admin email" class="w-full p-3 mb-3 rounded-xl bg-gray-50 border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
+        <input id="loginPassword" type="password" placeholder="Password" class="w-full p-3 mb-4 rounded-xl bg-gray-50 border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
+        <button id="loginBtn" class="bg-eazylife text-white w-full py-3 rounded-xl font-bold text-sm shadow-lg">Log In</button>
+        <p id="loginError" class="text-red-500 text-xs text-center mt-3 hidden"></p>
+    </div>
+</div>
+
+<!-- DASHBOARD (shown after login) -->
+<div id="dashboard" class="hidden">
+    <header class="bg-white border-b sticky top-0 z-40 p-4 shadow-sm flex justify-between items-center">
+        <h1 class="font-syne font-extrabold text-lg">EazyLife <span class="text-[#00B09B]">Admin</span></h1>
+        <button id="logoutBtn" class="text-gray-400 text-xs font-bold hover:text-gray-700">
+            <i class="fas fa-sign-out-alt"></i> Log out
+        </button>
+    </header>
+
+    <div class="max-w-4xl mx-auto p-4">
+        <!-- TABS -->
+        <div class="flex gap-2 mb-6 overflow-x-auto no-scrollbar">
+            <button data-tab="products" class="tab-btn tab-active px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Products</button>
+            <button data-tab="heroes" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Heroes</button>
+            <button data-tab="reviews" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Reviews</button>
+            <button data-tab="requests" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Requests</button>
+            <button data-tab="orders" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Orders</button>
+            <button data-tab="settings" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Settings</button>
+        </div>
+
+        <!-- PRODUCTS PANEL -->
+        <div id="panel-products" class="tab-panel">
+            <div class="bg-white p-6 rounded-[24px] shadow-sm mb-6">
+                <h2 id="formTitle" class="font-black text-lg mb-4">Add Product</h2>
+                <form id="productForm" class="space-y-3">
+                    <input type="hidden" id="editId">
+                    <input id="pName" placeholder="Product name (e.g. HP EliteBook 840 G5)" required class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
+                    <div class="grid grid-cols-2 gap-3">
+                        <input id="pBrand" placeholder="Brand (e.g. HP)" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
+                        <input id="pCategory" placeholder="Category (e.g. Laptops)" required class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
+                    </div>
+                    <textarea id="pDesc" placeholder="Short description (applies to all variants)" rows="2" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]"></textarea>
+                    <label class="flex items-center gap-2 text-xs font-bold text-gray-500 px-1">
+                        <input type="checkbox" id="pInStock" checked> Product visible in shop
+                    </label>
+
+                    <!-- VARIANTS -->
+                    <div class="bg-gray-50 rounded-xl p-3 mt-2">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-xs font-black uppercase text-gray-500">Variants (color / RAM / storage / price)</h3>
+                            <button type="button" id="addVariantBtn" class="text-[11px] bg-gray-900 text-white px-3 py-1 rounded-lg font-bold">+ Add Variant</button>
+                        </div>
+                        <p class="text-[10px] text-gray-400 mb-2 px-1">Every product needs at least one variant — this is what customers actually pick and pay for.</p>
+                        <div id="variantRows" class="space-y-2"></div>
+                    </div>
+
+                    <!-- UPGRADES -->
+                    <div class="bg-gray-50 rounded-xl p-3">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-xs font-black uppercase text-gray-500">Optional Upgrades (RAM/ROM add-ons)</h3>
+                            <button type="button" id="addUpgradeBtn" class="text-[11px] bg-gray-900 text-white px-3 py-1 rounded-lg font-bold">+ Add Upgrade</button>
+                        </div>
+                        <p class="text-[10px] text-gray-400 mb-2 px-1">Optional — only add these if this specific device can be upgraded for an extra fee.</p>
+                        <div id="upgradeRows" class="space-y-2"></div>
+                    </div>
+
+                    <div class="flex gap-2 pt-1">
+                        <button type="submit" class="flex-1 bg-gray-900 text-white py-3 rounded-xl font-bold text-sm">Save Product</button>
+                        <button type="button" id="resetFormBtn" class="bg-gray-100 text-gray-500 px-4 rounded-xl font-bold text-sm">Reset</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="flex gap-2 mb-3">
+                <button type="button" id="exportExcelBtn" class="flex-1 bg-white border border-gray-200 text-gray-700 py-2.5 rounded-xl font-bold text-xs">
+                    <i class="fas fa-file-export"></i> Export to Excel
+                </button>
+                <label class="flex-1 bg-white border border-gray-200 text-gray-700 py-2.5 rounded-xl font-bold text-xs text-center cursor-pointer">
+                    <i class="fas fa-file-import"></i> Import from Excel
+                    <input type="file" id="importExcelInput" accept=".xlsx,.xls" class="hidden">
+                </label>
+            </div>
+            <p id="importStatus" class="text-[11px] font-bold text-teal-600 mb-2 px-1 hidden"></p>
+            <p class="text-[10px] text-gray-400 mb-3 px-1">Export gives you an Excel file with your current catalog. Edit it (or add new rows with the Product ID left blank), then import it back — matching IDs update existing products, blank IDs create new ones.</p>
+
+            <div class="flex justify-between items-center mb-3">
+                <input id="productSearch" placeholder="Search products..." class="w-full max-w-xs p-3 bg-white rounded-xl border border-gray-200 text-sm outline-none">
+                <span class="text-xs text-gray-400 font-bold ml-3" id="productCount">0 items</span>
+            </div>
+            <div id="productList" class="grid gap-3"></div>
+        </div>
+
+        <!-- ORDERS PANEL -->
+        <div id="panel-heroes" class="tab-panel hidden">
+            <div class="bg-white p-6 rounded-[24px] shadow-sm mb-6">
+                <h2 id="heroFormTitle" class="font-black text-lg mb-1">Add Hero Slide</h2>
+                <p class="text-xs text-gray-400 mb-4">These show as a carousel on the homepage. Each slide links straight into the shop.</p>
+                <form id="heroForm" class="space-y-3">
+                    <input type="hidden" id="heroEditId">
+                    <input id="hTitle" placeholder="Title (e.g. HP EliteBook Deals)" required class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
+                    <input id="hSubtitle" placeholder="Subtitle (short, one line)" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
+                    <div>
+                        <div class="flex gap-2">
+                            <input id="hImage" placeholder="Image URL (or browse below)" class="flex-1 p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
+                            <button type="button" onclick="openImagePicker('heroes','hImage')" class="bg-gray-100 text-gray-700 px-4 rounded-xl font-bold text-xs whitespace-nowrap">Browse</button>
+                        </div>
+                        <img id="hImagePreview" class="hidden mt-2 h-16 rounded-lg object-cover border border-gray-200">
+                    </div>
+                    <input id="hCtaText" placeholder="Button text (e.g. Shop Laptops)" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
+                    <div class="grid grid-cols-2 gap-3">
+                        <select id="hLinkType" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none">
+                            <option value="category">Links to Category</option>
+                            <option value="product">Links to Product</option>
+                            <option value="url">Custom Link</option>
+                        </select>
+                        <input id="hOrder" type="number" placeholder="Order (0 = first)" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none">
+                    </div>
+                    <div id="hLinkValueWrap">
+                        <select id="hLinkValueCategory" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"></select>
+                        <select id="hLinkValueProduct" class="hidden w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"></select>
+                        <input id="hLinkValueUrl" placeholder="https://..." class="hidden w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
+                        <p class="text-[10px] text-gray-400 mt-1 px-1">Pulled straight from your real products/categories — no typing or copying IDs needed.</p>
+                    </div>
+                    <div class="flex gap-2 pt-1">
+                        <button type="submit" class="flex-1 bg-gray-900 text-white py-3 rounded-xl font-bold text-sm">Save Hero</button>
+                        <button type="button" id="heroResetBtn" class="bg-gray-100 text-gray-500 px-4 rounded-xl font-bold text-sm">Reset</button>
+                    </div>
+                </form>
+            </div>
+            <div id="heroList" class="grid gap-3"></div>
+        </div>
+
+        <div id="panel-reviews" class="tab-panel hidden">
+            <div class="bg-white p-6 rounded-[24px] shadow-sm mb-6">
+                <h2 class="font-black text-lg mb-1">Add Review</h2>
+                <p class="text-xs text-gray-400 mb-4">Paste in a review you received by email (Formspree). New reviews are unapproved until you toggle them live.</p>
+                <form id="reviewAddForm" class="space-y-3">
+                    <input id="rvName" placeholder="Customer name (e.g. Adebayo T.)" required class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
+                    <input id="rvTitle" placeholder="Title (e.g. Student, Ibadan)" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
+                    <select id="rvStars" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none">
+                        <option value="5">★★★★★ (5)</option>
+                        <option value="4">★★★★☆ (4)</option>
+                        <option value="3">★★★☆☆ (3)</option>
+                        <option value="2">★★☆☆☆ (2)</option>
+                        <option value="1">★☆☆☆☆ (1)</option>
+                    </select>
+                    <textarea id="rvText" placeholder="Review text" required rows="3" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]"></textarea>
+                    <label class="flex items-center gap-2 text-xs text-gray-500 font-bold px-1">
+                        <input type="checkbox" id="rvApproved" checked> Publish immediately (approved)
+                    </label>
+                    <button type="submit" class="bg-gray-900 text-white w-full py-3 rounded-xl font-bold text-sm">Save Review</button>
+                </form>
+            </div>
+            <div id="reviewList" class="grid gap-3"></div>
+        </div>
+
+        <div id="panel-requests" class="tab-panel hidden">
+            <p class="text-xs text-gray-400 mb-4 px-1">"Can't find what you want" and budget-based sourcing requests from the shop. Move each through New → Contacted → Fulfilled.</p>
+            <div id="requestList" class="grid gap-3"></div>
+        </div>
+
+        <div id="panel-orders" class="tab-panel hidden">
+            <div id="orderList" class="grid gap-3"></div>
+        </div>
+
+        <!-- SETTINGS PANEL -->
+        <div id="panel-settings" class="tab-panel hidden">
+            <div class="bg-white p-6 rounded-[24px] shadow-sm">
+                <h2 class="font-black text-lg mb-4">Site Settings</h2>
+                <form id="settingsForm" class="space-y-3">
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-gray-400">WhatsApp Number (with country code, no +)</label>
+                        <input id="s_whatsapp" placeholder="2347051548082" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-gray-400">Tagline</label>
+                        <input id="s_tagline" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-gray-400">About Text</label>
+                        <textarea id="s_about" rows="3" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"></textarea>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <label class="text-[10px] font-black uppercase text-gray-400 mb-2 block">Delivery Fee (cascading discount)</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <input id="s_deliveryFee" type="number" placeholder="Fee per item (₦)" class="w-full p-3 bg-white rounded-xl border border-gray-200 text-sm outline-none">
+                            <input id="s_deliveryDiscount" type="number" placeholder="Discount per extra item (%)" class="w-full p-3 bg-white rounded-xl border border-gray-200 text-sm outline-none">
+                        </div>
+                        <p class="text-[11px] text-gray-400 mt-2 leading-relaxed">Each extra item adds its full fee, then the whole running total takes another discount — so the more someone buys, the cheaper delivery gets per item. E.g. ₦750 fee with 10% discount: 1 item = ₦750, 4 items ≈ ₦2,376 (not ₦3,000).</p>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <label class="flex items-center gap-2 text-sm font-bold text-gray-800">
+                            <input type="checkbox" id="s_referralMode">
+                            Referral mode for Components & Training
+                        </label>
+                        <p class="text-[11px] text-gray-400 mt-2 leading-relaxed">
+                            <b>ON:</b> homepage says you connect customers with a trusted partner (current setup).<br>
+                            <b>OFF:</b> homepage says you source it directly yourself — no mention of a partner. Flip this the moment you're ready, no code changes needed.
+                        </p>
+                    </div>
+                    <button type="submit" class="bg-gray-900 text-white w-full py-3 rounded-xl font-bold text-sm">Save Settings</button>
+                </form>
+                <p id="settingsMsg" class="text-center text-xs text-green-600 font-bold mt-3 hidden">Saved!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- IMAGE PICKER MODAL — shared by Products and Heroes forms -->
+<div id="imagePickerModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] flex items-end md:items-center justify-center">
+    <div class="bg-white w-full max-w-lg rounded-t-[28px] md:rounded-[24px] shadow-2xl p-5 max-h-[85vh] flex flex-col">
+        <div class="flex justify-between items-center mb-3">
+            <h3 class="font-black text-base text-gray-800">Choose an Image</h3>
+            <button onclick="closeImagePicker()" class="text-gray-400 text-2xl p-1">&times;</button>
+        </div>
+        <p id="pickerHint" class="text-xs text-gray-400 mb-3"></p>
+        <div id="pickerGrid" class="grid grid-cols-3 gap-2 overflow-y-auto pr-1" style="flex:1;">
+            <p class="col-span-3 text-center text-gray-400 text-sm py-10">Loading images...</p>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="js/admin-app.mjs"></script>
+</body>
+</html>
