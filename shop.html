@@ -229,7 +229,14 @@
             </div>
             <div class="flex justify-between items-center px-2 mt-2 pt-2 border-t border-gray-100 dark:border-[#2a3835]">
                 <span class="font-bold text-gray-500 dark:text-gray-400">Total</span>
-                <span class="text-2xl font-black text-teal">₦<span id="total">0</span></span>
+                <span class="flex items-center gap-1.5">
+                    <span id="totalOriginal" class="hidden text-[11px] text-gray-400 line-through"></span>
+                    <span id="totalSavingsPercent" class="hidden text-[10px] font-black text-teal"></span>
+                    <span class="text-2xl font-black text-teal">₦<span id="total">0</span></span>
+                </span>
+            </div>
+            <div id="totalSavedWrap" class="hidden flex justify-end px-2 mt-0.5">
+                <span class="text-[11px] font-bold text-teal">You saved ₦<span id="totalSavedAmount">0</span></span>
             </div>
 
             <button onclick="submitOrder()" id="submitBtn" class="bg-gray-900 text-white w-full py-4 mt-6 rounded-2xl font-black text-lg shadow-xl hover:bg-black transition-all flex items-center justify-center gap-2">
@@ -691,6 +698,24 @@
         } else {
             naiveEl.classList.add("hidden");
             pctEl.classList.add("hidden");
+        }
+
+        const totalNaive = priceSavings.naiveTotal + breakdown.naiveTotal;
+        const totalSavings = totalNaive - totals.total;
+        const totalOrigEl = document.getElementById("totalOriginal");
+        const totalPctEl = document.getElementById("totalSavingsPercent");
+        const totalSavedWrap = document.getElementById("totalSavedWrap");
+        if (totalSavings > 0) {
+            totalOrigEl.textContent = `₦${totalNaive.toLocaleString()}`;
+            totalPctEl.textContent = `-${((totalSavings / totalNaive) * 100).toFixed(1)}%`;
+            document.getElementById("totalSavedAmount").textContent = totalSavings.toLocaleString();
+            totalOrigEl.classList.remove("hidden");
+            totalPctEl.classList.remove("hidden");
+            totalSavedWrap.classList.remove("hidden");
+        } else {
+            totalOrigEl.classList.add("hidden");
+            totalPctEl.classList.add("hidden");
+            totalSavedWrap.classList.add("hidden");
         }
 
         document.getElementById("cartModal").classList.remove("hidden");
