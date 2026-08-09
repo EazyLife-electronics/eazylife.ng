@@ -174,16 +174,25 @@
         </div>
 
         <div class="flex justify-between items-center mb-1 px-1">
+            <span class="text-[11px] text-gray-400"><i class="fas fa-tag mr-1"></i>Item price</span>
+            <span class="flex items-center gap-1.5">
+                <span id="pmUnitOriginal" class="hidden text-[10px] text-gray-400 line-through"></span>
+                <span class="text-[11px] font-bold text-gray-500 dark:text-gray-400">₦<span id="pmUnitPrice">0</span>/unit</span>
+            </span>
+        </div>
+        <div id="pmUpgradeLines" class="mb-1"></div>
+        <div class="flex justify-between items-center mb-4 px-1">
+            <span class="text-[11px] text-gray-400"><i class="fas fa-truck-fast mr-1"></i>Delivery</span>
+            <span class="text-[11px] font-bold text-gray-500 dark:text-gray-400">₦<span id="pmDeliveryFee">0</span>/unit <span class="text-teal">· cheaper the more you buy</span></span>
+        </div>
+
+        <div class="flex justify-between items-center mb-4 px-1 pt-2 border-t border-gray-100 dark:border-[#2a3835]">
             <span class="font-bold text-gray-500 dark:text-gray-400 text-sm">Price</span>
             <span class="flex items-center gap-1.5">
                 <span id="pmOriginalPrice" class="hidden text-xs text-gray-400 line-through"></span>
                 <span id="pmDiscountPercent" class="hidden text-[10px] font-black text-teal"></span>
                 <span class="text-2xl font-black text-teal">₦<span id="pmPrice">0</span></span>
             </span>
-        </div>
-        <div class="flex justify-between items-center mb-4 px-1">
-            <span class="text-[11px] text-gray-400"><i class="fas fa-truck-fast mr-1"></i>Delivery</span>
-            <span class="text-[11px] font-bold text-gray-500 dark:text-gray-400">₦<span id="pmDeliveryFee">0</span>/unit <span class="text-teal">· cheaper the more you buy</span></span>
         </div>
 
         <button onclick="addPmToCart()" class="bg-gray-900 text-white w-full py-4 rounded-2xl font-black text-lg shadow-xl hover:bg-black transition-all flex items-center justify-center gap-2">
@@ -520,11 +529,28 @@
         img.src = (v && v.image) || (pmProduct.variants[0] && pmProduct.variants[0].image) || 'https://via.placeholder.com/300?text=' + encodeURIComponent(pmProduct.name);
 
         const base = variantUnitPrice(v);
-        const upgradesTotal = getSelectedUpgrades().reduce((a, u) => a + (u.price || 0), 0);
+        const selectedUpgrades = getSelectedUpgrades();
+        const upgradesTotal = selectedUpgrades.reduce((a, u) => a + (u.price || 0), 0);
         const unit = base + upgradesTotal;
         const actualTotal = unit * pmQty;
         document.getElementById('pmPrice').textContent = actualTotal.toLocaleString();
         document.getElementById('pmDeliveryFee').textContent = resolveDeliveryFee(v, deliveryFeePerItem).toLocaleString();
+
+        document.getElementById('pmUnitPrice').textContent = base.toLocaleString();
+        const unitOrigEl = document.getElementById('pmUnitOriginal');
+        if (v && hasPromo(v)) {
+            unitOrigEl.textContent = `₦${(v.price || 0).toLocaleString()}`;
+            unitOrigEl.classList.remove('hidden');
+        } else {
+            unitOrigEl.classList.add('hidden');
+        }
+
+        document.getElementById('pmUpgradeLines').innerHTML = selectedUpgrades.map(u => `
+            <div class="flex justify-between items-center px-1">
+                <span class="text-[11px] text-gray-400">+ ${u.name}</span>
+                <span class="text-[11px] font-bold text-gray-500 dark:text-gray-400">₦${(u.price || 0).toLocaleString()}/unit</span>
+            </div>
+        `).join('');
 
         const origUnit = (v ? (v.price || 0) : 0) + upgradesTotal;
         const origTotal = origUnit * pmQty;
