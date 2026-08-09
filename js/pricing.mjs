@@ -45,6 +45,41 @@ export function calcCascadingFeeMixed(unitFees, rate) {
   return Math.round(total);
 }
 
+/**
+ * Builds a human-readable "here's what you'd expect to pay" breakdown for the delivery fee,
+ * alongside what's actually charged after the grouped/cascading discount — for showing
+ * customers the discount is real and grows the more they buy.
+ *
+ * Terms are grouped purely by per-unit fee amount (e.g. "1000×3 + 1500×3 + 750×4"), regardless
+ * of which product/route each unit belongs to — it's the naive "if nothing were discounted"
+ * total a shopper could work out themselves, not a breakdown of the grouping logic.
+ *
+ * @param {Array<{quantity:number, unitDeliveryFee:number|null, deliveryRoute:'general'|'separate', productId:string, variantId:string}>} cartLines
+ * @param {number} generalFeePerItem
+ * @param {number} rate
+ * @returns {{terms:{fee:number,qty:number}[], expression:string, naiveTotal:number, actualTotal:number, savings:number, savingsPercent:number}}
+ */
+export function buildDeliveryFeeSummary(cartLines, generalFeePerItem, rate) {
+  const feeCounts = new Map(); // fee -> qty
+
+  (cartLines || []).forEach(line => {
+    const fee = line.unitDeliveryFee != null ? line.unitDeliveryFee : generalFeePerItem;
+    feeCounts.set(fee, (feeCounts.get(fee) || 0) + line.quantity);
+  });
+
+  const terms = [...feeCounts.entries()]
+    .sort((a, b) => b[0] - a[0]) // largest fee first, matches how people'd naturally list it
+    .map(([fee, qty]) => ({ fee, qty }));
+
+  const naiveTotal = terms.reduce((sum, t) => sum + t.fee * t.qty, 0);
+  const actualTotal = calcGroupedDeliveryFee(cartLines, generalFeePerItem, rate);
+  const savings = naiveTotal - actualTotal;
+  const savingsPercent = naiveTotal > 0 ? (savings / naiveTotal) * 100 : 0;
+  const expression = terms.map(t => `${t.fee.toLocaleString()}×${t.qty}`).join(' + ');
+
+  return { terms, expression, naiveTotal, actualTotal, savings, savingsPercent };
+}
+
 /** A variant's own delivery fee if it overrides the general one, else the general fee. */
 export function resolveDeliveryFee(variant, generalFeePerItem) {
   return (variant && variant.deliveryFee != null && variant.deliveryFee !== '')
@@ -99,11 +134,53 @@ export function variantUnitPrice(variant) {
   return variant.promoPrice > 0 ? variant.promoPrice : (variant.price || 0);
 }
 
-/** Lowest and highest effective price across a product's variants, for "From ₦X" display. */
+/** Whether a variant currently has an active promo (a promoPrice lower than its normal price). */
+export function hasPromo(variant) {
+  return !!(variant && variant.promoPrice > 0 && variant.promoPrice < variant.price);
+}
+
+/** Percentage discount for a variant, 0 if it has no active promo. */
+export function variantDiscountPercent(variant) {
+  if (!hasPromo(variant)) return 0;
+  return ((variant.price - variant.promoPrice) / variant.price) * 100;
+}
+
+/** Whether any variant of a product currently has an active promo — drives the "Sale" badge. */
+export function productHasPromo(product) {
+  return (product.variants || []).some(hasPromo);
+}
+
+/** Lowest and highest effective (post-promo) price across a product's variants, for "From ₦X" display. */
 export function productPriceRange(product) {
   const prices = (product.variants || []).map(variantUnitPrice).filter(p => p > 0);
   if (prices.length === 0) return { min: 0, max: 0 };
   return { min: Math.min(...prices), max: Math.max(...prices) };
+}
+
+/** Lowest and highest *original* (pre-promo) price across a product's variants, for a struck-through reference range. */
+export function productOriginalPriceRange(product) {
+  const prices = (product.variants || []).map(v => v.price || 0).filter(p => p > 0);
+  if (prices.length === 0) return { min: 0, max: 0 };
+  return { min: Math.min(...prices), max: Math.max(...prices) };
+}
+
+/**
+ * Naive (pre-promo) vs actual (post-promo) item total, mirroring buildDeliveryFeeSummary's
+ * shape, so the cart can show how much was saved from promo pricing specifically — separate
+ * from and not mixed into the delivery discount.
+ * @param {Array<{unitPrice:number, originalUnitPrice:number, quantity:number}>} cartLines
+ */
+export function buildPriceSavingsSummary(cartLines) {
+  let naiveTotal = 0;
+  let actualTotal = 0;
+  (cartLines || []).forEach(line => {
+    const original = line.originalUnitPrice != null ? line.originalUnitPrice : line.unitPrice;
+    naiveTotal += original * line.quantity;
+    actualTotal += line.unitPrice * line.quantity;
+  });
+  const savings = naiveTotal - actualTotal;
+  const savingsPercent = naiveTotal > 0 ? (savings / naiveTotal) * 100 : 0;
+  return { naiveTotal, actualTotal, savings, savingsPercent };
 }
 
 /** A short readable label for a variant, e.g. "Space Grey · 16GB / 512GB". */
