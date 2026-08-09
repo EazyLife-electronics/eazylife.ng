@@ -134,11 +134,53 @@ export function variantUnitPrice(variant) {
   return variant.promoPrice > 0 ? variant.promoPrice : (variant.price || 0);
 }
 
-/** Lowest and highest effective price across a product's variants, for "From ₦X" display. */
+/** Whether a variant currently has an active promo (a promoPrice lower than its normal price). */
+export function hasPromo(variant) {
+  return !!(variant && variant.promoPrice > 0 && variant.promoPrice < variant.price);
+}
+
+/** Percentage discount for a variant, 0 if it has no active promo. */
+export function variantDiscountPercent(variant) {
+  if (!hasPromo(variant)) return 0;
+  return ((variant.price - variant.promoPrice) / variant.price) * 100;
+}
+
+/** Whether any variant of a product currently has an active promo — drives the "Sale" badge. */
+export function productHasPromo(product) {
+  return (product.variants || []).some(hasPromo);
+}
+
+/** Lowest and highest effective (post-promo) price across a product's variants, for "From ₦X" display. */
 export function productPriceRange(product) {
   const prices = (product.variants || []).map(variantUnitPrice).filter(p => p > 0);
   if (prices.length === 0) return { min: 0, max: 0 };
   return { min: Math.min(...prices), max: Math.max(...prices) };
+}
+
+/** Lowest and highest *original* (pre-promo) price across a product's variants, for a struck-through reference range. */
+export function productOriginalPriceRange(product) {
+  const prices = (product.variants || []).map(v => v.price || 0).filter(p => p > 0);
+  if (prices.length === 0) return { min: 0, max: 0 };
+  return { min: Math.min(...prices), max: Math.max(...prices) };
+}
+
+/**
+ * Naive (pre-promo) vs actual (post-promo) item total, mirroring buildDeliveryFeeSummary's
+ * shape, so the cart can show how much was saved from promo pricing specifically — separate
+ * from and not mixed into the delivery discount.
+ * @param {Array<{unitPrice:number, originalUnitPrice:number, quantity:number}>} cartLines
+ */
+export function buildPriceSavingsSummary(cartLines) {
+  let naiveTotal = 0;
+  let actualTotal = 0;
+  (cartLines || []).forEach(line => {
+    const original = line.originalUnitPrice != null ? line.originalUnitPrice : line.unitPrice;
+    naiveTotal += original * line.quantity;
+    actualTotal += line.unitPrice * line.quantity;
+  });
+  const savings = naiveTotal - actualTotal;
+  const savingsPercent = naiveTotal > 0 ? (savings / naiveTotal) * 100 : 0;
+  return { naiveTotal, actualTotal, savings, savingsPercent };
 }
 
 /** A short readable label for a variant, e.g. "Space Grey · 16GB / 512GB". */
