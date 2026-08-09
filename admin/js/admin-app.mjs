@@ -187,6 +187,14 @@ function variantRowHTML(rowId, v = {}) {
         <button type="button" onclick="openImagePicker('products','v${rowId}_image')" class="bg-gray-100 text-gray-700 px-3 rounded-lg font-bold text-[10px] whitespace-nowrap">Browse</button>
       </div>
       <img id="v${rowId}_preview" class="${v.image ? '' : 'hidden'} mb-2 h-12 rounded-lg object-cover border border-gray-200" src="${v.image ? (v.image.startsWith('http') ? v.image : '../' + v.image) : ''}">
+      <div class="mb-2">
+        <input id="v${rowId}_deliveryFee" type="number" placeholder="Delivery fee for this variant (₦) — blank = use general" value="${v.deliveryFee != null ? v.deliveryFee : ''}" class="w-full p-2 bg-gray-50 rounded-lg border border-gray-200 text-xs outline-none">
+        <label class="flex items-center gap-2 text-[10px] font-bold text-gray-500 mt-1.5 px-1">
+          <input type="checkbox" id="v${rowId}_deliveryGeneral" ${v.deliveryRoute === 'separate' ? '' : 'checked'}>
+          Stack with general delivery route
+        </label>
+        <p class="text-[9px] text-gray-400 mt-1 px-1">Blank fee always uses the general route. With a custom fee set: checked = pools together with other general-route items for the discount; unchecked = this variant's own quantity discounts on its own, separately.</p>
+      </div>
       <div class="flex justify-between items-center">
         <label class="flex items-center gap-2 text-[11px] font-bold text-gray-500">
           <input type="checkbox" id="v${rowId}_instock" ${v.inStock === false ? '' : 'checked'}> In stock
@@ -231,6 +239,7 @@ document.getElementById('addUpgradeBtn').addEventListener('click', () => addUpgr
 function collectVariants() {
   return [...document.querySelectorAll('.variant-row')].map(row => {
     const rowId = row.dataset.rowId;
+    const deliveryFeeRaw = document.getElementById(`v${rowId}_deliveryFee`).value.trim();
     return {
       id: 'v' + Date.now() + '_' + rowId,
       color: document.getElementById(`v${rowId}_color`).value.trim(),
@@ -240,6 +249,8 @@ function collectVariants() {
       price: parseInt(document.getElementById(`v${rowId}_price`).value, 10) || 0,
       promoPrice: parseInt(document.getElementById(`v${rowId}_promo`).value, 10) || 0,
       image: document.getElementById(`v${rowId}_image`).value.trim(),
+      deliveryFee: deliveryFeeRaw === '' ? null : parseInt(deliveryFeeRaw, 10),
+      deliveryRoute: document.getElementById(`v${rowId}_deliveryGeneral`).checked ? 'general' : 'separate',
       inStock: document.getElementById(`v${rowId}_instock`).checked
     };
   });
@@ -384,6 +395,8 @@ function exportProductsToExcel() {
         'Processor': v.processor || '',
         'Price': v.price || 0,
         'Promo Price': v.promoPrice || 0,
+        'Delivery Fee (blank=general)': v.deliveryFee != null ? v.deliveryFee : '',
+        'Delivery Route (general/separate)': v.deliveryRoute || 'general',
         'Image': v.image || '',
         'Variant In Stock': v.inStock !== false
       });
@@ -470,6 +483,8 @@ document.getElementById('importExcelInput').addEventListener('change', async (e)
       }
       const group = groups.get(key);
       const variantId = (row['Variant ID'] || '').toString().trim() || ('v' + Date.now() + '_' + Math.random().toString(36).slice(2, 8));
+      const deliveryFeeRaw = row['Delivery Fee (blank=general)'];
+      const deliveryFeeStr = (deliveryFeeRaw === undefined || deliveryFeeRaw === null) ? '' : deliveryFeeRaw.toString().trim();
       group.variants.push({
         id: variantId,
         color: (row['Color'] || '').toString().trim(),
@@ -478,6 +493,8 @@ document.getElementById('importExcelInput').addEventListener('change', async (e)
         processor: (row['Processor'] || '').toString().trim(),
         price: parseInt(row['Price'], 10) || 0,
         promoPrice: parseInt(row['Promo Price'], 10) || 0,
+        deliveryFee: deliveryFeeStr === '' ? null : parseInt(deliveryFeeStr, 10),
+        deliveryRoute: (row['Delivery Route (general/separate)'] || '').toString().trim().toLowerCase() === 'separate' ? 'separate' : 'general',
         image: (row['Image'] || '').toString().trim(),
         inStock: truthy(row['Variant In Stock'])
       });
