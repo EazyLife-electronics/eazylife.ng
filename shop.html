@@ -285,7 +285,7 @@
 
 <script type="module">
     import { getProducts, placeOrder, placeRequest, getSettings } from './js/store.mjs';
-    import { calcCascadingFee, variantUnitPrice, productPriceRange, variantLabel } from './js/pricing.mjs';
+    import { calcGroupedDeliveryFee, variantUnitPrice, productPriceRange, variantLabel } from './js/pricing.mjs';
 
     const CKEY = "eazylife_cart_v2";
     const UKEY = "eazylife_user_v2";
@@ -520,10 +520,13 @@
             cart.push({
                 lineId,
                 productId: pmProduct.id,
+                variantId: v.id,
                 productName: pmProduct.name,
                 variantLabel: variantLabel(v),
                 upgradeNames: upgrades.map(u => u.name),
                 unitPrice,
+                unitDeliveryFee: (v.deliveryFee != null && v.deliveryFee !== '') ? v.deliveryFee : null,
+                deliveryRoute: v.deliveryRoute === 'separate' ? 'separate' : 'general',
                 image: v.image || '',
                 quantity: pmQty
             });
@@ -560,8 +563,17 @@
 
     function cartTotals() {
         const subtotal = cart.reduce((a, b) => a + (b.unitPrice * b.quantity), 0);
-        const totalQty = cart.reduce((a, b) => a + b.quantity, 0);
-        const deliveryFee = calcCascadingFee(deliveryFeePerItem, totalQty, deliveryDiscountRate);
+        const deliveryFee = calcGroupedDeliveryFee(
+            cart.map(item => ({
+                quantity: item.quantity,
+                unitDeliveryFee: item.unitDeliveryFee,
+                deliveryRoute: item.deliveryRoute || 'general',
+                productId: item.productId,
+                variantId: item.variantId || item.lineId // fallback for cart lines saved before this feature existed
+            })),
+            deliveryFeePerItem,
+            deliveryDiscountRate
+        );
         return { subtotal, deliveryFee, total: subtotal + deliveryFee };
     }
 
