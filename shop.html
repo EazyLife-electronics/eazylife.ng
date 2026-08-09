@@ -173,9 +173,13 @@
             </div>
         </div>
 
-        <div class="flex justify-between items-center mb-4 px-1">
+        <div class="flex justify-between items-center mb-1 px-1">
             <span class="font-bold text-gray-500 dark:text-gray-400 text-sm">Price</span>
             <span class="text-2xl font-black text-teal">₦<span id="pmPrice">0</span></span>
+        </div>
+        <div class="flex justify-between items-center mb-4 px-1">
+            <span class="text-[11px] text-gray-400"><i class="fas fa-truck-fast mr-1"></i>Delivery</span>
+            <span class="text-[11px] font-bold text-gray-500 dark:text-gray-400">₦<span id="pmDeliveryFee">0</span>/unit <span class="text-teal">· cheaper the more you buy</span></span>
         </div>
 
         <button onclick="addPmToCart()" class="bg-gray-900 text-white w-full py-4 rounded-2xl font-black text-lg shadow-xl hover:bg-black transition-all flex items-center justify-center gap-2">
@@ -207,9 +211,15 @@
                 <span class="text-gray-500 dark:text-gray-400">Subtotal</span>
                 <span class="font-bold text-gray-800 dark:text-gray-100">₦<span id="subtotal">0</span></span>
             </div>
-            <div class="flex justify-between items-center px-2 text-sm mt-1">
-                <span class="text-gray-500 dark:text-gray-400">Delivery Fee</span>
-                <span class="font-bold text-gray-800 dark:text-gray-100">₦<span id="deliveryFeeDisplay">0</span></span>
+            <div class="px-2 mt-1">
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-gray-500 dark:text-gray-400">Delivery Fee</span>
+                    <span class="font-bold text-gray-800 dark:text-gray-100">₦<span id="deliveryFeeDisplay">0</span></span>
+                </div>
+                <div id="deliverySavingsWrap" class="hidden flex justify-between items-center mt-0.5 gap-2">
+                    <span id="deliveryExpression" class="text-[10px] text-gray-400 line-through truncate"></span>
+                    <span id="deliverySavingsPercent" class="text-[10px] font-black text-teal whitespace-nowrap"></span>
+                </div>
             </div>
             <div class="flex justify-between items-center px-2 mt-2 pt-2 border-t border-gray-100 dark:border-[#2a3835]">
                 <span class="font-bold text-gray-500 dark:text-gray-400">Total</span>
@@ -285,7 +295,7 @@
 
 <script type="module">
     import { getProducts, placeOrder, placeRequest, getSettings } from './js/store.mjs';
-    import { calcGroupedDeliveryFee, variantUnitPrice, productPriceRange, variantLabel } from './js/pricing.mjs';
+    import { calcGroupedDeliveryFee, buildDeliveryFeeSummary, resolveDeliveryFee, variantUnitPrice, productPriceRange, variantLabel } from './js/pricing.mjs';
 
     const CKEY = "eazylife_cart_v2";
     const UKEY = "eazylife_user_v2";
@@ -492,6 +502,7 @@
         const upgradesTotal = getSelectedUpgrades().reduce((a, u) => a + (u.price || 0), 0);
         const unit = base + upgradesTotal;
         document.getElementById('pmPrice').textContent = (unit * pmQty).toLocaleString();
+        document.getElementById('pmDeliveryFee').textContent = resolveDeliveryFee(v, deliveryFeePerItem).toLocaleString();
     }
 
     function changePmQty(delta) {
@@ -587,6 +598,7 @@
                 <div class="flex-1 pr-4">
                     <p class="font-bold text-gray-800 dark:text-gray-100 text-sm leading-tight">${i.productName}</p>
                     <p class="text-[11px] text-gray-400">${i.variantLabel}${i.upgradeNames.length ? ' · ' + i.upgradeNames.join(', ') : ''}</p>
+                    <p class="text-[10px] text-gray-400"><i class="fas fa-truck-fast mr-1"></i>Delivery ₦${(i.unitDeliveryFee != null ? i.unitDeliveryFee : deliveryFeePerItem).toLocaleString()}/unit</p>
                     <p class="text-xs text-teal font-bold">₦${(i.unitPrice * i.quantity).toLocaleString()}</p>
                 </div>
                 <div class="flex items-center gap-3 bg-gray-50 dark:bg-[#1c2925] p-1 rounded-xl">
@@ -600,6 +612,27 @@
         document.getElementById("subtotal").textContent = totals.subtotal.toLocaleString();
         document.getElementById("deliveryFeeDisplay").textContent = totals.deliveryFee.toLocaleString();
         document.getElementById("total").textContent = totals.total.toLocaleString();
+
+        const breakdown = buildDeliveryFeeSummary(
+            cart.map(item => ({
+                quantity: item.quantity,
+                unitDeliveryFee: item.unitDeliveryFee,
+                deliveryRoute: item.deliveryRoute || 'general',
+                productId: item.productId,
+                variantId: item.variantId || item.lineId
+            })),
+            deliveryFeePerItem,
+            deliveryDiscountRate
+        );
+        const savingsWrap = document.getElementById("deliverySavingsWrap");
+        if (breakdown.savings > 0) {
+            document.getElementById("deliveryExpression").textContent = `₦${breakdown.expression} = ₦${breakdown.naiveTotal.toLocaleString()}`;
+            document.getElementById("deliverySavingsPercent").textContent = `-${breakdown.savingsPercent.toFixed(1)}%`;
+            savingsWrap.classList.remove("hidden");
+        } else {
+            savingsWrap.classList.add("hidden");
+        }
+
         document.getElementById("cartModal").classList.remove("hidden");
     }
 
