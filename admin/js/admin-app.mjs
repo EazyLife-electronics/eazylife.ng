@@ -195,6 +195,23 @@ function variantRowHTML(rowId, v = {}) {
         </label>
         <p class="text-[9px] text-gray-400 mt-1 px-1">Blank fee always uses the general route. With a custom fee set: checked = pools together with other general-route items for the discount; unchecked = this variant's own quantity discounts on its own, separately.</p>
       </div>
+      <div class="mb-2 bg-gray-50 rounded-lg p-2 border border-gray-200">
+        <label class="flex items-center gap-2 text-[11px] font-bold text-gray-600 mb-1.5">
+          <input type="checkbox" id="v${rowId}_bulkEnabled" ${v.bulkSavingsEnabled ? 'checked' : ''}>
+          Bulk savings
+        </label>
+        <div id="v${rowId}_bulkFields" class="${v.bulkSavingsEnabled ? '' : 'hidden'} space-y-1.5">
+          <label class="flex items-center gap-3 text-[10px] font-bold text-gray-500">
+            <span class="flex items-center gap-1"><input type="radio" name="v${rowId}_bulkMode" value="general" ${v.bulkSavingsMode === 'own' ? '' : 'checked'}> Inherit general</span>
+            <span class="flex items-center gap-1"><input type="radio" name="v${rowId}_bulkMode" value="own" ${v.bulkSavingsMode === 'own' ? 'checked' : ''}> Own</span>
+          </label>
+          <div id="v${rowId}_bulkOwnFields" class="${v.bulkSavingsMode === 'own' ? '' : 'hidden'} grid grid-cols-2 gap-2">
+            <input id="v${rowId}_bulkPercent" type="number" step="0.1" placeholder="Discount (%)" value="${v.bulkSavingsPercent != null ? v.bulkSavingsPercent : ''}" class="p-2 bg-white rounded-lg border border-gray-200 text-xs outline-none">
+            <input id="v${rowId}_bulkMinQty" type="number" placeholder="Min quantity" value="${v.bulkSavingsMinQty != null ? v.bulkSavingsMinQty : ''}" class="p-2 bg-white rounded-lg border border-gray-200 text-xs outline-none">
+          </div>
+          <p class="text-[9px] text-gray-400 px-1">Flat % off this line's total once quantity hits the minimum — not tiered, not compounding. "Inherit general" uses the site-wide % and minimum quantity set in Settings.</p>
+        </div>
+      </div>
       <div class="flex justify-between items-center">
         <label class="flex items-center gap-2 text-[11px] font-bold text-gray-500">
           <input type="checkbox" id="v${rowId}_instock" ${v.inStock === false ? '' : 'checked'}> In stock
@@ -221,6 +238,14 @@ function addVariantRow(data) {
   document.querySelector(`.remove-variant-btn[data-row-id="${rowId}"]`).addEventListener('click', (e) => {
     document.querySelector(`.variant-row[data-row-id="${rowId}"]`).remove();
   });
+  document.getElementById(`v${rowId}_bulkEnabled`).addEventListener('change', (e) => {
+    document.getElementById(`v${rowId}_bulkFields`).classList.toggle('hidden', !e.target.checked);
+  });
+  document.querySelectorAll(`input[name="v${rowId}_bulkMode"]`).forEach(radio => {
+    radio.addEventListener('change', () => {
+      document.getElementById(`v${rowId}_bulkOwnFields`).classList.toggle('hidden', radio.value !== 'own' || !radio.checked);
+    });
+  });
 }
 
 function addUpgradeRow(data) {
@@ -240,6 +265,8 @@ function collectVariants() {
   return [...document.querySelectorAll('.variant-row')].map(row => {
     const rowId = row.dataset.rowId;
     const deliveryFeeRaw = document.getElementById(`v${rowId}_deliveryFee`).value.trim();
+    const bulkEnabled = document.getElementById(`v${rowId}_bulkEnabled`).checked;
+    const bulkModeOwn = document.querySelector(`input[name="v${rowId}_bulkMode"][value="own"]`).checked;
     return {
       id: 'v' + Date.now() + '_' + rowId,
       color: document.getElementById(`v${rowId}_color`).value.trim(),
@@ -251,6 +278,10 @@ function collectVariants() {
       image: document.getElementById(`v${rowId}_image`).value.trim(),
       deliveryFee: deliveryFeeRaw === '' ? null : parseInt(deliveryFeeRaw, 10),
       deliveryRoute: document.getElementById(`v${rowId}_deliveryGeneral`).checked ? 'general' : 'separate',
+      bulkSavingsEnabled: bulkEnabled,
+      bulkSavingsMode: bulkModeOwn ? 'own' : 'general',
+      bulkSavingsPercent: parseFloat(document.getElementById(`v${rowId}_bulkPercent`).value) || 0,
+      bulkSavingsMinQty: parseInt(document.getElementById(`v${rowId}_bulkMinQty`).value, 10) || 0,
       inStock: document.getElementById(`v${rowId}_instock`).checked
     };
   });
@@ -397,6 +428,10 @@ function exportProductsToExcel() {
         'Promo Price': v.promoPrice || 0,
         'Delivery Fee (blank=general)': v.deliveryFee != null ? v.deliveryFee : '',
         'Delivery Route (general/separate)': v.deliveryRoute || 'general',
+        'Bulk Savings Enabled': v.bulkSavingsEnabled ? true : false,
+        'Bulk Savings Mode (own/general)': v.bulkSavingsMode || 'general',
+        'Bulk Savings %': v.bulkSavingsPercent || 0,
+        'Bulk Savings Min Qty': v.bulkSavingsMinQty || 0,
         'Image': v.image || '',
         'Variant In Stock': v.inStock !== false
       });
@@ -495,6 +530,10 @@ document.getElementById('importExcelInput').addEventListener('change', async (e)
         promoPrice: parseInt(row['Promo Price'], 10) || 0,
         deliveryFee: deliveryFeeStr === '' ? null : parseInt(deliveryFeeStr, 10),
         deliveryRoute: (row['Delivery Route (general/separate)'] || '').toString().trim().toLowerCase() === 'separate' ? 'separate' : 'general',
+        bulkSavingsEnabled: truthy(row['Bulk Savings Enabled']),
+        bulkSavingsMode: (row['Bulk Savings Mode (own/general)'] || '').toString().trim().toLowerCase() === 'own' ? 'own' : 'general',
+        bulkSavingsPercent: parseFloat(row['Bulk Savings %']) || 0,
+        bulkSavingsMinQty: parseInt(row['Bulk Savings Min Qty'], 10) || 0,
         image: (row['Image'] || '').toString().trim(),
         inStock: truthy(row['Variant In Stock'])
       });
@@ -933,6 +972,8 @@ async function loadSettingsForm() {
   document.getElementById('s_referralMode').checked = settings.referralMode !== false; // defaults to true
   document.getElementById('s_deliveryFee').value = settings.deliveryFeePerItem ?? 750;
   document.getElementById('s_deliveryDiscount').value = settings.deliveryDiscountPercent ?? 10;
+  document.getElementById('s_bulkSavingsPercent').value = settings.bulkSavingsPercent ?? '';
+  document.getElementById('s_bulkSavingsMinQty').value = settings.bulkSavingsMinQty ?? '';
 }
 
 document.getElementById('settingsForm').addEventListener('submit', async (e) => {
@@ -943,7 +984,9 @@ document.getElementById('settingsForm').addEventListener('submit', async (e) => 
     aboutText: document.getElementById('s_about').value.trim(),
     referralMode: document.getElementById('s_referralMode').checked,
     deliveryFeePerItem: parseInt(document.getElementById('s_deliveryFee').value, 10) || 0,
-    deliveryDiscountPercent: parseFloat(document.getElementById('s_deliveryDiscount').value) || 0
+    deliveryDiscountPercent: parseFloat(document.getElementById('s_deliveryDiscount').value) || 0,
+    bulkSavingsPercent: parseFloat(document.getElementById('s_bulkSavingsPercent').value) || 0,
+    bulkSavingsMinQty: parseInt(document.getElementById('s_bulkSavingsMinQty').value, 10) || 0
   });
   const msg = document.getElementById('settingsMsg');
   msg.classList.remove('hidden');

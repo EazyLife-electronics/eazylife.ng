@@ -183,6 +183,51 @@ export function buildPriceSavingsSummary(cartLines) {
   return { naiveTotal, actualTotal, savings, savingsPercent };
 }
 
+/**
+ * A variant's effective bulk-savings percent + minimum qualifying quantity, honoring its two
+ * switches: bulkSavingsEnabled (off by default — most variants never get this) and, once
+ * enabled, bulkSavingsMode deciding whether it uses its own percent/minQty or inherits the
+ * site-wide general ones. Both values travel together — a variant can't inherit one and
+ * override the other.
+ */
+export function resolveBulkSavings(variant, generalPercent, generalMinQty) {
+  if (!variant || !variant.bulkSavingsEnabled) return { percent: 0, minQty: null };
+  if (variant.bulkSavingsMode === 'own') {
+    return { percent: variant.bulkSavingsPercent || 0, minQty: variant.bulkSavingsMinQty || 1 };
+  }
+  return { percent: generalPercent || 0, minQty: generalMinQty || 1 };
+}
+
+/**
+ * Flat percentage off a line's whole total once its quantity reaches the cutoff — a single
+ * threshold, not tiered, and NOT cascading like the delivery fee. Each line's discount is
+ * independent of every other line: e.g. (150000×3)×(1-1.5%) + (200000×1)×(1-0.5%), simply added.
+ */
+export function calcBulkSavingsForLine(unitPrice, quantity, percent, minQty) {
+  if (!percent || !minQty || quantity < minQty) return 0;
+  return Math.round(unitPrice * quantity * (percent / 100));
+}
+
+/**
+ * Naive (no bulk discount) vs actual line totals, mirroring buildPriceSavingsSummary's shape,
+ * so the cart can show bulk savings as its own line — separate from promo pricing and delivery.
+ * @param {Array<{unitPrice:number, quantity:number, bulkSavingsPercent:number, bulkSavingsMinQty:number|null}>} cartLines
+ *   Pass each line's already-*resolved* percent/minQty (via resolveBulkSavings at add-to-cart time), not the raw variant switches.
+ */
+export function buildBulkSavingsSummary(cartLines) {
+  let naiveTotal = 0;
+  let actualTotal = 0;
+  (cartLines || []).forEach(line => {
+    const lineTotal = line.unitPrice * line.quantity;
+    const discount = calcBulkSavingsForLine(line.unitPrice, line.quantity, line.bulkSavingsPercent, line.bulkSavingsMinQty);
+    naiveTotal += lineTotal;
+    actualTotal += lineTotal - discount;
+  });
+  const savings = naiveTotal - actualTotal;
+  const savingsPercent = naiveTotal > 0 ? (savings / naiveTotal) * 100 : 0;
+  return { naiveTotal, actualTotal, savings, savingsPercent };
+}
+
 /** A short readable label for a variant, e.g. "Space Grey · 16GB / 512GB". */
 export function variantLabel(variant) {
   const parts = [variant.color, [variant.ram, variant.rom].filter(Boolean).join(' / ')].filter(Boolean);
