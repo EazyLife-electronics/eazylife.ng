@@ -213,6 +213,14 @@
                         <p class="text-[11px] text-gray-400 mt-2 leading-relaxed">Each extra item adds its full fee, then the whole running total takes another discount — so the more someone buys, the cheaper delivery gets per item. E.g. ₦750 fee with 10% discount: 1 item = ₦750, 4 items ≈ ₦2,376 (not ₦3,000).</p>
                     </div>
                     <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <label class="text-[10px] font-black uppercase text-gray-400 mb-2 block">General Bulk Savings</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <input id="s_bulkSavingsPercent" type="number" step="0.1" placeholder="Discount (%)" class="w-full p-3 bg-white rounded-xl border border-gray-200 text-sm outline-none">
+                            <input id="s_bulkSavingsMinQty" type="number" placeholder="Min quantity" class="w-full p-3 bg-white rounded-xl border border-gray-200 text-sm outline-none">
+                        </div>
+                        <p class="text-[11px] text-gray-400 mt-2 leading-relaxed">A flat % off a line's total once its quantity hits the minimum — a single cutoff, not tiered, and not compounding like delivery. Only applies to variants with bulk savings switched on and set to "inherit general" (see the product form).</p>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
                         <label class="flex items-center gap-2 text-sm font-bold text-gray-800">
                             <input type="checkbox" id="s_referralMode">
                             Referral mode for Components & Training
