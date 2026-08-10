@@ -168,7 +168,7 @@
             <span class="text-xs font-bold text-gray-500 dark:text-gray-400">Quantity</span>
             <div class="flex items-center gap-3">
                 <button onclick="changePmQty(-1)" class="w-8 h-8 bg-white dark:bg-[#182420] dark:text-gray-100 rounded-lg shadow-sm font-bold">-</button>
-                <span id="pmQty" class="font-black text-sm w-4 text-center dark:text-gray-100">1</span>
+                <input id="pmQty" type="text" inputmode="numeric" pattern="[0-9]*" value="1" onfocus="this.select()" onchange="setPmQty(this.value)" class="font-black text-sm w-10 text-center dark:text-gray-100 bg-white dark:bg-[#182420] rounded-lg py-1.5 outline-none">
                 <button onclick="changePmQty(1)" class="w-8 h-8 bg-white dark:bg-[#182420] dark:text-gray-100 rounded-lg shadow-sm font-bold">+</button>
             </div>
         </div>
@@ -196,8 +196,8 @@
             </span>
         </div>
 
-        <button onclick="addPmToCart()" class="bg-gray-900 text-white w-full py-4 rounded-2xl font-black text-lg shadow-xl hover:bg-black transition-all flex items-center justify-center gap-2">
-            <i class="fas fa-shopping-basket"></i> Add to Cart
+        <button id="pmAddBtn" onclick="addPmToCart()" class="bg-gray-900 text-white w-full py-4 rounded-2xl font-black text-lg shadow-xl hover:bg-black transition-all flex items-center justify-center gap-2">
+            <i id="pmAddBtnIcon" class="fas fa-shopping-basket"></i> <span id="pmAddBtnLabel">Add to Cart</span>
         </button>
     </div>
 </div>
@@ -599,7 +599,13 @@
                 ${variantLabel(v)} — ₦${variantUnitPrice(v).toLocaleString()}${hasPromo(v) ? ` (was ₦${v.price.toLocaleString()}, -${Math.round(variantDiscountPercent(v))}%)` : ''}${v.inStock === false ? ' (Out of stock)' : ''}
             </option>
         `).join('');
-        variantSel.onchange = updateProductModalPrice;
+        // Explicitly select the same "default" variant the shop-card stepper uses (first
+        // in-stock, else first) — don't rely on the browser's implicit first-option
+        // selection, which is what let the dropdown and the card's already-in-cart line
+        // fall out of sync in the first place.
+        const cardDefaultVariant = getDefaultVariant(p);
+        if (cardDefaultVariant) variantSel.value = cardDefaultVariant.id;
+        variantSel.onchange = syncPmQtyToCart;
 
         const upgrades = p.upgrades || [];
         const upgradesWrap = document.getElementById('pmUpgradesWrap');
@@ -611,15 +617,42 @@
                     <span class="font-bold text-teal">+₦${(u.price || 0).toLocaleString()}</span>
                 </label>
             `).join('');
-            document.querySelectorAll('.pm-upgrade-check').forEach(cb => cb.addEventListener('change', updateProductModalPrice));
+            document.querySelectorAll('.pm-upgrade-check').forEach(cb => cb.addEventListener('change', syncPmQtyToCart));
         } else {
             upgradesWrap.classList.add('hidden');
             document.getElementById('pmUpgrades').innerHTML = '';
         }
 
-        document.getElementById('pmQty').textContent = pmQty;
-        updateProductModalPrice();
+        syncPmQtyToCart();
         document.getElementById('productModal').classList.remove('hidden');
+    }
+
+    // Reads whichever cart line matches the currently selected variant + upgrades combo
+    // and pulls its quantity into the modal, so the modal always mirrors the cart instead
+    // of silently starting over at 1 when that combo already has items in the cart.
+    function findMatchingCartLine() {
+        const v = getSelectedVariant();
+        if (!v || !pmProduct) return null;
+        const upgrades = getSelectedUpgrades();
+        const upgradeIds = upgrades.map(u => u.id).sort().join(',');
+        const lineId = `${pmProduct.id}::${v.id}::${upgradeIds}`;
+        return cart.find(i => i.lineId === lineId) || null;
+    }
+
+    function syncPmQtyToCart() {
+        const line = findMatchingCartLine();
+        pmQty = line ? line.quantity : 1;
+        document.getElementById('pmQty').value = pmQty;
+        const label = document.getElementById('pmAddBtnLabel');
+        const icon = document.getElementById('pmAddBtnIcon');
+        if (line) {
+            label.textContent = 'Update Cart';
+            icon.className = 'fas fa-rotate';
+        } else {
+            label.textContent = 'Add to Cart';
+            icon.className = 'fas fa-shopping-basket';
+        }
+        updateProductModalPrice();
     }
 
     function getSelectedVariant() {
@@ -696,7 +729,15 @@
 
     function changePmQty(delta) {
         pmQty = Math.max(1, pmQty + delta);
-        document.getElementById('pmQty').textContent = pmQty;
+        document.getElementById('pmQty').value = pmQty;
+        updateProductModalPrice();
+    }
+
+    // Direct edit of the modal's quantity field, same idea as the cart's setQty.
+    function setPmQty(value) {
+        const n = parseInt(value, 10);
+        if (Number.isFinite(n) && n >= 1) pmQty = n;
+        document.getElementById('pmQty').value = pmQty;
         updateProductModalPrice();
     }
 
@@ -718,9 +759,13 @@
         const lineId = `${pmProduct.id}::${v.id}::${upgradeIds}`;
         const bulk = resolveBulkSavings(v, generalBulkSavingsPercent, generalBulkSavingsMinQty);
 
+        // pmQty is synced from the matching cart line when the modal opens (or when the
+        // variant/upgrades selection changes), so it already reflects "current cart qty
+        // for this exact combo" — set the line to it rather than adding on top, or every
+        // qty edit here would double up on what's already in the cart.
         const existing = cart.find(i => i.lineId === lineId);
         if (existing) {
-            existing.quantity += pmQty;
+            existing.quantity = pmQty;
         } else {
             cart.push({
                 lineId,
@@ -1216,6 +1261,7 @@
     window.openProductModal = openProductModal;
     window.hideProductModal = hideProductModal;
     window.changePmQty = changePmQty;
+    window.setPmQty = setPmQty;
     window.addPmToCart = addPmToCart;
     window.changeQty = changeQty;
     window.setQty = setQty;
