@@ -205,39 +205,16 @@
 <div id="cartModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-end md:items-center justify-center">
     <div class="bg-white dark:bg-[#182420] w-full max-w-md rounded-t-[32px] md:rounded-[24px] shadow-2xl p-6 overflow-y-auto max-h-[90vh]">
 
-        <!-- Step 1: cart items — select what to check out, edit quantity -->
+        <!-- Step 1: cart — mutable. Edit quantity, toggle items in/out, fill contact details. -->
         <div id="cartStep">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="font-syne font-extrabold text-2xl text-gray-900 dark:text-gray-100">Your Cart</h2>
+                <h2 class="font-syne font-extrabold text-2xl text-gray-900 dark:text-gray-100">Your Order</h2>
                 <button onclick="hideCart()" class="text-gray-400 p-2 text-3xl">&times;</button>
             </div>
 
-            <div id="cartItems" class="space-y-4 mb-6"></div>
+            <div id="cartItems" class="space-y-4 mb-8"></div>
 
-            <p id="cartExcludedNote" class="hidden text-[11px] text-gray-400 px-2 mb-4">Unchecked items stay in your cart for later — they won't be included when you check out.</p>
-
-            <div class="flex justify-between items-center px-2 mb-3">
-                <span class="font-bold text-gray-500 dark:text-gray-400 text-sm">Selected total</span>
-                <span class="text-xl font-black text-teal">₦<span id="cartSelectedTotal">0</span></span>
-            </div>
-
-            <button onclick="goToCheckout()" id="reviewBtn" class="bg-gray-900 text-white w-full py-4 rounded-2xl font-black text-lg shadow-xl hover:bg-black transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
-                <i class="fas fa-arrow-right"></i>
-                Review Order
-            </button>
-        </div>
-
-        <!-- Step 2: checkout review — finalized, read-only summary of selected items + details -->
-        <div id="checkoutStep" class="hidden">
-            <div class="flex justify-between items-center mb-6">
-                <div class="flex items-center gap-2">
-                    <button onclick="backToCart()" class="text-gray-400 p-2 -ml-2 text-xl"><i class="fas fa-arrow-left"></i></button>
-                    <h2 class="font-syne font-extrabold text-2xl text-gray-900 dark:text-gray-100">Checkout</h2>
-                </div>
-                <button onclick="hideCart()" class="text-gray-400 p-2 text-3xl">&times;</button>
-            </div>
-
-            <div id="checkoutItems" class="space-y-2 mb-6 bg-gray-50 dark:bg-[#1c2925] rounded-2xl p-4"></div>
+            <p id="cartExcludedNote" class="hidden text-[11px] text-gray-400 px-2 mb-4">Unchecked items stay in your cart — they won't be included when you check out.</p>
 
             <div class="bg-gray-100 dark:bg-[#1c2925] p-4 rounded-2xl mb-6 space-y-3">
                 <input id="custName" placeholder="Full Name" class="w-full bg-white dark:bg-[#182420] dark:text-gray-100 border-none p-3 rounded-xl shadow-sm text-sm outline-none">
@@ -273,6 +250,59 @@
                 <span class="text-[11px] font-bold text-teal">You saved ₦<span id="totalSavedAmount">0</span></span>
             </div>
 
+            <button onclick="goToCheckout()" id="reviewBtn" class="bg-gray-900 text-white w-full py-4 mt-6 rounded-2xl font-black text-lg shadow-xl hover:bg-black transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
+                <i class="fas fa-arrow-right"></i>
+                Review Order
+            </button>
+            <p class="text-center text-xs text-gray-400 mt-3">No app switch needed — we'll confirm by phone or WhatsApp.</p>
+        </div>
+
+        <!-- Step 2: checkout — immutable confirmation. Same look as the cart, minus toggles and unchecked lines. -->
+        <div id="checkoutStep" class="hidden">
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center gap-2">
+                    <button onclick="backToCart()" class="text-gray-400 p-2 -ml-2 text-xl"><i class="fas fa-arrow-left"></i></button>
+                    <h2 class="font-syne font-extrabold text-2xl text-gray-900 dark:text-gray-100">Confirm Order</h2>
+                </div>
+                <button onclick="hideCart()" class="text-gray-400 p-2 text-3xl">&times;</button>
+            </div>
+
+            <div id="checkoutItems" class="space-y-4 mb-8"></div>
+
+            <div class="bg-gray-100 dark:bg-[#1c2925] p-4 rounded-2xl mb-6 space-y-1.5 text-sm">
+                <p class="text-gray-800 dark:text-gray-100"><span class="text-gray-400 dark:text-gray-500">Name:</span> <span id="coName"></span></p>
+                <p class="text-gray-800 dark:text-gray-100"><span class="text-gray-400 dark:text-gray-500">Phone:</span> <span id="coPhone"></span></p>
+                <p class="text-gray-800 dark:text-gray-100"><span class="text-gray-400 dark:text-gray-500">Address:</span> <span id="coAddr"></span></p>
+            </div>
+
+            <div class="flex justify-between items-center px-2 text-sm">
+                <span class="text-gray-500 dark:text-gray-400">Subtotal</span>
+                <span class="flex items-center gap-1.5">
+                    <span id="subtotalOriginalCo" class="hidden text-[11px] text-gray-400 line-through"></span>
+                    <span id="subtotalSavingsPercentCo" class="hidden text-[10px] font-black text-teal"></span>
+                    <span class="font-bold text-gray-800 dark:text-gray-100">₦<span id="subtotalCo">0</span></span>
+                </span>
+            </div>
+            <div class="flex justify-between items-center px-2 text-sm mt-1">
+                <span class="text-gray-500 dark:text-gray-400">Delivery Fee</span>
+                <span class="flex items-center gap-1.5">
+                    <span id="deliveryNaiveCo" class="hidden text-[11px] text-gray-400 line-through"></span>
+                    <span id="deliverySavingsPercentCo" class="hidden text-[10px] font-black text-teal"></span>
+                    <span class="font-bold text-gray-800 dark:text-gray-100">₦<span id="deliveryFeeDisplayCo">0</span></span>
+                </span>
+            </div>
+            <div class="flex justify-between items-center px-2 mt-2 pt-2 border-t border-gray-100 dark:border-[#2a3835]">
+                <span class="font-bold text-gray-500 dark:text-gray-400">Total</span>
+                <span class="flex items-center gap-1.5">
+                    <span id="totalOriginalCo" class="hidden text-[11px] text-gray-400 line-through"></span>
+                    <span id="totalSavingsPercentCo" class="hidden text-[10px] font-black text-teal"></span>
+                    <span class="text-2xl font-black text-teal">₦<span id="totalCo">0</span></span>
+                </span>
+            </div>
+            <div id="totalSavedWrapCo" class="hidden flex justify-end px-2 mt-0.5">
+                <span class="text-[11px] font-bold text-teal">You saved ₦<span id="totalSavedAmountCo">0</span></span>
+            </div>
+
             <button onclick="submitOrder()" id="submitBtn" class="bg-gray-900 text-white w-full py-4 mt-6 rounded-2xl font-black text-lg shadow-xl hover:bg-black transition-all flex items-center justify-center gap-2">
                 <i class="fas fa-check-circle"></i>
                 Place Order
@@ -280,7 +310,8 @@
             <p class="text-center text-xs text-gray-400 mt-3">No app switch needed — we'll confirm by phone or WhatsApp.</p>
         </div>
 
-        <!-- Step 2: confirmation (shown after order is written to Firestore) -->
+        <!-- Step 3: confirmation (shown after order is written to Firestore) -->
+
         <div id="confirmStep" class="hidden text-center py-6">
             <div class="text-5xl text-teal mb-4"><i class="fas fa-circle-check"></i></div>
             <h2 class="font-syne font-extrabold text-2xl text-gray-900 dark:text-gray-100 mb-2">Order Received!</h2>
@@ -709,6 +740,73 @@
         return { subtotal, deliveryFee, total: subtotal + deliveryFee };
     }
 
+    // Fills the subtotal/delivery/total block. suffix is '' for the cart step's ids (subtotal, total, ...)
+    // or 'Co' for the checkout step's ids (subtotalCo, totalCo, ...) — same look, two places.
+    function renderTotalsBlock(suffix, items) {
+        const totals = cartTotals(items);
+        document.getElementById("subtotal" + suffix).textContent = totals.subtotal.toLocaleString();
+        document.getElementById("deliveryFeeDisplay" + suffix).textContent = totals.deliveryFee.toLocaleString();
+        document.getElementById("total" + suffix).textContent = totals.total.toLocaleString();
+
+        const priceSavings = buildPriceSavingsSummary(items.map(item => ({
+            unitPrice: item.unitPrice,
+            originalUnitPrice: item.originalUnitPrice,
+            quantity: item.quantity
+        })));
+        const subOrigEl = document.getElementById("subtotalOriginal" + suffix);
+        const subPctEl = document.getElementById("subtotalSavingsPercent" + suffix);
+        if (priceSavings.savings > 0) {
+            subOrigEl.textContent = `₦${priceSavings.naiveTotal.toLocaleString()}`;
+            subPctEl.textContent = `-${priceSavings.savingsPercent.toFixed(1)}%`;
+            subOrigEl.classList.remove("hidden");
+            subPctEl.classList.remove("hidden");
+        } else {
+            subOrigEl.classList.add("hidden");
+            subPctEl.classList.add("hidden");
+        }
+
+        const breakdown = buildDeliveryFeeSummary(
+            items.map(item => ({
+                quantity: item.quantity,
+                unitDeliveryFee: item.unitDeliveryFee,
+                deliveryRoute: item.deliveryRoute || 'general',
+                productId: item.productId,
+                variantId: item.variantId || item.lineId
+            })),
+            deliveryFeePerItem,
+            deliveryDiscountRate
+        );
+        const naiveEl = document.getElementById("deliveryNaive" + suffix);
+        const pctEl = document.getElementById("deliverySavingsPercent" + suffix);
+        if (breakdown.savings > 0) {
+            naiveEl.textContent = `₦${breakdown.naiveTotal.toLocaleString()}`;
+            pctEl.textContent = `-${breakdown.savingsPercent.toFixed(1)}%`;
+            naiveEl.classList.remove("hidden");
+            pctEl.classList.remove("hidden");
+        } else {
+            naiveEl.classList.add("hidden");
+            pctEl.classList.add("hidden");
+        }
+
+        const totalNaive = priceSavings.naiveTotal + breakdown.naiveTotal;
+        const totalSavings = totalNaive - totals.total;
+        const totalOrigEl = document.getElementById("totalOriginal" + suffix);
+        const totalPctEl = document.getElementById("totalSavingsPercent" + suffix);
+        const totalSavedWrap = document.getElementById("totalSavedWrap" + suffix);
+        if (totalSavings > 0) {
+            totalOrigEl.textContent = `₦${totalNaive.toLocaleString()}`;
+            totalPctEl.textContent = `-${((totalSavings / totalNaive) * 100).toFixed(1)}%`;
+            document.getElementById("totalSavedAmount" + suffix).textContent = totalSavings.toLocaleString();
+            totalOrigEl.classList.remove("hidden");
+            totalPctEl.classList.remove("hidden");
+            totalSavedWrap.classList.remove("hidden");
+        } else {
+            totalOrigEl.classList.add("hidden");
+            totalPctEl.classList.add("hidden");
+            totalSavedWrap.classList.add("hidden");
+        }
+    }
+
     function showCart() {
         if (cart.length === 0) return hideCart();
         document.getElementById("cartStep").classList.remove("hidden");
@@ -725,15 +823,17 @@
             const baseHasPromo = baseOrigUnit > baseUnit;
             const upgradeItems = i.upgradeItems || [];
             return `
-            <div class="flex items-start gap-3 border-b border-gray-50 dark:border-[#2a3835] pb-3">
-                <input type="checkbox" ${included ? 'checked' : ''} onchange="toggleIncluded('${i.lineId}')" class="w-5 h-5 mt-1 accent-teal rounded shrink-0" title="Include in checkout">
-                <div class="flex-1 pr-2 transition-opacity ${included ? '' : 'opacity-40'}">
-                    <p class="font-bold text-gray-800 dark:text-gray-100 text-sm leading-tight">${i.productName}</p>
-                    <p class="text-[11px] text-gray-400">${i.variantLabel}${i.upgradeNames.length ? ' · ' + i.upgradeNames.join(', ') : ''}</p>
-                    <p class="text-[10px] text-gray-400"><i class="fas fa-tag mr-1"></i>Item ${baseHasPromo ? `<span class="line-through">₦${baseOrigUnit.toLocaleString()}</span> ` : ''}₦${baseUnit.toLocaleString()}/unit</p>
-                    ${upgradeItems.map(u => `<p class="text-[10px] text-gray-400">+ ${u.name} ₦${(u.price || 0).toLocaleString()}/unit</p>`).join('')}
-                    <p class="text-[10px] text-gray-400"><i class="fas fa-truck-fast mr-1"></i>Delivery ₦${(i.unitDeliveryFee != null ? i.unitDeliveryFee : deliveryFeePerItem).toLocaleString()}/unit</p>
-                    <p class="text-xs font-bold flex items-center gap-1.5">
+            <div class="flex justify-between items-center border-b border-gray-50 dark:border-[#2a3835] pb-3">
+                <div class="flex-1 pr-4 transition-opacity ${included ? '' : 'opacity-40'}">
+                    <label class="flex items-center gap-2">
+                        <input type="checkbox" ${included ? 'checked' : ''} onchange="toggleIncluded('${i.lineId}')" class="w-4 h-4 accent-teal rounded shrink-0" title="Include in order">
+                        <p class="font-bold text-gray-800 dark:text-gray-100 text-sm leading-tight">${i.productName}</p>
+                    </label>
+                    <p class="text-[11px] text-gray-400 pl-6">${i.variantLabel}${i.upgradeNames.length ? ' · ' + i.upgradeNames.join(', ') : ''}</p>
+                    <p class="text-[10px] text-gray-400 pl-6"><i class="fas fa-tag mr-1"></i>Item ${baseHasPromo ? `<span class="line-through">₦${baseOrigUnit.toLocaleString()}</span> ` : ''}₦${baseUnit.toLocaleString()}/unit</p>
+                    ${upgradeItems.map(u => `<p class="text-[10px] text-gray-400 pl-6">+ ${u.name} ₦${(u.price || 0).toLocaleString()}/unit</p>`).join('')}
+                    <p class="text-[10px] text-gray-400 pl-6"><i class="fas fa-truck-fast mr-1"></i>Delivery ₦${(i.unitDeliveryFee != null ? i.unitDeliveryFee : deliveryFeePerItem).toLocaleString()}/unit</p>
+                    <p class="text-xs font-bold flex items-center gap-1.5 pl-6">
                         ${lineHasPromo ? `<span class="text-gray-400 text-[10px] line-through">₦${origLineTotal.toLocaleString()}</span><span class="text-[9px] font-black text-teal">-${(((origLineTotal - lineTotal) / origLineTotal) * 100).toFixed(0)}%</span>` : ''}
                         <span class="text-teal">₦${lineTotal.toLocaleString()}</span>
                     </p>
@@ -749,9 +849,7 @@
 
         const included = includedCartItems();
         document.getElementById("cartExcludedNote").classList.toggle("hidden", included.length >= cart.length);
-
-        const totals = cartTotals(included);
-        document.getElementById("cartSelectedTotal").textContent = totals.total.toLocaleString();
+        renderTotalsBlock("", included);
 
         const reviewBtn = document.getElementById("reviewBtn");
         reviewBtn.disabled = included.length === 0;
@@ -762,90 +860,58 @@
         document.getElementById("cartModal").classList.remove("hidden");
     }
 
-    // Step 2 — a finalized, read-only snapshot of only the checked items. Nothing here is editable;
-    // to change anything (quantity, what's included) the customer goes back to the cart.
+    // Frozen at the moment "Review Order" is tapped, so step 2 stays a stable confirmation
+    // even though nothing in the cart can actually change while it's showing.
+    let checkoutSnapshot = [];
+
+    // Step 2 — immutable confirmation of only the checked items. Nothing here is editable;
+    // to change quantities or what's included, the customer goes back to the cart.
     function goToCheckout() {
         const included = includedCartItems();
         if (included.length === 0) return;
+        const name = document.getElementById("custName").value.trim();
+        const phone = document.getElementById("custPhone").value.trim();
+        const addr = document.getElementById("custAddr").value.trim();
+        if (!name || !phone || !addr) return alert("Please fill in your name, phone, and address.");
+
+        checkoutSnapshot = included.map(i => ({ ...i }));
+        localStorage.setItem(UKEY, JSON.stringify({ name, phone, addr }));
 
         document.getElementById("cartStep").classList.add("hidden");
         document.getElementById("confirmStep").classList.add("hidden");
         document.getElementById("checkoutStep").classList.remove("hidden");
 
-        document.getElementById("checkoutItems").innerHTML = included.map(i => `
-            <div class="flex justify-between items-start text-sm border-b border-gray-100 dark:border-[#2a3835] last:border-0 pb-2 last:pb-0">
-                <div class="pr-2">
-                    <p class="font-bold text-gray-800 dark:text-gray-100">${i.productName} <span class="text-gray-400 font-normal">× ${i.quantity}</span></p>
+        document.getElementById("coName").textContent = name;
+        document.getElementById("coPhone").textContent = phone;
+        document.getElementById("coAddr").textContent = addr;
+
+        document.getElementById("checkoutItems").innerHTML = checkoutSnapshot.map(i => {
+            const origLineTotal = (i.originalUnitPrice != null ? i.originalUnitPrice : i.unitPrice) * i.quantity;
+            const lineTotal = i.unitPrice * i.quantity;
+            const lineHasPromo = origLineTotal > lineTotal;
+            const baseUnit = i.unitBasePrice != null ? i.unitBasePrice : i.unitPrice;
+            const baseOrigUnit = i.originalUnitBasePrice != null ? i.originalUnitBasePrice : baseUnit;
+            const baseHasPromo = baseOrigUnit > baseUnit;
+            const upgradeItems = i.upgradeItems || [];
+            return `
+            <div class="flex justify-between items-center border-b border-gray-50 dark:border-[#2a3835] pb-3">
+                <div class="flex-1 pr-4">
+                    <p class="font-bold text-gray-800 dark:text-gray-100 text-sm leading-tight">${i.productName}</p>
                     <p class="text-[11px] text-gray-400">${i.variantLabel}${i.upgradeNames.length ? ' · ' + i.upgradeNames.join(', ') : ''}</p>
+                    <p class="text-[10px] text-gray-400"><i class="fas fa-tag mr-1"></i>Item ${baseHasPromo ? `<span class="line-through">₦${baseOrigUnit.toLocaleString()}</span> ` : ''}₦${baseUnit.toLocaleString()}/unit</p>
+                    ${upgradeItems.map(u => `<p class="text-[10px] text-gray-400">+ ${u.name} ₦${(u.price || 0).toLocaleString()}/unit</p>`).join('')}
+                    <p class="text-[10px] text-gray-400"><i class="fas fa-truck-fast mr-1"></i>Delivery ₦${(i.unitDeliveryFee != null ? i.unitDeliveryFee : deliveryFeePerItem).toLocaleString()}/unit</p>
+                    <p class="text-xs font-bold flex items-center gap-1.5">
+                        ${lineHasPromo ? `<span class="text-gray-400 text-[10px] line-through">₦${origLineTotal.toLocaleString()}</span><span class="text-[9px] font-black text-teal">-${(((origLineTotal - lineTotal) / origLineTotal) * 100).toFixed(0)}%</span>` : ''}
+                        <span class="text-teal">₦${lineTotal.toLocaleString()}</span>
+                    </p>
                 </div>
-                <span class="font-bold text-teal shrink-0">₦${(i.unitPrice * i.quantity).toLocaleString()}</span>
+                <span class="font-black text-sm text-gray-500 dark:text-gray-400 shrink-0">× ${i.quantity}</span>
             </div>
-        `).join('');
+        `;
+        }).join('');
 
-        const totals = cartTotals(included);
-        document.getElementById("subtotal").textContent = totals.subtotal.toLocaleString();
-        document.getElementById("deliveryFeeDisplay").textContent = totals.deliveryFee.toLocaleString();
-        document.getElementById("total").textContent = totals.total.toLocaleString();
-
-        const priceSavings = buildPriceSavingsSummary(included.map(item => ({
-            unitPrice: item.unitPrice,
-            originalUnitPrice: item.originalUnitPrice,
-            quantity: item.quantity
-        })));
-        const subOrigEl = document.getElementById("subtotalOriginal");
-        const subPctEl = document.getElementById("subtotalSavingsPercent");
-        if (priceSavings.savings > 0) {
-            subOrigEl.textContent = `₦${priceSavings.naiveTotal.toLocaleString()}`;
-            subPctEl.textContent = `-${priceSavings.savingsPercent.toFixed(1)}%`;
-            subOrigEl.classList.remove("hidden");
-            subPctEl.classList.remove("hidden");
-        } else {
-            subOrigEl.classList.add("hidden");
-            subPctEl.classList.add("hidden");
-        }
-
-        const breakdown = buildDeliveryFeeSummary(
-            included.map(item => ({
-                quantity: item.quantity,
-                unitDeliveryFee: item.unitDeliveryFee,
-                deliveryRoute: item.deliveryRoute || 'general',
-                productId: item.productId,
-                variantId: item.variantId || item.lineId
-            })),
-            deliveryFeePerItem,
-            deliveryDiscountRate
-        );
-        const naiveEl = document.getElementById("deliveryNaive");
-        const pctEl = document.getElementById("deliverySavingsPercent");
-        if (breakdown.savings > 0) {
-            naiveEl.textContent = `₦${breakdown.naiveTotal.toLocaleString()}`;
-            pctEl.textContent = `-${breakdown.savingsPercent.toFixed(1)}%`;
-            naiveEl.classList.remove("hidden");
-            pctEl.classList.remove("hidden");
-        } else {
-            naiveEl.classList.add("hidden");
-            pctEl.classList.add("hidden");
-        }
-
-        const totalNaive = priceSavings.naiveTotal + breakdown.naiveTotal;
-        const totalSavings = totalNaive - totals.total;
-        const totalOrigEl = document.getElementById("totalOriginal");
-        const totalPctEl = document.getElementById("totalSavingsPercent");
-        const totalSavedWrap = document.getElementById("totalSavedWrap");
-        if (totalSavings > 0) {
-            totalOrigEl.textContent = `₦${totalNaive.toLocaleString()}`;
-            totalPctEl.textContent = `-${((totalSavings / totalNaive) * 100).toFixed(1)}%`;
-            document.getElementById("totalSavedAmount").textContent = totalSavings.toLocaleString();
-            totalOrigEl.classList.remove("hidden");
-            totalPctEl.classList.remove("hidden");
-            totalSavedWrap.classList.remove("hidden");
-        } else {
-            totalOrigEl.classList.add("hidden");
-            totalPctEl.classList.add("hidden");
-            totalSavedWrap.classList.add("hidden");
-        }
-
-        loadUserData();
+        renderTotalsBlock("Co", checkoutSnapshot);
     }
 
     function backToCart() {
@@ -865,26 +931,22 @@
     }
 
     async function submitOrder() {
-        const included = includedCartItems();
-        if (included.length === 0) return;
+        if (checkoutSnapshot.length === 0) return;
 
-        const name = document.getElementById("custName").value.trim();
-        const phone = document.getElementById("custPhone").value.trim();
-        const addr = document.getElementById("custAddr").value.trim();
-
-        if (!name || !phone || !addr) return alert("Please fill in your name, phone, and address.");
+        const user = JSON.parse(localStorage.getItem(UKEY)) || {};
+        const name = user.name || "";
+        const phone = user.phone || "";
+        const addr = user.addr || "";
 
         const submitBtn = document.getElementById("submitBtn");
         submitBtn.disabled = true;
         submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Placing order...`;
 
-        localStorage.setItem(UKEY, JSON.stringify({ name, phone, addr }));
-
-        const totals = cartTotals(included);
+        const totals = cartTotals(checkoutSnapshot);
 
         try {
             const trackingCode = await placeOrder({
-                items: included.map(i => ({
+                items: checkoutSnapshot.map(i => ({
                     productId: i.productId,
                     name: i.productName,
                     variant: i.variantLabel,
@@ -913,7 +975,7 @@
 
             // Build an optional WhatsApp confirmation link (not required — order already saved)
             let msg = `*EAZYLIFE - NEW ORDER*%0A%0A*Tracking Code:* ${trackingCode}%0A%0A`;
-            included.forEach(i => {
+            checkoutSnapshot.forEach(i => {
                 msg += `• ${i.productName} (${i.variantLabel}${i.upgradeNames.length ? ', ' + i.upgradeNames.join(', ') : ''})%0A  Qty: ${i.quantity} | ₦${(i.unitPrice * i.quantity).toLocaleString()}%0A%0A`;
             });
             msg += `Subtotal: ₦${totals.subtotal.toLocaleString()}%0ADelivery: ₦${totals.deliveryFee.toLocaleString()}%0A*TOTAL: ₦${totals.total.toLocaleString()}*%0A%0A*Name:* ${name}%0A*Phone:* ${phone}%0A*Address:* ${addr}`;
@@ -924,6 +986,7 @@
             cart = cart.filter(i => i.included === false);
             localStorage.setItem(CKEY, JSON.stringify(cart));
             updateCartCount();
+            checkoutSnapshot = [];
 
             document.getElementById("checkoutStep").classList.add("hidden");
             document.getElementById("confirmStep").classList.remove("hidden");
