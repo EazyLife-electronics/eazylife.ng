@@ -727,7 +727,7 @@
               <div class="cat">${p.category || ''}</div>
               <h4>${p.name}</h4>
               <div class="price">${promo ? `<span class="old">${origPriceLabel}</span> ` : ''}${priceLabel}</div>
-              ${bulk ? `<div class="bulk-hint"><i class="fas fa-tags"></i>Buy ${bulk.minQty}+, save ${bulk.percent}%</div>` : ''}
+              ${bulk ? `<div class="bulk-hint"><i class="fas fa-tags"></i>Buy ${bulk.minQty}+, ${promo ? `save an extra ${bulk.percent}%` : `save ${bulk.percent}%`}</div>` : ''}
             </a>
           `;
         }).join('');
