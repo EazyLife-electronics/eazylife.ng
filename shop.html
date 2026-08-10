@@ -532,12 +532,32 @@
 
     function renderCategoryButtons() {
         const cats = ['All', ...new Set(products.map(p => p.category))];
-        document.getElementById("catFilters").innerHTML = cats.map(c => `
+        let html = cats.map(c => `
             <button onclick="filterByCategory('${c}')"
                     class="whitespace-nowrap px-5 py-2 rounded-full border text-xs font-bold transition-all ${currentCategory === c ? 'active-cat' : 'bg-white dark:bg-[#182420] text-gray-500 dark:text-gray-300 border-gray-200 dark:border-[#2a3835]'}">
                 ${c}
             </button>
         `).join('');
+        // Quick-access bulk-savings toggle, sitting right in the category scroller so it's
+        // one tap away — same as the category pills, not tucked inside the filter drawer.
+        html += `
+            <button onclick="toggleQuickBulk()"
+                    class="whitespace-nowrap px-5 py-2 rounded-full border text-xs font-bold transition-all flex items-center gap-1.5 ${onlyBulk ? 'active-cat' : 'bg-white dark:bg-[#182420] text-gray-500 dark:text-gray-300 border-gray-200 dark:border-[#2a3835]'}">
+                <i class="fas fa-tags"></i> Bulk Savings
+            </button>
+        `;
+        document.getElementById("catFilters").innerHTML = html;
+    }
+
+    // Toggles the bulk-savings filter straight from the quick-access pill, without opening
+    // the full filter drawer. Kept in sync with the drawer's own "Bulk savings available"
+    // checkbox since both read/write the same onlyBulk state.
+    function toggleQuickBulk() {
+        onlyBulk = !onlyBulk;
+        renderCategoryButtons();
+        renderFilteredGrid();
+        updateFilterBadge();
+        renderActiveFilterChips();
     }
 
     function filterByCategory(cat) {
@@ -736,6 +756,7 @@
         onlyBulk = document.getElementById('filterBulk').checked;
         onlyInStock = document.getElementById('filterInStock').checked;
         closeFilters();
+        renderCategoryButtons();
         renderFilteredGrid();
         updateFilterBadge();
         renderActiveFilterChips();
@@ -753,6 +774,7 @@
         document.getElementById('filterBulk').checked = false;
         document.getElementById('filterInStock').checked = false;
         renderFilterDrawer();
+        renderCategoryButtons();
         renderFilteredGrid();
         updateFilterBadge();
         renderActiveFilterChips();
@@ -809,6 +831,7 @@
         if (key === 'onlyPromo') onlyPromo = false;
         else if (key === 'onlyBulk') onlyBulk = false;
         else if (key === 'onlyInStock') onlyInStock = false;
+        renderCategoryButtons();
         renderFilteredGrid(); updateFilterBadge(); renderActiveFilterChips();
     }
 
@@ -1611,6 +1634,7 @@
     window.removeRomChip = removeRomChip;
     window.removePriceChip = removePriceChip;
     window.removeToggleChip = removeToggleChip;
+    window.toggleQuickBulk = toggleQuickBulk;
 
     init();
 </script>
