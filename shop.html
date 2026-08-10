@@ -121,9 +121,11 @@
         </div>
         <div id="catFilters" class="flex gap-2 overflow-x-auto no-scrollbar pb-2"></div>
         <div class="flex gap-2 mt-1">
-            <select id="brandFilter" class="flex-1 p-2.5 rounded-xl border-none shadow-sm text-xs outline-none dark:bg-[#182420] dark:text-gray-100">
-                <option value="All">All Brands</option>
-            </select>
+            <button id="filtersBtn" onclick="openFilters()" type="button"
+                    class="relative flex-1 p-2.5 rounded-xl shadow-sm text-xs font-bold outline-none bg-white dark:bg-[#182420] text-gray-600 dark:text-gray-200 flex items-center justify-center gap-1.5">
+                <i class="fas fa-sliders"></i> Filters
+                <span id="filterBadge" class="hidden absolute -top-1.5 -right-1.5 bg-teal-600 text-white text-[9px] font-black w-4 h-4 rounded-full items-center justify-center" style="background:var(--teal);">0</span>
+            </button>
             <select id="sortSelect" class="flex-1 p-2.5 rounded-xl border-none shadow-sm text-xs outline-none dark:bg-[#182420] dark:text-gray-100">
                 <option value="default">Sort: Featured</option>
                 <option value="price-asc">Price: Low to High</option>
@@ -131,6 +133,7 @@
                 <option value="name-asc">Name: A–Z</option>
             </select>
         </div>
+        <div id="activeFilterChips" class="hidden flex flex-wrap gap-1.5 mt-2"></div>
     </div>
 
     <div id="loader" class="flex flex-col items-center justify-center py-20 text-gray-400">
@@ -198,6 +201,67 @@
 
         <button id="pmAddBtn" onclick="addPmToCart()" class="bg-gray-900 text-white w-full py-4 rounded-2xl font-black text-lg shadow-xl hover:bg-black transition-all flex items-center justify-center gap-2">
             <i id="pmAddBtnIcon" class="fas fa-shopping-basket"></i> <span id="pmAddBtnLabel">Add to Cart</span>
+        </button>
+    </div>
+</div>
+
+<!-- FILTERS DRAWER — brand (synced to category), price range, spec filters (RAM/ROM, dynamic per
+     category), and quick toggles for promo items / bulk-savings items / in-stock only. -->
+<div id="filtersModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-end md:items-center justify-center">
+    <div class="bg-white dark:bg-[#182420] w-full max-w-md rounded-t-[32px] md:rounded-[24px] shadow-2xl p-6 overflow-y-auto max-h-[90vh]">
+        <div class="flex justify-between items-center mb-5">
+            <h2 class="font-syne font-extrabold text-xl text-gray-900 dark:text-gray-100">Filters</h2>
+            <div class="flex items-center gap-3">
+                <button onclick="clearFilters()" class="text-teal text-xs font-bold">Clear all</button>
+                <button onclick="closeFilters()" class="text-gray-400 p-1 text-3xl leading-none">&times;</button>
+            </div>
+        </div>
+
+        <div class="mb-5">
+            <label class="text-[10px] font-black uppercase text-gray-400 mb-2 block">Price Range (₦)</label>
+            <div class="flex items-center gap-2">
+                <input id="filterPriceMin" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="Min"
+                       class="w-full p-3 bg-gray-50 dark:bg-[#1c2925] dark:text-gray-100 border border-gray-200 dark:border-[#2a3835] rounded-xl text-sm outline-none">
+                <span class="text-gray-400 text-xs">—</span>
+                <input id="filterPriceMax" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="Max"
+                       class="w-full p-3 bg-gray-50 dark:bg-[#1c2925] dark:text-gray-100 border border-gray-200 dark:border-[#2a3835] rounded-xl text-sm outline-none">
+            </div>
+            <p id="filterPriceHint" class="text-[10px] text-gray-400 mt-1 px-1"></p>
+        </div>
+
+        <div id="filterBrandWrap" class="mb-5 hidden">
+            <label class="text-[10px] font-black uppercase text-gray-400 mb-2 block">Brand</label>
+            <div id="filterBrandChips" class="flex flex-wrap gap-2"></div>
+        </div>
+
+        <div id="filterRamWrap" class="mb-5 hidden">
+            <label class="text-[10px] font-black uppercase text-gray-400 mb-2 block">RAM</label>
+            <div id="filterRamChips" class="flex flex-wrap gap-2"></div>
+        </div>
+
+        <div id="filterRomWrap" class="mb-5 hidden">
+            <label class="text-[10px] font-black uppercase text-gray-400 mb-2 block">Storage</label>
+            <div id="filterRomChips" class="flex flex-wrap gap-2"></div>
+        </div>
+
+        <div class="mb-6 space-y-2">
+            <label class="text-[10px] font-black uppercase text-gray-400 mb-1 block">Deals & Availability</label>
+            <label class="flex items-center justify-between bg-gray-50 dark:bg-[#1c2925] rounded-xl p-3 text-sm dark:text-gray-100 cursor-pointer">
+                <span class="flex items-center gap-2"><i class="fas fa-tags text-teal"></i> On promotion</span>
+                <input id="filterPromo" type="checkbox" class="w-4 h-4 accent-[#00B09B]">
+            </label>
+            <label class="flex items-center justify-between bg-gray-50 dark:bg-[#1c2925] rounded-xl p-3 text-sm dark:text-gray-100 cursor-pointer">
+                <span class="flex items-center gap-2"><i class="fas fa-boxes-stacked text-teal"></i> Bulk savings available</span>
+                <input id="filterBulk" type="checkbox" class="w-4 h-4 accent-[#00B09B]">
+            </label>
+            <label class="flex items-center justify-between bg-gray-50 dark:bg-[#1c2925] rounded-xl p-3 text-sm dark:text-gray-100 cursor-pointer">
+                <span class="flex items-center gap-2"><i class="fas fa-check-circle text-teal"></i> In stock only</span>
+                <input id="filterInStock" type="checkbox" class="w-4 h-4 accent-[#00B09B]">
+            </label>
+        </div>
+
+        <button onclick="applyFilters()" class="bg-gray-900 text-white w-full py-4 rounded-2xl font-black text-lg shadow-xl hover:bg-black transition-all flex items-center justify-center gap-2">
+            <i class="fas fa-filter"></i> <span id="filterApplyLabel">Show results</span>
         </button>
     </div>
 </div>
@@ -390,8 +454,25 @@
     let products = [];
     let cart = JSON.parse(localStorage.getItem(CKEY)) || [];
     let currentCategory = 'All';
-    let currentBrand = 'All';
     let currentSort = 'default';
+
+    // Complex filter state — all multi-select/range, distinct from the single-pick
+    // category pills and sort dropdown above.
+    let currentBrands = [];      // [] = all brands
+    let currentRams = [];        // [] = all RAM options
+    let currentRoms = [];        // [] = all storage options
+    let priceMin = null;         // null = no floor
+    let priceMax = null;         // null = no ceiling
+    let onlyPromo = false;
+    let onlyBulk = false;
+    let onlyInStock = false;
+
+    // Draft copies edited inside the filter drawer — only committed to the "current*"
+    // state above when the user taps "Show results", so browsing the drawer never
+    // re-filters the grid behind it until they're done.
+    let draftBrands = [];
+    let draftRams = [];
+    let draftRoms = [];
     let whatsappNumber = '2347051548082'; // fallback if settings doc isn't set yet
     let deliveryFeePerItem = 750;
     let deliveryDiscountRate = 0.10;
@@ -418,14 +499,17 @@
             return;
         }
         loadUserData();
-        renderBrandOptions();
         applyIncomingLink();
         if (window.location.hash === '#cart' && cart.length > 0) {
             showCart();
         }
         document.getElementById("search").addEventListener("keyup", renderFilteredGrid);
-        document.getElementById("brandFilter").addEventListener("change", (e) => { currentBrand = e.target.value; renderFilteredGrid(); });
         document.getElementById("sortSelect").addEventListener("change", (e) => { currentSort = e.target.value; renderFilteredGrid(); });
+        document.getElementById("filterPriceMin").addEventListener("input", updateFilterApplyLabel);
+        document.getElementById("filterPriceMax").addEventListener("input", updateFilterApplyLabel);
+        document.getElementById("filterPromo").addEventListener("change", updateFilterApplyLabel);
+        document.getElementById("filterBulk").addEventListener("change", updateFilterApplyLabel);
+        document.getElementById("filterInStock").addEventListener("change", updateFilterApplyLabel);
     }
 
     // Handles hero-carousel links from the homepage: shop.html?category=Laptops or shop.html?product=abc123
@@ -446,12 +530,6 @@
         }
     }
 
-    function renderBrandOptions() {
-        const brands = [...new Set(products.map(p => p.brand).filter(Boolean))].sort();
-        document.getElementById('brandFilter').innerHTML =
-            `<option value="All">All Brands</option>` + brands.map(b => `<option value="${b}">${b}</option>`).join('');
-    }
-
     function renderCategoryButtons() {
         const cats = ['All', ...new Set(products.map(p => p.category))];
         document.getElementById("catFilters").innerHTML = cats.map(c => `
@@ -464,18 +542,47 @@
 
     function filterByCategory(cat) {
         currentCategory = cat;
+        // Brand/RAM/storage options are scoped to the selected category (a "Sensors" brand
+        // rarely means anything under "Laptops"), so a stale pick from the old category would
+        // otherwise silently keep filtering the grid after switching. Price/promo/bulk/in-stock
+        // are category-agnostic and carry over.
+        currentBrands = [];
+        currentRams = [];
+        currentRoms = [];
         renderCategoryButtons();
         renderFilteredGrid();
+        updateFilterBadge();
+    }
+
+    // Every variant across a product counts as one candidate the product-level filters
+    // (price/RAM/storage) can match against — a product passes if ANY of its variants fits,
+    // since that's the variant a shopper would actually pick.
+    function productVariantsList(p) {
+        return p.variants || [];
     }
 
     function getFilteredSortedProducts() {
         const term = document.getElementById("search").value.toLowerCase();
         let list = products.filter(p => {
             const matchesCategory = currentCategory === 'All' || p.category === currentCategory;
-            const matchesBrand = currentBrand === 'All' || p.brand === currentBrand;
+            const matchesBrand = currentBrands.length === 0 || currentBrands.includes(p.brand);
             const matchesSearch = !term || p.name.toLowerCase().includes(term) ||
                 (p.category || '').toLowerCase().includes(term) || (p.brand || '').toLowerCase().includes(term);
-            return matchesCategory && matchesBrand && matchesSearch;
+
+            const variants = productVariantsList(p);
+            const matchesPrice = (priceMin == null && priceMax == null) || variants.some(v => {
+                const price = variantUnitPrice(v);
+                return (priceMin == null || price >= priceMin) && (priceMax == null || price <= priceMax);
+            });
+            const matchesRam = currentRams.length === 0 || variants.some(v => currentRams.includes(v.ram));
+            const matchesRom = currentRoms.length === 0 || variants.some(v => currentRoms.includes(v.rom));
+            const matchesPromo = !onlyPromo || productHasPromo(p);
+            const matchesBulk = !onlyBulk || !!bestBulkSavings(p);
+            const outOfStock = p.inStock === false || variants.every(v => v.inStock === false);
+            const matchesInStock = !onlyInStock || !outOfStock;
+
+            return matchesCategory && matchesBrand && matchesSearch && matchesPrice &&
+                   matchesRam && matchesRom && matchesPromo && matchesBulk && matchesInStock;
         });
 
         if (currentSort === 'price-asc') list = [...list].sort((a, b) => productPriceRange(a).min - productPriceRange(b).min);
@@ -487,6 +594,222 @@
 
     function renderFilteredGrid() {
         renderProducts(getFilteredSortedProducts());
+    }
+
+    /* ---------------- FILTERS DRAWER ---------------- */
+
+    // Products in scope for populating filter options: current category + search term,
+    // but NOT the filters being edited themselves — so opening "Brand" always shows every
+    // brand available in this category, not just the ones matching an already-ticked brand.
+    function productsInCategoryScope() {
+        const term = document.getElementById("search").value.toLowerCase();
+        return products.filter(p => {
+            const matchesCategory = currentCategory === 'All' || p.category === currentCategory;
+            const matchesSearch = !term || p.name.toLowerCase().includes(term) ||
+                (p.category || '').toLowerCase().includes(term) || (p.brand || '').toLowerCase().includes(term);
+            return matchesCategory && matchesSearch;
+        });
+    }
+
+    function chipHTML(value, selected, onclick) {
+        return `<button type="button" onclick="${onclick}" class="px-3.5 py-2 rounded-full border text-xs font-bold transition-all ${selected ? 'active-cat' : 'bg-gray-50 dark:bg-[#1c2925] text-gray-500 dark:text-gray-300 border-gray-200 dark:border-[#2a3835]'}">${value}</button>`;
+    }
+
+    function toggleDraft(arr, value) {
+        const idx = arr.indexOf(value);
+        if (idx === -1) arr.push(value); else arr.splice(idx, 1);
+    }
+
+    function toggleDraftBrand(b) { toggleDraft(draftBrands, b); renderFilterDrawer(); }
+    function toggleDraftRam(r) { toggleDraft(draftRams, r); renderFilterDrawer(); }
+    function toggleDraftRom(r) { toggleDraft(draftRoms, r); renderFilterDrawer(); }
+
+    // Rebuilds the drawer's option chips from the in-scope products (so RAM/Storage sections
+    // only appear when a category actually has those specs — e.g. Laptops, not Sensors) and
+    // reflects the current draft selections.
+    function renderFilterDrawer() {
+        const scoped = productsInCategoryScope();
+        const variants = scoped.flatMap(productVariantsList);
+
+        const brands = [...new Set(scoped.map(p => p.brand).filter(Boolean))].sort();
+        const brandWrap = document.getElementById('filterBrandWrap');
+        if (brands.length > 0) {
+            brandWrap.classList.remove('hidden');
+            document.getElementById('filterBrandChips').innerHTML = brands
+                .map(b => chipHTML(b, draftBrands.includes(b), `toggleDraftBrand('${b.replace(/'/g, "\\'")}')`)).join('');
+        } else {
+            brandWrap.classList.add('hidden');
+        }
+
+        const rams = [...new Set(variants.map(v => v.ram).filter(Boolean))]
+            .sort((a, b) => (parseInt(a, 10) || 0) - (parseInt(b, 10) || 0));
+        const ramWrap = document.getElementById('filterRamWrap');
+        if (rams.length > 0) {
+            ramWrap.classList.remove('hidden');
+            document.getElementById('filterRamChips').innerHTML = rams
+                .map(r => chipHTML(r, draftRams.includes(r), `toggleDraftRam('${r.replace(/'/g, "\\'")}')`)).join('');
+        } else {
+            ramWrap.classList.add('hidden');
+        }
+
+        const roms = [...new Set(variants.map(v => v.rom).filter(Boolean))]
+            .sort((a, b) => (parseInt(a, 10) || 0) - (parseInt(b, 10) || 0));
+        const romWrap = document.getElementById('filterRomWrap');
+        if (roms.length > 0) {
+            romWrap.classList.remove('hidden');
+            document.getElementById('filterRomChips').innerHTML = roms
+                .map(r => chipHTML(r, draftRoms.includes(r), `toggleDraftRom('${r.replace(/'/g, "\\'")}')`)).join('');
+        } else {
+            romWrap.classList.add('hidden');
+        }
+
+        const prices = variants.map(variantUnitPrice).filter(p => p > 0);
+        const hint = document.getElementById('filterPriceHint');
+        hint.textContent = prices.length
+            ? `Range in ${currentCategory === 'All' ? 'catalog' : currentCategory}: ₦${Math.min(...prices).toLocaleString()} – ₦${Math.max(...prices).toLocaleString()}`
+            : '';
+
+        updateFilterApplyLabel();
+    }
+
+    function openFilters() {
+        draftBrands = [...currentBrands];
+        draftRams = [...currentRams];
+        draftRoms = [...currentRoms];
+        document.getElementById('filterPriceMin').value = priceMin != null ? priceMin : '';
+        document.getElementById('filterPriceMax').value = priceMax != null ? priceMax : '';
+        document.getElementById('filterPromo').checked = onlyPromo;
+        document.getElementById('filterBulk').checked = onlyBulk;
+        document.getElementById('filterInStock').checked = onlyInStock;
+        renderFilterDrawer();
+        document.getElementById('filtersModal').classList.remove('hidden');
+    }
+
+    function closeFilters() {
+        document.getElementById('filtersModal').classList.add('hidden');
+    }
+
+    // Live count of how many products the DRAFT selections would return, shown on the
+    // apply button so the user knows what tapping it will do before committing.
+    function updateFilterApplyLabel() {
+        const min = document.getElementById('filterPriceMin').value.trim();
+        const max = document.getElementById('filterPriceMax').value.trim();
+        const draftMin = min ? parseInt(min, 10) : null;
+        const draftMax = max ? parseInt(max, 10) : null;
+        const draftPromo = document.getElementById('filterPromo').checked;
+        const draftBulk = document.getElementById('filterBulk').checked;
+        const draftInStock = document.getElementById('filterInStock').checked;
+
+        const term = document.getElementById("search").value.toLowerCase();
+        const count = products.filter(p => {
+            const matchesCategory = currentCategory === 'All' || p.category === currentCategory;
+            const matchesSearch = !term || p.name.toLowerCase().includes(term) ||
+                (p.category || '').toLowerCase().includes(term) || (p.brand || '').toLowerCase().includes(term);
+            const matchesBrand = draftBrands.length === 0 || draftBrands.includes(p.brand);
+            const variants = productVariantsList(p);
+            const matchesPrice = (draftMin == null && draftMax == null) || variants.some(v => {
+                const price = variantUnitPrice(v);
+                return (draftMin == null || price >= draftMin) && (draftMax == null || price <= draftMax);
+            });
+            const matchesRam = draftRams.length === 0 || variants.some(v => draftRams.includes(v.ram));
+            const matchesRom = draftRoms.length === 0 || variants.some(v => draftRoms.includes(v.rom));
+            const matchesPromo = !draftPromo || productHasPromo(p);
+            const matchesBulk = !draftBulk || !!bestBulkSavings(p);
+            const outOfStock = p.inStock === false || variants.every(v => v.inStock === false);
+            const matchesInStock = !draftInStock || !outOfStock;
+            return matchesCategory && matchesSearch && matchesBrand && matchesPrice &&
+                   matchesRam && matchesRom && matchesPromo && matchesBulk && matchesInStock;
+        }).length;
+
+        document.getElementById('filterApplyLabel').textContent = `Show ${count} result${count === 1 ? '' : 's'}`;
+    }
+
+    function applyFilters() {
+        currentBrands = [...draftBrands];
+        currentRams = [...draftRams];
+        currentRoms = [...draftRoms];
+        const min = document.getElementById('filterPriceMin').value.trim();
+        const max = document.getElementById('filterPriceMax').value.trim();
+        priceMin = min ? parseInt(min, 10) : null;
+        priceMax = max ? parseInt(max, 10) : null;
+        onlyPromo = document.getElementById('filterPromo').checked;
+        onlyBulk = document.getElementById('filterBulk').checked;
+        onlyInStock = document.getElementById('filterInStock').checked;
+        closeFilters();
+        renderFilteredGrid();
+        updateFilterBadge();
+        renderActiveFilterChips();
+    }
+
+    function clearFilters() {
+        currentBrands = []; draftBrands = [];
+        currentRams = []; draftRams = [];
+        currentRoms = []; draftRoms = [];
+        priceMin = null; priceMax = null;
+        onlyPromo = false; onlyBulk = false; onlyInStock = false;
+        document.getElementById('filterPriceMin').value = '';
+        document.getElementById('filterPriceMax').value = '';
+        document.getElementById('filterPromo').checked = false;
+        document.getElementById('filterBulk').checked = false;
+        document.getElementById('filterInStock').checked = false;
+        renderFilterDrawer();
+        renderFilteredGrid();
+        updateFilterBadge();
+        renderActiveFilterChips();
+    }
+
+    function activeFilterCount() {
+        return currentBrands.length + currentRams.length + currentRoms.length +
+            (priceMin != null ? 1 : 0) + (priceMax != null ? 1 : 0) +
+            (onlyPromo ? 1 : 0) + (onlyBulk ? 1 : 0) + (onlyInStock ? 1 : 0);
+    }
+
+    function updateFilterBadge() {
+        const count = activeFilterCount();
+        const badge = document.getElementById('filterBadge');
+        badge.textContent = count;
+        badge.classList.toggle('hidden', count === 0);
+        badge.classList.toggle('flex', count > 0);
+    }
+
+    // Removable pill trail under the search bar summarizing every active filter, so the
+    // user can see (and undo) their picks without reopening the whole drawer.
+    function renderActiveFilterChips() {
+        const wrap = document.getElementById('activeFilterChips');
+        const pills = [];
+        currentBrands.forEach(b => pills.push({ label: b, onclick: `removeBrandChip('${b.replace(/'/g, "\\'")}')` }));
+        currentRams.forEach(r => pills.push({ label: `${r} RAM`, onclick: `removeRamChip('${r.replace(/'/g, "\\'")}')` }));
+        currentRoms.forEach(r => pills.push({ label: `${r} Storage`, onclick: `removeRomChip('${r.replace(/'/g, "\\'")}')` }));
+        if (priceMin != null || priceMax != null) {
+            const label = priceMin != null && priceMax != null ? `₦${priceMin.toLocaleString()}–₦${priceMax.toLocaleString()}`
+                : priceMin != null ? `Over ₦${priceMin.toLocaleString()}` : `Under ₦${priceMax.toLocaleString()}`;
+            pills.push({ label, onclick: `removePriceChip()` });
+        }
+        if (onlyPromo) pills.push({ label: 'On promo', onclick: `removeToggleChip('onlyPromo')` });
+        if (onlyBulk) pills.push({ label: 'Bulk savings', onclick: `removeToggleChip('onlyBulk')` });
+        if (onlyInStock) pills.push({ label: 'In stock', onclick: `removeToggleChip('onlyInStock')` });
+
+        if (pills.length === 0) {
+            wrap.classList.add('hidden');
+            wrap.innerHTML = '';
+            return;
+        }
+        wrap.classList.remove('hidden');
+        wrap.innerHTML = pills.map(p => `
+            <button type="button" onclick="${p.onclick}" class="active-cat flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold">
+                ${p.label} <i class="fas fa-xmark"></i>
+            </button>`).join('');
+    }
+
+    function removeBrandChip(b) { currentBrands = currentBrands.filter(x => x !== b); renderFilteredGrid(); updateFilterBadge(); renderActiveFilterChips(); }
+    function removeRamChip(r) { currentRams = currentRams.filter(x => x !== r); renderFilteredGrid(); updateFilterBadge(); renderActiveFilterChips(); }
+    function removeRomChip(r) { currentRoms = currentRoms.filter(x => x !== r); renderFilteredGrid(); updateFilterBadge(); renderActiveFilterChips(); }
+    function removePriceChip() { priceMin = null; priceMax = null; renderFilteredGrid(); updateFilterBadge(); renderActiveFilterChips(); }
+    function removeToggleChip(key) {
+        if (key === 'onlyPromo') onlyPromo = false;
+        else if (key === 'onlyBulk') onlyBulk = false;
+        else if (key === 'onlyInStock') onlyInStock = false;
+        renderFilteredGrid(); updateFilterBadge(); renderActiveFilterChips();
     }
 
     // The variant a shop-card's quick +/- stepper (and "Add") acts on, absent a variant
@@ -1276,6 +1599,18 @@
     window.showRequestModal = showRequestModal;
     window.hideRequestModal = hideRequestModal;
     window.submitRequest = submitRequest;
+    window.openFilters = openFilters;
+    window.closeFilters = closeFilters;
+    window.applyFilters = applyFilters;
+    window.clearFilters = clearFilters;
+    window.toggleDraftBrand = toggleDraftBrand;
+    window.toggleDraftRam = toggleDraftRam;
+    window.toggleDraftRom = toggleDraftRom;
+    window.removeBrandChip = removeBrandChip;
+    window.removeRamChip = removeRamChip;
+    window.removeRomChip = removeRomChip;
+    window.removePriceChip = removePriceChip;
+    window.removeToggleChip = removeToggleChip;
 
     init();
 </script>
