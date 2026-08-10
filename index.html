@@ -186,11 +186,14 @@
     .shop-preview-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; gap: 16px; flex-wrap: wrap; }
     .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
     .product-card { background: #fff; border: 1px solid #eee; border-radius: 18px; padding: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
-    .product-card img { height: 110px; width: 100%; object-fit: contain; border-radius: 12px; background: #f8f9fa; margin-bottom: 10px; }
+    .product-card .thumb { position: relative; margin-bottom: 10px; }
+    .product-card .thumb img { height: 110px; width: 100%; object-fit: contain; border-radius: 12px; background: #f8f9fa; margin-bottom: 0; display: block; }
+    .product-card .badge-promo { position: absolute; top: 6px; left: 6px; background: var(--teal); color: #fff; font-size: 0.6rem; font-weight: 800; padding: 2px 6px; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
     .product-card .cat { font-size: 0.62rem; font-weight: 800; text-transform: uppercase; color: var(--teal); letter-spacing: 0.05em; }
     .product-card h4 { font-size: 0.82rem; font-weight: 700; color: var(--dark); margin: 4px 0 8px; line-height: 1.3; min-height: 2.6em; }
     .product-card .price { font-weight: 800; font-size: 0.88rem; color: var(--dark); }
     .product-card .price .old { text-decoration: line-through; color: #bbb; font-weight: 600; font-size: 0.72rem; margin-left: 4px; }
+    .product-card .bulk-hint { font-size: 0.66rem; font-weight: 800; color: var(--teal); margin-top: 4px; display: flex; align-items: center; gap: 4px; }
     .shop-preview-loading, .shop-preview-empty { text-align: center; color: var(--text-light); font-size: 0.88rem; padding: 30px; grid-column: 1 / -1; }
 
     /* SERVICES STRIP */
@@ -284,7 +287,7 @@
     :root[data-theme="dark"] .contact-item,
     :root[data-theme="dark"] .social-card,
     :root[data-theme="dark"] .review-form-wrap { background: var(--dm-surface); border-color: var(--dm-border); }
-    :root[data-theme="dark"] .product-card img { background: var(--dm-surface-2); }
+    :root[data-theme="dark"] .product-card .thumb img { background: var(--dm-surface-2); }
     :root[data-theme="dark"] .product-card h4,
     :root[data-theme="dark"] .service-card h3,
     :root[data-theme="dark"] .review-card .who,
@@ -675,26 +678,56 @@
     }
 
     // ── SHOP PREVIEW (top products, live) ──
+    // Deliberately lighter than the full shop grid: no +/- quantity stepper, no "Add to
+    // Cart" — this is a teaser that links into shop.html for the actual buying flow. It does
+    // still surface promo and bulk-savings info, since those are exactly what makes someone
+    // click through.
     async function loadShopPreview() {
       const grid = document.getElementById('productPreviewGrid');
       try {
-        const { productPriceRange } = await import('./js/pricing.mjs');
-        const products = await getProducts();
+        const { productPriceRange, productOriginalPriceRange, productHasPromo, variantDiscountPercent, resolveBulkSavings } = await import('./js/pricing.mjs');
+        const [products, settings] = await Promise.all([getProducts(), getSettings()]);
         if (!products.length) {
           grid.innerHTML = `<div class="shop-preview-empty">Catalog is being updated — check back shortly.</div>`;
           return;
         }
-        const preview = products.slice(0, 8);
+        const generalBulkPercent = settings.bulkSavingsPercent || 0;
+        const generalBulkMinQty = settings.bulkSavingsMinQty || 0;
+
+        // Best bulk-savings offer across a product's variants — mirrors shop.html's own
+        // teaser-badge logic so the two stay consistent.
+        function bestBulkSavings(p) {
+          let best = null;
+          (p.variants || []).forEach(v => {
+            const b = resolveBulkSavings(v, generalBulkPercent, generalBulkMinQty);
+            if (b.percent > 0 && b.minQty > 0 && (!best || b.percent > best.percent)) best = b;
+          });
+          return best;
+        }
+
+        // Keep the homepage snackable — a full row on desktop (4-col grid), two tidy rows
+        // on mobile (2-col grid), rather than the longer scroll the full catalog invites.
+        const PREVIEW_COUNT = 4;
+        const preview = products.slice(0, PREVIEW_COUNT);
         grid.innerHTML = preview.map(p => {
           const range = productPriceRange(p);
           const priceLabel = range.min === range.max ? `₦${range.min.toLocaleString()}` : `From ₦${range.min.toLocaleString()}`;
+          const promo = productHasPromo(p);
+          const origRange = productOriginalPriceRange(p);
+          const origPriceLabel = origRange.min === origRange.max ? `₦${origRange.min.toLocaleString()}` : `From ₦${origRange.min.toLocaleString()}`;
+          const maxDiscountPercent = promo ? Math.max(...(p.variants || []).map(variantDiscountPercent)) : 0;
+          const bulk = bestBulkSavings(p);
           const thumb = (p.variants && p.variants[0] && p.variants[0].image) || '';
           return `
             <a href="shop.html?product=${encodeURIComponent(p.id)}" class="product-card">
-              <img src="${thumb || 'https://via.placeholder.com/150?text=' + encodeURIComponent(p.name)}" alt="${p.name}">
+              <div class="thumb">
+                <img src="${thumb || 'https://via.placeholder.com/150?text=' + encodeURIComponent(p.name)}" alt="${p.name}">
+                ${promo ? `<span class="badge-promo">-${Math.round(maxDiscountPercent)}%</span>` : ''}
+              </div>
               <div class="cat">${p.category || ''}</div>
               <h4>${p.name}</h4>
-              <div class="price">${priceLabel}</div>
+              <div class="price">${promo ? `<span class="old">${origPriceLabel}</span> ` : ''}${priceLabel}</div>
+              ${bulk ? `<div class="bulk-hint"><i class="fas fa-tags"></i>Buy ${bulk.minQty}+, save ${bulk.percent}%</div>` : ''}
             </a>
           `;
         }).join('');
