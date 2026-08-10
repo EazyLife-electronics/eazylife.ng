@@ -172,14 +172,25 @@
 
     /* FEATURED / HERO CAROUSEL */
     #featured { padding: 24px 0 8px; }
-    .hero-carousel-track { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; padding: 10px 20px 16px; scrollbar-width: none; margin: 0 -20px; }
-    .hero-carousel-track::-webkit-scrollbar { display: none; }
-    .hero-slide { scroll-snap-align: start; flex: 0 0 auto; width: 250px; border-radius: 20px; overflow: hidden; background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #eee; }
-    .hero-slide img { height: 130px; width: 100%; object-fit: cover; background: #f4f4f4; }
-    .hero-slide .slide-body { padding: 14px; }
-    .hero-slide h4 { font-size: 0.92rem; font-weight: 800; color: var(--dark); margin-bottom: 4px; }
-    .hero-slide p { font-size: 0.76rem; color: var(--text-light); margin-bottom: 10px; }
-    .hero-slide .slide-cta { font-size: 0.74rem; font-weight: 700; color: var(--teal); }
+    /* FEATURED HERO CAROUSEL — auto-scrolling marquee so every slide gets seen without
+       requiring a manual swipe, especially on small screens. Bleeds full viewport width
+       (breaks out of .container) for a bigger, more eye-catching banner feel. The track
+       renders each slide twice back-to-back; animating exactly -50% loops seamlessly. */
+    .hero-carousel-viewport { overflow: hidden; width: 100vw; margin-left: calc(-50vw + 50%); padding: 14px 0 22px; }
+    .hero-carousel-track { display: flex; gap: 18px; padding: 0 20px; }
+    .hero-carousel-track.marquee { width: max-content; animation: heroMarquee linear infinite; animation-duration: var(--marquee-duration, 32s); }
+    .hero-carousel-track.single { width: 100%; justify-content: center; }
+    .hero-carousel-track.paused { animation-play-state: paused; }
+    @keyframes heroMarquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    .hero-slide { flex: 0 0 auto; width: 280px; border-radius: 22px; overflow: hidden; background: #fff; box-shadow: 0 8px 28px rgba(0,0,0,0.09); border: 1px solid #eee; }
+    .hero-slide img { height: 160px; width: 100%; object-fit: cover; background: #f4f4f4; }
+    .hero-slide .slide-body { padding: 16px; }
+    .hero-slide h4 { font-size: 1rem; font-weight: 800; color: var(--dark); margin-bottom: 5px; }
+    .hero-slide p { font-size: 0.8rem; color: var(--text-light); margin-bottom: 11px; }
+    .hero-slide .slide-cta { font-size: 0.76rem; font-weight: 700; color: var(--teal); }
+    @media (prefers-reduced-motion: reduce) {
+      .hero-carousel-track.marquee { animation: none; }
+    }
 
     /* SHOP PREVIEW */
     #shop-preview { background: #fafbfc; }
@@ -258,6 +269,8 @@
 
     @media (min-width: 720px) {
       .hero h1 { font-size: 2.9rem; }
+      .hero-slide { width: 320px; }
+      .hero-slide img { height: 180px; }
       .product-grid { grid-template-columns: repeat(4, 1fr); }
       .services-strip { grid-template-columns: repeat(3, 1fr); }
       .trust-grid { grid-template-columns: repeat(2, 1fr); }
@@ -350,7 +363,9 @@
     <div class="container">
       <div class="section-label">Featured Right Now</div>
     </div>
-    <div class="hero-carousel-track container" id="heroCarousel"></div>
+    <div class="hero-carousel-viewport">
+      <div class="hero-carousel-track" id="heroCarousel"></div>
+    </div>
   </section>
 
   <!-- SHOP PREVIEW (live from Firestore) -->
@@ -657,20 +672,52 @@
       if (hero.linkType === 'category') return `shop.html?category=${encodeURIComponent(hero.linkValue)}`;
       return hero.linkValue || 'shop.html';
     }
+    function heroSlideHTML(h, decorative) {
+      return `
+        <a href="${linkFor(h)}" class="hero-slide"${decorative ? ' aria-hidden="true" tabindex="-1"' : ''}>
+          <img src="${h.image || 'https://via.placeholder.com/280x160?text=' + encodeURIComponent(h.title || 'EazyLife')}" alt="${decorative ? '' : (h.title || '')}">
+          <div class="slide-body">
+            <h4>${h.title || ''}</h4>
+            <p>${h.subtitle || ''}</p>
+            <span class="slide-cta">${h.ctaText || 'View'} <i class="fas fa-arrow-right" style="font-size:0.6rem;"></i></span>
+          </div>
+        </a>
+      `;
+    }
     async function loadHeroCarousel() {
       try {
         const heroes = await getHeroes();
         if (!heroes.length) return;
-        document.getElementById('heroCarousel').innerHTML = heroes.map(h => `
-          <a href="${linkFor(h)}" class="hero-slide">
-            <img src="${h.image || 'https://via.placeholder.com/250x130?text=' + encodeURIComponent(h.title || 'EazyLife')}" alt="${h.title || ''}">
-            <div class="slide-body">
-              <h4>${h.title || ''}</h4>
-              <p>${h.subtitle || ''}</p>
-              <span class="slide-cta">${h.ctaText || 'View'} <i class="fas fa-arrow-right" style="font-size:0.6rem;"></i></span>
-            </div>
-          </a>
-        `).join('');
+        const track = document.getElementById('heroCarousel');
+        const viewport = track.parentElement;
+
+        if (heroes.length > 1) {
+          // Auto-scrolling marquee — every slide gets seen on its own without the visitor
+          // having to swipe, which matters most on small screens where only one card fits
+          // at a time. Rendering the list twice back-to-back and animating exactly -50%
+          // makes the loop seamless (no visible jump/reset).
+          track.innerHTML = heroes.map(h => heroSlideHTML(h, false)).join('') + heroes.map(h => heroSlideHTML(h, true)).join('');
+          track.classList.add('marquee');
+          track.classList.remove('single');
+          // Speed scales with how much content there is, so the pace per-card feels the
+          // same whether there are 3 slides or 8.
+          track.style.setProperty('--marquee-duration', `${heroes.length * 6}s`);
+
+          // Pause on hover/touch so a visitor can actually read a card or tap its link
+          // without it sliding out from under them mid-interaction.
+          const pause = () => track.classList.add('paused');
+          const resume = () => track.classList.remove('paused');
+          viewport.addEventListener('mouseenter', pause);
+          viewport.addEventListener('mouseleave', resume);
+          viewport.addEventListener('touchstart', pause, { passive: true });
+          viewport.addEventListener('touchend', () => setTimeout(resume, 1200));
+        } else {
+          // Nothing to loop with a single slide — just center it.
+          track.innerHTML = heroes.map(h => heroSlideHTML(h, false)).join('');
+          track.classList.add('single');
+          track.classList.remove('marquee');
+        }
+
         document.getElementById('featured').style.display = 'block';
       } catch (err) {
         console.error('Hero carousel failed to load:', err);
