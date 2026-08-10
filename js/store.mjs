@@ -87,6 +87,20 @@ export async function updateOrderStatus(id, status) {
   return updateDoc(doc(db, 'orders', id), { status });
 }
 
+// Admin-only: reject/cancel an order.
+// reason: 'out_of_stock' | 'payment_failed' | 'other' | null — null means no reason is shown to the customer.
+// customerNote: extra sentence shown to the customer, only really meaningful when reason === 'other'.
+// internalNote: for the shop's own records only (e.g. "price changed with supplier") — never surfaced on track.html.
+export async function cancelOrder(id, { reason = null, customerNote = null, internalNote = null } = {}) {
+  return updateDoc(doc(db, 'orders', id), {
+    status: 'cancelled',
+    cancelReason: reason,
+    cancelCustomerNote: customerNote,
+    cancelInternalNote: internalNote,
+    cancelledAt: serverTimestamp()
+  });
+}
+
 /* ---------------- HEROES ---------------- */
 // heroes/{id} -> { title, subtitle, image, ctaText, linkType: 'category'|'product'|'url', linkValue, order }
 
