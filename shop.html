@@ -181,10 +181,11 @@
             </span>
         </div>
         <div id="pmUpgradeLines" class="mb-1"></div>
-        <div class="flex justify-between items-center mb-4 px-1">
+        <div class="flex justify-between items-center mb-1 px-1">
             <span class="text-[11px] text-gray-400"><i class="fas fa-truck-fast mr-1"></i>Delivery</span>
             <span class="text-[11px] font-bold text-gray-500 dark:text-gray-400">₦<span id="pmDeliveryFee">0</span>/unit <span class="text-teal">· cheaper the more you buy</span></span>
         </div>
+        <p id="pmBulkHint" class="hidden text-[11px] text-teal font-bold mb-4 px-1"></p>
 
         <div class="flex justify-between items-center mb-4 px-1 pt-2 border-t border-gray-100 dark:border-[#2a3835]">
             <span class="font-bold text-gray-500 dark:text-gray-400 text-sm">Price</span>
@@ -229,6 +230,10 @@
                     <span id="subtotalSavingsPercent" class="hidden text-[10px] font-black text-teal"></span>
                     <span class="font-bold text-gray-800 dark:text-gray-100">₦<span id="subtotal">0</span></span>
                 </span>
+            </div>
+            <div id="bulkSavingsRow" class="hidden flex justify-between items-center px-2 text-sm mt-1">
+                <span class="text-gray-500 dark:text-gray-400">Bulk Savings</span>
+                <span class="font-bold text-teal">-₦<span id="bulkSavingsAmount">0</span></span>
             </div>
             <div class="flex justify-between items-center px-2 text-sm mt-1">
                 <span class="text-gray-500 dark:text-gray-400">Delivery Fee</span>
@@ -282,6 +287,10 @@
                     <span id="subtotalSavingsPercentCo" class="hidden text-[10px] font-black text-teal"></span>
                     <span class="font-bold text-gray-800 dark:text-gray-100">₦<span id="subtotalCo">0</span></span>
                 </span>
+            </div>
+            <div id="bulkSavingsRowCo" class="hidden flex justify-between items-center px-2 text-sm mt-1">
+                <span class="text-gray-500 dark:text-gray-400">Bulk Savings</span>
+                <span class="font-bold text-teal">-₦<span id="bulkSavingsAmountCo">0</span></span>
             </div>
             <div class="flex justify-between items-center px-2 text-sm mt-1">
                 <span class="text-gray-500 dark:text-gray-400">Delivery Fee</span>
@@ -373,7 +382,7 @@
 
 <script type="module">
     import { getProducts, placeOrder, placeRequest, getSettings } from './js/store.mjs';
-    import { calcGroupedDeliveryFee, buildDeliveryFeeSummary, resolveDeliveryFee, variantUnitPrice, productPriceRange, productOriginalPriceRange, hasPromo, variantDiscountPercent, productHasPromo, buildPriceSavingsSummary, variantLabel } from './js/pricing.mjs';
+    import { calcGroupedDeliveryFee, buildDeliveryFeeSummary, resolveDeliveryFee, variantUnitPrice, productPriceRange, productOriginalPriceRange, hasPromo, variantDiscountPercent, productHasPromo, buildPriceSavingsSummary, variantLabel, resolveBulkSavings, calcBulkSavingsForLine, buildBulkSavingsSummary } from './js/pricing.mjs';
 
     const CKEY = "eazylife_cart_v2";
     const UKEY = "eazylife_user_v2";
@@ -386,6 +395,8 @@
     let whatsappNumber = '2347051548082'; // fallback if settings doc isn't set yet
     let deliveryFeePerItem = 750;
     let deliveryDiscountRate = 0.10;
+    let generalBulkSavingsPercent = 0;
+    let generalBulkSavingsMinQty = 0;
 
     // Product detail modal state
     let pmProduct = null;
@@ -398,6 +409,8 @@
             if (settings.whatsapp) whatsappNumber = settings.whatsapp;
             if (settings.deliveryFeePerItem != null) deliveryFeePerItem = settings.deliveryFeePerItem;
             if (settings.deliveryDiscountPercent != null) deliveryDiscountRate = settings.deliveryDiscountPercent / 100;
+            if (settings.bulkSavingsPercent != null) generalBulkSavingsPercent = settings.bulkSavingsPercent;
+            if (settings.bulkSavingsMinQty != null) generalBulkSavingsMinQty = settings.bulkSavingsMinQty;
             document.getElementById("loader").classList.add("hidden");
         } catch (e) {
             document.getElementById("loader").innerHTML = `<p class="text-red-500">Failed to load catalog. Check your connection.</p>`;
@@ -588,9 +601,25 @@
         const selectedUpgrades = getSelectedUpgrades();
         const upgradesTotal = selectedUpgrades.reduce((a, u) => a + (u.price || 0), 0);
         const unit = base + upgradesTotal;
-        const actualTotal = unit * pmQty;
+        const preDiscountTotal = unit * pmQty;
+
+        const bulk = resolveBulkSavings(v, generalBulkSavingsPercent, generalBulkSavingsMinQty);
+        const bulkDiscount = calcBulkSavingsForLine(unit, pmQty, bulk.percent, bulk.minQty);
+        const actualTotal = preDiscountTotal - bulkDiscount;
         document.getElementById('pmPrice').textContent = actualTotal.toLocaleString();
         document.getElementById('pmDeliveryFee').textContent = resolveDeliveryFee(v, deliveryFeePerItem).toLocaleString();
+
+        const bulkHint = document.getElementById('pmBulkHint');
+        if (bulk.percent > 0 && bulk.minQty > 0) {
+            if (pmQty >= bulk.minQty) {
+                bulkHint.textContent = `🎉 Bulk savings applied: -${bulk.percent}% for ${bulk.minQty}+ units`;
+            } else {
+                bulkHint.textContent = `Buy ${bulk.minQty - pmQty} more for ${bulk.percent}% off this item`;
+            }
+            bulkHint.classList.remove('hidden');
+        } else {
+            bulkHint.classList.add('hidden');
+        }
 
         document.getElementById('pmUnitPrice').textContent = base.toLocaleString();
         const unitOrigEl = document.getElementById('pmUnitOriginal');
@@ -612,7 +641,7 @@
         const origTotal = origUnit * pmQty;
         const origEl = document.getElementById('pmOriginalPrice');
         const pctEl = document.getElementById('pmDiscountPercent');
-        if (v && hasPromo(v) && origTotal > actualTotal) {
+        if (v && origTotal > actualTotal) {
             origEl.textContent = `₦${origTotal.toLocaleString()}`;
             pctEl.textContent = `-${(((origTotal - actualTotal) / origTotal) * 100).toFixed(1)}%`;
             origEl.classList.remove('hidden');
@@ -645,6 +674,7 @@
         const originalUnitPrice = originalUnitBasePrice + upgradesTotal;
         const upgradeIds = upgrades.map(u => u.id).sort().join(',');
         const lineId = `${pmProduct.id}::${v.id}::${upgradeIds}`;
+        const bulk = resolveBulkSavings(v, generalBulkSavingsPercent, generalBulkSavingsMinQty);
 
         const existing = cart.find(i => i.lineId === lineId);
         if (existing) {
@@ -664,6 +694,8 @@
                 originalUnitPrice,
                 unitDeliveryFee: (v.deliveryFee != null && v.deliveryFee !== '') ? v.deliveryFee : null,
                 deliveryRoute: v.deliveryRoute === 'separate' ? 'separate' : 'general',
+                bulkSavingsPercent: bulk.percent,
+                bulkSavingsMinQty: bulk.minQty,
                 image: v.image || '',
                 quantity: pmQty
             });
@@ -726,6 +758,12 @@
     function cartTotals(items) {
         const list = items || includedCartItems();
         const subtotal = list.reduce((a, b) => a + (b.unitPrice * b.quantity), 0);
+        const bulkSummary = buildBulkSavingsSummary(list.map(item => ({
+            unitPrice: item.unitPrice,
+            quantity: item.quantity,
+            bulkSavingsPercent: item.bulkSavingsPercent,
+            bulkSavingsMinQty: item.bulkSavingsMinQty
+        })));
         const deliveryFee = calcGroupedDeliveryFee(
             list.map(item => ({
                 quantity: item.quantity,
@@ -737,7 +775,7 @@
             deliveryFeePerItem,
             deliveryDiscountRate
         );
-        return { subtotal, deliveryFee, total: subtotal + deliveryFee };
+        return { subtotal, bulkSavings: bulkSummary.savings, deliveryFee, total: subtotal - bulkSummary.savings + deliveryFee };
     }
 
     // Fills the subtotal/delivery/total block. suffix is '' for the cart step's ids (subtotal, total, ...)
@@ -747,6 +785,14 @@
         document.getElementById("subtotal" + suffix).textContent = totals.subtotal.toLocaleString();
         document.getElementById("deliveryFeeDisplay" + suffix).textContent = totals.deliveryFee.toLocaleString();
         document.getElementById("total" + suffix).textContent = totals.total.toLocaleString();
+
+        const bulkRow = document.getElementById("bulkSavingsRow" + suffix);
+        if (totals.bulkSavings > 0) {
+            document.getElementById("bulkSavingsAmount" + suffix).textContent = totals.bulkSavings.toLocaleString();
+            bulkRow.classList.remove("hidden");
+        } else {
+            bulkRow.classList.add("hidden");
+        }
 
         const priceSavings = buildPriceSavingsSummary(items.map(item => ({
             unitPrice: item.unitPrice,
@@ -807,6 +853,17 @@
         }
     }
 
+    // Per-line nudge/confirmation: "applied" once qty meets the cutoff, otherwise a nudge
+    // toward it. Empty string when the line has no bulk savings at all.
+    function bulkLineHint(i, indented) {
+        const percent = i.bulkSavingsPercent;
+        const minQty = i.bulkSavingsMinQty;
+        if (!percent || !minQty) return '';
+        const pad = indented ? ' pl-6' : '';
+        if (i.quantity >= minQty) return `<p class="text-[10px] text-teal font-bold${pad}">🎉 Bulk savings applied: -${percent}%</p>`;
+        return `<p class="text-[10px] text-gray-400${pad}">Add ${minQty - i.quantity} more for ${percent}% off</p>`;
+    }
+
     function showCart() {
         if (cart.length === 0) return hideCart();
         document.getElementById("cartStep").classList.remove("hidden");
@@ -833,6 +890,7 @@
                     <p class="text-[10px] text-gray-400 pl-6"><i class="fas fa-tag mr-1"></i>Item ${baseHasPromo ? `<span class="line-through">₦${baseOrigUnit.toLocaleString()}</span> ` : ''}₦${baseUnit.toLocaleString()}/unit</p>
                     ${upgradeItems.map(u => `<p class="text-[10px] text-gray-400 pl-6">+ ${u.name} ₦${(u.price || 0).toLocaleString()}/unit</p>`).join('')}
                     <p class="text-[10px] text-gray-400 pl-6"><i class="fas fa-truck-fast mr-1"></i>Delivery ₦${(i.unitDeliveryFee != null ? i.unitDeliveryFee : deliveryFeePerItem).toLocaleString()}/unit</p>
+                    ${bulkLineHint(i, true)}
                     <p class="text-xs font-bold flex items-center gap-1.5 pl-6">
                         ${lineHasPromo ? `<span class="text-gray-400 text-[10px] line-through">₦${origLineTotal.toLocaleString()}</span><span class="text-[9px] font-black text-teal">-${(((origLineTotal - lineTotal) / origLineTotal) * 100).toFixed(0)}%</span>` : ''}
                         <span class="text-teal">₦${lineTotal.toLocaleString()}</span>
@@ -901,6 +959,7 @@
                     <p class="text-[10px] text-gray-400"><i class="fas fa-tag mr-1"></i>Item ${baseHasPromo ? `<span class="line-through">₦${baseOrigUnit.toLocaleString()}</span> ` : ''}₦${baseUnit.toLocaleString()}/unit</p>
                     ${upgradeItems.map(u => `<p class="text-[10px] text-gray-400">+ ${u.name} ₦${(u.price || 0).toLocaleString()}/unit</p>`).join('')}
                     <p class="text-[10px] text-gray-400"><i class="fas fa-truck-fast mr-1"></i>Delivery ₦${(i.unitDeliveryFee != null ? i.unitDeliveryFee : deliveryFeePerItem).toLocaleString()}/unit</p>
+                    ${bulkLineHint(i, false)}
                     <p class="text-xs font-bold flex items-center gap-1.5">
                         ${lineHasPromo ? `<span class="text-gray-400 text-[10px] line-through">₦${origLineTotal.toLocaleString()}</span><span class="text-[9px] font-black text-teal">-${(((origLineTotal - lineTotal) / origLineTotal) * 100).toFixed(0)}%</span>` : ''}
                         <span class="text-teal">₦${lineTotal.toLocaleString()}</span>
