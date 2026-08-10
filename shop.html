@@ -489,6 +489,25 @@
         renderProducts(getFilteredSortedProducts());
     }
 
+    // The variant a shop-card's quick +/- stepper (and "Add") acts on, absent a variant
+    // pick from the modal: the first in-stock variant, else just the first.
+    function getDefaultVariant(p) {
+        const variants = p.variants || [];
+        return variants.find(v => v.inStock !== false) || variants[0] || null;
+    }
+
+    // Most attractive bulk-savings offer across a product's variants, for the catalog
+    // teaser badge — not tied to whichever variant the card's stepper happens to control,
+    // since this is just "here's an incentive to buy more", not a live quote.
+    function bestBulkSavings(p) {
+        let best = null;
+        (p.variants || []).forEach(v => {
+            const b = resolveBulkSavings(v, generalBulkSavingsPercent, generalBulkSavingsMinQty);
+            if (b.percent > 0 && b.minQty > 0 && (!best || b.percent > best.percent)) best = b;
+        });
+        return best;
+    }
+
     function requestTileHTML(full) {
         return `
             <div onclick="showRequestModal()" class="product-card request-tile ${full ? 'col-span-full' : ''}"
@@ -516,6 +535,21 @@
             const maxDiscountPercent = promo ? Math.max(...(p.variants || []).map(variantDiscountPercent)) : 0;
             const thumb = (p.variants && p.variants[0] && p.variants[0].image) || '';
             const outOfStock = p.inStock === false || (p.variants || []).every(v => v.inStock === false);
+
+            // Best bulk-savings offer across the product's variants — a teaser badge so
+            // customers see the incentive to buy more right in the catalog, before opening
+            // the product modal (where the exact per-variant figure is shown).
+            const bulk = bestBulkSavings(p);
+
+            // The cart line this card's quick +/- stepper controls: the product's default
+            // (first in-stock, else first) variant, no upgrades — mirrors addPmToCart's
+            // lineId shape so it's the exact same line whether added here or via the modal.
+            const defaultVariant = getDefaultVariant(p);
+            const defaultLineId = defaultVariant ? `${p.id}::${defaultVariant.id}::` : null;
+            const cardLine = defaultLineId ? cart.find(i => i.lineId === defaultLineId) : null;
+            const otherQty = cart.filter(i => i.productId === p.id && i.lineId !== defaultLineId)
+                .reduce((a, b) => a + b.quantity, 0);
+
             grid.innerHTML += `
                 <div class="product-card bg-white dark:bg-[#182420] dark:border-[#2a3835] p-3 rounded-[24px] shadow-sm flex flex-col">
                     <div class="relative mb-3">
@@ -524,13 +558,21 @@
                     </div>
                     <span class="text-[9px] font-black uppercase text-teal tracking-wider mb-1">${p.brand ? p.brand + ' · ' : ''}${p.category}</span>
                     <h3 class="font-bold text-gray-800 dark:text-gray-100 leading-tight text-xs md:text-sm flex-grow mb-2">${p.name}</h3>
-                    <div class="mb-3 flex items-baseline gap-1.5 flex-wrap">
+                    <div class="mb-1 flex items-baseline gap-1.5 flex-wrap">
                         ${promo ? `<span class="text-gray-400 text-[10px] line-through">${origPriceLabel}</span>` : ''}
                         <span class="text-gray-900 dark:text-gray-100 font-black text-sm md:text-base">${priceLabel}</span>
                     </div>
+                    ${bulk ? `<p class="text-[9px] font-black text-teal mb-2 flex items-center gap-1"><i class="fas fa-tags"></i>Buy ${bulk.minQty}+, save ${bulk.percent}%</p>` : `<div class="mb-2"></div>`}
                     <div class="mt-auto">
                         ${outOfStock ? `
                             <button disabled class="bg-gray-200 dark:bg-[#2a3835] text-gray-400 w-full py-2.5 rounded-xl font-bold text-xs cursor-not-allowed">Out of Stock</button>
+                        ` : cardLine ? `
+                            <div class="flex items-center justify-center gap-2 bg-gray-50 dark:bg-[#1c2925] p-1 rounded-xl">
+                                <button onclick="changeCardQty('${p.id}',-1)" class="w-8 h-8 bg-white dark:bg-[#182420] dark:text-gray-100 rounded-lg shadow-sm font-bold">-</button>
+                                <input type="text" inputmode="numeric" pattern="[0-9]*" value="${cardLine.quantity}" onfocus="this.select()" onchange="setCardQty('${p.id}', this.value)" class="font-black text-sm w-10 text-center dark:text-gray-100 bg-white dark:bg-[#182420] rounded-lg py-1.5 outline-none">
+                                <button onclick="changeCardQty('${p.id}',1)" class="w-8 h-8 bg-white dark:bg-[#182420] dark:text-gray-100 rounded-lg shadow-sm font-bold">+</button>
+                            </div>
+                            <button onclick="openProductModal('${p.id}')" class="w-full text-center text-[10px] text-gray-400 mt-1 underline decoration-dotted">${otherQty > 0 ? `+${otherQty} more in other options` : 'Change option'}</button>
                         ` : `
                             <button onclick="openProductModal('${p.id}')" class="bg-gray-900 text-white w-full py-2.5 rounded-xl font-bold text-xs hover:bg-black transition-colors">View Options</button>
                         `}
@@ -702,6 +744,7 @@
         }
         localStorage.setItem(CKEY, JSON.stringify(cart));
         updateCartCount();
+        renderFilteredGrid(); // so the card's stepper reflects this line once the cart is closed
         hideProductModal();
         showCart();
     }
@@ -727,6 +770,66 @@
         saveAndSync();
     }
 
+    // Shop-card quick stepper: +/- on the product's default variant, right in the catalog,
+    // without opening the modal. Shares addPmToCart's lineId shape so it's the same cart
+    // line either way — increment here, then open the modal, and the quantity carries over.
+    function changeCardQty(productId, delta) {
+        const p = products.find(x => x.id === productId);
+        const defaultVariant = p && getDefaultVariant(p);
+        if (!defaultVariant) return;
+        const lineId = `${productId}::${defaultVariant.id}::`;
+        let item = cart.find(i => i.lineId === lineId);
+        if (!item) {
+            if (delta <= 0) return;
+            const bulk = resolveBulkSavings(defaultVariant, generalBulkSavingsPercent, generalBulkSavingsMinQty);
+            item = {
+                lineId,
+                productId: p.id,
+                variantId: defaultVariant.id,
+                productName: p.name,
+                variantLabel: variantLabel(defaultVariant),
+                upgradeNames: [],
+                upgradeItems: [],
+                unitBasePrice: variantUnitPrice(defaultVariant),
+                originalUnitBasePrice: defaultVariant.price || 0,
+                unitPrice: variantUnitPrice(defaultVariant),
+                originalUnitPrice: defaultVariant.price || 0,
+                unitDeliveryFee: (defaultVariant.deliveryFee != null && defaultVariant.deliveryFee !== '') ? defaultVariant.deliveryFee : null,
+                deliveryRoute: defaultVariant.deliveryRoute === 'separate' ? 'separate' : 'general',
+                bulkSavingsPercent: bulk.percent,
+                bulkSavingsMinQty: bulk.minQty,
+                image: defaultVariant.image || '',
+                quantity: 1
+            };
+            cart.push(item);
+        } else {
+            item.quantity += delta;
+            if (item.quantity <= 0) cart = cart.filter(i => i.lineId !== lineId);
+        }
+        localStorage.setItem(CKEY, JSON.stringify(cart));
+        updateCartCount();
+        renderFilteredGrid();
+    }
+
+    // Direct edit of the card's quantity field, same idea as the cart's setQty.
+    function setCardQty(productId, value) {
+        const n = parseInt(value, 10);
+        if (!Number.isFinite(n) || n < 1) return renderFilteredGrid(); // ignore bad input, redraw to reset the field
+        const p = products.find(x => x.id === productId);
+        const defaultVariant = p && getDefaultVariant(p);
+        if (!defaultVariant) return;
+        const lineId = `${productId}::${defaultVariant.id}::`;
+        let item = cart.find(i => i.lineId === lineId);
+        if (!item) {
+            changeCardQty(productId, 1);
+            item = cart.find(i => i.lineId === lineId);
+        }
+        if (item) item.quantity = n;
+        localStorage.setItem(CKEY, JSON.stringify(cart));
+        updateCartCount();
+        renderFilteredGrid();
+    }
+
     // Include/exclude a line from checkout without removing it from the cart —
     // so a customer who can't afford everything today can uncheck items and come back for them later.
     function toggleIncluded(lineId) {
@@ -744,6 +847,7 @@
     function saveAndSync() {
         localStorage.setItem(CKEY, JSON.stringify(cart));
         updateCartCount();
+        renderFilteredGrid(); // keep the shop-card steppers in sync with cart-modal edits
         if (!document.getElementById("cartModal").classList.contains("hidden") &&
             !document.getElementById("cartStep").classList.contains("hidden")) showCart();
     }
@@ -1115,6 +1219,8 @@
     window.addPmToCart = addPmToCart;
     window.changeQty = changeQty;
     window.setQty = setQty;
+    window.changeCardQty = changeCardQty;
+    window.setCardQty = setCardQty;
     window.toggleIncluded = toggleIncluded;
     window.showCart = showCart;
     window.goToCheckout = goToCheckout;
