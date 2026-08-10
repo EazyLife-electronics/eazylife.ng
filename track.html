@@ -129,6 +129,18 @@
         { key: 'delivered', label: 'Delivered', icon: 'fa-house' }
     ];
 
+    // Mirrors admin/js/admin-app.mjs — only the codes that are meant to be customer-facing.
+    const CANCEL_REASONS = {
+        out_of_stock: 'Out of stock',
+        payment_failed: 'Payment could not be confirmed'
+    };
+
+    function cancelReasonLabel(order) {
+        if (!order.cancelReason) return null;
+        if (order.cancelReason === 'other') return order.cancelCustomerNote || null;
+        return CANCEL_REASONS[order.cancelReason] || null;
+    }
+
     function renderTimeline(status) {
         const currentIdx = STATUS_STEPS.findIndex(s => s.key === status);
         return `
@@ -143,6 +155,13 @@
             </div>`;
     }
 
+    function statusBadgeClass(status) {
+        if (status === 'cancelled') return 'bg-red-100 text-red-700';
+        if (status === 'delivered') return 'bg-green-100 text-green-700';
+        if (status === 'confirmed') return 'bg-blue-100 text-blue-700';
+        return 'bg-yellow-100 text-yellow-700';
+    }
+
     function renderOrderCard(order, compact) {
         const itemsHtml = (order.items || []).map(i => `${i.name}${i.variant ? ' (' + i.variant + ')' : ''} × ${i.quantity}`).join(', ');
         const created = order.createdAt?.toDate ? order.createdAt.toDate().toLocaleString() : '';
@@ -152,12 +171,14 @@
                    class="block bg-white dark:bg-[#182420] border border-gray-100 dark:border-[#2a3835] rounded-2xl p-4 shadow-sm">
                     <div class="flex justify-between items-center mb-1">
                         <span class="font-black text-sm text-gray-800 dark:text-gray-100">${order.trackingCode}</span>
-                        <span class="text-[10px] font-bold uppercase px-2 py-1 rounded-full ${order.status === 'delivered' ? 'bg-green-100 text-green-700' : order.status === 'confirmed' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'}">${order.status || 'new'}</span>
+                        <span class="text-[10px] font-bold uppercase px-2 py-1 rounded-full ${statusBadgeClass(order.status)}">${order.status || 'new'}</span>
                     </div>
                     <p class="text-xs text-gray-400">${created}</p>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">${itemsHtml}</p>
                 </a>`;
         }
+        const isCancelled = order.status === 'cancelled';
+        const reasonLabel = cancelReasonLabel(order);
         return `
             <div class="bg-white dark:bg-[#182420] border border-gray-100 dark:border-[#2a3835] rounded-2xl p-5 shadow-sm">
                 <div class="flex justify-between items-start mb-4">
@@ -167,7 +188,12 @@
                     </div>
                     <p class="text-xs text-gray-400 text-right">${created}</p>
                 </div>
-                ${renderTimeline(order.status || 'new')}
+                ${isCancelled ? `
+                    <div class="bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/50 rounded-xl p-4 mb-4">
+                        <p class="text-sm font-black text-red-700 dark:text-red-400 mb-1"><i class="fas fa-circle-xmark mr-1"></i> Order Cancelled</p>
+                        <p class="text-xs text-red-600 dark:text-red-300">${reasonLabel ? reasonLabel : "We're unable to fulfill this order. Please reach out to us if you'd like to know more."}</p>
+                    </div>
+                ` : renderTimeline(order.status || 'new')}
                 <div class="border-t border-gray-100 dark:border-[#2a3835] pt-4">
                     <p class="text-xs text-gray-500 dark:text-gray-400 mb-1"><b class="text-gray-700 dark:text-gray-200">Items:</b> ${itemsHtml}</p>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mb-1"><b class="text-gray-700 dark:text-gray-200">Delivery to:</b> ${order.address || ''}</p>
