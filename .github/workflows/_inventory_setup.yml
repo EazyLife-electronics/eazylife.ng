@@ -1,0 +1,48 @@
+name: inventory-setup
+on:
+  push:
+    branches: [feature/inventory]
+permissions:
+  contents: write
+jobs:
+  setup:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/inventory
+      - name: Integrate inventory UI and rules
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('admin/index.html')
+          s=p.read_text()
+          marker='            <button data-tab="products" class="tab-btn tab-active px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Products</button>'
+          if 'id="inventoryTabBtn"' not in s:
+              s=s.replace(marker, marker+'\n            <button data-tab="inventory" id="inventoryTabBtn" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Inventory</button>')
+          marker2='        <!-- ORDERS PANEL -->'
+          if 'id="panel-inventory"' not in s:
+              s=s.replace(marker2, '        <!-- INVENTORY PANEL -->\n        <div id="panel-inventory" class="tab-panel hidden"><div id="inventoryContent"></div></div>\n\n'+marker2)
+          marker3='<script type="module" src="js/admin-app.mjs"></script>'
+          if 'js/inventory.mjs' not in s:
+              loader='''<script type="module">\nimport { initInventory } from "./js/inventory.mjs";\nlet stopInventory=null;\nconst btn=document.getElementById("inventoryTabBtn");\nbtn.addEventListener("click",()=>{document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("tab-active"));btn.classList.add("tab-active");document.querySelectorAll(".tab-panel").forEach(p=>p.classList.add("hidden"));document.getElementById("panel-inventory").classList.remove("hidden");if(!stopInventory)stopInventory=initInventory();});\ndocument.querySelectorAll(".tab-btn:not(#inventoryTabBtn)").forEach(other=>other.addEventListener("click",()=>{if(stopInventory){stopInventory();stopInventory=null;}}));\n</script>'''
+              s=s.replace(marker3, marker3+'\n'+loader)
+          p.write_text(s)
+          r=Path('firestore.rules')
+          rs=r.read_text()
+          rule='''\n    match /inventoryMovements/{movementId} {\n      allow read, create: if request.auth != null;\n      allow update, delete: if request.auth != null;\n    }\n'''
+          if 'match /inventoryMovements/' not in rs:
+              rs=rs.replace('\n  }\n}',rule+'\n  }\n}')
+              r.write_text(rs)
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add admin/index.html firestore.rules
+          git diff --cached --quiet || git commit -m 'feat(inventory): integrate admin inventory tab and firestore rules'
+          git push origin feature/inventory
+      - name: Remove setup workflow
+        run: |
+          git rm .github/workflows/_inventory_setup.yml
+          git commit -m 'chore: remove temporary inventory setup workflow'
+          git push origin feature/inventory
