@@ -2,13 +2,14 @@
 // Inventory foundation: variant-level SKUs, quantities, cost prices, movements and dashboard.
 import { initFirebase } from '../../js/firebase.mjs';
 import {
-  collection, doc, getDocs, onSnapshot, query, orderBy,
+  collection, doc, getDoc, getDocs, onSnapshot, query, orderBy,
   runTransaction, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const { db } = initFirebase();
 let unsubscribe = null;
 let products = [];
+let productBridgeInstalled = false;
 
 function makeSku(product, variant, index) {
   const clean = value => String(value || '').toUpperCase().replace(/[^A-Z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 10);
@@ -198,7 +199,183 @@ async function loadMovements() {
   } catch (e) { el.innerHTML = `<p class="text-xs text-red-500 py-4">Could not load movements: ${e.message}</p>`; }
 }
 
+/* ---------------- PRODUCT ↔ INVENTORY BRIDGE ---------------- */
+// The Product editor originally treated variants as catalog data only. This bridge
+// adds inventory fields without replacing the existing product UI. Existing variant
+// stock is always preserved when editing a product; only a genuinely new variant gets
+// its opening-stock value from the Product form.
+function bridgeEscape(value) {
+  return String(value ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function decorateVariantRow(row, originalVariant = null) {
+  if (!row || row.dataset.inventoryDecorated === '1') return;
+  row.dataset.inventoryDecorated = '1';
+  if (originalVariant?.id) row.dataset.originalVariantId = originalVariant.id;
+  const rowId = row.dataset.rowId;
+  const existing = originalVariant ? true : false;
+  const stock = originalVariant ? Number(originalVariant.stockQty || 0) : 0;
+  const reorder = originalVariant ? Number(originalVariant.reorderLevel ?? 2) : 2;
+  const cost = originalVariant ? Number(originalVariant.costPrice || 0) : 0;
+  const sku = originalVariant?.sku || '';
+  const label = existing ? 'Current stock (managed in Inventory)' : 'Opening stock (new variant)';
+
+  const image = row.querySelector(`#v${rowId}_image`)?.closest('.flex');
+  const html = document.createElement('div');
+  html.className = 'mt-2 bg-gray-50 rounded-lg p-2 border border-gray-200';
+  html.dataset.inventoryFields = '1';
+  html.innerHTML = `
+    <p class="text-[10px] font-black uppercase text-gray-500 mb-1.5">Inventory</p>
+    <div class="grid grid-cols-2 gap-2 mb-2">
+      <div><label class="text-[9px] text-gray-400 font-bold block mb-1">SKU</label><input id="v${rowId}_invSku" value="${bridgeEscape(sku)}" placeholder="e.g. HP840-R5-16-512" class="w-full p-2 bg-white rounded-lg border border-gray-200 text-xs font-mono outline-none"></div>
+      <div><label class="text-[9px] text-gray-400 font-bold block mb-1">Cost price (₦)</label><input id="v${rowId}_invCost" type="number" min="0" value="${cost || ''}" placeholder="What it costs you" class="w-full p-2 bg-white rounded-lg border border-gray-200 text-xs outline-none"></div>
+    </div>
+    <div class="grid grid-cols-2 gap-2">
+      <div><label class="text-[9px] text-gray-400 font-bold block mb-1">Reorder level</label><input id="v${rowId}_invReorder" type="number" min="0" value="${reorder}" class="w-full p-2 bg-white rounded-lg border border-gray-200 text-xs outline-none"></div>
+      <div><label class="text-[9px] text-gray-400 font-bold block mb-1">${label}</label><input id="v${rowId}_invStock" type="number" min="0" value="${stock}" ${existing ? 'readonly' : ''} class="w-full p-2 ${existing ? 'bg-gray-100 text-gray-500' : 'bg-white'} rounded-lg border border-gray-200 text-xs outline-none"></div>
+    </div>
+    <p class="text-[9px] text-gray-400 mt-1.5">${existing ? 'Current stock is controlled from Inventory. Editing this product will not reset it.' : 'This becomes the starting quantity. After saving, use Inventory for all stock movements.'}</p>`;
+  if (image?.parentElement) image.parentElement.insertAdjacentElement('afterend', html);
+  else row.appendChild(html);
+}
+
+async function markExistingVariantIds(productId) {
+  if (!productId) return;
+  try {
+    const snap = await getDoc(doc(db, 'products', productId));
+    if (!snap.exists()) return;
+    const variants = Array.isArray(snap.data().variants) ? snap.data().variants : [];
+    const rows = [...document.querySelectorAll('#variantRows .variant-row')];
+    rows.forEach((row, index) => {
+      if (variants[index]) {
+        row.dataset.originalVariantId = variants[index].id || '';
+        decorateVariantRow(row, variants[index]);
+      }
+    });
+  } catch (e) {
+    console.warn('Could not load existing inventory data for product form:', e);
+  }
+}
+
+async function saveProductFromBridge(event) {
+  if (event) {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  }
+  const form = document.getElementById('productForm');
+  if (!form) return;
+  const editId = document.getElementById('editId')?.value || '';
+  const existingProductSnap = editId ? await getDoc(doc(db, 'products', editId)) : null;
+  const existingProduct = existingProductSnap?.exists() ? existingProductSnap.data() : null;
+  const existingVariants = Array.isArray(existingProduct?.variants) ? existingProduct.variants : [];
+  const variantRows = [...document.querySelectorAll('#variantRows .variant-row')];
+  if (!variantRows.length) return alert('Add at least one variant — that\'s what customers actually buy.');
+
+  const variants = variantRows.map((row, index) => {
+    const id = row.dataset.originalVariantId || ('v' + Date.now() + '_' + index + '_' + Math.random().toString(36).slice(2, 7));
+    const old = existingVariants.find(v => v.id === id);
+    const value = key => document.getElementById(`v${row.dataset.rowId}_${key}`)?.value?.trim() || '';
+    const number = key => parseInt(document.getElementById(`v${row.dataset.rowId}_${key}`)?.value, 10) || 0;
+    const invSku = document.getElementById(`v${row.dataset.rowId}_invSku`)?.value?.trim() || '';
+    const invCost = parseInt(document.getElementById(`v${row.dataset.rowId}_invCost`)?.value, 10) || 0;
+    const invReorder = Math.max(0, parseInt(document.getElementById(`v${row.dataset.rowId}_invReorder`)?.value, 10) || 0);
+    const openingStock = Math.max(0, parseInt(document.getElementById(`v${row.dataset.rowId}_invStock`)?.value, 10) || 0);
+    const deliveryFeeRaw = document.getElementById(`v${row.dataset.rowId}_deliveryFee`)?.value?.trim() || '';
+    const bulkEnabled = document.getElementById(`v${row.dataset.rowId}_bulkEnabled`)?.checked || false;
+    const bulkModeOwn = document.querySelector(`input[name="v${row.dataset.rowId}_bulkMode"][value="own"]`)?.checked || false;
+    const image = value('image');
+    const stockQty = old ? Math.max(0, Number(old.stockQty || 0)) : openingStock;
+    return {
+      id,
+      color: value('color'), processor: value('processor'), ram: value('ram'), rom: value('rom'),
+      price: number('price'), promoPrice: number('promo'), image,
+      deliveryFee: deliveryFeeRaw === '' ? null : parseInt(deliveryFeeRaw, 10),
+      deliveryRoute: document.getElementById(`v${row.dataset.rowId}_deliveryGeneral`)?.checked ? 'general' : 'separate',
+      bulkSavingsEnabled: bulkEnabled,
+      bulkSavingsMode: bulkModeOwn ? 'own' : 'general',
+      bulkSavingsPercent: parseFloat(document.getElementById(`v${row.dataset.rowId}_bulkPercent`)?.value) || 0,
+      bulkSavingsMinQty: parseInt(document.getElementById(`v${row.dataset.rowId}_bulkMinQty`)?.value, 10) || 0,
+      sku: invSku || old?.sku || '',
+      costPrice: invCost || Number(old?.costPrice || 0),
+      reorderLevel: invReorder,
+      stockQty,
+      inStock: stockQty > 0
+    };
+  });
+
+  if (variants.some(v => !v.price)) return alert('Every variant needs a price.');
+  const product = {
+    name: document.getElementById('pName').value.trim(),
+    brand: document.getElementById('pBrand').value.trim(),
+    category: document.getElementById('pCategory').value.trim(),
+    desc: document.getElementById('pDesc').value.trim(),
+    inStock: document.getElementById('pInStock').checked,
+    variants,
+    upgrades: collectBridgeUpgrades()
+  };
+
+  try {
+    const ref = editId ? doc(db, 'products', editId) : doc(collection(db, 'products'));
+    if (editId) {
+      await runTransaction(db, async tx => {
+        const snap = await tx.get(ref);
+        if (!snap.exists()) throw new Error('Product no longer exists.');
+        tx.update(ref, product);
+      });
+    } else {
+      await runTransaction(db, async tx => tx.set(ref, product));
+    }
+    form.reset();
+    document.getElementById('editId').value = '';
+    document.getElementById('formTitle').textContent = 'Add Product';
+    document.getElementById('variantRows').innerHTML = '';
+    document.getElementById('upgradeRows').innerHTML = '';
+    document.getElementById('pInStock').checked = true;
+    // Reuse the existing Add Variant button by triggering it.
+    document.getElementById('addVariantBtn').click();
+    alert(editId ? 'Product updated successfully.' : 'Product added successfully.');
+  } catch (e) {
+    alert('Failed to save product: ' + e.message);
+  }
+}
+
+function collectBridgeUpgrades() {
+  return [...document.querySelectorAll('#upgradeRows .upgrade-row')].map(row => {
+    const rowId = row.dataset.rowId;
+    return {
+      id: 'u' + Date.now() + '_' + rowId,
+      name: document.getElementById(`u${rowId}_name`)?.value?.trim() || '',
+      price: parseInt(document.getElementById(`u${rowId}_price`)?.value, 10) || 0
+    };
+  }).filter(u => u.name);
+}
+
+function installProductBridge() {
+  if (productBridgeInstalled) return;
+  const form = document.getElementById('productForm');
+  const rowsContainer = document.getElementById('variantRows');
+  if (!form || !rowsContainer) return;
+  productBridgeInstalled = true;
+
+  const decorateAll = () => document.querySelectorAll('#variantRows .variant-row').forEach(row => decorateVariantRow(row));
+  new MutationObserver(decorateAll).observe(rowsContainer, { childList: true });
+  decorateAll();
+
+  document.addEventListener('click', event => {
+    const editButton = event.target.closest?.('[data-edit]');
+    if (editButton) setTimeout(() => markExistingVariantIds(editButton.dataset.edit), 80);
+  }, true);
+
+  form.addEventListener('submit', saveProductFromBridge, true);
+}
+
+// Inventory is lazy-loaded by the Admin page. Install the Product bridge as soon as
+// this module is loaded (the first time the Inventory tab is opened), and again when
+// initInventory is called.
+installProductBridge();
+
 export function initInventory() {
+  installProductBridge();
   const panel = document.getElementById('panel-inventory');
   if (!panel) return () => {};
   if (unsubscribe) unsubscribe();
