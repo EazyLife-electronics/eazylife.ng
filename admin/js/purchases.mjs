@@ -6,6 +6,7 @@ import { initFirebase } from '../../js/firebase.mjs';
 import { collection, doc, getDocs, onSnapshot, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import './suppliers.mjs';
+import './purchase-void.mjs';
 
 const { db, auth } = initFirebase();
 let products = [];
@@ -302,15 +303,15 @@ function renderPurchaseHistory() {
     return;
   }
   el.innerHTML = filtered.map(p => `
-    <div class="border border-gray-100 rounded-xl p-3 hover:border-gray-200">
+    <div data-purchase-id="${escapeHtml(p.id)}" data-purchase-status="${escapeHtml(p.status || 'received')}" class="border border-gray-100 rounded-xl p-3 hover:border-gray-200">
       <div class="flex flex-col md:flex-row md:items-center gap-2">
         <div class="flex-grow min-w-0">
           <div class="flex flex-wrap items-center gap-2">
             <p class="text-xs font-black truncate">${escapeHtml(p.productName || 'Product')} · ${escapeHtml(p.variantLabel || '')}</p>
-            <span class="text-[9px] font-bold px-2 py-1 rounded-full bg-gray-100 text-gray-500">RECEIVED</span>
+            <span class="purchase-status text-[9px] font-bold px-2 py-1 rounded-full ${p.status === 'voided' ? 'bg-red-50 text-red-500' : 'bg-gray-100 text-gray-500'}">${p.status === 'voided' ? 'VOIDED' : 'RECEIVED'}</span>
           </div>
           <p class="text-[10px] text-gray-400 mt-1">${escapeHtml(p.supplier || 'Supplier')} ${p.reference ? `· ${escapeHtml(p.reference)}` : ''} · ${escapeHtml(p.sku || 'No SKU')}</p>
-          <p class="text-[10px] text-gray-400 mt-1">${dateText(p.createdAt)}</p>
+          <p class="text-[10px] text-gray-400 mt-1">${dateText(p.createdAt)}${p.voidReason ? ` · Void reason: ${escapeHtml(p.voidReason)}` : ''}</p>
         </div>
         <div class="grid grid-cols-3 md:flex gap-4 md:items-center text-right">
           <div><p class="text-[9px] text-gray-400">QTY</p><p class="text-xs font-black">${Number(p.quantity || 0).toLocaleString()}</p></div>
@@ -318,6 +319,7 @@ function renderPurchaseHistory() {
           <div><p class="text-[9px] text-gray-400">TOTAL</p><p class="text-xs font-black">${money(p.totalCost)}</p></div>
         </div>
       </div>
+      <div class="purchase-actions flex justify-end gap-2">${p.status === 'voided' ? '<span class="text-[10px] text-gray-400 font-bold py-2">No further action</span>' : ''}</div>
       ${p.notes ? `<p class="text-[10px] text-gray-500 mt-2 border-t border-gray-50 pt-2">${escapeHtml(p.notes)}</p>` : ''}
     </div>`).join('');
   renderSuppliers();
