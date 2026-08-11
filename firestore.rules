@@ -22,6 +22,12 @@ service cloud.firestore {
       allow get: if true;
       allow list: if isAdmin();
       allow update, delete: if isAdmin();
+
+      match /payments/{paymentId} {
+        // Payments are private financial records. Only the designated Admin can
+        // read or create them; customers never write payment ledger entries.
+        allow read, create, update, delete: if isAdmin();
+      }
     }
 
     match /settings/{docId} {
