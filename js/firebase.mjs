@@ -26,3 +26,8 @@ export function initFirebase() {
   cached = { app, db, auth };
   return cached;
 }
+
+// The purchase receiver is admin-only UI. Dynamic import keeps it out of the public shop.
+if (typeof location !== 'undefined' && location.pathname.includes('/admin/')) {
+  import('../admin/js/purchases.mjs').catch(err => console.warn('Purchase module could not load:', err));
+}
