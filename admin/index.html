@@ -45,6 +45,7 @@
         <!-- TABS -->
         <div class="flex gap-2 mb-6 overflow-x-auto no-scrollbar">
             <button data-tab="products" class="tab-btn tab-active px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Products</button>
+            <button data-tab="inventory" id="inventoryTabBtn" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Inventory</button>
             <button data-tab="heroes" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Heroes</button>
             <button data-tab="reviews" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Reviews</button>
             <button data-tab="requests" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Requests</button>
@@ -113,6 +114,9 @@
             </div>
             <div id="productList" class="grid gap-3"></div>
         </div>
+
+        <!-- INVENTORY PANEL -->
+        <div id="panel-inventory" class="tab-panel hidden"><div id="inventoryContent"></div></div>
 
         <!-- ORDERS PANEL -->
         <div id="panel-heroes" class="tab-panel hidden">
@@ -253,5 +257,12 @@
 </div>
 
 <script type="module" src="js/admin-app.mjs"></script>
+<script type="module">
+import { initInventory } from "./js/inventory.mjs";
+let stopInventory=null;
+const btn=document.getElementById("inventoryTabBtn");
+btn.addEventListener("click",()=>{document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("tab-active"));btn.classList.add("tab-active");document.querySelectorAll(".tab-panel").forEach(p=>p.classList.add("hidden"));document.getElementById("panel-inventory").classList.remove("hidden");if(!stopInventory)stopInventory=initInventory();});
+document.querySelectorAll(".tab-btn:not(#inventoryTabBtn)").forEach(other=>other.addEventListener("click",()=>{if(stopInventory){stopInventory();stopInventory=null;}}));
+</script>
 </body>
 </html>
