@@ -27,15 +27,7 @@ export function initFirebase() {
   return cached;
 }
 
-// Admin-only modules are dynamically imported here so they stay out of the public shop.
+// The purchase receiver is admin-only UI. Dynamic import keeps it out of the public shop.
 if (typeof location !== 'undefined' && location.pathname.includes('/admin/')) {
-  const loadAdminModules = () => {
-    import('../admin/js/purchases.mjs').catch(err => console.warn('Purchase module could not load:', err));
-    import('../admin/js/payments.mjs').catch(err => console.warn('Payment module could not load:', err));
-  };
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', loadAdminModules, { once: true });
-  } else {
-    loadAdminModules();
-  }
+  import('../admin/js/purchases.mjs').catch(err => console.warn('Purchase module could not load:', err));
 }
