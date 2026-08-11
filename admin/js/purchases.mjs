@@ -5,6 +5,7 @@
 import { initFirebase } from '../../js/firebase.mjs';
 import { collection, doc, getDocs, onSnapshot, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import './suppliers.mjs';
 
 const { db, auth } = initFirebase();
 let products = [];
