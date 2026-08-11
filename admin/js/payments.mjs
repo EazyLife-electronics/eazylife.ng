@@ -5,7 +5,7 @@
 
 import { initFirebase } from '../../js/firebase.mjs';
 import {
-  collection, doc, getDocs, addDoc, updateDoc, query, orderBy, serverTimestamp
+  collection, doc, getDoc, getDocs, addDoc, updateDoc, query, orderBy, serverTimestamp
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
@@ -69,12 +69,10 @@ export async function recordPayment(orderId, payment) {
   const user = auth.currentUser;
   if (!user) throw new Error('You must be signed in as an administrator.');
 
-  const payments = await getOrderPayments(orderId);
-  const orderRef = doc(db, 'orders', orderId);
-  const paymentRef = doc(collection(db, 'orders', orderId, 'payments'));
-  const orderSnap = await (await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js')).getDoc(orderRef);
+  const orderSnap = await getDoc(doc(db, 'orders', orderId));
   if (!orderSnap.exists()) throw new Error('Order no longer exists.');
   const order = { id: orderId, ...orderSnap.data() };
+  const payments = await getOrderPayments(orderId);
   const summary = summarizePayments(order, payments);
   if (amount > summary.balance) {
     throw new Error(`Payment exceeds the outstanding balance of ₦${summary.balance.toLocaleString()}.`);
@@ -105,11 +103,15 @@ function findOrderCard(orderId) {
   return button?.closest('.bg-white');
 }
 
-async function enhanceOrderCard(order) {
-  const card = findOrderCard(order.id);
-  if (!card || card.querySelector(`[data-payment-panel="${CSS.escape(order.id)}"]`)) return;
+async function enhanceOrderCard(orderInput) {
+  const orderId = orderInput.id;
+  const card = findOrderCard(orderId);
+  if (!card || card.querySelector(`[data-payment-panel="${CSS.escape(orderId)}"]`)) return;
 
-  const payments = await getOrderPayments(order.id).catch(() => []);
+  const orderSnap = await getDoc(doc(db, 'orders', orderId)).catch(() => null);
+  if (!orderSnap?.exists()) return;
+  const order = { id: orderId, ...orderSnap.data() };
+  const payments = await getOrderPayments(orderId).catch(() => []);
   const summary = summarizePayments(order, payments);
   const terms = order.paymentTerms || 'pay_on_delivery';
   const paymentRows = payments.length
@@ -117,7 +119,7 @@ async function enhanceOrderCard(order) {
     : '<p class="text-[10px] text-gray-400">No payments recorded yet.</p>';
 
   const panel = document.createElement('div');
-  panel.dataset.paymentPanel = order.id;
+  panel.dataset.paymentPanel = orderId;
   panel.className = 'mt-3 pt-3 border-t border-gray-100';
   panel.innerHTML = `
     <div class="flex justify-between items-center mb-2">
@@ -126,25 +128,26 @@ async function enhanceOrderCard(order) {
     </div>
     <div class="bg-gray-50 rounded-lg p-2 mb-2 space-y-1">${paymentRows}</div>
     <div class="grid grid-cols-2 gap-2 mb-2">
-      <select data-payment-terms="${escapeHtml(order.id)}" class="p-2 bg-gray-50 rounded-lg border border-gray-200 text-[10px] outline-none">
+      <select data-payment-terms="${escapeHtml(orderId)}" class="p-2 bg-gray-50 rounded-lg border border-gray-200 text-[10px] outline-none">
         ${Object.entries(PAYMENT_TERMS).map(([key, label]) => `<option value="${key}" ${key === terms ? 'selected' : ''}>${label}</option>`).join('')}
       </select>
-      <button type="button" data-payment-add="${escapeHtml(order.id)}" class="bg-gray-900 text-white p-2 rounded-lg text-[10px] font-bold" ${summary.balance <= 0 ? 'disabled' : ''}>Record Payment</button>
+      <button type="button" data-payment-add="${escapeHtml(orderId)}" class="bg-gray-900 text-white p-2 rounded-lg text-[10px] font-bold" ${summary.balance <= 0 ? 'disabled' : ''}>Record Payment</button>
     </div>
-    <div data-payment-form="${escapeHtml(order.id)}" class="hidden space-y-2 bg-white border border-gray-200 rounded-lg p-2">
-      <input data-pay-amount="${escapeHtml(order.id)}" type="number" min="1" step="0.01" placeholder="Amount (₦)" class="w-full p-2 bg-gray-50 rounded-lg border border-gray-200 text-[10px] outline-none">
-      <select data-pay-method="${escapeHtml(order.id)}" class="w-full p-2 bg-gray-50 rounded-lg border border-gray-200 text-[10px] outline-none">${Object.entries(PAYMENT_METHODS).map(([key, label]) => `<option value="${key}">${label}</option>`).join('')}</select>
-      <input data-pay-reference="${escapeHtml(order.id)}" placeholder="Reference (optional)" class="w-full p-2 bg-gray-50 rounded-lg border border-gray-200 text-[10px] outline-none">
-      <input data-pay-note="${escapeHtml(order.id)}" placeholder="Note (optional)" class="w-full p-2 bg-gray-50 rounded-lg border border-gray-200 text-[10px] outline-none">
-      <button type="button" data-pay-save="${escapeHtml(order.id)}" class="w-full bg-[#00B09B] text-white p-2 rounded-lg text-[10px] font-bold">Save Payment</button>
+    <div data-payment-form="${escapeHtml(orderId)}" class="hidden space-y-2 bg-white border border-gray-200 rounded-lg p-2">
+      <input data-pay-amount="${escapeHtml(orderId)}" type="number" min="1" step="0.01" placeholder="Amount (₦)" class="w-full p-2 bg-gray-50 rounded-lg border border-gray-200 text-[10px] outline-none">
+      <select data-pay-method="${escapeHtml(orderId)}" class="w-full p-2 bg-gray-50 rounded-lg border border-gray-200 text-[10px] outline-none">${Object.entries(PAYMENT_METHODS).map(([key, label]) => `<option value="${key}">${label}</option>`).join('')}</select>
+      <input data-pay-reference="${escapeHtml(orderId)}" placeholder="Reference (optional)" class="w-full p-2 bg-gray-50 rounded-lg border border-gray-200 text-[10px] outline-none">
+      <input data-pay-note="${escapeHtml(orderId)}" placeholder="Note (optional)" class="w-full p-2 bg-gray-50 rounded-lg border border-gray-200 text-[10px] outline-none">
+      <button type="button" data-pay-save="${escapeHtml(orderId)}" class="w-full bg-[#00B09B] text-white p-2 rounded-lg text-[10px] font-bold">Save Payment</button>
     </div>`;
 
   card.appendChild(panel);
 
   panel.querySelector('[data-payment-terms]').addEventListener('change', async e => {
+    const previous = order.paymentTerms || 'pay_on_delivery';
     e.target.disabled = true;
-    try { await setOrderPaymentTerms(order.id, e.target.value); }
-    catch (err) { alert(err.message); e.target.value = terms; }
+    try { await setOrderPaymentTerms(orderId, e.target.value); }
+    catch (err) { alert(err.message); e.target.value = previous; }
     finally { e.target.disabled = false; }
   });
   panel.querySelector('[data-payment-add]').addEventListener('click', () => panel.querySelector('[data-payment-form]').classList.toggle('hidden'));
@@ -156,8 +159,8 @@ async function enhanceOrderCard(order) {
     e.currentTarget.disabled = true;
     e.currentTarget.textContent = 'Saving...';
     try {
-      await recordPayment(order.id, { amount, method, reference, note });
-      await refreshPaymentsForCard(order);
+      await recordPayment(orderId, { amount, method, reference, note });
+      await refreshPaymentsForCard({ id: orderId });
     } catch (err) {
       alert(err.message);
       e.currentTarget.disabled = false;
@@ -180,8 +183,7 @@ export function initPaymentsAdmin() {
     const target = document.getElementById('orderList');
     if (!target) return;
     const enhance = () => {
-      const buttons = target.querySelectorAll('[data-msg-toggle]');
-      buttons.forEach(button => {
+      target.querySelectorAll('[data-msg-toggle]').forEach(button => {
         const id = button.dataset.msgToggle;
         if (!id || findOrderCard(id)?.querySelector(`[data-payment-panel="${CSS.escape(id)}"]`)) return;
         enhanceOrderCard({ id });
