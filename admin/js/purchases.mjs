@@ -152,6 +152,14 @@ function installPanel() {
       </div>
       <div id="purchaseHistorySummary" class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4"></div>
       <div id="purchaseRows" class="space-y-2"><p class="text-xs text-gray-400">Loading...</p></div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
+        <div><h2 class="font-black text-lg">Supplier Directory</h2><p class="text-[11px] text-gray-400">Suppliers are grouped automatically from your purchase records. No duplicate supplier records are created here.</p></div>
+        <input id="supplierSearch" placeholder="Search suppliers..." class="w-full md:w-64 p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none">
+      </div>
+      <div id="supplierRows" class="grid gap-2"><p class="text-xs text-gray-400">Loading suppliers...</p></div>
     </div>`;
   panel.appendChild(wrap);
 
@@ -179,6 +187,7 @@ function installPanel() {
   document.getElementById('receivePurchaseBtn').onclick = receivePurchase;
   document.getElementById('purchaseHistorySearch').addEventListener('input', renderPurchaseHistory);
   document.getElementById('purchaseHistoryRefresh').onclick = loadPurchases;
+  document.getElementById('supplierSearch').addEventListener('input', () => renderSuppliers());
   loadPurchases();
 }
 
@@ -262,6 +271,7 @@ async function loadPurchases() {
   } catch (e) {
     purchaseHistory = [];
     el.innerHTML = `<p class="text-xs text-red-500 py-3">Could not load purchases: ${escapeHtml(e.message)}</p>`;
+    renderSuppliers();
   }
 }
 
@@ -287,6 +297,7 @@ function renderPurchaseHistory() {
   }
   if (!filtered.length) {
     el.innerHTML = `<div class="py-8 text-center text-xs text-gray-400">${query ? 'No purchases match your search.' : 'No purchases recorded yet.'}</div>`;
+    renderSuppliers();
     return;
   }
   el.innerHTML = filtered.map(p => `
@@ -308,6 +319,63 @@ function renderPurchaseHistory() {
       </div>
       ${p.notes ? `<p class="text-[10px] text-gray-500 mt-2 border-t border-gray-50 pt-2">${escapeHtml(p.notes)}</p>` : ''}
     </div>`).join('');
+  renderSuppliers();
+}
+
+function renderSuppliers() {
+  const el = document.getElementById('supplierRows');
+  if (!el) return;
+  const query = String(document.getElementById('supplierSearch')?.value || '').trim().toLowerCase();
+  const map = new Map();
+
+  purchaseHistory.forEach(p => {
+    const name = String(p.supplier || '').trim();
+    if (!name) return;
+    const key = name.toLowerCase();
+    if (!map.has(key)) map.set(key, { name, purchases: 0, units: 0, value: 0, lastPurchase: null });
+    const item = map.get(key);
+    item.purchases += 1;
+    item.units += Number(p.quantity || 0);
+    item.value += Number(p.totalCost || 0);
+    const time = p.createdAt?.toMillis?.() || 0;
+    const previousTime = item.lastPurchase?.createdAt?.toMillis?.() || 0;
+    if (time > previousTime) item.lastPurchase = p;
+  });
+
+  const suppliers = [...map.values()]
+    .filter(s => !query || s.name.toLowerCase().includes(query))
+    .sort((a, b) => b.value - a.value);
+
+  if (!suppliers.length) {
+    el.innerHTML = `<div class="py-8 text-center text-xs text-gray-400">${query ? 'No suppliers match your search.' : 'No suppliers found yet. Suppliers appear here after the first purchase is received.'}</div>`;
+    return;
+  }
+
+  el.innerHTML = suppliers.map(s => `
+    <button type="button" data-supplier="${escapeHtml(s.name)}" class="supplier-filter w-full text-left border border-gray-100 rounded-xl p-3 hover:border-gray-200 bg-white">
+      <div class="flex flex-col md:flex-row md:items-center gap-3">
+        <div class="flex-grow min-w-0">
+          <p class="text-sm font-black truncate">${escapeHtml(s.name)}</p>
+          <p class="text-[10px] text-gray-400 mt-1">${s.purchases} purchase${s.purchases === 1 ? '' : 's'} · ${s.units.toLocaleString()} unit${s.units === 1 ? '' : 's'} · Last purchase ${dateText(s.lastPurchase?.createdAt)}</p>
+        </div>
+        <div class="text-right">
+          <p class="text-[9px] text-gray-400 uppercase">Purchase value</p>
+          <p class="text-xs font-black">${money(s.value)}</p>
+        </div>
+      </div>
+    </button>`).join('');
+
+  el.querySelectorAll('.supplier-filter').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const supplier = btn.dataset.supplier || '';
+      const search = document.getElementById('purchaseHistorySearch');
+      if (search) {
+        search.value = supplier;
+        renderPurchaseHistory();
+        document.getElementById('purchaseRows')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
 }
 
 function boot() {
