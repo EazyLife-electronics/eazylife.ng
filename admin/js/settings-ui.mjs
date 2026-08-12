@@ -78,22 +78,32 @@ if (typeof document !== 'undefined' &&
     settingsPanel?.parentElement?.insertBefore(receivablesPanel, settingsPanel);
 
     import('./receivables.mjs').then(({ initReceivables }) => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
-        btn.classList.add('tab-active');
-        document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
-        receivablesPanel.classList.remove('hidden');
-        initReceivables();
-      });
       import('./receivables-payments.mjs').then(({ initReceivablesPayments }) => {
-        initReceivablesPayments();
-      }).catch(err => console.error('Receivables payment module failed to load:', err));
+        btn.addEventListener('click', async () => {
+          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
+          btn.classList.add('tab-active');
+          document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+          receivablesPanel.classList.remove('hidden');
+
+          await initReceivables();
+          await initReceivablesPayments();
+        });
+      }).catch(err => {
+        console.error('Receivables payment module failed to load:', err);
+        btn.addEventListener('click', async () => {
+          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
+          btn.classList.add('tab-active');
+          document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+          receivablesPanel.classList.remove('hidden');
+          await initReceivables();
+        });
+      });
     }).catch(err => {
       console.error('Receivables module failed to load:', err);
       btn.addEventListener('click', () => {
         receivablesPanel.classList.remove('hidden');
         document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('hidden', p !== receivablesPanel));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('tab-active', b === btn));
+        document.querySelectorAll('.tab-btn').forEach(p => p.classList.toggle('tab-active', p === btn));
         document.getElementById('receivablesContent').innerHTML = `<div class="bg-white rounded-[24px] p-6 text-sm text-red-600">Receivables failed to load: ${String(err.message || err)}</div>`;
       });
     });
