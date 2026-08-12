@@ -32,6 +32,22 @@ function dateText(timestamp) {
   return date ? date.toLocaleString() : '';
 }
 
+function inputDateValue(date) {
+  if (!date) return '';
+  const d = date instanceof Date ? date : dateValue(date);
+  if (!d) return '';
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function parseDateInput(value, endOfDay = false) {
+  if (!value) return null;
+  const date = new Date(`${value}T${endOfDay ? '23:59:59.999' : '00:00:00.000'}`);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
 function isExcluded(order) {
   return ['cancelled', 'returned'].includes(String(order.status || '').toLowerCase());
 }
@@ -147,7 +163,7 @@ function paymentLine(payment) {
     </div>`;
 }
 
-async function loadCustomerStatement(customer) {
+async function loadCustomerStatement(customer, range = {}) {
   const snap = await getDocs(query(collection(db, 'orders'), orderBy('createdAt', 'asc')));
   const orders = [];
 
@@ -164,9 +180,9 @@ async function loadCustomerStatement(customer) {
     orders.push({ ...order, total, paid, balance: Math.max(0, total - paid), payments });
   }
 
-  const entries = [];
+  const allEntries = [];
   for (const order of orders) {
-    entries.push({
+    allEntries.push({
       type: 'order',
       date: dateValue(order.createdAt) || new Date(0),
       order,
@@ -174,7 +190,7 @@ async function loadCustomerStatement(customer) {
       sort: 0
     });
     for (const payment of order.payments) {
-      entries.push({
+      allEntries.push({
         type: 'payment',
         date: dateValue(payment.createdAt) || dateValue(order.createdAt) || new Date(0),
         order,
@@ -185,23 +201,53 @@ async function loadCustomerStatement(customer) {
     }
   }
 
-  entries.sort((a, b) => {
+  allEntries.sort((a, b) => {
     const timeDiff = a.date.getTime() - b.date.getTime();
     if (timeDiff !== 0) return timeDiff;
     return a.sort - b.sort;
   });
 
-  let runningBalance = 0;
+  const from = parseDateInput(range.from);
+  const to = parseDateInput(range.to, true);
+  if (from && to && from > to) throw new Error('The From date cannot be after the To date.');
+
+  let openingBalance = 0;
+  if (from) {
+    for (const entry of allEntries) {
+      if (entry.date >= from) break;
+      openingBalance += entry.type === 'order' ? entry.amount : -entry.amount;
+    }
+    openingBalance = Math.max(0, openingBalance);
+  }
+
+  const entries = allEntries.filter(entry => {
+    if (from && entry.date < from) return false;
+    if (to && entry.date > to) return false;
+    return true;
+  });
+
+  let runningBalance = openingBalance;
   for (const entry of entries) {
     if (entry.type === 'order') runningBalance += entry.amount;
     else runningBalance = Math.max(0, runningBalance - entry.amount);
     entry.runningBalance = runningBalance;
   }
 
-  const totalPurchases = orders.reduce((sum, order) => sum + order.total, 0);
-  const totalPaid = orders.reduce((sum, order) => sum + order.paid, 0);
-  const outstanding = Math.max(0, totalPurchases - totalPaid);
-  return { orders, entries, totalPurchases, totalPaid, outstanding };
+  const totalPurchases = entries.filter(e => e.type === 'order').reduce((sum, e) => sum + e.amount, 0);
+  const totalPaid = entries.filter(e => e.type === 'payment').reduce((sum, e) => sum + e.amount, 0);
+  const outstanding = runningBalance;
+
+  return {
+    orders,
+    allEntries,
+    entries,
+    openingBalance,
+    totalPurchases,
+    totalPaid,
+    outstanding,
+    from: range.from || '',
+    to: range.to || ''
+  };
 }
 
 function statementEntryLine(entry) {
@@ -228,41 +274,53 @@ function statementEntryLine(entry) {
     </div>`;
 }
 
-function printStatement(customer, statement) {
+function statementRowsHtml(statement) {
+  return statement.entries.map(entry => {
+    const isOrder = entry.type === 'order';
+    const code = entry.order.trackingCode || entry.order.id;
+    const method = entry.payment?.method || entry.payment?.paymentMethod || 'Payment';
+    const detail = isOrder
+      ? `${(entry.order.items || []).map(item => `${esc(item.name)} × ${Number(item.quantity || 0)}`).join(', ') || 'Order'} · ${esc(TERMS[entry.order.paymentTerms] || entry.order.paymentTerms || 'Pay on Delivery')}`
+      : `${esc(code)}${entry.payment.reference ? ` · Ref: ${esc(entry.payment.reference)}` : ''}${entry.payment.note ? ` · ${esc(entry.payment.note)}` : ''}`;
+    return `<div class="print-row">
+      <div class="print-date">${esc(entry.date.toLocaleString())}</div>
+      <div><strong>${isOrder ? 'Order' : 'Payment · ' + esc(method)}</strong><div class="print-muted">${detail}</div></div>
+      <div class="print-amount ${isOrder ? '' : 'print-green'}">${isOrder ? '+' : '-'}${money(entry.amount)}<small>Balance ${money(entry.runningBalance)}</small></div>
+    </div>`;
+  }).join('');
+}
+
+function buildPrintSheet(customer, statement, title = 'EazyLife Customer Statement') {
   const oldSheet = document.getElementById('eazylifePrintSheet');
-  if (oldSheet) oldSheet.remove();
+  const oldStyle = document.getElementById('eazylifePrintStyle');
+  oldSheet?.remove();
+  oldStyle?.remove();
+
+  const rangeLabel = statement.from || statement.to
+    ? `${statement.from || 'Beginning'} to ${statement.to || 'Today'}`
+    : 'All time';
 
   const sheet = document.createElement('section');
   sheet.id = 'eazylifePrintSheet';
   sheet.innerHTML = `
     <div class="print-header">
-      <h1>EazyLife Customer Statement</h1>
+      <h1>${esc(title)}</h1>
       <p><strong>${esc(customer.name)}</strong></p>
       <p class="print-muted">${esc(customer.phone || 'No phone recorded')}</p>
+      <p class="print-muted">Period: ${esc(rangeLabel)}</p>
       <p class="print-muted">Generated ${esc(new Date().toLocaleString())}</p>
     </div>
     <div class="print-summary">
+      <div><span>Opening balance</span><strong>${money(statement.openingBalance)}</strong></div>
       <div><span>Purchases</span><strong>${money(statement.totalPurchases)}</strong></div>
       <div><span>Payments</span><strong class="print-green">${money(statement.totalPaid)}</strong></div>
-      <div><span>Balance</span><strong class="print-red">${money(statement.outstanding)}</strong></div>
+      <div><span>Closing balance</span><strong class="print-red">${money(statement.outstanding)}</strong></div>
     </div>
     <h2>Account Activity</h2>
     <div class="print-rows">
-      ${statement.entries.map(entry => {
-        const isOrder = entry.type === 'order';
-        const code = entry.order.trackingCode || entry.order.id;
-        const method = entry.payment?.method || entry.payment?.paymentMethod || 'Payment';
-        const detail = isOrder
-          ? `${(entry.order.items || []).map(item => `${esc(item.name)} × ${Number(item.quantity || 0)}`).join(', ') || 'Order'} · ${esc(TERMS[entry.order.paymentTerms] || entry.order.paymentTerms || 'Pay on Delivery')}`
-          : `${esc(code)}${entry.payment.reference ? ` · Ref: ${esc(entry.payment.reference)}` : ''}${entry.payment.note ? ` · ${esc(entry.payment.note)}` : ''}`;
-        return `<div class="print-row">
-          <div class="print-date">${esc(entry.date.toLocaleString())}</div>
-          <div><strong>${isOrder ? 'Order' : 'Payment · ' + esc(method)}</strong><div class="print-muted">${detail}</div></div>
-          <div class="print-amount ${isOrder ? '' : 'print-green'}">${isOrder ? '+' : '-'}${money(entry.amount)}<small>Balance ${money(entry.runningBalance)}</small></div>
-        </div>`;
-      }).join('')}
+      ${statement.entries.length ? statementRowsHtml(statement) : '<p class="print-empty">No transactions found for this period.</p>'}
     </div>
-    <div class="print-total"><span>Current Balance</span><strong>${money(statement.outstanding)}</strong></div>`;
+    <div class="print-total"><span>Closing Balance</span><strong>${money(statement.outstanding)}</strong></div>`;
 
   const style = document.createElement('style');
   style.id = 'eazylifePrintStyle';
@@ -276,7 +334,7 @@ function printStatement(customer, statement) {
       #eazylifePrintSheet h2 { font-size:15px; margin:20px 0 8px; }
       #eazylifePrintSheet p { margin:3px 0; font-size:12px; }
       .print-muted { color:#666; font-size:11px; }
-      .print-summary { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:18px 0; }
+      .print-summary { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:18px 0; }
       .print-summary > div { border:1px solid #ddd; border-radius:7px; padding:10px; }
       .print-summary span { display:block; font-size:9px; color:#777; text-transform:uppercase; font-weight:bold; }
       .print-summary strong { display:block; font-size:14px; margin-top:4px; }
@@ -289,12 +347,16 @@ function printStatement(customer, statement) {
       .print-amount { text-align:right; font-weight:bold; font-size:11px; }
       .print-amount small { display:block; color:#666; font-weight:normal; font-size:9px; margin-top:3px; }
       .print-total { display:flex; justify-content:space-between; margin-top:18px; padding:12px; background:#f3f4f6; border-radius:7px; font-size:13px; font-weight:bold; }
+      .print-empty { padding:18px; text-align:center; color:#777; }
     }
   `;
-
   document.head.appendChild(style);
   document.body.appendChild(sheet);
+  return { sheet, style };
+}
 
+function printStatement(customer, statement) {
+  const { sheet, style } = buildPrintSheet(customer, statement);
   let cleaned = false;
   const cleanup = () => {
     if (cleaned) return;
@@ -303,9 +365,7 @@ function printStatement(customer, statement) {
     style.remove();
     window.removeEventListener('afterprint', cleanup);
   };
-
   window.addEventListener('afterprint', cleanup, { once: true });
-
   try {
     window.print();
   } catch (err) {
@@ -315,6 +375,142 @@ function printStatement(customer, statement) {
   }
 }
 
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function exportExcel(customer, statement) {
+  const rows = [
+    ['EazyLife Customer Statement'],
+    ['Customer', customer.name],
+    ['Phone', customer.phone || ''],
+    ['Period', statement.from || statement.to ? `${statement.from || 'Beginning'} to ${statement.to || 'Today'}` : 'All time'],
+    [],
+    ['Date', 'Type', 'Reference', 'Details', 'Debit', 'Credit', 'Running Balance']
+  ];
+  for (const entry of statement.entries) {
+    const isOrder = entry.type === 'order';
+    const code = entry.order.trackingCode || entry.order.id;
+    const details = isOrder
+      ? `${(entry.order.items || []).map(item => `${item.name} × ${Number(item.quantity || 0)}`).join(', ') || 'Order'} · ${TERMS[entry.order.paymentTerms] || entry.order.paymentTerms || 'Pay on Delivery'}`
+      : `${entry.payment.method || entry.payment.paymentMethod || 'Payment'}${entry.payment.reference ? ` · Ref: ${entry.payment.reference}` : ''}${entry.payment.note ? ` · ${entry.payment.note}` : ''}`;
+    rows.push([
+      entry.date.toLocaleString(),
+      isOrder ? 'Order' : 'Payment',
+      code,
+      details,
+      isOrder ? entry.amount : '',
+      isOrder ? '' : entry.amount,
+      entry.runningBalance
+    ]);
+  }
+  rows.push([], ['Opening balance', statement.openingBalance], ['Purchases', statement.totalPurchases], ['Payments', statement.totalPaid], ['Closing balance', statement.outstanding]);
+
+  const xmlEsc = value => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const xml = `<?xml version="1.0"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Worksheet ss:Name="Statement"><Table>${rows.map(row => `<Row>${row.map(cell => `<Cell><Data ss:Type="${typeof cell === 'number' ? 'Number' : 'String'}">${xmlEsc(cell)}</Data></Cell>`).join('')}</Row>`).join('')}</Table></Worksheet></Workbook>`;
+  downloadBlob(new Blob([xml], { type: 'application/vnd.ms-excel' }), `EazyLife-${safeFileName(customer.name)}-statement.xls`);
+}
+
+function safeFileName(value) {
+  return String(value || 'customer').replace(/[^a-z0-9_-]+/gi, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'customer';
+}
+
+function exportImage(customer, statement) {
+  const entries = statement.entries;
+  const width = 1200;
+  const rowHeight = 58;
+  const headerHeight = 230;
+  const footerHeight = 80;
+  const height = Math.max(700, headerHeight + Math.max(entries.length, 1) * rowHeight + footerHeight);
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Image export is not supported by this browser.');
+
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, width, height);
+  ctx.fillStyle = '#111827';
+  ctx.font = '700 30px Arial';
+  ctx.fillText('EazyLife Customer Statement', 50, 55);
+  ctx.font = '700 22px Arial';
+  ctx.fillText(customer.name || 'Customer', 50, 95);
+  ctx.font = '16px Arial';
+  ctx.fillStyle = '#6b7280';
+  ctx.fillText(customer.phone || 'No phone recorded', 50, 122);
+  const period = statement.from || statement.to ? `${statement.from || 'Beginning'} to ${statement.to || 'Today'}` : 'All time';
+  ctx.fillText(`Period: ${period}`, 50, 148);
+
+  const boxes = [
+    ['Opening', statement.openingBalance, '#111827'],
+    ['Purchases', statement.totalPurchases, '#111827'],
+    ['Payments', statement.totalPaid, '#008f7a'],
+    ['Closing', statement.outstanding, '#c62828']
+  ];
+  boxes.forEach((box, index) => {
+    const x = 50 + index * 275;
+    ctx.fillStyle = '#f3f4f6';
+    ctx.fillRect(x, 170, 255, 48);
+    ctx.fillStyle = '#6b7280';
+    ctx.font = '700 12px Arial';
+    ctx.fillText(box[0].toUpperCase(), x + 12, 189);
+    ctx.fillStyle = box[2];
+    ctx.font = '700 16px Arial';
+    ctx.fillText(money(box[1]), x + 12, 210);
+  });
+
+  let y = headerHeight;
+  ctx.fillStyle = '#111827';
+  ctx.font = '700 15px Arial';
+  ctx.fillText('DATE', 50, y - 12);
+  ctx.fillText('ACTIVITY', 235, y - 12);
+  ctx.fillText('AMOUNT', 960, y - 12);
+  ctx.fillText('BALANCE', 1070, y - 12);
+  ctx.strokeStyle = '#d1d5db';
+  ctx.beginPath(); ctx.moveTo(50, y); ctx.lineTo(1150, y); ctx.stroke();
+
+  ctx.font = '13px Arial';
+  for (const entry of entries) {
+    y += rowHeight;
+    const isOrder = entry.type === 'order';
+    const code = entry.order.trackingCode || entry.order.id;
+    const detail = isOrder
+      ? `${(entry.order.items || []).map(item => `${item.name} × ${Number(item.quantity || 0)}`).join(', ') || 'Order'} · ${TERMS[entry.order.paymentTerms] || entry.order.paymentTerms || 'Pay on Delivery'}`
+      : `${entry.payment.method || entry.payment.paymentMethod || 'Payment'} · ${code}`;
+    ctx.fillStyle = '#6b7280';
+    ctx.fillText(entry.date.toLocaleDateString(), 50, y);
+    ctx.fillStyle = isOrder ? '#111827' : '#008f7a';
+    ctx.font = '700 13px Arial';
+    ctx.fillText(isOrder ? `Order ${code}` : `Payment · ${code}`, 235, y);
+    ctx.fillStyle = '#6b7280';
+    ctx.font = '11px Arial';
+    ctx.fillText(detail.slice(0, 78), 235, y + 17);
+    ctx.fillStyle = isOrder ? '#111827' : '#008f7a';
+    ctx.font = '700 13px Arial';
+    ctx.fillText(`${isOrder ? '+' : '-'}${money(entry.amount)}`, 960, y);
+    ctx.fillStyle = '#111827';
+    ctx.fillText(money(entry.runningBalance), 1070, y);
+    ctx.strokeStyle = '#eeeeee';
+    ctx.beginPath(); ctx.moveTo(50, y + 28); ctx.lineTo(1150, y + 28); ctx.stroke();
+  }
+
+  y += 45;
+  ctx.fillStyle = '#111827';
+  ctx.font = '700 17px Arial';
+  ctx.fillText(`Closing Balance: ${money(statement.outstanding)}`, 50, y);
+  canvas.toBlob(blob => {
+    if (blob) downloadBlob(blob, `EazyLife-${safeFileName(customer.name)}-statement.png`);
+    else alert('Could not create the image.');
+  }, 'image/png');
+}
+
 function renderStatement(root, customer, statement) {
   const existing = document.getElementById('receivablesStatement');
   if (existing) existing.remove();
@@ -322,40 +518,112 @@ function renderStatement(root, customer, statement) {
   const wrapper = document.createElement('div');
   wrapper.id = 'receivablesStatement';
   wrapper.className = 'mt-5';
+  const rangeLabel = statement.from || statement.to
+    ? `${statement.from || 'Beginning'} → ${statement.to || 'Today'}`
+    : 'All time';
+
   wrapper.innerHTML = `
     <div class="bg-white rounded-[24px] shadow-sm border border-gray-100 p-5">
       <div class="flex justify-between items-start gap-3">
         <div>
           <p class="text-[10px] uppercase font-black text-gray-400">Customer Statement</p>
           <h3 class="font-black text-lg mt-1">${esc(customer.name)}</h3>
-          <p class="text-xs text-gray-400">${esc(customer.phone || 'No phone recorded')} · All non-cancelled transactions</p>
+          <p class="text-xs text-gray-400">${esc(customer.phone || 'No phone recorded')} · ${esc(rangeLabel)}</p>
         </div>
         <button type="button" id="closeStatement" class="bg-gray-100 text-gray-600 px-3 py-2 rounded-xl text-xs font-bold">Close</button>
       </div>
-      <div class="grid grid-cols-3 gap-2 mt-4">
+
+      <div class="mt-4 bg-gray-50 rounded-2xl border border-gray-100 p-3">
+        <p class="text-[9px] uppercase font-black text-gray-400 mb-2">Statement period</p>
+        <div class="grid grid-cols-2 gap-2">
+          <label class="text-[10px] font-bold text-gray-500">From<input id="statementFrom" type="date" value="${esc(statement.from)}" class="mt-1 w-full p-2.5 bg-white rounded-xl border border-gray-200 text-xs"></label>
+          <label class="text-[10px] font-bold text-gray-500">To<input id="statementTo" type="date" value="${esc(statement.to)}" class="mt-1 w-full p-2.5 bg-white rounded-xl border border-gray-200 text-xs"></label>
+        </div>
+        <div class="flex gap-2 mt-2">
+          <button type="button" id="applyStatementRange" class="flex-1 bg-gray-900 text-white py-2.5 rounded-xl text-[11px] font-black">Apply dates</button>
+          <button type="button" id="clearStatementRange" class="bg-white border border-gray-200 text-gray-600 px-4 rounded-xl text-[11px] font-bold">All time</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 mt-4">
+        <div class="bg-gray-50 rounded-xl p-3"><p class="text-[9px] uppercase text-gray-400 font-bold">Opening balance</p><p class="text-sm font-black mt-1">${money(statement.openingBalance)}</p></div>
         <div class="bg-gray-50 rounded-xl p-3"><p class="text-[9px] uppercase text-gray-400 font-bold">Purchases</p><p class="text-sm font-black mt-1">${money(statement.totalPurchases)}</p></div>
         <div class="bg-gray-50 rounded-xl p-3"><p class="text-[9px] uppercase text-gray-400 font-bold">Payments</p><p class="text-sm font-black text-teal-600 mt-1">${money(statement.totalPaid)}</p></div>
-        <div class="bg-red-50 rounded-xl p-3"><p class="text-[9px] uppercase text-red-400 font-bold">Balance</p><p class="text-sm font-black text-red-600 mt-1">${money(statement.outstanding)}</p></div>
+        <div class="bg-red-50 rounded-xl p-3"><p class="text-[9px] uppercase text-red-400 font-bold">Closing balance</p><p class="text-sm font-black text-red-600 mt-1">${money(statement.outstanding)}</p></div>
       </div>
+
       <div class="mt-4 flex justify-between items-center gap-3">
         <p class="text-xs font-black text-gray-700">Account activity</p>
         <span class="text-[9px] font-bold text-gray-400">${statement.entries.length} transaction${statement.entries.length === 1 ? '' : 's'}</span>
       </div>
       <div class="mt-2 bg-gray-50 rounded-xl border border-gray-100 px-3">
-        ${statement.entries.length ? statement.entries.map(statementEntryLine).join('') : '<p class="text-xs text-gray-400 py-5 text-center">No transactions found.</p>'}
+        ${statement.entries.length ? statement.entries.map(statementEntryLine).join('') : '<p class="text-xs text-gray-400 py-5 text-center">No transactions found for this period.</p>'}
       </div>
-      <div class="mt-4 bg-gray-900 text-white rounded-xl p-4 flex justify-between items-center gap-3">
-        <div>
-          <p class="text-[9px] uppercase font-bold text-gray-400">Current balance</p>
-          <p class="text-lg font-black mt-1">${money(statement.outstanding)}</p>
+
+      <div class="mt-4 bg-gray-900 text-white rounded-xl p-4">
+        <div class="flex justify-between items-center gap-3">
+          <div>
+            <p class="text-[9px] uppercase font-bold text-gray-400">Export statement</p>
+            <p class="text-sm font-black mt-1">${esc(rangeLabel)}</p>
+          </div>
+          <div class="relative">
+            <button type="button" id="statementExport" class="bg-white text-gray-900 px-4 py-2 rounded-lg text-[11px] font-black">Export ▾</button>
+            <div id="statementExportMenu" class="hidden absolute right-0 bottom-full mb-2 w-44 bg-white text-gray-800 rounded-xl shadow-xl border border-gray-200 overflow-hidden z-50">
+              <button type="button" data-export="print" class="w-full text-left px-4 py-3 text-[11px] font-bold hover:bg-gray-50">🖨️ Print</button>
+              <button type="button" data-export="pdf" class="w-full text-left px-4 py-3 text-[11px] font-bold hover:bg-gray-50">📄 PDF</button>
+              <button type="button" data-export="excel" class="w-full text-left px-4 py-3 text-[11px] font-bold hover:bg-gray-50">📊 Excel</button>
+              <button type="button" data-export="image" class="w-full text-left px-4 py-3 text-[11px] font-bold hover:bg-gray-50">🖼️ Image</button>
+            </div>
+          </div>
         </div>
-        <button type="button" id="printStatement" class="bg-white text-gray-900 px-4 py-2 rounded-lg text-[11px] font-black">Print</button>
       </div>
     </div>`;
 
   root.appendChild(wrapper);
+
   document.getElementById('closeStatement')?.addEventListener('click', () => wrapper.remove());
-  document.getElementById('printStatement')?.addEventListener('click', () => printStatement(customer, statement));
+
+  const reloadStatement = async (from, to) => {
+    const apply = document.getElementById('applyStatementRange');
+    if (apply) { apply.disabled = true; apply.textContent = 'Loading...'; }
+    try {
+      const next = await loadCustomerStatement(customer, { from, to });
+      renderStatement(root, customer, next);
+      wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (err) {
+      if (apply) { apply.disabled = false; apply.textContent = 'Apply dates'; }
+      alert(`Could not load statement: ${err.message}`);
+    }
+  };
+
+  document.getElementById('applyStatementRange')?.addEventListener('click', () => {
+    const from = document.getElementById('statementFrom')?.value || '';
+    const to = document.getElementById('statementTo')?.value || '';
+    reloadStatement(from, to);
+  });
+
+  document.getElementById('clearStatementRange')?.addEventListener('click', () => reloadStatement('', ''));
+
+  const exportMenu = document.getElementById('statementExportMenu');
+  document.getElementById('statementExport')?.addEventListener('click', event => {
+    event.stopPropagation();
+    exportMenu?.classList.toggle('hidden');
+  });
+
+  document.querySelectorAll('[data-export]').forEach(button => {
+    button.addEventListener('click', () => {
+      exportMenu?.classList.add('hidden');
+      try {
+        const type = button.dataset.export;
+        if (type === 'print' || type === 'pdf') printStatement(customer, statement);
+        if (type === 'excel') exportExcel(customer, statement);
+        if (type === 'image') exportImage(customer, statement);
+      } catch (err) {
+        console.error('Statement export failed:', err);
+        alert(`Could not export statement: ${err.message}`);
+      }
+    });
+  });
 }
 
 function renderLedger(customer) {
@@ -468,8 +736,9 @@ function render(customers, queryText = '') {
 
   document.querySelectorAll('[data-customer-toggle]').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.getElementById(`receivableOrders-${btn.dataset.customerToggle}`).classList.toggle('hidden');
-      btn.textContent = btn.textContent === 'View orders' ? 'Hide orders' : 'View orders';
+      const panel = document.getElementById(`receivableOrders-${btn.dataset.customerToggle}`);
+      panel?.classList.toggle('hidden');
+      btn.textContent = panel?.classList.contains('hidden') ? 'View orders' : 'Hide orders';
     });
   });
 
