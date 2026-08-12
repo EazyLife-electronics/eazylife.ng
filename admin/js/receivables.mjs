@@ -22,11 +22,16 @@ function esc(value) {
   }[c]));
 }
 
-function dateText(timestamp) {
-  if (!timestamp) return '';
-  if (timestamp.toDate) return timestamp.toDate().toLocaleString();
+function dateValue(timestamp) {
+  if (!timestamp) return null;
+  if (timestamp.toDate) return timestamp.toDate();
   const date = new Date(timestamp);
-  return Number.isNaN(date.getTime()) ? '' : date.toLocaleString();
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function dateText(timestamp) {
+  const date = dateValue(timestamp);
+  return date ? date.toLocaleString() : '';
 }
 
 function isExcluded(order) {
@@ -152,6 +157,150 @@ function paymentLine(payment) {
     </div>`;
 }
 
+async function loadCustomerStatement(customer) {
+  const snap = await getDocs(query(collection(db, 'orders'), orderBy('createdAt', 'asc')));
+  const orders = [];
+
+  for (const docSnap of snap.docs) {
+    const order = { id: docSnap.id, ...docSnap.data() };
+    if (isExcluded(order) || customerKey(order) !== customer.key) continue;
+
+    const payments = await loadOrderPayments(order.id);
+    const paymentTotal = payments.reduce((sum, p) => sum + Number(p.amount || 0), 0);
+    const legacyPaid = Number(order.paidAmount || 0);
+    const paid = payments.length ? paymentTotal : legacyPaid;
+    const total = Number(order.total || 0);
+
+    orders.push({
+      ...order,
+      total,
+      paid,
+      balance: Math.max(0, total - paid),
+      payments
+    });
+  }
+
+  const entries = [];
+  for (const order of orders) {
+    entries.push({
+      type: 'order',
+      date: dateValue(order.createdAt) || new Date(0),
+      order,
+      amount: order.total,
+      sort: 0
+    });
+
+    for (const payment of order.payments) {
+      entries.push({
+        type: 'payment',
+        date: dateValue(payment.createdAt) || dateValue(order.createdAt) || new Date(0),
+        order,
+        payment,
+        amount: Number(payment.amount || 0),
+        sort: 1
+      });
+    }
+  }
+
+  entries.sort((a, b) => {
+    const timeDiff = a.date.getTime() - b.date.getTime();
+    if (timeDiff !== 0) return timeDiff;
+    return a.sort - b.sort;
+  });
+
+  let runningBalance = 0;
+  for (const entry of entries) {
+    if (entry.type === 'order') runningBalance += entry.amount;
+    else runningBalance = Math.max(0, runningBalance - entry.amount);
+    entry.runningBalance = runningBalance;
+  }
+
+  const totalPurchases = orders.reduce((sum, order) => sum + order.total, 0);
+  const totalPaid = orders.reduce((sum, order) => sum + order.paid, 0);
+  const outstanding = Math.max(0, totalPurchases - totalPaid);
+
+  return { orders, entries, totalPurchases, totalPaid, outstanding };
+}
+
+function statementEntryLine(entry) {
+  const isOrder = entry.type === 'order';
+  const code = entry.order.trackingCode || entry.order.id;
+  const label = isOrder
+    ? `Order ${code}`
+    : `Payment · ${entry.payment.method || entry.payment.paymentMethod || 'Payment'}`;
+  const detail = isOrder
+    ? `${(entry.order.items || []).map(item => `${esc(item.name)} × ${Number(item.quantity || 0)}`).join(', ') || 'Order'} · ${esc(TERMS[entry.order.paymentTerms] || entry.order.paymentTerms || 'Pay on Delivery')}`
+    : `${esc(code)}${entry.payment.reference ? ` · Ref: ${esc(entry.payment.reference)}` : ''}${entry.payment.note ? ` · ${esc(entry.payment.note)}` : ''}`;
+
+  return `
+    <div class="grid grid-cols-[70px_1fr_auto] gap-2 items-start py-3 border-b border-gray-100 last:border-0">
+      <div class="text-[9px] text-gray-400 leading-tight">${esc(entry.date.toLocaleDateString())}<br>${esc(entry.date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }))}</div>
+      <div class="min-w-0">
+        <p class="text-[10px] font-black ${isOrder ? 'text-gray-800' : 'text-teal-600'}">${label}</p>
+        <p class="text-[9px] text-gray-400 mt-0.5">${detail}</p>
+      </div>
+      <div class="text-right whitespace-nowrap">
+        <p class="text-[10px] font-black ${isOrder ? 'text-gray-800' : 'text-teal-600'}">${isOrder ? '+' : '-'}${money(entry.amount)}</p>
+        <p class="text-[9px] text-gray-400 mt-0.5">Bal ${money(entry.runningBalance)}</p>
+      </div>
+    </div>`;
+}
+
+function renderStatement(root, customer, statement) {
+  const existing = document.getElementById('receivablesStatement');
+  if (existing) existing.remove();
+
+  const wrapper = document.createElement('div');
+  wrapper.id = 'receivablesStatement';
+  wrapper.className = 'mt-5';
+  wrapper.innerHTML = `
+    <div class="bg-white rounded-[24px] shadow-sm border border-gray-100 p-5">
+      <div class="flex justify-between items-start gap-3">
+        <div>
+          <p class="text-[10px] uppercase font-black text-gray-400">Customer Statement</p>
+          <h3 class="font-black text-lg mt-1">${esc(customer.name)}</h3>
+          <p class="text-xs text-gray-400">${esc(customer.phone || 'No phone recorded')} · All non-cancelled transactions</p>
+        </div>
+        <button type="button" id="closeStatement" class="bg-gray-100 text-gray-600 px-3 py-2 rounded-xl text-xs font-bold">Close</button>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 mt-4">
+        <div class="bg-gray-50 rounded-xl p-3"><p class="text-[9px] uppercase text-gray-400 font-bold">Purchases</p><p class="text-sm font-black mt-1">${money(statement.totalPurchases)}</p></div>
+        <div class="bg-gray-50 rounded-xl p-3"><p class="text-[9px] uppercase text-gray-400 font-bold">Payments</p><p class="text-sm font-black text-teal-600 mt-1">${money(statement.totalPaid)}</p></div>
+        <div class="bg-red-50 rounded-xl p-3"><p class="text-[9px] uppercase text-red-400 font-bold">Balance</p><p class="text-sm font-black text-red-600 mt-1">${money(statement.outstanding)}</p></div>
+      </div>
+
+      <div class="mt-4 flex justify-between items-center gap-3">
+        <p class="text-xs font-black text-gray-700">Account activity</p>
+        <span class="text-[9px] font-bold text-gray-400">${statement.entries.length} transaction${statement.entries.length === 1 ? '' : 's'}</span>
+      </div>
+
+      <div class="mt-2 bg-gray-50 rounded-xl border border-gray-100 px-3">
+        ${statement.entries.length
+          ? statement.entries.map(statementEntryLine).join('')
+          : '<p class="text-xs text-gray-400 py-5 text-center">No transactions found.</p>'}
+      </div>
+
+      <div class="mt-4 bg-gray-900 text-white rounded-xl p-4 flex justify-between items-center gap-3">
+        <div>
+          <p class="text-[9px] uppercase font-bold text-gray-400">Current balance</p>
+          <p class="text-lg font-black mt-1">${money(statement.outstanding)}</p>
+        </div>
+        <button type="button" id="printStatement" class="bg-white text-gray-900 px-4 py-2 rounded-lg text-[11px] font-black">Print</button>
+      </div>
+    </div>`;
+
+  root.appendChild(wrapper);
+
+  document.getElementById('closeStatement')?.addEventListener('click', () => wrapper.remove());
+  document.getElementById('printStatement')?.addEventListener('click', () => {
+    const printWindow = window.open('', '_blank', 'noopener,noreferrer');
+    if (!printWindow) return;
+    printWindow.document.write(`<!doctype html><html><head><title>${esc(customer.name)} - Account Statement</title><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{font-family:Arial,sans-serif;padding:24px;color:#111}h1{margin:0 0 4px}p{margin:4px 0}.meta{color:#666;font-size:12px}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0}.box{border:1px solid #ddd;padding:12px;border-radius:8px}.label{font-size:10px;color:#777;text-transform:uppercase;font-weight:bold}.value{font-size:16px;font-weight:bold;margin-top:5px}.rows{border:1px solid #ddd;border-radius:8px;padding:0 12px}.row{display:grid;grid-template-columns:110px 1fr 130px;gap:10px;padding:12px 0;border-bottom:1px solid #eee}.row:last-child{border-bottom:0}.small{font-size:11px;color:#666}.amount{text-align:right;font-weight:bold}.green{color:#008f7a}.red{color:#c62828}@media print{button{display:none}}</style></head><body><h1>EazyLife Customer Statement</h1><p><strong>${esc(customer.name)}</strong></p><p class="meta">${esc(customer.phone || 'No phone recorded')} · Generated ${esc(new Date().toLocaleString())}</p><div class="summary"><div class="box"><div class="label">Purchases</div><div class="value">${money(statement.totalPurchases)}</div></div><div class="box"><div class="label">Payments</div><div class="value green">${money(statement.totalPaid)}</div></div><div class="box"><div class="label">Balance</div><div class="value red">${money(statement.outstanding)}</div></div></div><h3>Account Activity</h3><div class="rows">${statement.entries.map(entry => `<div class="row"><div class="small">${esc(entry.date.toLocaleString())}</div><div><strong>${entry.type === 'order' ? 'Order' : 'Payment'}</strong><div class="small">${entry.type === 'order' ? esc(entry.order.trackingCode || entry.order.id) : esc(entry.payment.method || entry.payment.paymentMethod || 'Payment')}</div></div><div class="amount ${entry.type === 'order' ? '' : 'green'}">${entry.type === 'order' ? '+' : '-'}${money(entry.amount)}<div class="small">Balance ${money(entry.runningBalance)}</div></div></div>`).join('')}</div><script>window.onload=()=>window.print();</script></body></html>`);
+    printWindow.document.close();
+  });
+}
+
 function renderLedger(customer) {
   const root = document.getElementById('receivablesLedger');
   if (!root) return;
@@ -172,7 +321,10 @@ function renderLedger(customer) {
         <div class="bg-red-50 rounded-xl p-3"><p class="text-[9px] uppercase text-red-400 font-bold">Outstanding</p><p class="text-sm font-black text-red-600 mt-1">${money(customer.balance)}</p></div>
       </div>
       <div class="mt-4">
-        <p class="text-xs font-black text-gray-700 mb-2">Outstanding orders</p>
+        <div class="flex justify-between items-center gap-3 mb-2">
+          <p class="text-xs font-black text-gray-700">Outstanding orders</p>
+          <button type="button" id="openStatementFromLedger" class="bg-gray-900 text-white px-3 py-2 rounded-lg text-[10px] font-bold">Statement</button>
+        </div>
         <div class="space-y-2">
           ${customer.orders.map(order => `
             <div class="border border-gray-100 rounded-xl p-3">
@@ -189,6 +341,23 @@ function renderLedger(customer) {
   document.getElementById('closeLedger')?.addEventListener('click', () => {
     root.classList.add('hidden');
     root.innerHTML = '';
+  });
+
+  document.getElementById('openStatementFromLedger')?.addEventListener('click', async () => {
+    const button = document.getElementById('openStatementFromLedger');
+    if (!button) return;
+    button.disabled = true;
+    button.textContent = 'Loading...';
+    try {
+      const statement = await loadCustomerStatement(customer);
+      renderStatement(root, customer, statement);
+      document.getElementById('receivablesStatement')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (err) {
+      console.error('Customer statement failed:', err);
+      button.disabled = false;
+      button.textContent = 'Statement';
+      alert(`Could not load customer statement: ${err.message}`);
+    }
   });
 }
 
