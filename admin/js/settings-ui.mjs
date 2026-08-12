@@ -87,6 +87,9 @@ if (typeof document !== 'undefined' &&
         receivablesPanel.classList.remove('hidden');
         initReceivables();
       });
+      import('./receivables-payments.mjs').then(({ initReceivablesPayments }) => {
+        initReceivablesPayments();
+      }).catch(err => console.error('Receivables payment module failed to load:', err));
     }).catch(err => {
       console.error('Receivables module failed to load:', err);
       btn.addEventListener('click', () => {
