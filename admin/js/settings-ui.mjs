@@ -61,8 +61,6 @@ if (typeof document !== 'undefined' &&
       </div>`;
   }
 
-  // Receivables is kept as its own navigation tab so customer debt does not get
-  // mixed into Inventory or Orders. It uses the existing payment subcollections.
   const nav = document.querySelector('.flex.gap-2.mb-6.overflow-x-auto');
   if (nav && !document.querySelector('[data-tab="receivables"]')) {
     const btn = document.createElement('button');
@@ -105,3 +103,13 @@ if (typeof document !== 'undefined' &&
 // Order workflow UI is loaded here so we can enhance the existing Orders panel
 // without changing the stable admin-app renderer.
 import('./order-workflow-ui.mjs').catch(err => console.error('Order workflow UI failed to load:', err));
+
+// Payment UI is loaded explicitly once. It observes the Orders list and enhances
+// each order card, while payments-ui.mjs itself guards against duplicate roots.
+if (typeof document !== 'undefined' &&
+    (location.pathname.endsWith('/admin/') || location.pathname.endsWith('/admin/index.html'))) {
+  import('../../js/firebase.mjs').then(({ initFirebase }) => {
+    const { db } = initFirebase();
+    return import('./payments-ui.mjs').then(({ initPaymentsUI }) => initPaymentsUI(db));
+  }).catch(err => console.error('Order payment UI failed to load:', err));
+}
