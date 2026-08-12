@@ -24,10 +24,15 @@ export function initFirebase() {
   const db = getFirestore(app);
   const auth = getAuth(app);
   cached = { app, db, auth };
-  return cached;
-}
 
-// The purchase receiver is admin-only UI. Dynamic import keeps it out of the public shop.
-if (typeof location !== 'undefined' && location.pathname.includes('/admin/')) {
-  import('../admin/js/purchases.mjs').catch(err => console.warn('Purchase module could not load:', err));
+  // Admin-only modules are loaded after Firebase is initialized so they can
+  // safely use the same Firestore instance without affecting the public shop.
+  if (typeof location !== 'undefined' && location.pathname.includes('/admin/')) {
+    import('../admin/js/purchases.mjs').catch(err => console.warn('Purchase module could not load:', err));
+    import('../admin/js/payments-ui.mjs')
+      .then(({ initPaymentsUI }) => initPaymentsUI(db))
+      .catch(err => console.warn('Payment UI could not load:', err));
+  }
+
+  return cached;
 }
