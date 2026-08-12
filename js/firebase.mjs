@@ -5,6 +5,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+// This module only injects markup on Admin pages. It is safe to load from the
+// shared Firebase module and, importantly, runs before admin-app.mjs starts.
+import "../admin/js/settings-ui.mjs";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBmF_InIyNfcDMeX4VE_EkSdIipz0nWz6g",
