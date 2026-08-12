@@ -144,8 +144,6 @@ function render(orders) {
       panel.querySelector('#collectionReference').value = '';
       panel.querySelector('#collectionNote').value = '';
 
-      // Refresh the Receivables dashboard immediately so totals/customer balances
-      // reflect the payment without requiring a browser reload.
       document.getElementById('receivablesRefresh')?.click();
 
       if (newBalance <= 0) {
@@ -195,12 +193,5 @@ async function load() {
 }
 
 export function initReceivablesPayments() {
-  load();
-}
-
-if (typeof document !== 'undefined') {
-  const observer = new MutationObserver(() => {
-    if (document.getElementById('receivablesContent') && !document.getElementById('receivablesCollectionPanel')) load();
-  });
-  observer.observe(document.body, { childList: true, subtree: true });
+  return load();
 }
