@@ -27,9 +27,6 @@ function getCardStatus(card) {
   if (explicit) return explicit.toLowerCase();
   const badge = card.querySelector('[data-order-status-badge]');
   if (badge) return badge.textContent.trim().toLowerCase();
-
-  // admin-app.mjs currently renders the order status as the first span in the card.
-  // Keep this fallback so cancelled orders are recognised even without a data attribute.
   const firstSpan = card.querySelector(':scope > div > div > span');
   return firstSpan?.textContent?.trim().toLowerCase() || '';
 }
@@ -45,7 +42,6 @@ async function refreshPaymentCard(db, id, root) {
   const order = snap.data();
   const status = String(order.status || '').toLowerCase();
 
-  // Cancellation closes collection. Never show UNPAID/PARTIAL or payment controls.
   if (CLOSED_STATUSES.has(status)) {
     const payments = await loadPayments(db, id);
     const paid = payments.reduce((s,p)=>s+Number(p.amount||0),0);
@@ -89,7 +85,7 @@ async function refreshPaymentCard(db, id, root) {
   });
 
   const record=root.querySelector('[data-record-payment]');
-  const form=root.querySelector('[data-payment-form');
+  const form=root.querySelector('[data-payment-form]');
   record?.addEventListener('click',()=>form?.classList.toggle('hidden'));
   root.querySelector('[data-payment-cancel]')?.addEventListener('click',()=>form?.classList.add('hidden'));
   root.querySelector('[data-payment-save]')?.addEventListener('click',async()=>{
@@ -121,21 +117,17 @@ function enhanceOrders(db) {
   const list=document.getElementById('orderList');
   if(!list || enhancing)return;
   enhancing = true;
-
   try {
     list.querySelectorAll(':scope > div').forEach(card=>{
       const id=getCardOrderId(card);
       if(!id)return;
       const status=getCardStatus(card);
 
-      // A cancelled/returned order must never get a collectible payment UI.
       if(CLOSED_STATUSES.has(status)) {
         removePaymentRoots(card);
         return;
       }
 
-      // Keep exactly one payment root per order card. This also cleans up duplicates
-      // left by an earlier initializer or by a previous observer cycle.
       const roots=[...card.querySelectorAll('[data-payment-root]')];
       const root=roots[0];
       roots.slice(1).forEach(r=>r.remove());
@@ -154,8 +146,6 @@ function enhanceOrders(db) {
 }
 
 function observerCallback(mutations) {
-  // Ignore mutations caused only by rendering inside an existing payment root.
-  // This prevents our own innerHTML updates from causing repeated payment sections.
   const relevant = mutations.some(m => {
     if (m.type !== 'childList') return false;
     if ([...m.addedNodes, ...m.removedNodes].some(node => {
@@ -170,13 +160,11 @@ function observerCallback(mutations) {
 export function initPaymentsUI(db) {
   const list=document.getElementById('orderList');
   if(!list)return()=>{};
-
   if(activeObserver) activeObserver.disconnect();
   activeDb = db;
   activeObserver = new MutationObserver(observerCallback);
   activeObserver.observe(list,{childList:true,subtree:true});
   enhanceOrders(activeDb);
-
   return()=>{
     if(activeObserver){activeObserver.disconnect();activeObserver=null;}
     activeDb=null;
