@@ -73,6 +73,7 @@
     </div>
 </div>
 <div id="imagePickerModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] flex items-end md:items-center justify-center"><div class="bg-white w-full max-w-lg rounded-t-[28px] md:rounded-[24px] shadow-2xl p-5 max-h-[85vh] flex flex-col"><div class="flex justify-between items-center mb-3"><h3 class="font-black text-base text-gray-800">Choose an Image</h3><button onclick="closeImagePicker()" class="text-gray-400 text-2xl p-1">&times;</button></div><p id="pickerHint" class="text-xs text-gray-400 mb-3"></p><div id="pickerGrid" class="grid grid-cols-3 gap-2 overflow-y-auto pr-1" style="flex:1;"><p class="col-span-3 text-center text-gray-400 text-sm py-10">Loading images...</p></div></div></div>
+<script type="module" src="js/settings-ui.mjs"></script>
 <script type="module" src="js/admin-app.mjs"></script>
 <script type="module">
 import { initInventory } from "./js/inventory.mjs";
@@ -84,7 +85,6 @@ const reportsBtn=document.getElementById("reportsTabBtn");
 function showPanel(tab){document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("tab-active"));document.querySelector(`[data-tab="${tab}"]`).classList.add("tab-active");document.querySelectorAll(".tab-panel").forEach(p=>p.classList.add("hidden"));document.getElementById(`panel-${tab}`).classList.remove("hidden");}
 inventoryBtn.addEventListener("click",()=>{showPanel("inventory");if(stopReports){stopReports();stopReports=null;}if(!stopInventory)stopInventory=initInventory();});
 reportsBtn.addEventListener("click",()=>{showPanel("reports");if(stopInventory){stopInventory();stopInventory=null;}if(!stopReports)stopReports=initInventoryReports();});
-document.querySelectorAll(".tab-btn:not(#inventoryTabBtn):not(#reportsTabBtn)").forEach(other=>other.addEventListener("click",()=>{if(stopInventory){stopInventory();stopInventory=null;}if(stopReports){stopReports();stopReports=null;}}));
 </script>
 </body>
 </html>
