@@ -140,6 +140,58 @@ function orderLine(order) {
     </div>`;
 }
 
+function paymentLine(payment) {
+  const method = payment.method || payment.paymentMethod || 'Payment';
+  return `
+    <div class="flex justify-between gap-3 py-2 border-b border-gray-100 last:border-0">
+      <div class="min-w-0">
+        <p class="text-[10px] font-bold text-gray-700">${esc(method)}${payment.reference ? ` · ${esc(payment.reference)}` : ''}</p>
+        <p class="text-[9px] text-gray-400">${esc(dateText(payment.createdAt))}${payment.note ? ` · ${esc(payment.note)}` : ''}</p>
+      </div>
+      <p class="text-[10px] font-black text-teal-600 whitespace-nowrap">${money(payment.amount)}</p>
+    </div>`;
+}
+
+function renderLedger(customer) {
+  const root = document.getElementById('receivablesLedger');
+  if (!root) return;
+
+  root.innerHTML = `
+    <div class="bg-white rounded-[24px] shadow-sm border border-gray-100 p-5">
+      <div class="flex justify-between items-start gap-3">
+        <div>
+          <p class="text-[10px] uppercase font-black text-gray-400">Customer Ledger</p>
+          <h3 class="font-black text-lg mt-1">${esc(customer.name)}</h3>
+          <p class="text-xs text-gray-400">${esc(customer.phone || 'No phone recorded')}</p>
+        </div>
+        <button type="button" id="closeLedger" class="bg-gray-100 text-gray-600 px-3 py-2 rounded-xl text-xs font-bold">Close</button>
+      </div>
+      <div class="grid grid-cols-3 gap-2 mt-4">
+        <div class="bg-gray-50 rounded-xl p-3"><p class="text-[9px] uppercase text-gray-400 font-bold">Purchases</p><p class="text-sm font-black mt-1">${money(customer.total)}</p></div>
+        <div class="bg-gray-50 rounded-xl p-3"><p class="text-[9px] uppercase text-gray-400 font-bold">Paid</p><p class="text-sm font-black text-teal-600 mt-1">${money(customer.paid)}</p></div>
+        <div class="bg-red-50 rounded-xl p-3"><p class="text-[9px] uppercase text-red-400 font-bold">Outstanding</p><p class="text-sm font-black text-red-600 mt-1">${money(customer.balance)}</p></div>
+      </div>
+      <div class="mt-4">
+        <p class="text-xs font-black text-gray-700 mb-2">Outstanding orders</p>
+        <div class="space-y-2">
+          ${customer.orders.map(order => `
+            <div class="border border-gray-100 rounded-xl p-3">
+              ${orderLine(order)}
+              <div class="mt-2 bg-white border border-gray-100 rounded-lg px-3">
+                <p class="text-[9px] uppercase font-black text-gray-400 py-2">Payment history</p>
+                ${order.payments.length ? order.payments.map(paymentLine).join('') : '<p class="text-[10px] text-gray-400 pb-2">No payments recorded for this order.</p>'}
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+
+  document.getElementById('closeLedger')?.addEventListener('click', () => {
+    root.classList.add('hidden');
+    root.innerHTML = '';
+  });
+}
+
 function render(customers, queryText = '') {
   const root = document.getElementById('receivablesContent');
   if (!root) return;
@@ -191,6 +243,7 @@ function render(customers, queryText = '') {
             </div>
             <div class="flex gap-2 mt-3">
               <button type="button" data-customer-toggle="${index}" class="flex-1 bg-gray-900 text-white text-[11px] font-bold py-2 rounded-lg">View orders</button>
+              <button type="button" data-ledger="${index}" class="bg-[#00B09B] text-white text-[11px] font-bold px-4 rounded-lg">Ledger</button>
               <button type="button" data-go-orders class="bg-gray-100 text-gray-700 text-[11px] font-bold px-3 rounded-lg">Orders</button>
             </div>
             <div id="receivableOrders-${index}" class="hidden mt-3 pt-3 border-t border-gray-100 space-y-2">
@@ -199,14 +252,25 @@ function render(customers, queryText = '') {
           </div>
         `).join('') || `<p class="text-center text-gray-400 text-sm py-10">No outstanding customer balances.</p>`}
       </div>
-    </div>`;
+    </div>
+    <div id="receivablesLedger" class="hidden mt-5"></div>`;
 
-  document.getElementById('receivablesRefresh')?.addEventListener('click', () => refresh());
+  document.getElementById('receivablesRefresh')?.addEventListener('click', () => refresh(queryText));
   document.getElementById('receivablesSearch')?.addEventListener('input', e => render(customers, e.target.value));
   document.querySelectorAll('[data-customer-toggle]').forEach(btn => {
     btn.addEventListener('click', () => {
       document.getElementById(`receivableOrders-${btn.dataset.customerToggle}`).classList.toggle('hidden');
       btn.textContent = btn.textContent === 'View orders' ? 'Hide orders' : 'View orders';
+    });
+  });
+  document.querySelectorAll('[data-ledger]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const customer = filtered[Number(btn.dataset.ledger)];
+      if (!customer) return;
+      const ledger = document.getElementById('receivablesLedger');
+      ledger.classList.remove('hidden');
+      renderLedger(customer);
+      ledger.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   });
   document.querySelectorAll('[data-go-orders]').forEach(btn => {
