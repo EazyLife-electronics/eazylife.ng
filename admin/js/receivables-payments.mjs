@@ -137,15 +137,39 @@ function render(orders) {
         note: panel.querySelector('#collectionNote').value
       });
 
+      const newBalance = Math.max(0, order.balance - value);
       message.textContent = `${money(value)} payment recorded successfully.`;
       message.className = 'text-xs font-bold text-center text-[#00B09B]';
       amount.value = '';
       panel.querySelector('#collectionReference').value = '';
       panel.querySelector('#collectionNote').value = '';
 
-      setTimeout(() => {
-        document.querySelector('[data-tab="receivables"]')?.click();
-      }, 500);
+      // Refresh the Receivables dashboard immediately so totals/customer balances
+      // reflect the payment without requiring a browser reload.
+      document.getElementById('receivablesRefresh')?.click();
+
+      if (newBalance <= 0) {
+        orderSelect.querySelector(`option[value="${CSS.escape(order.id)}"]`)?.remove();
+        orderSelect.value = '';
+        summary.classList.add('hidden');
+        amount.removeAttribute('max');
+      } else {
+        order.balance = newBalance;
+        const option = orderSelect.querySelector(`option[value="${CSS.escape(order.id)}"]`);
+        if (option) {
+          option.textContent = `${order.customerName || 'Unknown'} · ${order.trackingCode || order.id} · Balance ${money(newBalance)}`;
+        }
+        summary.innerHTML = `
+          <div class="grid grid-cols-3 gap-2">
+            <div><span class="text-[9px] uppercase text-gray-400 font-bold">Order</span><p class="font-black mt-1">${esc(order.trackingCode || order.id)}</p></div>
+            <div><span class="text-[9px] uppercase text-gray-400 font-bold">Total</span><p class="font-black mt-1">${money(order.total)}</p></div>
+            <div><span class="text-[9px] uppercase text-gray-400 font-bold">Balance</span><p class="font-black text-red-600 mt-1">${money(newBalance)}</p></div>
+          </div>`;
+        amount.max = String(newBalance);
+      }
+
+      save.disabled = false;
+      save.textContent = 'Record Payment';
     } catch (err) {
       console.error('Receivables payment failed:', err);
       message.textContent = err.message || 'Could not record payment.';
