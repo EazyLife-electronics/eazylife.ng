@@ -26,7 +26,16 @@ function getCardStatus(card) {
   const explicit = card.dataset.orderStatus;
   if (explicit) return explicit.toLowerCase();
   const badge = card.querySelector('[data-order-status-badge]');
-  return badge?.textContent?.trim().toLowerCase() || '';
+  if (badge) return badge.textContent.trim().toLowerCase();
+
+  // admin-app.mjs currently renders the order status as the first span in the card.
+  // Keep this fallback so cancelled orders are recognised even without a data attribute.
+  const firstSpan = card.querySelector(':scope > div > div > span');
+  return firstSpan?.textContent?.trim().toLowerCase() || '';
+}
+
+function removePaymentRoots(card) {
+  card.querySelectorAll('[data-payment-root]').forEach(root => root.remove());
 }
 
 async function refreshPaymentCard(db, id, root) {
@@ -80,9 +89,9 @@ async function refreshPaymentCard(db, id, root) {
   });
 
   const record=root.querySelector('[data-record-payment]');
-  const form=root.querySelector('[data-payment-form]');
-  record?.addEventListener('click',()=>form.classList.toggle('hidden'));
-  root.querySelector('[data-payment-cancel]')?.addEventListener('click',()=>form.classList.add('hidden'));
+  const form=root.querySelector('[data-payment-form');
+  record?.addEventListener('click',()=>form?.classList.toggle('hidden'));
+  root.querySelector('[data-payment-cancel]')?.addEventListener('click',()=>form?.classList.add('hidden'));
   root.querySelector('[data-payment-save]')?.addEventListener('click',async()=>{
     const amount=Number(root.querySelector('[data-payment-amount]').value||0);
     const method=root.querySelector('[data-payment-method]').value;
@@ -104,44 +113,59 @@ async function refreshPaymentCard(db, id, root) {
   });
 }
 
-function enhanceOrders(db) {
-  const list=document.getElementById('orderList');
-  if(!list)return;
-
-  // Remove any duplicate payment roots left by multiple initializers/observers.
-  const rootsById = new Map();
-  list.querySelectorAll('[data-payment-root]').forEach(root => {
-    const id = root.dataset.paymentRoot;
-    if (!id) return;
-    const existing = rootsById.get(id);
-    if (existing) root.remove();
-    else rootsById.set(id, root);
-  });
-
-  list.querySelectorAll(':scope > div').forEach(card=>{
-    const id=getCardOrderId(card);
-    if(!id)return;
-    const status=getCardStatus(card);
-
-    // A cancelled/returned order must never get a collectible payment UI.
-    if(CLOSED_STATUSES.has(status)) {
-      card.querySelectorAll(`[data-payment-root="${CSS.escape(id)}"]`).forEach(root => root.remove());
-      return;
-    }
-
-    if(card.querySelector(`[data-payment-root="${CSS.escape(id)}"]`))return;
-
-    const root=document.createElement('div');
-    root.dataset.paymentRoot=id;
-    card.appendChild(root);
-    refreshPaymentCard(db,id,root).catch(err=>{
-      if(root.isConnected) root.innerHTML=`<p class="text-[10px] text-red-500 mt-3">Payment section failed to load: ${esc(err.message)}</p>`;
-    });
-  });
-}
-
 let activeObserver = null;
 let activeDb = null;
+let enhancing = false;
+
+function enhanceOrders(db) {
+  const list=document.getElementById('orderList');
+  if(!list || enhancing)return;
+  enhancing = true;
+
+  try {
+    list.querySelectorAll(':scope > div').forEach(card=>{
+      const id=getCardOrderId(card);
+      if(!id)return;
+      const status=getCardStatus(card);
+
+      // A cancelled/returned order must never get a collectible payment UI.
+      if(CLOSED_STATUSES.has(status)) {
+        removePaymentRoots(card);
+        return;
+      }
+
+      // Keep exactly one payment root per order card. This also cleans up duplicates
+      // left by an earlier initializer or by a previous observer cycle.
+      const roots=[...card.querySelectorAll('[data-payment-root]')];
+      const root=roots[0];
+      roots.slice(1).forEach(r=>r.remove());
+      if(root) return;
+
+      const newRoot=document.createElement('div');
+      newRoot.dataset.paymentRoot=id;
+      card.appendChild(newRoot);
+      refreshPaymentCard(db,id,newRoot).catch(err=>{
+        if(newRoot.isConnected) newRoot.innerHTML=`<p class="text-[10px] text-red-500 mt-3">Payment section failed to load: ${esc(err.message)}</p>`;
+      });
+    });
+  } finally {
+    enhancing = false;
+  }
+}
+
+function observerCallback(mutations) {
+  // Ignore mutations caused only by rendering inside an existing payment root.
+  // This prevents our own innerHTML updates from causing repeated payment sections.
+  const relevant = mutations.some(m => {
+    if (m.type !== 'childList') return false;
+    if ([...m.addedNodes, ...m.removedNodes].some(node => {
+      if (!(node instanceof Element)) return false;
+      return node.closest('[data-payment-root]') || node.matches('[data-payment-root]');
+    })) return false;
+    return true;
+  });
+  if (relevant) enhanceOrders(activeDb);
+}
 
 export function initPaymentsUI(db) {
   const list=document.getElementById('orderList');
@@ -149,7 +173,7 @@ export function initPaymentsUI(db) {
 
   if(activeObserver) activeObserver.disconnect();
   activeDb = db;
-  activeObserver = new MutationObserver(()=>enhanceOrders(activeDb));
+  activeObserver = new MutationObserver(observerCallback);
   activeObserver.observe(list,{childList:true,subtree:true});
   enhanceOrders(activeDb);
 
