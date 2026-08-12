@@ -10,6 +10,26 @@ import {
 
 const { db } = initFirebase();
 
+/* ---------------- ADMIN ERROR FEEDBACK ---------------- */
+// Many Admin buttons intentionally use fire-and-forget async handlers. If an async
+// action rejects without a local catch, the browser otherwise only shows a console
+// error, making the button look like it did nothing. Surface the real error to the
+// logged-in Admin while keeping the underlying rejection visible in the console.
+if (typeof window !== 'undefined' &&
+    (location.pathname.endsWith('/admin/') || location.pathname.endsWith('/admin/index.html'))) {
+  window.addEventListener('unhandledrejection', (event) => {
+    const reason = event.reason;
+    const message = reason?.message || String(reason || 'Unknown error');
+    console.error('Admin action failed:', reason);
+
+    if (typeof window.alert === 'function') {
+      window.alert(`Action failed: ${message}`);
+    }
+
+    event.preventDefault();
+  });
+}
+
 /* ---------------- PRODUCTS ---------------- */
 
 export async function getProducts() {
