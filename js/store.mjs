@@ -1,10 +1,6 @@
 // js/store.mjs
 // Firestore data layer shared by shop.html and the admin dashboard.
-// Collections used:
-//   products/{id}   -> { name, variants[], inStock, desc }
-//   orders/{id}     -> { items[], customerName, phone, address, total, status, createdAt }
-//   settings/site   -> { whatsapp, tagline, aboutText, ... }
-//   inventoryMovements/{id} -> stock movement ledger
+// Inventory-aware order status changes are performed transactionally.
 
 import { initFirebase } from './firebase.mjs';
 import {
@@ -23,8 +19,7 @@ export async function getProducts() {
 
 export function watchProducts(callback) {
   return onSnapshot(collection(db, 'products'), (snap) => {
-    const products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    callback(products);
+    callback(snap.docs.map(d => ({ id: d.id, ...d.data() })));
   });
 }
 
@@ -54,12 +49,6 @@ function variantLabelForOrder(v, index) {
   return bits.length ? bits.join(' / ') : `Variant ${index + 1}`;
 }
 
-/*
- * Older orders stored only a human-readable variant label. New inventory-aware orders
- * must carry variantId so a sale can never accidentally deduct stock from the wrong
- * variant. We resolve the legacy cart shape here at write time, without changing the
- * customer's checkout UI.
- */
 async function resolveOrderItems(items) {
   const productsSnap = await getDocs(collection(db, 'products'));
   const products = new Map(productsSnap.docs.map(d => [d.id, { id: d.id, ...d.data() }]));
@@ -109,8 +98,7 @@ export async function getOrderByTrackingCode(code) {
 export function watchOrders(callback) {
   const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
   return onSnapshot(q, (snap) => {
-    const orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    callback(orders);
+    callback(snap.docs.map(d => ({ id: d.id, ...d.data() })));
   });
 }
 
@@ -122,6 +110,11 @@ function isReversalStatus(status) {
   return ['cancelled', 'returned'].includes(String(status || '').toLowerCase());
 }
 
+/*
+ * Firestore transactions require all reads to happen before any writes.
+ * Read and validate every affected product first, then perform the writes.
+ * This also guarantees that a multi-item order cannot partially change stock.
+ */
 async function applyOrderInventory(tx, order, direction) {
   const items = Array.isArray(order.items) ? order.items : [];
   const grouped = new Map();
@@ -138,40 +131,59 @@ async function applyOrderInventory(tx, order, direction) {
     grouped.set(key, current);
   }
 
-  for (const { productId, variantId, quantity, item } of grouped.values()) {
-    const productRef = doc(db, 'products', productId);
+  const changes = [];
+
+  // READ PHASE — no transaction writes before all product reads finish.
+  for (const entry of grouped.values()) {
+    const productRef = doc(db, 'products', entry.productId);
     const productSnap = await tx.get(productRef);
-    if (!productSnap.exists()) throw new Error(`Product ${item.name || productId} no longer exists.`);
+    if (!productSnap.exists()) throw new Error(`Product ${entry.item.name || entry.productId} no longer exists.`);
 
     const product = productSnap.data();
     const variants = Array.isArray(product.variants) ? [...product.variants] : [];
-    const index = variants.findIndex(v => v.id === variantId);
-    if (index < 0) throw new Error(`Variant for ${item.name || productId} no longer exists.`);
+    const index = variants.findIndex(v => v.id === entry.variantId);
+    if (index < 0) throw new Error(`Variant for ${entry.item.name || entry.productId} no longer exists.`);
 
     const current = Math.max(0, Number(variants[index].stockQty || 0));
-    const delta = direction > 0 ? -quantity : quantity;
+    const delta = direction > 0 ? -entry.quantity : entry.quantity;
     const next = current + delta;
     if (next < 0) {
-      throw new Error(`Insufficient stock for ${item.name || product.name || 'product'} (${item.variant || variantId}). Current stock: ${current}, requested: ${quantity}.`);
+      throw new Error(`Insufficient stock for ${entry.item.name || product.name || 'product'} (${entry.item.variant || entry.variantId}). Current stock: ${current}, requested: ${entry.quantity}.`);
     }
 
     variants[index] = { ...variants[index], stockQty: next, inStock: next > 0 };
-    tx.update(productRef, {
+    changes.push({
+      productRef,
+      product,
       variants,
-      inStock: variants.some(v => Number(v.stockQty || 0) > 0)
+      index,
+      current,
+      next,
+      delta,
+      item: entry.item,
+      productId: entry.productId,
+      variantId: entry.variantId
+    });
+  }
+
+  // WRITE PHASE — only after every read and stock check succeeded.
+  for (const change of changes) {
+    tx.update(change.productRef, {
+      variants: change.variants,
+      inStock: change.variants.some(v => Number(v.stockQty || 0) > 0)
     });
 
     const movementRef = doc(collection(db, 'inventoryMovements'));
     tx.set(movementRef, {
-      productId,
-      variantId,
-      sku: variants[index].sku || item.sku || '',
-      productName: product.name || item.name || '',
-      variantLabel: item.variant || variantLabelForOrder(variants[index], index),
+      productId: change.productId,
+      variantId: change.variantId,
+      sku: change.variants[change.index].sku || change.item.sku || '',
+      productName: change.product.name || change.item.name || '',
+      variantLabel: change.item.variant || variantLabelForOrder(change.variants[change.index], change.index),
       type: direction > 0 ? 'sale' : 'return',
-      quantity: delta,
-      previousQty: current,
-      newQty: next,
+      quantity: change.delta,
+      previousQty: change.current,
+      newQty: change.next,
       reason: direction > 0 ? 'Customer order confirmed' : 'Order cancelled/returned',
       reference: order.trackingCode || order.id || '',
       orderId: order.id || order.trackingCode || '',
@@ -180,16 +192,6 @@ async function applyOrderInventory(tx, order, direction) {
   }
 }
 
-/*
- * Inventory policy:
- *   new/pending -> no stock change
- *   confirmed   -> deduct once
- *   shipped/delivered -> no additional change
- *   cancelled/returned -> restore once if the order was previously deducted
- *
- * The entire order status change + all stock changes + movement records happen in one
- * Firestore transaction. If any item lacks stock, nothing is partially deducted.
- */
 export async function updateOrderStatus(id, status) {
   const orderRef = doc(db, 'orders', id);
 
@@ -224,8 +226,6 @@ export async function updateOrderStatus(id, status) {
 }
 
 export async function cancelOrder(id, { reason = null, customerNote = null, internalNote = null } = {}) {
-  // Use the same transactional status path so cancellation restores stock only when
-  // the order previously consumed stock.
   const orderRef = doc(db, 'orders', id);
   return runTransaction(db, async tx => {
     const snap = await tx.get(orderRef);
