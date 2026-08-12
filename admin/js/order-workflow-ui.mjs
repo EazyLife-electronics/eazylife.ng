@@ -4,19 +4,11 @@
 
 import { updateOrderStatus } from '../../js/store.mjs';
 
-const FLOW = ['new', 'confirmed', 'delivered'];
-const LABELS = { new: 'New', confirmed: 'Confirmed', delivered: 'Delivered', cancelled: 'Cancelled' };
-const COLORS = {
-  new: 'bg-yellow-100 text-yellow-700',
-  confirmed: 'bg-blue-100 text-blue-700',
-  delivered: 'bg-green-100 text-green-700',
-  cancelled: 'bg-red-100 text-red-700'
-};
+const LABELS = { all: 'All', new: 'New', confirmed: 'Confirmed', delivered: 'Delivered', cancelled: 'Cancelled' };
 
 let currentFilter = 'all';
 let currentSearch = '';
 let toolbar = null;
-let observer = null;
 let orderMutationQueued = false;
 
 function esc(value) {
@@ -25,15 +17,15 @@ function esc(value) {
   }[c]));
 }
 
+function getStatus(card) {
+  // The existing renderer has one status <span> at the top of each order card.
+  return card.querySelector('span')?.textContent?.trim().toLowerCase() || '';
+}
+
 function orderMatches(card) {
   const text = (card.textContent || '').toLowerCase();
-  const searchOk = !currentSearch || text.includes(currentSearch);
-  if (!searchOk) return false;
-
-  if (currentFilter === 'all') return true;
-  const badge = card.querySelector('span.text-[10px]');
-  const status = badge?.textContent?.trim().toLowerCase() || '';
-  return status === currentFilter;
+  if (currentSearch && !text.includes(currentSearch)) return false;
+  return currentFilter === 'all' || getStatus(card) === currentFilter;
 }
 
 function updateVisibility() {
@@ -64,8 +56,7 @@ function getCounts() {
   [...list.children].forEach(card => {
     if (!card.classList.contains('bg-white')) return;
     counts.all++;
-    const badge = card.querySelector('span.text-[10px]');
-    const status = badge?.textContent?.trim().toLowerCase();
+    const status = getStatus(card);
     if (Object.prototype.hasOwnProperty.call(counts, status)) counts[status]++;
   });
   return counts;
@@ -96,7 +87,7 @@ function renderToolbar() {
     <div class="flex gap-2 overflow-x-auto pb-1">
       ${filters.map(status => `
         <button type="button" data-order-filter="${status}" class="whitespace-nowrap px-3 py-2 rounded-lg text-[10px] font-bold ${currentFilter === status ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600'}">
-          ${LABELS[status] || 'All'} <span class="opacity-70">${counts[status]}</span>
+          ${LABELS[status]} <span class="opacity-70">${counts[status]}</span>
         </button>
       `).join('')}
     </div>`;
@@ -132,7 +123,6 @@ function bindStatusActions() {
     const id = btn.dataset.order;
     const next = btn.dataset.next;
     const label = LABELS[next] || next;
-
     if (!id || !next) return;
 
     const question = next === 'confirmed'
@@ -147,8 +137,6 @@ function bindStatusActions() {
 
     try {
       await updateOrderStatus(id, next);
-      // watchOrders will redraw the card. This fallback keeps the UI understandable
-      // even if the snapshot takes a moment to arrive.
       btn.textContent = `${label} ✓`;
     } catch (err) {
       console.error('Order status update failed:', err);
@@ -185,7 +173,7 @@ function init() {
   }
 
   refresh();
-  observer = new MutationObserver(queueRefresh);
+  const observer = new MutationObserver(queueRefresh);
   observer.observe(list, { childList: true, subtree: true });
 }
 
