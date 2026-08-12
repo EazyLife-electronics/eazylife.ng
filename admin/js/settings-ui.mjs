@@ -60,4 +60,41 @@ if (typeof document !== 'undefined' &&
         </form>
       </div>`;
   }
+
+  // Receivables is kept as its own navigation tab so customer debt does not get
+  // mixed into Inventory or Orders. It uses the existing payment subcollections.
+  const nav = document.querySelector('.flex.gap-2.mb-6.overflow-x-auto');
+  if (nav && !document.querySelector('[data-tab="receivables"]')) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.dataset.tab = 'receivables';
+    btn.className = 'tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100';
+    btn.textContent = 'Receivables';
+    nav.insertBefore(btn, document.querySelector('[data-tab="settings"]'));
+
+    const receivablesPanel = document.createElement('div');
+    receivablesPanel.id = 'panel-receivables';
+    receivablesPanel.className = 'tab-panel hidden';
+    receivablesPanel.innerHTML = '<div id="receivablesContent"></div>';
+    const settingsPanel = document.getElementById('panel-settings');
+    settingsPanel?.parentElement?.insertBefore(receivablesPanel, settingsPanel);
+
+    import('./receivables.mjs').then(({ initReceivables }) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
+        btn.classList.add('tab-active');
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+        receivablesPanel.classList.remove('hidden');
+        initReceivables();
+      });
+    }).catch(err => {
+      console.error('Receivables module failed to load:', err);
+      btn.addEventListener('click', () => {
+        receivablesPanel.classList.remove('hidden');
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('hidden', p !== receivablesPanel));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('tab-active', b === btn));
+        document.getElementById('receivablesContent').innerHTML = `<div class="bg-white rounded-[24px] p-6 text-sm text-red-600">Receivables failed to load: ${String(err.message || err)}</div>`;
+      });
+    });
+  }
 }
