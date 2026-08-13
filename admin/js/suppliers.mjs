@@ -13,13 +13,40 @@ let installed = false;
 let loading = false;
 
 function escapeHtml(v) {
-  return String(v ?? '').replace(/[&<>'"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[c]));
+  return String(v ?? '').replace(/[&<>'\"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[c]));
 }
 
 function dateText(value) {
   if (!value) return '—';
   const date = value?.toDate ? value.toDate() : new Date(value);
   return Number.isNaN(date.getTime()) ? '—' : date.toLocaleDateString('en-NG', { dateStyle: 'medium' });
+}
+
+// Finds an existing master supplier by name, or creates one when a new supplier
+// is entered through Receive Purchase. This keeps purchase transactions and the
+// Supplier Records collection synchronized without creating case-only duplicates.
+export async function ensureSupplierRecord(name) {
+  const cleanName = String(name || '').trim();
+  if (!cleanName) throw new Error('Supplier name is required.');
+
+  const key = cleanName.toLowerCase();
+  const snap = await getDocs(collection(db, 'suppliers'));
+  const existing = snap.docs.find(d => String(d.data()?.name || '').trim().toLowerCase() === key);
+  if (existing) return { id: existing.id, ...existing.data(), created: false };
+
+  const now = serverTimestamp();
+  const ref = await addDoc(collection(db, 'suppliers'), {
+    name: cleanName,
+    contactPerson: '',
+    phone: '',
+    whatsapp: '',
+    address: '',
+    notes: 'Automatically created from a received purchase. Add contact details in Supplier Records.',
+    source: 'purchase',
+    createdAt: now,
+    updatedAt: now
+  });
+  return { id: ref.id, name: cleanName, created: true };
 }
 
 function install() {
@@ -35,7 +62,7 @@ function install() {
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
       <div>
         <h2 class="font-black text-lg">Supplier Records</h2>
-        <p class="text-[11px] text-gray-400">Store supplier contact and business details separately from purchase transactions.</p>
+        <p class="text-[11px] text-gray-400">Supplier names entered while receiving purchases are automatically added here. Store contact and business details separately from purchase transactions.</p>
       </div>
       <button id="newSupplierBtn" class="bg-gray-900 text-white px-4 py-3 rounded-xl font-bold text-xs">+ Add Supplier</button>
     </div>
