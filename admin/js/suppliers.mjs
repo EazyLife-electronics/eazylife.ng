@@ -66,182 +66,109 @@ function install() {
       </div>
       <button id="newSupplierBtn" class="bg-gray-900 text-white px-4 py-3 rounded-xl font-bold text-xs">+ Add Supplier</button>
     </div>
-    <div id="supplierFormWrap" class="hidden bg-gray-50 rounded-xl border border-gray-200 p-3 mb-4">
-      <div class="flex justify-between items-center mb-3">
-        <h3 id="supplierFormTitle" class="text-sm font-black">Add Supplier</h3>
-        <button id="cancelSupplierBtn" class="text-xs text-gray-400 font-bold">Cancel</button>
-      </div>
-      <div class="grid md:grid-cols-2 gap-2">
-        <input id="supplierRecordName" placeholder="Supplier / business name *" class="p-3 bg-white rounded-xl border border-gray-200 text-sm outline-none">
-        <input id="supplierContactPerson" placeholder="Contact person" class="p-3 bg-white rounded-xl border border-gray-200 text-sm outline-none">
-        <input id="supplierPhone" type="tel" placeholder="Phone" class="p-3 bg-white rounded-xl border border-gray-200 text-sm outline-none">
-        <input id="supplierWhatsapp" type="tel" placeholder="WhatsApp" class="p-3 bg-white rounded-xl border border-gray-200 text-sm outline-none">
-        <input id="supplierAddress" placeholder="Address" class="p-3 bg-white rounded-xl border border-gray-200 text-sm outline-none md:col-span-2">
-        <textarea id="supplierNotes" rows="2" placeholder="Notes" class="p-3 bg-white rounded-xl border border-gray-200 text-sm outline-none md:col-span-2"></textarea>
-      </div>
-      <div class="flex gap-2 mt-3">
-        <button id="saveSupplierBtn" class="flex-1 bg-gray-900 text-white py-3 rounded-xl font-bold text-sm">Save Supplier</button>
-        <button id="resetSupplierBtn" class="bg-white border border-gray-200 text-gray-500 px-4 rounded-xl font-bold text-sm">Clear</button>
-      </div>
-      <p id="supplierRecordMessage" class="text-xs mt-3 hidden"></p>
-    </div>
-    <div class="flex gap-2 mb-3">
-      <input id="supplierRecordSearch" placeholder="Search saved suppliers..." class="flex-1 p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none">
-      <button id="supplierRecordRefresh" class="bg-gray-100 text-gray-600 px-4 rounded-xl font-bold text-xs">Refresh</button>
-    </div>
-    <div id="supplierRecordRows" class="grid gap-2"><p class="text-xs text-gray-400">Loading suppliers...</p></div>`;
-
-  directory.insertAdjacentElement('afterend', section);
+    <div id="supplierRecordRows" class="space-y-2"></div>`;
+  directory.after(section);
   installed = true;
-
-  document.getElementById('newSupplierBtn').onclick = () => openForm();
-  document.getElementById('cancelSupplierBtn').onclick = closeForm;
-  document.getElementById('resetSupplierBtn').onclick = resetForm;
-  document.getElementById('saveSupplierBtn').onclick = saveSupplier;
-  document.getElementById('supplierRecordRefresh').onclick = loadSuppliers;
-  document.getElementById('supplierRecordSearch').addEventListener('input', render);
-  loadSuppliers();
+  document.getElementById('newSupplierBtn')?.addEventListener('click', () => openSupplierEditor());
   return true;
 }
 
-function openForm(supplier = null) {
-  document.getElementById('supplierFormWrap')?.classList.remove('hidden');
-  document.getElementById('supplierFormTitle').textContent = supplier ? 'Edit Supplier' : 'Add Supplier';
-  document.getElementById('supplierFormWrap').dataset.editId = supplier?.id || '';
-  document.getElementById('supplierRecordName').value = supplier?.name || '';
-  document.getElementById('supplierContactPerson').value = supplier?.contactPerson || '';
-  document.getElementById('supplierPhone').value = supplier?.phone || '';
-  document.getElementById('supplierWhatsapp').value = supplier?.whatsapp || '';
-  document.getElementById('supplierAddress').value = supplier?.address || '';
-  document.getElementById('supplierNotes').value = supplier?.notes || '';
-  document.getElementById('supplierRecordName')?.focus();
-}
-
-function closeForm() {
-  document.getElementById('supplierFormWrap')?.classList.add('hidden');
-  resetForm();
-}
-
-function resetForm() {
-  const wrap = document.getElementById('supplierFormWrap');
-  if (!wrap) return;
-  wrap.dataset.editId = '';
-  document.getElementById('supplierFormTitle').textContent = 'Add Supplier';
-  ['supplierRecordName','supplierContactPerson','supplierPhone','supplierWhatsapp','supplierAddress','supplierNotes'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
-  });
-  const message = document.getElementById('supplierRecordMessage');
-  if (message) message.className = 'text-xs mt-3 hidden';
-}
-
-function message(text, error = false) {
-  const el = document.getElementById('supplierRecordMessage');
-  if (!el) return;
-  el.textContent = text;
-  el.className = `text-xs mt-3 ${error ? 'text-red-500' : 'text-green-600'}`;
-  el.classList.remove('hidden');
-}
-
-async function saveSupplier() {
-  if (!currentUser) return message('Please log in first.', true);
-  const name = document.getElementById('supplierRecordName').value.trim();
-  if (!name) return message('Supplier name is required.', true);
-
-  const data = {
-    name,
-    contactPerson: document.getElementById('supplierContactPerson').value.trim(),
-    phone: document.getElementById('supplierPhone').value.trim(),
-    whatsapp: document.getElementById('supplierWhatsapp').value.trim(),
-    address: document.getElementById('supplierAddress').value.trim(),
-    notes: document.getElementById('supplierNotes').value.trim(),
-    updatedAt: serverTimestamp()
-  };
-
-  const editId = document.getElementById('supplierFormWrap').dataset.editId;
-  try {
-    if (editId) {
-      await updateDoc(doc(db, 'suppliers', editId), data);
-      message('Supplier updated successfully.');
-    } else {
-      const duplicate = suppliers.some(s => String(s.name || '').trim().toLowerCase() === name.toLowerCase());
-      if (duplicate) return message('A saved supplier with this name already exists.', true);
-      await addDoc(collection(db, 'suppliers'), { ...data, createdAt: serverTimestamp() });
-      message('Supplier saved successfully.');
-    }
-    await loadSuppliers();
-    setTimeout(closeForm, 350);
-  } catch (e) {
-    message(e.message || 'Could not save supplier.', true);
-  }
-}
-
-async function loadSuppliers() {
-  if (!currentUser || loading) return;
-  const el = document.getElementById('supplierRecordRows');
-  if (!el) return;
-  loading = true;
-  el.innerHTML = '<p class="text-xs text-gray-400 py-3">Loading saved suppliers...</p>';
-  try {
-    const snap = await getDocs(collection(db, 'suppliers'));
-    suppliers = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
-    render();
-  } catch (e) {
-    el.innerHTML = `<p class="text-xs text-red-500 py-3">Could not load supplier records: ${escapeHtml(e.message)}</p>`;
-  } finally {
-    loading = false;
-  }
-}
-
 function render() {
-  const el = document.getElementById('supplierRecordRows');
-  if (!el) return;
-  const query = String(document.getElementById('supplierRecordSearch')?.value || '').trim().toLowerCase();
-  const filtered = suppliers.filter(s => [s.name, s.contactPerson, s.phone, s.whatsapp, s.address, s.notes].some(v => String(v || '').toLowerCase().includes(query)));
-  if (!filtered.length) {
-    el.innerHTML = `<div class="py-8 text-center text-xs text-gray-400">${query ? 'No saved suppliers match your search.' : 'No saved supplier records yet. Add your first supplier above.'}</div>`;
+  const rows = document.getElementById('supplierRecordRows');
+  if (!rows) return;
+  if (loading) {
+    rows.innerHTML = '<div class="text-sm text-gray-400 py-4">Loading supplier records...</div>';
     return;
   }
-  el.innerHTML = filtered.map(s => `
-    <div class="border border-gray-100 rounded-xl p-3">
-      <div class="flex flex-col md:flex-row md:items-start gap-3">
-        <div class="flex-grow min-w-0">
-          <div class="flex items-center gap-2">
-            <p class="text-sm font-black truncate">${escapeHtml(s.name)}</p>
-            <span class="text-[9px] font-bold px-2 py-1 rounded-full bg-green-50 text-green-600">SAVED</span>
-          </div>
-          <p class="text-[10px] text-gray-400 mt-1">${escapeHtml(s.contactPerson || 'No contact person')} · ${escapeHtml(s.phone || 'No phone')}</p>
-          ${s.whatsapp ? `<p class="text-[10px] text-gray-400 mt-1">WhatsApp: ${escapeHtml(s.whatsapp)}</p>` : ''}
-          ${s.address ? `<p class="text-[10px] text-gray-400 mt-1">${escapeHtml(s.address)}</p>` : ''}
-          ${s.notes ? `<p class="text-[10px] text-gray-500 mt-2">${escapeHtml(s.notes)}</p>` : ''}
-          <p class="text-[9px] text-gray-300 mt-2">Updated ${dateText(s.updatedAt || s.createdAt)}</p>
-        </div>
-        <button type="button" data-id="${escapeHtml(s.id)}" class="edit-supplier bg-gray-100 text-gray-600 px-4 py-2 rounded-lg font-bold text-xs">Edit</button>
+  if (!suppliers.length) {
+    rows.innerHTML = '<div class="text-sm text-gray-400 py-4">No supplier records yet.</div>';
+    return;
+  }
+  rows.innerHTML = suppliers.map(s => `
+    <div class="border rounded-xl p-3 flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div>
+        <div class="font-bold text-sm">${escapeHtml(s.name || 'Unnamed supplier')}</div>
+        <div class="text-xs text-gray-500">${escapeHtml(s.phone || 'No phone')} · ${escapeHtml(s.email || 'No email')}</div>
+        <div class="text-[10px] text-gray-400 mt-1">${escapeHtml(s.business || 'No business name')} · Updated ${dateText(s.updatedAt || s.createdAt)}</div>
       </div>
+      <button class="editSupplierBtn text-xs font-bold px-3 py-2 rounded-lg border" data-id="${escapeHtml(s.id)}">Edit</button>
     </div>`).join('');
-
-  el.querySelectorAll('.edit-supplier').forEach(btn => btn.addEventListener('click', () => {
+  rows.querySelectorAll('.editSupplierBtn').forEach(btn => btn.addEventListener('click', () => {
     const supplier = suppliers.find(s => s.id === btn.dataset.id);
-    if (supplier) openForm(supplier);
+    if (supplier) openSupplierEditor(supplier);
   }));
 }
 
-function boot() {
-  onAuthStateChanged(auth, user => {
-    currentUser = user;
-    if (!user) {
-      suppliers = [];
-      const rows = document.getElementById('supplierRecordRows');
-      if (rows) rows.innerHTML = '<p class="text-xs text-gray-400 py-3">Log in to manage supplier records.</p>';
-      return;
+function openSupplierEditor(existing = null) {
+  const old = document.getElementById('supplierEditorModal');
+  old?.remove();
+  const modal = document.createElement('div');
+  modal.id = 'supplierEditorModal';
+  modal.className = 'fixed inset-0 bg-black/50 z-[300] flex items-center justify-center p-4';
+  modal.innerHTML = `
+    <div class="bg-white rounded-2xl p-5 w-full max-w-md shadow-2xl">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="font-black text-lg">${existing ? 'Edit Supplier' : 'Add Supplier'}</h3>
+        <button id="closeSupplierEditor" class="text-2xl text-gray-400">&times;</button>
+      </div>
+      <form id="supplierEditorForm" class="space-y-3">
+        <input name="name" required placeholder="Supplier name" value="${escapeHtml(existing?.name)}" class="w-full border rounded-xl px-3 py-3 text-sm">
+        <input name="business" placeholder="Business name" value="${escapeHtml(existing?.business)}" class="w-full border rounded-xl px-3 py-3 text-sm">
+        <input name="phone" placeholder="Phone" value="${escapeHtml(existing?.phone)}" class="w-full border rounded-xl px-3 py-3 text-sm">
+        <input name="email" type="email" placeholder="Email" value="${escapeHtml(existing?.email)}" class="w-full border rounded-xl px-3 py-3 text-sm">
+        <input name="address" placeholder="Address" value="${escapeHtml(existing?.address)}" class="w-full border rounded-xl px-3 py-3 text-sm">
+        <button class="w-full bg-emerald-600 text-white rounded-xl py-3 font-bold text-sm">Save Supplier</button>
+      </form>
+    </div>`;
+  document.body.appendChild(modal);
+  document.getElementById('closeSupplierEditor')?.addEventListener('click', () => modal.remove());
+  document.getElementById('supplierEditorForm')?.addEventListener('submit', async e => {
+    e.preventDefault();
+    const form = new FormData(e.currentTarget);
+    const data = {
+      name: String(form.get('name') || '').trim(),
+      business: String(form.get('business') || '').trim(),
+      phone: String(form.get('phone') || '').trim(),
+      email: String(form.get('email') || '').trim(),
+      address: String(form.get('address') || '').trim(),
+      updatedAt: serverTimestamp()
+    };
+    try {
+      if (existing?.id) await updateDoc(doc(db, 'suppliers', existing.id), data);
+      else await addDoc(collection(db, 'suppliers'), { ...data, createdAt: serverTimestamp(), createdBy: currentUser?.uid || null });
+      modal.remove();
+      await loadSuppliers();
+    } catch (err) {
+      console.error('Supplier save failed:', err);
+      alert(err?.message || 'Could not save supplier.');
     }
-    install();
-    loadSuppliers();
   });
 }
 
-const observer = new MutationObserver(() => {
-  if (currentUser) install();
-});
-if (document.body) observer.observe(document.body, { childList: true, subtree: true });
-boot();
+async function loadSuppliers() {
+  loading = true;
+  render();
+  try {
+    const snap = await getDocs(collection(db, 'suppliers'));
+    suppliers = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+  } catch (err) {
+    console.error('Supplier records load failed:', err);
+    suppliers = [];
+  } finally {
+    loading = false;
+    render();
+  }
+}
+
+function boot() {
+  if (!install()) return;
+  onAuthStateChanged(auth, user => {
+    currentUser = user;
+    if (user) loadSuppliers();
+  });
+}
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
+else boot();
+
+export { boot as initSuppliers };
