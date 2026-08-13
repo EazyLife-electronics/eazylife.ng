@@ -1,46 +1,106 @@
 // admin/js/suppliers.mjs
 // Supplier master records for the Purchases tab.
-// Purchase history remains the source of transaction totals; this collection stores supplier details.
+// The suppliers collection stores identity/contact data; purchase records remain
+// the source of transaction history and financial totals.
 import { initFirebase } from '../../js/firebase.mjs';
-import { collection, getDocs, addDoc, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  doc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import './purchase-void.mjs';
 
 const { db, auth } = initFirebase();
+
 let suppliers = [];
+let purchases = [];
 let currentUser = null;
 let installed = false;
 let loading = false;
+let syncing = false;
 
 function escapeHtml(v) {
-  return String(v ?? '').replace(/[&<>'\"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[c]));
+  return String(v ?? '').replace(/[&<>'\"]/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+  }[c]));
 }
 
-function dateText(value) {
-  if (!value) return '—';
-  const date = value?.toDate ? value.toDate() : new Date(value);
-  return Number.isNaN(date.getTime()) ? '—' : date.toLocaleDateString('en-NG', { dateStyle: 'medium' });
+function cleanName(value) {
+  return String(value || '').trim().replace(/\s+/g, ' ');
 }
 
 function normalizeName(value) {
-  return String(value || '').trim().replace(/\s+/g, ' ').toLowerCase();
+  return cleanName(value).toLowerCase();
 }
 
-// Finds an existing master supplier by name, or creates one when a new supplier
-// is entered through Receive Purchase. This keeps purchase transactions and the
-// Supplier Records collection synchronized without creating case-only duplicates.
-export async function ensureSupplierRecord(name) {
-  const cleanName = String(name || '').trim().replace(/\s+/g, ' ');
-  if (!cleanName) throw new Error('Supplier name is required.');
+function dateText(value, withTime = false) {
+  if (!value) return '—';
+  const date = value?.toDate ? value.toDate() : new Date(value);
+  if (Number.isNaN(date.getTime())) return '—';
+  return date.toLocaleString('en-NG', withTime
+    ? { dateStyle: 'medium', timeStyle: 'short' }
+    : { dateStyle: 'medium' });
+}
 
-  const key = normalizeName(cleanName);
+function money(value) {
+  return `₦${Number(value || 0).toLocaleString('en-NG')}`;
+}
+
+function purchaseMetrics() {
+  const metrics = new Map();
+  purchases.forEach(p => {
+    if (p.status === 'voided') return;
+    const key = p.supplierId || normalizeName(p.supplier);
+    if (!key) return;
+    const current = metrics.get(key) || { purchases: 0, units: 0, value: 0, lastPurchase: null };
+    current.purchases += 1;
+    current.units += Number(p.quantity || 0);
+    current.value += Number(p.totalCost || 0);
+    const time = p.createdAt?.toMillis?.() || 0;
+    const lastTime = current.lastPurchase?.toMillis?.() || 0;
+    if (time > lastTime) current.lastPurchase = p.createdAt;
+    metrics.set(key, current);
+  });
+  return metrics;
+}
+
+function getMetrics(supplier, metrics) {
+  return metrics.get(supplier.id) || metrics.get(normalizeName(supplier.name)) || {
+    purchases: 0, units: 0, value: 0, lastPurchase: null
+  };
+}
+
+function findSupplierByName(name) {
+  const key = normalizeName(name);
+  return suppliers.find(s => normalizeName(s.name) === key) || null;
+}
+
+// Public API used by purchases.mjs. Existing suppliers are reused by normalized
+// name; new suppliers become master records immediately.
+export async function ensureSupplierRecord(name) {
+  const clean = cleanName(name);
+  if (!clean) throw new Error('Supplier name is required.');
+
+  const existing = findSupplierByName(clean);
+  if (existing) return { id: existing.id, ...existing, created: false };
+
+  // Read directly so this remains reliable even when the master UI has not yet
+  // loaded (for example when Receive Purchase is opened first).
   const snap = await getDocs(collection(db, 'suppliers'));
-  const existing = snap.docs.find(d => normalizeName(d.data()?.name) === key);
-  if (existing) return { id: existing.id, ...existing.data(), created: false };
+  const found = snap.docs.find(d => normalizeName(d.data()?.name) === normalizeName(clean));
+  if (found) {
+    const record = { id: found.id, ...found.data() };
+    if (!suppliers.some(s => s.id === found.id)) suppliers.push(record);
+    return { ...record, created: false };
+  }
 
   const now = serverTimestamp();
   const ref = await addDoc(collection(db, 'suppliers'), {
-    name: cleanName,
+    name: clean,
+    normalizedName: normalizeName(clean),
     business: '',
     contactPerson: '',
     phone: '',
@@ -50,9 +110,20 @@ export async function ensureSupplierRecord(name) {
     notes: 'Automatically created from a received purchase. Add contact details in Supplier Records.',
     source: 'purchase',
     createdAt: now,
-    updatedAt: now
+    updatedAt: now,
+    createdBy: currentUser?.uid || null
   });
-  return { id: ref.id, name: cleanName, created: true };
+
+  const record = {
+    id: ref.id,
+    name: clean,
+    normalizedName: normalizeName(clean),
+    business: '', contactPerson: '', phone: '', whatsapp: '', email: '', address: '',
+    notes: 'Automatically created from a received purchase. Add contact details in Supplier Records.',
+    source: 'purchase', created: true
+  };
+  suppliers.push(record);
+  return record;
 }
 
 function install() {
@@ -67,48 +138,101 @@ function install() {
   section.innerHTML = `
     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4">
       <div>
-        <h2 class="font-black text-lg">Supplier Records</h2>
-        <p class="text-[11px] text-gray-400 max-w-2xl">Your supplier master. Purchase transactions are kept separately, while contact and business information is stored here and linked by supplier ID.</p>
+        <div class="flex flex-wrap items-center gap-2">
+          <h2 class="font-black text-lg">Supplier Master</h2>
+          <span class="text-[9px] font-black uppercase tracking-wide bg-teal-50 text-teal-600 px-2 py-1 rounded-full">Master Records</span>
+        </div>
+        <p class="text-[11px] text-gray-400 max-w-2xl mt-1">One supplier record for contact and business details. Purchases link to this record by Supplier ID, while purchase history remains the source of totals.</p>
       </div>
-      <button id="newSupplierBtn" type="button" class="bg-gray-900 text-white px-4 py-3 rounded-xl font-bold text-xs whitespace-nowrap">+ Add Supplier</button>
+      <div class="flex gap-2">
+        <button id="syncSupplierRecords" type="button" class="bg-gray-100 text-gray-700 px-4 py-3 rounded-xl font-bold text-xs whitespace-nowrap">Sync Purchases</button>
+        <button id="newSupplierBtn" type="button" class="bg-gray-900 text-white px-4 py-3 rounded-xl font-bold text-xs whitespace-nowrap">+ Add Supplier</button>
+      </div>
     </div>
-    <div class="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4">
-      <div class="rounded-xl bg-gray-50 border border-gray-100 p-3"><p class="text-[9px] text-gray-400 uppercase font-bold">Saved suppliers</p><p id="supplierCount" class="text-sm font-black mt-1">0</p></div>
+
+    <div id="supplierSyncMessage" class="hidden mb-3 rounded-xl px-3 py-2 text-xs font-bold"></div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+      <div class="rounded-xl bg-gray-50 border border-gray-100 p-3"><p class="text-[9px] text-gray-400 uppercase font-bold">Suppliers</p><p id="supplierCount" class="text-sm font-black mt-1">0</p></div>
       <div class="rounded-xl bg-gray-50 border border-gray-100 p-3"><p class="text-[9px] text-gray-400 uppercase font-bold">With contact</p><p id="supplierContactCount" class="text-sm font-black mt-1">0</p></div>
-      <div class="rounded-xl bg-gray-50 border border-gray-100 p-3 col-span-2 md:col-span-1"><p class="text-[9px] text-gray-400 uppercase font-bold">Last updated</p><p id="supplierLastUpdated" class="text-sm font-black mt-1">—</p></div>
+      <div class="rounded-xl bg-gray-50 border border-gray-100 p-3"><p class="text-[9px] text-gray-400 uppercase font-bold">Purchase-linked</p><p id="supplierLinkedCount" class="text-sm font-black mt-1">0</p></div>
+      <div class="rounded-xl bg-gray-50 border border-gray-100 p-3"><p class="text-[9px] text-gray-400 uppercase font-bold">Last updated</p><p id="supplierLastUpdated" class="text-sm font-black mt-1">—</p></div>
     </div>
+
     <div class="flex gap-2 mb-3">
-      <input id="supplierRecordSearch" type="search" placeholder="Search saved suppliers..." class="flex-1 p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none">
+      <input id="supplierRecordSearch" type="search" placeholder="Search name, contact, phone, email..." class="flex-1 p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none">
       <button id="refreshSupplierRecords" type="button" class="bg-gray-100 text-gray-700 px-4 rounded-xl font-bold text-xs">Refresh</button>
     </div>
     <div id="supplierRecordRows" class="space-y-2"></div>`;
+
   directory.after(section);
   installed = true;
 
   document.getElementById('newSupplierBtn')?.addEventListener('click', () => openSupplierEditor());
+  document.getElementById('syncSupplierRecords')?.addEventListener('click', syncPurchaseLinks);
   document.getElementById('refreshSupplierRecords')?.addEventListener('click', loadSuppliers);
   document.getElementById('supplierRecordSearch')?.addEventListener('input', render);
+
   return true;
+}
+
+function installPurchaseSupplierHelper() {
+  const input = document.getElementById('purchaseSupplier');
+  if (!input || input.dataset.supplierMasterEnhanced === '1') return;
+
+  input.dataset.supplierMasterEnhanced = '1';
+  input.setAttribute('list', 'supplierMasterOptions');
+  input.setAttribute('autocomplete', 'off');
+  input.placeholder = 'Supplier name — select saved supplier or type new';
+
+  let list = document.getElementById('supplierMasterOptions');
+  if (!list) {
+    list = document.createElement('datalist');
+    list.id = 'supplierMasterOptions';
+    input.insertAdjacentElement('afterend', list);
+  }
+
+  input.addEventListener('change', () => {
+    const record = findSupplierByName(input.value);
+    if (record) input.value = record.name;
+  });
+
+  renderSupplierOptions();
+}
+
+function renderSupplierOptions() {
+  const list = document.getElementById('supplierMasterOptions');
+  if (!list) return;
+  list.innerHTML = suppliers
+    .slice()
+    .sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')))
+    .map(s => `<option value="${escapeHtml(s.name)}">${escapeHtml(s.contactPerson || s.business || '')}</option>`)
+    .join('');
 }
 
 function render() {
   const rows = document.getElementById('supplierRecordRows');
   if (!rows) return;
+  installPurchaseSupplierHelper();
 
   const query = normalizeName(document.getElementById('supplierRecordSearch')?.value || '');
+  const metrics = purchaseMetrics();
   const filtered = suppliers.filter(s => {
     if (!query) return true;
-    return [s.name, s.business, s.contactPerson, s.phone, s.whatsapp, s.email, s.address]
+    return [s.name, s.business, s.contactPerson, s.phone, s.whatsapp, s.email, s.address, s.notes]
       .some(value => normalizeName(value).includes(query));
   });
 
   const contactCount = suppliers.filter(s => [s.contactPerson, s.phone, s.whatsapp, s.email].some(v => String(v || '').trim())).length;
+  const linkedIds = new Set(purchases.filter(p => p.status !== 'voided' && p.supplierId).map(p => p.supplierId));
   const latest = suppliers.reduce((latestValue, s) => {
     const value = s.updatedAt?.toMillis?.() || s.createdAt?.toMillis?.() || 0;
     return value > latestValue ? value : latestValue;
   }, 0);
+
   document.getElementById('supplierCount').textContent = suppliers.length.toLocaleString();
   document.getElementById('supplierContactCount').textContent = contactCount.toLocaleString();
+  document.getElementById('supplierLinkedCount').textContent = linkedIds.size.toLocaleString();
   document.getElementById('supplierLastUpdated').textContent = latest ? dateText(new Date(latest)) : '—';
 
   if (loading) {
@@ -116,31 +240,42 @@ function render() {
     return;
   }
   if (!filtered.length) {
-    rows.innerHTML = `<div class="text-sm text-gray-400 py-8 text-center">${query ? 'No saved suppliers match your search.' : 'No supplier records yet. Receive a purchase or add a supplier manually.'}</div>`;
+    rows.innerHTML = `<div class="text-sm text-gray-400 py-8 text-center">${query ? 'No supplier records match your search.' : 'No supplier records yet. Receive a purchase or add a supplier manually.'}</div>`;
     return;
   }
 
   rows.innerHTML = filtered.map(s => {
+    const m = getMetrics(s, metrics);
     const phone = String(s.phone || '').trim();
     const whatsapp = String(s.whatsapp || '').trim();
     const contact = String(s.contactPerson || '').trim();
     const business = String(s.business || '').trim();
     const address = String(s.address || '').trim();
+    const linked = purchases.some(p => p.status !== 'voided' && p.supplierId === s.id);
+    const hasDetails = contact || phone || whatsapp || s.email || address || business;
     return `
-      <div class="border border-gray-100 rounded-xl p-3 bg-white hover:border-gray-200">
+      <div class="border border-gray-100 rounded-2xl p-4 bg-white hover:border-gray-200 transition">
         <div class="flex flex-col md:flex-row md:items-start justify-between gap-3">
           <div class="min-w-0 flex-1">
             <div class="flex flex-wrap items-center gap-2">
-              <p class="font-black text-sm truncate">${escapeHtml(s.name || 'Unnamed supplier')}</p>
+              <p class="font-black text-sm">${escapeHtml(s.name || 'Unnamed supplier')}</p>
               ${s.source === 'purchase' ? '<span class="text-[9px] font-bold px-2 py-1 rounded-full bg-emerald-50 text-emerald-600">FROM PURCHASE</span>' : '<span class="text-[9px] font-bold px-2 py-1 rounded-full bg-gray-100 text-gray-500">SAVED</span>'}
+              ${linked ? '<span class="text-[9px] font-bold px-2 py-1 rounded-full bg-blue-50 text-blue-600">LINKED</span>' : ''}
             </div>
             <p class="text-xs text-gray-500 mt-1">${escapeHtml(contact || 'No contact person')}${business ? ` · ${escapeHtml(business)}` : ''}</p>
             <p class="text-[10px] text-gray-400 mt-1">${phone ? escapeHtml(phone) : 'No phone'}${whatsapp ? ` · WhatsApp ${escapeHtml(whatsapp)}` : ''}${s.email ? ` · ${escapeHtml(s.email)}` : ''}</p>
             ${address ? `<p class="text-[10px] text-gray-400 mt-1">${escapeHtml(address)}</p>` : ''}
-            <p class="text-[10px] text-gray-400 mt-1">Updated ${dateText(s.updatedAt || s.createdAt)}</p>
+            ${!hasDetails ? '<p class="text-[10px] text-amber-500 mt-1">Contact details not filled yet.</p>' : ''}
+            <p class="text-[10px] text-gray-400 mt-2">Updated ${dateText(s.updatedAt || s.createdAt)}</p>
           </div>
           <button class="editSupplierBtn text-xs font-bold px-3 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 whitespace-nowrap" data-id="${escapeHtml(s.id)}">Edit</button>
         </div>
+        <div class="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-gray-50">
+          <div><p class="text-[9px] uppercase font-bold text-gray-400">Purchases</p><p class="text-xs font-black mt-1">${m.purchases}</p></div>
+          <div><p class="text-[9px] uppercase font-bold text-gray-400">Units</p><p class="text-xs font-black mt-1">${m.units.toLocaleString()}</p></div>
+          <div><p class="text-[9px] uppercase font-bold text-gray-400">Purchase value</p><p class="text-xs font-black mt-1">${money(m.value)}</p></div>
+        </div>
+        ${m.lastPurchase ? `<p class="text-[9px] text-gray-400 mt-2">Last purchase: ${dateText(m.lastPurchase, true)}</p>` : ''}
       </div>`;
   }).join('');
 
@@ -150,16 +285,65 @@ function render() {
   }));
 }
 
+function showSyncMessage(text, error = false) {
+  const el = document.getElementById('supplierSyncMessage');
+  if (!el) return;
+  el.textContent = text;
+  el.className = `mb-3 rounded-xl px-3 py-2 text-xs font-bold ${error ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'}`;
+  el.classList.remove('hidden');
+}
+
+async function syncPurchaseLinks() {
+  if (syncing) return;
+  syncing = true;
+  const button = document.getElementById('syncSupplierRecords');
+  if (button) { button.disabled = true; button.textContent = 'Syncing...'; }
+  try {
+    const purchaseSnap = await getDocs(collection(db, 'purchases'));
+    const purchaseDocs = purchaseSnap.docs;
+    let linked = 0;
+    let created = 0;
+    let skipped = 0;
+
+    // Work sequentially to keep duplicate detection deterministic and avoid
+    // hammering Firestore when a large purchase history is being repaired.
+    for (const purchaseDoc of purchaseDocs) {
+      const p = purchaseDoc.data();
+      if (p.status === 'voided') { skipped += 1; continue; }
+      if (p.supplierId) { linked += 1; continue; }
+      const name = cleanName(p.supplier);
+      if (!name) { skipped += 1; continue; }
+
+      const record = await ensureSupplierRecord(name);
+      await updateDoc(doc(db, 'purchases', purchaseDoc.id), {
+        supplier: record.name,
+        supplierId: record.id,
+        supplierSyncedAt: serverTimestamp()
+      });
+      linked += 1;
+      if (record.created) created += 1;
+    }
+
+    await loadSuppliers();
+    showSyncMessage(`Sync complete: ${linked} purchase${linked === 1 ? '' : 's'} linked, ${created} supplier master record${created === 1 ? '' : 's'} created${skipped ? `, ${skipped} skipped` : ''}.`);
+  } catch (err) {
+    console.error('Supplier purchase sync failed:', err);
+    showSyncMessage(err?.message || 'Supplier sync failed.', true);
+  } finally {
+    syncing = false;
+    if (button) { button.disabled = false; button.textContent = 'Sync Purchases'; }
+  }
+}
+
 function openSupplierEditor(existing = null) {
-  const old = document.getElementById('supplierEditorModal');
-  old?.remove();
+  document.getElementById('supplierEditorModal')?.remove();
   const modal = document.createElement('div');
   modal.id = 'supplierEditorModal';
   modal.className = 'fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-end md:items-center justify-center p-0 md:p-4';
   modal.innerHTML = `
     <div class="bg-white rounded-t-[24px] md:rounded-2xl p-5 w-full max-w-lg shadow-2xl max-h-[92vh] overflow-y-auto">
       <div class="flex justify-between items-center mb-4">
-        <div><h3 class="font-black text-lg">${existing ? 'Edit Supplier' : 'Add Supplier'}</h3><p class="text-[10px] text-gray-400 mt-1">Keep the master record separate from purchase transactions.</p></div>
+        <div><h3 class="font-black text-lg">${existing ? 'Edit Supplier' : 'Add Supplier'}</h3><p class="text-[10px] text-gray-400 mt-1">This is the supplier master. Purchase transactions are not edited here.</p></div>
         <button id="closeSupplierEditor" type="button" class="text-2xl text-gray-400">&times;</button>
       </div>
       <form id="supplierEditorForm" class="space-y-3">
@@ -173,24 +357,28 @@ function openSupplierEditor(existing = null) {
         </div>
         <input name="address" placeholder="Business / delivery address" value="${escapeHtml(existing?.address)}" class="w-full border border-gray-200 bg-gray-50 rounded-xl px-3 py-3 text-sm">
         <textarea name="notes" rows="3" placeholder="Notes" class="w-full border border-gray-200 bg-gray-50 rounded-xl px-3 py-3 text-sm resize-none">${escapeHtml(existing?.notes)}</textarea>
+        ${existing ? `<div class="rounded-xl bg-gray-50 p-3 text-[10px] text-gray-500">Supplier ID: <span class="font-mono">${escapeHtml(existing.id)}</span><br>Source: <span class="font-bold">${escapeHtml(existing.source || 'unknown')}</span></div>` : ''}
         <div class="flex gap-2 pt-1">
           <button id="cancelSupplierEditor" type="button" class="bg-gray-100 text-gray-600 px-4 py-3 rounded-xl font-bold text-sm">Cancel</button>
           <button id="saveSupplierEditor" class="flex-1 bg-gray-900 text-white rounded-xl py-3 font-bold text-sm">Save Supplier</button>
         </div>
       </form>
     </div>`;
+
   document.body.appendChild(modal);
-  document.getElementById('closeSupplierEditor')?.addEventListener('click', () => modal.remove());
-  document.getElementById('cancelSupplierEditor')?.addEventListener('click', () => modal.remove());
+  const close = () => modal.remove();
+  document.getElementById('closeSupplierEditor')?.addEventListener('click', close);
+  document.getElementById('cancelSupplierEditor')?.addEventListener('click', close);
 
   document.getElementById('supplierEditorForm')?.addEventListener('submit', async e => {
     e.preventDefault();
     const saveButton = document.getElementById('saveSupplierEditor');
     if (saveButton) { saveButton.disabled = true; saveButton.textContent = 'Saving...'; }
     const form = new FormData(e.currentTarget);
-    const name = String(form.get('name') || '').trim().replace(/\s+/g, ' ');
+    const name = cleanName(form.get('name'));
     const data = {
       name,
+      normalizedName: normalizeName(name),
       business: String(form.get('business') || '').trim(),
       contactPerson: String(form.get('contactPerson') || '').trim(),
       phone: String(form.get('phone') || '').trim(),
@@ -200,18 +388,23 @@ function openSupplierEditor(existing = null) {
       notes: String(form.get('notes') || '').trim(),
       updatedAt: serverTimestamp()
     };
+
     try {
       if (!name) throw new Error('Supplier name is required.');
-
       const duplicate = suppliers.find(s => s.id !== existing?.id && normalizeName(s.name) === normalizeName(name));
       if (duplicate) throw new Error(`A supplier named “${duplicate.name}” already exists. Edit that record instead.`);
 
       if (existing?.id) {
         await updateDoc(doc(db, 'suppliers', existing.id), data);
       } else {
-        await addDoc(collection(db, 'suppliers'), { ...data, source: 'manual', createdAt: serverTimestamp(), createdBy: currentUser?.uid || null });
+        await addDoc(collection(db, 'suppliers'), {
+          ...data,
+          source: 'manual',
+          createdAt: serverTimestamp(),
+          createdBy: currentUser?.uid || null
+        });
       }
-      modal.remove();
+      close();
       await loadSuppliers();
     } catch (err) {
       console.error('Supplier save failed:', err);
@@ -225,11 +418,19 @@ async function loadSuppliers() {
   loading = true;
   render();
   try {
-    const snap = await getDocs(collection(db, 'suppliers'));
-    suppliers = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+    const [supplierSnap, purchaseSnap] = await Promise.all([
+      getDocs(collection(db, 'suppliers')),
+      getDocs(collection(db, 'purchases'))
+    ]);
+    suppliers = supplierSnap.docs.map(d => ({ id: d.id, ...d.data() }))
+      .sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+    purchases = purchaseSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderSupplierOptions();
   } catch (err) {
     console.error('Supplier records load failed:', err);
     suppliers = [];
+    purchases = [];
+    showSyncMessage(`Could not load supplier records: ${err?.message || 'Unknown error'}`, true);
   } finally {
     loading = false;
     render();
@@ -240,9 +441,25 @@ function boot() {
   if (!install()) return;
   onAuthStateChanged(auth, user => {
     currentUser = user;
-    if (user) loadSuppliers();
+    if (user) {
+      loadSuppliers();
+      installPurchaseSupplierHelper();
+    }
   });
 }
+
+// Purchases is dynamically injected after authentication. Watch for that panel
+// so the Supplier Master can enhance the supplier input without tightly coupling
+// the two modules together.
+const observer = new MutationObserver(() => {
+  if (installed) {
+    installPurchaseSupplierHelper();
+    renderSupplierOptions();
+  } else {
+    install();
+  }
+});
+observer.observe(document.body, { childList: true, subtree: true });
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
 else boot();
