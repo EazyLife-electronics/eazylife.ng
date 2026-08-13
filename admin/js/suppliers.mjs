@@ -1,4 +1,3 @@
-// admin/js/suppliers.mjs
 // Supplier master records for the Purchases tab.
 import { initFirebase } from '../../js/firebase.mjs';
 import { collection, getDocs, addDoc, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -11,6 +10,8 @@ let currentUser = null;
 let installed = false;
 let loading = false;
 let syncing = false;
+let purchaseSupplierPickerInstalled = false;
+let purchaseSupplierOutsideClickInstalled = false;
 
 function escapeHtml(v) {
   return String(v ?? '').replace(/[&<>'\"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[c]));
@@ -81,6 +82,7 @@ export async function ensureSupplierRecord(name) {
     source: 'purchase', created: true
   };
   suppliers.push(record);
+  renderSupplierOptions();
   return record;
 }
 
@@ -120,32 +122,142 @@ function install() {
   return true;
 }
 
+function setPurchaseSupplierStatus(text, type = 'neutral') {
+  const status = document.getElementById('purchaseSupplierStatus');
+  if (!status) return;
+  status.textContent = text;
+  const classes = {
+    linked: 'text-emerald-600',
+    new: 'text-amber-600',
+    neutral: 'text-gray-400'
+  };
+  status.className = `text-[10px] mt-1 px-1 ${classes[type] || classes.neutral}`;
+}
+
+function hidePurchaseSupplierDropdown() {
+  document.getElementById('purchaseSupplierDropdown')?.classList.add('hidden');
+}
+
+function showPurchaseSupplierDropdown() {
+  const dropdown = document.getElementById('purchaseSupplierDropdown');
+  if (!dropdown) return;
+  dropdown.classList.remove('hidden');
+}
+
+function renderPurchaseSupplierDropdown(query = '') {
+  const dropdown = document.getElementById('purchaseSupplierDropdown');
+  if (!dropdown) return;
+  const key = normalizeName(query);
+  const matches = suppliers
+    .filter(s => !key || normalizeName(s.name).includes(key) || normalizeName(s.business).includes(key) || normalizeName(s.contactPerson).includes(key))
+    .sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+
+  const exact = findSupplierByName(query);
+  let html = matches.map(s => `
+    <button type="button" class="purchaseSupplierOption w-full text-left px-3 py-2.5 hover:bg-gray-50 border-b border-gray-50 last:border-0" data-id="${escapeHtml(s.id)}" data-name="${escapeHtml(s.name)}">
+      <span class="block text-xs font-bold text-gray-800">${escapeHtml(s.name)}</span>
+      <span class="block text-[10px] text-gray-400">${escapeHtml(s.contactPerson || s.business || 'Supplier Master record')}</span>
+    </button>`).join('');
+
+  if (!exact && cleanName(query)) {
+    html += `<div class="px-3 py-2.5 bg-amber-50 border-t border-amber-100"><p class="text-[10px] font-bold text-amber-700">New supplier</p><p class="text-[10px] text-amber-600 mt-0.5">“${escapeHtml(cleanName(query))}” will be added to Supplier Master when the purchase is received.</p></div>`;
+  }
+  if (!html) html = '<p class="px-3 py-3 text-[10px] text-gray-400">No matching suppliers.</p>';
+  dropdown.innerHTML = html;
+  dropdown.querySelectorAll('.purchaseSupplierOption').forEach(option => {
+    option.addEventListener('mousedown', event => event.preventDefault());
+    option.addEventListener('click', () => {
+      const input = document.getElementById('purchaseSupplier');
+      const record = suppliers.find(s => s.id === option.dataset.id);
+      if (input && record) {
+        input.value = record.name;
+        input.dataset.supplierId = record.id;
+        setPurchaseSupplierStatus(`Linked to Supplier Master · ${record.contactPerson || record.business || 'record ready'}`, 'linked');
+      }
+      hidePurchaseSupplierDropdown();
+    });
+  });
+}
+
 function installPurchaseSupplierHelper() {
   const input = document.getElementById('purchaseSupplier');
-  if (!input || input.dataset.supplierMasterEnhanced === '1') return false;
-  input.dataset.supplierMasterEnhanced = '1';
-  input.setAttribute('list', 'supplierMasterOptions');
-  input.setAttribute('autocomplete', 'off');
-  input.placeholder = 'Supplier name — select saved supplier or type new';
+  if (!input) return false;
 
+  if (!purchaseSupplierPickerInstalled) {
+    purchaseSupplierPickerInstalled = true;
+    input.dataset.supplierMasterEnhanced = '1';
+    input.setAttribute('autocomplete', 'off');
+    input.placeholder = 'Select Supplier Master record or type a new supplier';
+
+    const wrapper = input.parentElement;
+    if (wrapper) {
+      wrapper.classList.add('relative');
+      const status = document.createElement('p');
+      status.id = 'purchaseSupplierStatus';
+      status.className = 'text-[10px] mt-1 px-1 text-gray-400';
+      status.textContent = 'Choose an existing supplier or type a new name.';
+      input.insertAdjacentElement('afterend', status);
+
+      const dropdown = document.createElement('div');
+      dropdown.id = 'purchaseSupplierDropdown';
+      dropdown.className = 'hidden absolute left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden max-h-64 overflow-y-auto';
+      status.insertAdjacentElement('afterend', dropdown);
+    }
+
+    input.addEventListener('focus', () => {
+      renderPurchaseSupplierDropdown(input.value);
+      showPurchaseSupplierDropdown();
+    });
+    input.addEventListener('input', () => {
+      const record = findSupplierByName(input.value);
+      if (record) {
+        input.value = record.name;
+        input.dataset.supplierId = record.id;
+        setPurchaseSupplierStatus(`Linked to Supplier Master · ${record.contactPerson || record.business || 'record ready'}`, 'linked');
+      } else {
+        delete input.dataset.supplierId;
+        setPurchaseSupplierStatus(cleanName(input.value) ? 'New supplier — it will be created in Supplier Master when received.' : 'Choose an existing supplier or type a new name.', cleanName(input.value) ? 'new' : 'neutral');
+      }
+      renderPurchaseSupplierDropdown(input.value);
+      showPurchaseSupplierDropdown();
+    });
+    input.addEventListener('change', () => {
+      const record = findSupplierByName(input.value);
+      if (record) {
+        input.value = record.name;
+        input.dataset.supplierId = record.id;
+        setPurchaseSupplierStatus(`Linked to Supplier Master · ${record.contactPerson || record.business || 'record ready'}`, 'linked');
+      }
+    });
+    input.addEventListener('keydown', event => {
+      if (event.key === 'Escape') hidePurchaseSupplierDropdown();
+    });
+  }
+
+  renderSupplierOptions();
+  if (!purchaseSupplierOutsideClickInstalled) {
+    purchaseSupplierOutsideClickInstalled = true;
+    document.addEventListener('click', event => {
+      const input = document.getElementById('purchaseSupplier');
+      const dropdown = document.getElementById('purchaseSupplierDropdown');
+      if (input && dropdown && !input.contains(event.target) && !dropdown.contains(event.target)) hidePurchaseSupplierDropdown();
+    });
+  }
+  return true;
+}
+
+function renderSupplierOptions() {
+  const input = document.getElementById('purchaseSupplier');
+  if (!input) return;
   let list = document.getElementById('supplierMasterOptions');
   if (!list) {
     list = document.createElement('datalist');
     list.id = 'supplierMasterOptions';
     input.insertAdjacentElement('afterend', list);
   }
-  input.addEventListener('change', () => {
-    const record = findSupplierByName(input.value);
-    if (record) input.value = record.name;
-  });
-  renderSupplierOptions();
-  return true;
-}
-
-function renderSupplierOptions() {
-  const list = document.getElementById('supplierMasterOptions');
-  if (!list) return;
+  input.setAttribute('list', 'supplierMasterOptions');
   list.innerHTML = suppliers.slice().sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''))).map(s => `<option value="${escapeHtml(s.name)}">${escapeHtml(s.contactPerson || s.business || '')}</option>`).join('');
+  if (document.activeElement === input) renderPurchaseSupplierDropdown(input.value);
 }
 
 function render() {
@@ -298,8 +410,6 @@ function boot() {
 
 const observer = new MutationObserver(() => {
   if (!installed) install();
-  // Only react when the Purchases UI itself appears. Do not rewrite the datalist
-  // on every mutation because this observer also sees datalist changes.
   installPurchaseSupplierHelper();
 });
 observer.observe(document.body, { childList: true, subtree: true });
