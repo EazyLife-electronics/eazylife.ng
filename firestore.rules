@@ -1,0 +1,70 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'damzyeazy@gmail.com';
+    }
+
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /orders/{orderId} {
+      // Customers may place orders, but the Admin account is the only account
+      // allowed to read the full order collection or change/delete orders.
+      allow create: if request.resource.data.keys().hasAll(['items', 'customerName', 'phone', 'total'])
+                    && request.resource.data.total is number
+                    && request.resource.data.items is list;
+      allow get: if true;
+      allow list: if isAdmin();
+      allow update, delete: if isAdmin();
+
+      match /payments/{paymentId} {
+        // Payments are private financial records. Only the designated Admin can
+        // read or create them; customers never write payment ledger entries.
+        allow read, create, update, delete: if isAdmin();
+      }
+    }
+
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /heroes/{heroId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasAll(['name', 'text'])
+                    && request.resource.data.name is string
+                    && request.resource.data.text is string;
+      allow update, delete: if isAdmin();
+    }
+
+    match /requests/{requestId} {
+      allow create: if request.resource.data.keys().hasAll(['name', 'phone', 'need'])
+                    && request.resource.data.name is string
+                    && request.resource.data.phone is string;
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /inventoryMovements/{movementId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
+    match /purchases/{purchaseId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
+    match /suppliers/{supplierId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+  }
+}

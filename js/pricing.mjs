@@ -1,0 +1,235 @@
+// js/pricing.mjs
+// Shared pricing logic — kept separate from the Firestore data layer so it can be reused
+// anywhere (shop cart, future bulk-pricing promos, etc).
+
+/**
+ * Cascading/compounding discount: each additional unit adds its full fee, then the
+ * WHOLE running total takes another discount hit — not just a flat % off the sum.
+ * This makes earlier units get discounted multiple times over as the count grows,
+ * so the average cost per item keeps dropping the more someone buys.
+ *
+ * Example with perUnitFee=750, rate=0.10:
+ *   1 item:  750
+ *   2 items: (750+750) * 0.90            = 1350
+ *   3 items: (1350+750) * 0.90           = 1890
+ *   4 items: (1890+750) * 0.90           = 2376
+ *
+ * @param {number} perUnitFee - base fee for a single unit
+ * @param {number} count - total number of units
+ * @param {number} rate - discount rate per additional unit, e.g. 0.10 for 10%
+ */
+export function calcCascadingFee(perUnitFee, count, rate) {
+  if (!perUnitFee || count <= 0) return 0;
+  let total = perUnitFee;
+  for (let i = 1; i < count; i++) {
+    total = (total + perUnitFee) * (1 - rate);
+  }
+  return Math.round(total);
+}
+
+/**
+ * Same cascading logic as calcCascadingFee, but for a cart where different units can carry
+ * different per-unit delivery fees (a product/variant can override the general fee, or
+ * inherit it). Units are processed in the order given — first unit is its own fee with no
+ * discount yet, every unit after that adds its own fee then the running total is discounted.
+ *
+ * @param {number[]} unitFees - one entry per physical unit in the cart, in cart order
+ * @param {number} rate - discount rate per additional unit, e.g. 0.10 for 10%
+ */
+export function calcCascadingFeeMixed(unitFees, rate) {
+  if (!unitFees || unitFees.length === 0) return 0;
+  let total = unitFees[0] || 0;
+  for (let i = 1; i < unitFees.length; i++) {
+    total = (total + (unitFees[i] || 0)) * (1 - rate);
+  }
+  return Math.round(total);
+}
+
+/**
+ * Builds a human-readable "here's what you'd expect to pay" breakdown for the delivery fee,
+ * alongside what's actually charged after the grouped/cascading discount — for showing
+ * customers the discount is real and grows the more they buy.
+ *
+ * Terms are grouped purely by per-unit fee amount (e.g. "1000×3 + 1500×3 + 750×4"), regardless
+ * of which product/route each unit belongs to — it's the naive "if nothing were discounted"
+ * total a shopper could work out themselves, not a breakdown of the grouping logic.
+ *
+ * @param {Array<{quantity:number, unitDeliveryFee:number|null, deliveryRoute:'general'|'separate', productId:string, variantId:string}>} cartLines
+ * @param {number} generalFeePerItem
+ * @param {number} rate
+ * @returns {{terms:{fee:number,qty:number}[], expression:string, naiveTotal:number, actualTotal:number, savings:number, savingsPercent:number}}
+ */
+export function buildDeliveryFeeSummary(cartLines, generalFeePerItem, rate) {
+  const feeCounts = new Map(); // fee -> qty
+
+  (cartLines || []).forEach(line => {
+    const fee = line.unitDeliveryFee != null ? line.unitDeliveryFee : generalFeePerItem;
+    feeCounts.set(fee, (feeCounts.get(fee) || 0) + line.quantity);
+  });
+
+  const terms = [...feeCounts.entries()]
+    .sort((a, b) => b[0] - a[0]) // largest fee first, matches how people'd naturally list it
+    .map(([fee, qty]) => ({ fee, qty }));
+
+  const naiveTotal = terms.reduce((sum, t) => sum + t.fee * t.qty, 0);
+  const actualTotal = calcGroupedDeliveryFee(cartLines, generalFeePerItem, rate);
+  const savings = naiveTotal - actualTotal;
+  const savingsPercent = naiveTotal > 0 ? (savings / naiveTotal) * 100 : 0;
+  const expression = terms.map(t => `${t.fee.toLocaleString()}×${t.qty}`).join(' + ');
+
+  return { terms, expression, naiveTotal, actualTotal, savings, savingsPercent };
+}
+
+/** A variant's own delivery fee if it overrides the general one, else the general fee. */
+export function resolveDeliveryFee(variant, generalFeePerItem) {
+  return (variant && variant.deliveryFee != null && variant.deliveryFee !== '')
+    ? variant.deliveryFee
+    : generalFeePerItem;
+}
+
+/**
+ * Groups delivery fee calculation: units on the "general route" all pool together and
+ * cascade as one stack (so prodX and prodY both on general, ₦750 each, combine their
+ * quantities into one compounding discount). A variant marked as its own separate route
+ * cascades only against its own quantity, isolated from everything else, and that group's
+ * total is simply added on top — it doesn't get cheaper just because the general pool is big,
+ * and the general pool doesn't get cheaper because of it either.
+ *
+ * A variant with no fee override (deliveryFee == null) is always on the general route, using
+ * the general fee amount. A variant WITH a custom fee only joins the general pool if its
+ * route is explicitly set to 'general' — otherwise, even a custom fee that happens to match
+ * the general amount stays in its own isolated group.
+ *
+ * @param {Array<{quantity:number, unitDeliveryFee:number|null, deliveryRoute:'general'|'separate', productId:string, variantId:string}>} cartLines
+ * @param {number} generalFeePerItem
+ * @param {number} rate
+ */
+export function calcGroupedDeliveryFee(cartLines, generalFeePerItem, rate) {
+  const generalUnits = [];
+  const separateGroups = new Map(); // "productId::variantId" -> [fee, fee, ...]
+
+  (cartLines || []).forEach(line => {
+    const fee = line.unitDeliveryFee != null ? line.unitDeliveryFee : generalFeePerItem;
+    const isGeneral = line.unitDeliveryFee == null || line.deliveryRoute !== 'separate';
+    if (isGeneral) {
+      for (let i = 0; i < line.quantity; i++) generalUnits.push(fee);
+    } else {
+      const key = `${line.productId}::${line.variantId}`;
+      if (!separateGroups.has(key)) separateGroups.set(key, []);
+      const arr = separateGroups.get(key);
+      for (let i = 0; i < line.quantity; i++) arr.push(fee);
+    }
+  });
+
+  let total = calcCascadingFeeMixed(generalUnits, rate);
+  for (const fees of separateGroups.values()) {
+    total += calcCascadingFeeMixed(fees, rate);
+  }
+  return total;
+}
+
+/** The effective price for a variant, accounting for a promo price if set. */
+export function variantUnitPrice(variant) {
+  if (!variant) return 0;
+  return variant.promoPrice > 0 ? variant.promoPrice : (variant.price || 0);
+}
+
+/** Whether a variant currently has an active promo (a promoPrice lower than its normal price). */
+export function hasPromo(variant) {
+  return !!(variant && variant.promoPrice > 0 && variant.promoPrice < variant.price);
+}
+
+/** Percentage discount for a variant, 0 if it has no active promo. */
+export function variantDiscountPercent(variant) {
+  if (!hasPromo(variant)) return 0;
+  return ((variant.price - variant.promoPrice) / variant.price) * 100;
+}
+
+/** Whether any variant of a product currently has an active promo — drives the "Sale" badge. */
+export function productHasPromo(product) {
+  return (product.variants || []).some(hasPromo);
+}
+
+/** Lowest and highest effective (post-promo) price across a product's variants, for "From ₦X" display. */
+export function productPriceRange(product) {
+  const prices = (product.variants || []).map(variantUnitPrice).filter(p => p > 0);
+  if (prices.length === 0) return { min: 0, max: 0 };
+  return { min: Math.min(...prices), max: Math.max(...prices) };
+}
+
+/** Lowest and highest *original* (pre-promo) price across a product's variants, for a struck-through reference range. */
+export function productOriginalPriceRange(product) {
+  const prices = (product.variants || []).map(v => v.price || 0).filter(p => p > 0);
+  if (prices.length === 0) return { min: 0, max: 0 };
+  return { min: Math.min(...prices), max: Math.max(...prices) };
+}
+
+/**
+ * Naive (pre-promo) vs actual (post-promo) item total, mirroring buildDeliveryFeeSummary's
+ * shape, so the cart can show how much was saved from promo pricing specifically — separate
+ * from and not mixed into the delivery discount.
+ * @param {Array<{unitPrice:number, originalUnitPrice:number, quantity:number}>} cartLines
+ */
+export function buildPriceSavingsSummary(cartLines) {
+  let naiveTotal = 0;
+  let actualTotal = 0;
+  (cartLines || []).forEach(line => {
+    const original = line.originalUnitPrice != null ? line.originalUnitPrice : line.unitPrice;
+    naiveTotal += original * line.quantity;
+    actualTotal += line.unitPrice * line.quantity;
+  });
+  const savings = naiveTotal - actualTotal;
+  const savingsPercent = naiveTotal > 0 ? (savings / naiveTotal) * 100 : 0;
+  return { naiveTotal, actualTotal, savings, savingsPercent };
+}
+
+/**
+ * A variant's effective bulk-savings percent + minimum qualifying quantity, honoring its two
+ * switches: bulkSavingsEnabled (off by default — most variants never get this) and, once
+ * enabled, bulkSavingsMode deciding whether it uses its own percent/minQty or inherits the
+ * site-wide general ones. Both values travel together — a variant can't inherit one and
+ * override the other.
+ */
+export function resolveBulkSavings(variant, generalPercent, generalMinQty) {
+  if (!variant || !variant.bulkSavingsEnabled) return { percent: 0, minQty: null };
+  if (variant.bulkSavingsMode === 'own') {
+    return { percent: variant.bulkSavingsPercent || 0, minQty: variant.bulkSavingsMinQty || 1 };
+  }
+  return { percent: generalPercent || 0, minQty: generalMinQty || 1 };
+}
+
+/**
+ * Flat percentage off a line's whole total once its quantity reaches the cutoff — a single
+ * threshold, not tiered, and NOT cascading like the delivery fee. Each line's discount is
+ * independent of every other line: e.g. (150000×3)×(1-1.5%) + (200000×1)×(1-0.5%), simply added.
+ */
+export function calcBulkSavingsForLine(unitPrice, quantity, percent, minQty) {
+  if (!percent || !minQty || quantity < minQty) return 0;
+  return Math.round(unitPrice * quantity * (percent / 100));
+}
+
+/**
+ * Naive (no bulk discount) vs actual line totals, mirroring buildPriceSavingsSummary's shape,
+ * so the cart can show bulk savings as its own line — separate from promo pricing and delivery.
+ * @param {Array<{unitPrice:number, quantity:number, bulkSavingsPercent:number, bulkSavingsMinQty:number|null}>} cartLines
+ *   Pass each line's already-*resolved* percent/minQty (via resolveBulkSavings at add-to-cart time), not the raw variant switches.
+ */
+export function buildBulkSavingsSummary(cartLines) {
+  let naiveTotal = 0;
+  let actualTotal = 0;
+  (cartLines || []).forEach(line => {
+    const lineTotal = line.unitPrice * line.quantity;
+    const discount = calcBulkSavingsForLine(line.unitPrice, line.quantity, line.bulkSavingsPercent, line.bulkSavingsMinQty);
+    naiveTotal += lineTotal;
+    actualTotal += lineTotal - discount;
+  });
+  const savings = naiveTotal - actualTotal;
+  const savingsPercent = naiveTotal > 0 ? (savings / naiveTotal) * 100 : 0;
+  return { naiveTotal, actualTotal, savings, savingsPercent };
+}
+
+/** A short readable label for a variant, e.g. "Space Grey · 16GB / 512GB". */
+export function variantLabel(variant) {
+  const parts = [variant.color, [variant.ram, variant.rom].filter(Boolean).join(' / ')].filter(Boolean);
+  return parts.join(' · ') || 'Standard';
+}

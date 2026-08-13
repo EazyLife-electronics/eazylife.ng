@@ -1,0 +1,1656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EazyLife | Official Catalog</title>
+    <link rel="icon" type="image/png" href="assets/pictures/icon_dark.png" />
+    <link rel="apple-touch-icon" href="assets/pictures/icon_dark.png" />
+    <script>
+        (function () {
+            var saved = localStorage.getItem('eazylife-theme');
+            var theme = saved || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            if (theme === 'dark') document.documentElement.classList.add('dark');
+        })();
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { darkMode: 'class' }</script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root { --teal: #00B09B; --lime: #8DC63F; --dark: #1a2e2b; }
+        body { font-family: 'DM Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        h1, h2, .font-syne { font-family: 'Poppins', sans-serif; }
+        .bg-eazylife { background: linear-gradient(135deg, #00B09B, #8DC63F); }
+        .text-teal { color: var(--teal); }
+        .active-cat { background-color: var(--teal) !important; color: white !important; border-color: var(--teal) !important; }
+        .product-card { transition: transform 0.2s ease; border: 1px solid #eee; position: relative; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        #count.has-items { animation: pulse 0.5s ease-in-out; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+        .dark body { background: #0f1715; }
+        .dark .product-card { background: #182420; border-color: #2a3835; }
+        .dark #search { background: #1c2925; color: #eef2f0; }
+        .dark #search::placeholder { color: #7d8f8b; }
+        .nav-menu { position: relative; }
+        .nav-menu-panel { position: absolute; top: calc(100% + 8px); left: 0; background: #fff; border: 1px solid #eee; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); padding: 8px; min-width: 170px; z-index: 60; }
+        .dark .nav-menu-panel { background: #182420; border-color: #2a3835; }
+        .nav-menu-panel a { display: block; padding: 10px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; color: #1a2e2b; }
+        .dark .nav-menu-panel a { color: #eef2f0; }
+        .nav-menu-panel a:hover { background: #f0fdfb; }
+        .dark .nav-menu-panel a:hover { background: #1c2925; }
+        .request-tile { background: #f0fdfb; border: 1.5px dashed #00B09B; }
+        .dark .request-tile { background: #16302c; }
+        .request-tile h3 { color: #1a2e2b; }
+        .dark .request-tile h3 { color: #eef2f0; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-[#0f1715] pb-24">
+
+<header class="bg-white/90 dark:bg-[#0f1715]/90 backdrop-blur-md border-b dark:border-[#2a3835] sticky top-0 z-50 p-4 shadow-sm">
+    <div class="max-w-6xl mx-auto flex justify-between items-center">
+        <a href="index.html" class="flex items-center gap-2">
+            <img id="navLogo" src="assets/pictures/logo_black_transparent.png" class="h-9" alt="EazyLife">
+        </a>
+        <div class="flex items-center gap-2">
+            <button id="themeToggle" type="button" aria-label="Toggle dark mode" class="w-10 h-10 rounded-full border border-gray-200 dark:border-[#2a3835] dark:bg-[#182420] flex items-center justify-center text-gray-700 dark:text-gray-200">
+                <i class="fas fa-moon"></i>
+            </button>
+            <div class="nav-menu">
+                <button id="navMenuBtn" type="button" aria-label="Open menu" class="w-10 h-10 rounded-full border border-gray-200 dark:border-[#2a3835] dark:bg-[#182420] flex items-center justify-center text-gray-700 dark:text-gray-200">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div id="navMenuPanel" class="nav-menu-panel hidden">
+                    <a href="index.html"><i class="fas fa-house fa-fw"></i> Home</a>
+                    <a href="track.html"><i class="fas fa-truck-fast fa-fw"></i> Track Order</a>
+                    <a href="index.html#services"><i class="fas fa-layer-group fa-fw"></i> Services</a>
+                    <a href="index.html#contact"><i class="fas fa-address-card fa-fw"></i> Contact</a>
+                </div>
+            </div>
+            <button onclick="showCart()" class="bg-eazylife text-white px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 shadow-lg hover:opacity-90 transition-all">
+                <i class="fas fa-shopping-basket"></i>
+                <span id="count" class="bg-white text-teal-600 rounded-full px-2 py-0.5 text-xs">0</span>
+            </button>
+            <a href="https://wa.me/2347051548082" target="_blank" class="w-10 h-10 rounded-full bg-[#25D366] text-white flex items-center justify-center">
+                <i class="fab fa-whatsapp"></i>
+            </a>
+        </div>
+    </div>
+</header>
+
+<script>
+    function applyShopThemeVisuals() {
+        var isDark = document.documentElement.classList.contains('dark');
+        var logo = document.getElementById('navLogo');
+        var icon = document.querySelector('#themeToggle i');
+        logo.src = isDark ? 'assets/pictures/logo_white_transparent.png' : 'assets/pictures/logo_black_transparent.png';
+        if (icon) icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+    }
+    applyShopThemeVisuals();
+
+    document.getElementById('themeToggle').addEventListener('click', function () {
+        var isDark = document.documentElement.classList.toggle('dark');
+        localStorage.setItem('eazylife-theme', isDark ? 'dark' : 'light');
+        applyShopThemeVisuals();
+    });
+
+    var menuBtn = document.getElementById('navMenuBtn');
+    var menuPanel = document.getElementById('navMenuPanel');
+    menuBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        menuPanel.classList.toggle('hidden');
+    });
+    document.addEventListener('click', function (e) {
+        if (!menuPanel.classList.contains('hidden') && !menuPanel.contains(e.target) && e.target !== menuBtn) {
+            menuPanel.classList.add('hidden');
+        }
+    });
+</script>
+
+<main class="p-4 max-w-6xl mx-auto">
+    <div class="mt-4 mb-8">
+        <h1 class="text-3xl font-black text-gray-900 dark:text-gray-100 tracking-tight">Tech <span class="text-teal">Catalog</span></h1>
+        <p class="text-gray-500 dark:text-gray-400 text-sm">Genuine Laptops & Embedded Systems.</p>
+    </div>
+
+    <div class="sticky top-[76px] z-40 bg-gray-50/95 dark:bg-[#0f1715]/95 pt-2 pb-4">
+        <div class="relative mb-4">
+            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            <input id="search" placeholder="Search laptops, Arduino, sensors..."
+                   class="w-full pl-12 pr-4 py-4 rounded-2xl border-none shadow-sm focus:ring-2 focus:ring-[#00B09B] outline-none dark:text-gray-100">
+        </div>
+        <div id="catFilters" class="flex gap-2 overflow-x-auto no-scrollbar pb-2"></div>
+        <div class="flex gap-2 mt-1">
+            <button id="filtersBtn" onclick="openFilters()" type="button"
+                    class="relative flex-1 p-2.5 rounded-xl shadow-sm text-xs font-bold outline-none bg-white dark:bg-[#182420] text-gray-600 dark:text-gray-200 flex items-center justify-center gap-1.5">
+                <i class="fas fa-sliders"></i> Filters
+                <span id="filterBadge" class="hidden absolute -top-1.5 -right-1.5 bg-teal-600 text-white text-[9px] font-black w-4 h-4 rounded-full items-center justify-center" style="background:var(--teal);">0</span>
+            </button>
+            <select id="sortSelect" class="flex-1 p-2.5 rounded-xl border-none shadow-sm text-xs outline-none dark:bg-[#182420] dark:text-gray-100">
+                <option value="default">Sort: Featured</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="name-asc">Name: A–Z</option>
+            </select>
+        </div>
+        <div id="activeFilterChips" class="hidden flex flex-wrap gap-1.5 mt-2"></div>
+    </div>
+
+    <div id="loader" class="flex flex-col items-center justify-center py-20 text-gray-400">
+        <div class="animate-spin text-teal-500 text-3xl mb-3"><i class="fas fa-circle-notch"></i></div>
+        <p class="font-medium">Syncing Inventory...</p>
+    </div>
+
+    <div id="grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"></div>
+</main>
+
+<!-- PRODUCT DETAIL MODAL — pick variant + upgrades, price updates live -->
+<div id="productModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-end md:items-center justify-center">
+    <div class="bg-white dark:bg-[#182420] w-full max-w-md rounded-t-[32px] md:rounded-[24px] shadow-2xl p-6 overflow-y-auto max-h-[90vh]">
+        <div class="flex justify-between items-start mb-3">
+            <div>
+                <h2 id="pmName" class="font-syne font-extrabold text-xl text-gray-900 dark:text-gray-100 leading-tight"></h2>
+                <p id="pmMeta" class="text-xs text-gray-400 mt-1"></p>
+            </div>
+            <button onclick="hideProductModal()" class="text-gray-400 p-1 text-3xl">&times;</button>
+        </div>
+        <img id="pmImage" class="w-full h-40 object-contain rounded-xl bg-gray-50 dark:bg-[#1c2925] mb-4">
+        <p id="pmDesc" class="text-sm text-gray-500 dark:text-gray-400 mb-4"></p>
+
+        <div class="mb-4">
+            <label class="text-[10px] font-black uppercase text-gray-400 mb-1 block">Choose Option</label>
+            <select id="pmVariant" class="w-full p-3 bg-gray-50 dark:bg-[#1c2925] dark:text-gray-100 border border-gray-200 dark:border-[#2a3835] rounded-xl text-sm outline-none"></select>
+        </div>
+
+        <div id="pmUpgradesWrap" class="mb-4 hidden">
+            <label class="text-[10px] font-black uppercase text-gray-400 mb-2 block">Optional Upgrades</label>
+            <div id="pmUpgrades" class="space-y-2"></div>
+        </div>
+
+        <div class="flex items-center justify-between mb-5 bg-gray-50 dark:bg-[#1c2925] rounded-xl p-3">
+            <span class="text-xs font-bold text-gray-500 dark:text-gray-400">Quantity</span>
+            <div class="flex items-center gap-3">
+                <button onclick="changePmQty(-1)" class="w-8 h-8 bg-white dark:bg-[#182420] dark:text-gray-100 rounded-lg shadow-sm font-bold">-</button>
+                <input id="pmQty" type="text" inputmode="numeric" pattern="[0-9]*" value="1" onfocus="this.select()" onchange="setPmQty(this.value)" class="font-black text-sm w-10 text-center dark:text-gray-100 bg-white dark:bg-[#182420] rounded-lg py-1.5 outline-none">
+                <button onclick="changePmQty(1)" class="w-8 h-8 bg-white dark:bg-[#182420] dark:text-gray-100 rounded-lg shadow-sm font-bold">+</button>
+            </div>
+        </div>
+
+        <div class="flex justify-between items-center mb-1 px-1">
+            <span class="text-[11px] text-gray-400"><i class="fas fa-tag mr-1"></i>Item price</span>
+            <span class="flex items-center gap-1.5">
+                <span id="pmUnitOriginal" class="hidden text-[10px] text-gray-400 line-through"></span>
+                <span class="text-[11px] font-bold text-gray-500 dark:text-gray-400">₦<span id="pmUnitPrice">0</span>/unit</span>
+            </span>
+        </div>
+        <div id="pmUpgradeLines" class="mb-1"></div>
+        <div class="flex justify-between items-center mb-1 px-1">
+            <span class="text-[11px] text-gray-400"><i class="fas fa-truck-fast mr-1"></i>Delivery</span>
+            <span class="text-[11px] font-bold text-gray-500 dark:text-gray-400">₦<span id="pmDeliveryFee">0</span>/unit <span class="text-teal">· cheaper the more you buy</span></span>
+        </div>
+        <p id="pmBulkHint" class="hidden text-[11px] text-teal font-bold mb-4 px-1"></p>
+
+        <div class="flex justify-between items-center mb-4 px-1 pt-2 border-t border-gray-100 dark:border-[#2a3835]">
+            <span class="font-bold text-gray-500 dark:text-gray-400 text-sm">Price</span>
+            <span class="flex items-center gap-1.5">
+                <span id="pmOriginalPrice" class="hidden text-xs text-gray-400 line-through"></span>
+                <span id="pmDiscountPercent" class="hidden text-[10px] font-black text-teal"></span>
+                <span class="text-2xl font-black text-teal">₦<span id="pmPrice">0</span></span>
+            </span>
+        </div>
+
+        <button id="pmAddBtn" onclick="addPmToCart()" class="bg-gray-900 text-white w-full py-4 rounded-2xl font-black text-lg shadow-xl hover:bg-black transition-all flex items-center justify-center gap-2">
+            <i id="pmAddBtnIcon" class="fas fa-shopping-basket"></i> <span id="pmAddBtnLabel">Add to Cart</span>
+        </button>
+    </div>
+</div>
+
+<!-- FILTERS DRAWER — brand (synced to category), price range, spec filters (RAM/ROM, dynamic per
+     category), and quick toggles for promo items / bulk-savings items / in-stock only. -->
+<div id="filtersModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-end md:items-center justify-center">
+    <div class="bg-white dark:bg-[#182420] w-full max-w-md rounded-t-[32px] md:rounded-[24px] shadow-2xl p-6 overflow-y-auto max-h-[90vh]">
+        <div class="flex justify-between items-center mb-5">
+            <h2 class="font-syne font-extrabold text-xl text-gray-900 dark:text-gray-100">Filters</h2>
+            <div class="flex items-center gap-3">
+                <button onclick="clearFilters()" class="text-teal text-xs font-bold">Clear all</button>
+                <button onclick="closeFilters()" class="text-gray-400 p-1 text-3xl leading-none">&times;</button>
+            </div>
+        </div>
+
+        <div class="mb-5">
+            <label class="text-[10px] font-black uppercase text-gray-400 mb-2 block">Price Range (₦)</label>
+            <div class="flex items-center gap-2">
+                <input id="filterPriceMin" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="Min"
+                       class="w-full p-3 bg-gray-50 dark:bg-[#1c2925] dark:text-gray-100 border border-gray-200 dark:border-[#2a3835] rounded-xl text-sm outline-none">
+                <span class="text-gray-400 text-xs">—</span>
+                <input id="filterPriceMax" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="Max"
+                       class="w-full p-3 bg-gray-50 dark:bg-[#1c2925] dark:text-gray-100 border border-gray-200 dark:border-[#2a3835] rounded-xl text-sm outline-none">
+            </div>
+            <p id="filterPriceHint" class="text-[10px] text-gray-400 mt-1 px-1"></p>
+        </div>
+
+        <div id="filterBrandWrap" class="mb-5 hidden">
+            <label class="text-[10px] font-black uppercase text-gray-400 mb-2 block">Brand</label>
+            <div id="filterBrandChips" class="flex flex-wrap gap-2"></div>
+        </div>
+
+        <div id="filterRamWrap" class="mb-5 hidden">
+            <label class="text-[10px] font-black uppercase text-gray-400 mb-2 block">RAM</label>
+            <div id="filterRamChips" class="flex flex-wrap gap-2"></div>
+        </div>
+
+        <div id="filterRomWrap" class="mb-5 hidden">
+            <label class="text-[10px] font-black uppercase text-gray-400 mb-2 block">Storage</label>
+            <div id="filterRomChips" class="flex flex-wrap gap-2"></div>
+        </div>
+
+        <div class="mb-6 space-y-2">
+            <label class="text-[10px] font-black uppercase text-gray-400 mb-1 block">Deals & Availability</label>
+            <label class="flex items-center justify-between bg-gray-50 dark:bg-[#1c2925] rounded-xl p-3 text-sm dark:text-gray-100 cursor-pointer">
+                <span class="flex items-center gap-2"><i class="fas fa-tags text-teal"></i> On promotion</span>
+                <input id="filterPromo" type="checkbox" class="w-4 h-4 accent-[#00B09B]">
+            </label>
+            <label class="flex items-center justify-between bg-gray-50 dark:bg-[#1c2925] rounded-xl p-3 text-sm dark:text-gray-100 cursor-pointer">
+                <span class="flex items-center gap-2"><i class="fas fa-boxes-stacked text-teal"></i> Bulk savings available</span>
+                <input id="filterBulk" type="checkbox" class="w-4 h-4 accent-[#00B09B]">
+            </label>
+            <label class="flex items-center justify-between bg-gray-50 dark:bg-[#1c2925] rounded-xl p-3 text-sm dark:text-gray-100 cursor-pointer">
+                <span class="flex items-center gap-2"><i class="fas fa-check-circle text-teal"></i> In stock only</span>
+                <input id="filterInStock" type="checkbox" class="w-4 h-4 accent-[#00B09B]">
+            </label>
+        </div>
+
+        <button onclick="applyFilters()" class="bg-gray-900 text-white w-full py-4 rounded-2xl font-black text-lg shadow-xl hover:bg-black transition-all flex items-center justify-center gap-2">
+            <i class="fas fa-filter"></i> <span id="filterApplyLabel">Show results</span>
+        </button>
+    </div>
+</div>
+
+<!-- CART / CHECKOUT MODAL -->
+<div id="cartModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-end md:items-center justify-center">
+    <div class="bg-white dark:bg-[#182420] w-full max-w-md rounded-t-[32px] md:rounded-[24px] shadow-2xl p-6 overflow-y-auto max-h-[90vh]">
+
+        <!-- Step 1: cart — mutable. Edit quantity, toggle items in/out, fill contact details. -->
+        <div id="cartStep">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="font-syne font-extrabold text-2xl text-gray-900 dark:text-gray-100">Your Order</h2>
+                <button onclick="hideCart()" class="text-gray-400 p-2 text-3xl">&times;</button>
+            </div>
+
+            <div id="cartItems" class="space-y-4 mb-8"></div>
+
+            <p id="cartExcludedNote" class="hidden text-[11px] text-gray-400 px-2 mb-4">Unchecked items stay in your cart — they won't be included when you check out.</p>
+
+            <div class="bg-gray-100 dark:bg-[#1c2925] p-4 rounded-2xl mb-6 space-y-3">
+                <input id="custName" placeholder="Full Name" class="w-full bg-white dark:bg-[#182420] dark:text-gray-100 border-none p-3 rounded-xl shadow-sm text-sm outline-none">
+                <input id="custPhone" placeholder="Phone / WhatsApp Number" class="w-full bg-white dark:bg-[#182420] dark:text-gray-100 border-none p-3 rounded-xl shadow-sm text-sm outline-none">
+                <textarea id="custAddr" placeholder="Delivery Address or Office" class="w-full bg-white dark:bg-[#182420] dark:text-gray-100 border-none p-3 rounded-xl shadow-sm text-sm outline-none" rows="2"></textarea>
+            </div>
+
+            <div class="flex justify-between items-center px-2 text-sm">
+                <span class="text-gray-500 dark:text-gray-400">Subtotal</span>
+                <span class="flex items-center gap-1.5">
+                    <span id="subtotalOriginal" class="hidden text-[11px] text-gray-400 line-through"></span>
+                    <span id="subtotalSavingsPercent" class="hidden text-[10px] font-black text-teal"></span>
+                    <span class="font-bold text-gray-800 dark:text-gray-100">₦<span id="subtotal">0</span></span>
+                </span>
+            </div>
+            <div id="bulkSavingsRow" class="hidden flex justify-between items-center px-2 text-sm mt-1">
+                <span class="text-gray-500 dark:text-gray-400">Bulk Savings</span>
+                <span class="font-bold text-teal">-₦<span id="bulkSavingsAmount">0</span></span>
+            </div>
+            <div class="flex justify-between items-center px-2 text-sm mt-1">
+                <span class="text-gray-500 dark:text-gray-400">Delivery Fee</span>
+                <span class="flex items-center gap-1.5">
+                    <span id="deliveryNaive" class="hidden text-[11px] text-gray-400 line-through"></span>
+                    <span id="deliverySavingsPercent" class="hidden text-[10px] font-black text-teal"></span>
+                    <span class="font-bold text-gray-800 dark:text-gray-100">₦<span id="deliveryFeeDisplay">0</span></span>
+                </span>
+            </div>
+            <div class="flex justify-between items-center px-2 mt-2 pt-2 border-t border-gray-100 dark:border-[#2a3835]">
+                <span class="font-bold text-gray-500 dark:text-gray-400">Total</span>
+                <span class="flex items-center gap-1.5">
+                    <span id="totalOriginal" class="hidden text-[11px] text-gray-400 line-through"></span>
+                    <span id="totalSavingsPercent" class="hidden text-[10px] font-black text-teal"></span>
+                    <span class="text-2xl font-black text-teal">₦<span id="total">0</span></span>
+                </span>
+            </div>
+            <div id="totalSavedWrap" class="hidden flex justify-end px-2 mt-0.5">
+                <span class="text-[11px] font-bold text-teal">You saved ₦<span id="totalSavedAmount">0</span></span>
+            </div>
+
+            <button onclick="goToCheckout()" id="reviewBtn" class="bg-gray-900 text-white w-full py-4 mt-6 rounded-2xl font-black text-lg shadow-xl hover:bg-black transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
+                <i class="fas fa-arrow-right"></i>
+                Review Order
+            </button>
+            <p class="text-center text-xs text-gray-400 mt-3">No app switch needed — we'll confirm by phone or WhatsApp.</p>
+        </div>
+
+        <!-- Step 2: checkout — immutable confirmation. Same look as the cart, minus toggles and unchecked lines. -->
+        <div id="checkoutStep" class="hidden">
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center gap-2">
+                    <button onclick="backToCart()" class="text-gray-400 p-2 -ml-2 text-xl"><i class="fas fa-arrow-left"></i></button>
+                    <h2 class="font-syne font-extrabold text-2xl text-gray-900 dark:text-gray-100">Confirm Order</h2>
+                </div>
+                <button onclick="hideCart()" class="text-gray-400 p-2 text-3xl">&times;</button>
+            </div>
+
+            <div id="checkoutItems" class="space-y-4 mb-8"></div>
+
+            <div class="bg-gray-100 dark:bg-[#1c2925] p-4 rounded-2xl mb-6 space-y-1.5 text-sm">
+                <p class="text-gray-800 dark:text-gray-100"><span class="text-gray-400 dark:text-gray-500">Name:</span> <span id="coName"></span></p>
+                <p class="text-gray-800 dark:text-gray-100"><span class="text-gray-400 dark:text-gray-500">Phone:</span> <span id="coPhone"></span></p>
+                <p class="text-gray-800 dark:text-gray-100"><span class="text-gray-400 dark:text-gray-500">Address:</span> <span id="coAddr"></span></p>
+            </div>
+
+            <div class="flex justify-between items-center px-2 text-sm">
+                <span class="text-gray-500 dark:text-gray-400">Subtotal</span>
+                <span class="flex items-center gap-1.5">
+                    <span id="subtotalOriginalCo" class="hidden text-[11px] text-gray-400 line-through"></span>
+                    <span id="subtotalSavingsPercentCo" class="hidden text-[10px] font-black text-teal"></span>
+                    <span class="font-bold text-gray-800 dark:text-gray-100">₦<span id="subtotalCo">0</span></span>
+                </span>
+            </div>
+            <div id="bulkSavingsRowCo" class="hidden flex justify-between items-center px-2 text-sm mt-1">
+                <span class="text-gray-500 dark:text-gray-400">Bulk Savings</span>
+                <span class="font-bold text-teal">-₦<span id="bulkSavingsAmountCo">0</span></span>
+            </div>
+            <div class="flex justify-between items-center px-2 text-sm mt-1">
+                <span class="text-gray-500 dark:text-gray-400">Delivery Fee</span>
+                <span class="flex items-center gap-1.5">
+                    <span id="deliveryNaiveCo" class="hidden text-[11px] text-gray-400 line-through"></span>
+                    <span id="deliverySavingsPercentCo" class="hidden text-[10px] font-black text-teal"></span>
+                    <span class="font-bold text-gray-800 dark:text-gray-100">₦<span id="deliveryFeeDisplayCo">0</span></span>
+                </span>
+            </div>
+            <div class="flex justify-between items-center px-2 mt-2 pt-2 border-t border-gray-100 dark:border-[#2a3835]">
+                <span class="font-bold text-gray-500 dark:text-gray-400">Total</span>
+                <span class="flex items-center gap-1.5">
+                    <span id="totalOriginalCo" class="hidden text-[11px] text-gray-400 line-through"></span>
+                    <span id="totalSavingsPercentCo" class="hidden text-[10px] font-black text-teal"></span>
+                    <span class="text-2xl font-black text-teal">₦<span id="totalCo">0</span></span>
+                </span>
+            </div>
+            <div id="totalSavedWrapCo" class="hidden flex justify-end px-2 mt-0.5">
+                <span class="text-[11px] font-bold text-teal">You saved ₦<span id="totalSavedAmountCo">0</span></span>
+            </div>
+
+            <button onclick="submitOrder()" id="submitBtn" class="bg-gray-900 text-white w-full py-4 mt-6 rounded-2xl font-black text-lg shadow-xl hover:bg-black transition-all flex items-center justify-center gap-2">
+                <i class="fas fa-check-circle"></i>
+                Place Order
+            </button>
+            <p class="text-center text-xs text-gray-400 mt-3">No app switch needed — we'll confirm by phone or WhatsApp.</p>
+        </div>
+
+        <!-- Step 3: confirmation (shown after order is written to Firestore) -->
+
+        <div id="confirmStep" class="hidden text-center py-6">
+            <div class="text-5xl text-teal mb-4"><i class="fas fa-circle-check"></i></div>
+            <h2 class="font-syne font-extrabold text-2xl text-gray-900 dark:text-gray-100 mb-2">Order Received!</h2>
+            <p class="text-gray-500 dark:text-gray-400 text-sm mb-4">We've got your order and will reach out shortly to confirm delivery. Thank you for choosing EazyLife.</p>
+            <div class="bg-gray-50 dark:bg-[#1c2925] rounded-2xl p-4 mb-5">
+                <p class="text-[10px] font-black uppercase text-gray-400 mb-1">Your Tracking Code</p>
+                <p id="trackingCodeDisplay" class="text-2xl font-black text-teal tracking-wider mb-2"></p>
+                <p class="text-[11px] text-gray-400">Save this — use it anytime on our <a id="trackLink" href="track.html" class="text-teal font-bold underline">Track Order</a> page to check status.</p>
+            </div>
+            <a id="waConfirmLink" href="#" target="_blank" class="bg-[#25D366] text-white w-full py-3 rounded-2xl font-bold text-sm shadow-lg hover:bg-[#1ebd57] transition-all flex items-center justify-center gap-2 mb-3">
+                <i class="fab fa-whatsapp"></i> Also confirm on WhatsApp (optional)
+            </a>
+            <button onclick="hideCart()" class="text-gray-400 text-sm font-bold">Continue Shopping</button>
+        </div>
+    </div>
+</div>
+
+<!-- REQUEST MODAL — "can't find what you want" / budget-based sourcing -->
+<div id="requestModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-end md:items-center justify-center">
+    <div class="bg-white dark:bg-[#182420] w-full max-w-md rounded-t-[32px] md:rounded-[24px] shadow-2xl p-6 overflow-y-auto max-h-[90vh]">
+
+        <div id="requestStep">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="font-syne font-extrabold text-2xl text-gray-900 dark:text-gray-100">Tell Us What You Need</h2>
+                <button onclick="hideRequestModal()" class="text-gray-400 p-2 text-3xl">&times;</button>
+            </div>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-5">Give us your budget and what you're after — we'll source it, even if it's not in our current catalog.</p>
+
+            <div class="space-y-3 mb-6">
+                <input id="reqName" placeholder="Full Name" class="w-full bg-gray-50 dark:bg-[#1c2925] dark:text-gray-100 border border-gray-200 dark:border-[#2a3835] p-3 rounded-xl text-sm outline-none">
+                <input id="reqPhone" placeholder="Phone / WhatsApp Number" class="w-full bg-gray-50 dark:bg-[#1c2925] dark:text-gray-100 border border-gray-200 dark:border-[#2a3835] p-3 rounded-xl text-sm outline-none">
+                <select id="reqCategory" class="w-full bg-gray-50 dark:bg-[#1c2925] dark:text-gray-100 border border-gray-200 dark:border-[#2a3835] p-3 rounded-xl text-sm outline-none">
+                    <option value="">What kind of item? (optional)</option>
+                    <option value="Laptop">Laptop</option>
+                    <option value="Phone">Phone</option>
+                    <option value="Component">Electronic Component</option>
+                    <option value="Other">Other</option>
+                </select>
+                <input id="reqBudget" type="number" placeholder="Your Budget (₦, optional)" class="w-full bg-gray-50 dark:bg-[#1c2925] dark:text-gray-100 border border-gray-200 dark:border-[#2a3835] p-3 rounded-xl text-sm outline-none">
+                <textarea id="reqNeed" placeholder="Describe what you're looking for" rows="3" class="w-full bg-gray-50 dark:bg-[#1c2925] dark:text-gray-100 border border-gray-200 dark:border-[#2a3835] p-3 rounded-xl text-sm outline-none"></textarea>
+            </div>
+
+            <button onclick="submitRequest()" id="requestSubmitBtn" class="bg-gray-900 text-white w-full py-4 rounded-2xl font-black text-lg shadow-xl hover:bg-black transition-all flex items-center justify-center gap-2">
+                <i class="fas fa-paper-plane"></i> Send Request
+            </button>
+        </div>
+
+        <div id="requestConfirmStep" class="hidden text-center py-6">
+            <div class="text-5xl text-teal mb-4"><i class="fas fa-circle-check"></i></div>
+            <h2 class="font-syne font-extrabold text-2xl text-gray-900 dark:text-gray-100 mb-2">Got It!</h2>
+            <p class="text-gray-500 dark:text-gray-400 text-sm mb-8">We've received your request and will reach out shortly with options that fit your budget.</p>
+            <a id="reqWaConfirmLink" href="#" target="_blank" class="bg-[#25D366] text-white w-full py-3 rounded-2xl font-bold text-sm shadow-lg hover:bg-[#1ebd57] transition-all flex items-center justify-center gap-2 mb-3">
+                <i class="fab fa-whatsapp"></i> Also message us on WhatsApp (optional)
+            </a>
+            <button onclick="hideRequestModal()" class="text-gray-400 text-sm font-bold">Close</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { getProducts, placeOrder, placeRequest, getSettings } from './js/store.mjs';
+    import { calcGroupedDeliveryFee, buildDeliveryFeeSummary, resolveDeliveryFee, variantUnitPrice, productPriceRange, productOriginalPriceRange, hasPromo, variantDiscountPercent, productHasPromo, buildPriceSavingsSummary, variantLabel, resolveBulkSavings, calcBulkSavingsForLine, buildBulkSavingsSummary } from './js/pricing.mjs';
+
+    const CKEY = "eazylife_cart_v2";
+    const UKEY = "eazylife_user_v2";
+
+    let products = [];
+    let cart = JSON.parse(localStorage.getItem(CKEY)) || [];
+    let currentCategory = 'All';
+    let currentSort = 'default';
+
+    // Complex filter state — all multi-select/range, distinct from the single-pick
+    // category pills and sort dropdown above.
+    let currentBrands = [];      // [] = all brands
+    let currentRams = [];        // [] = all RAM options
+    let currentRoms = [];        // [] = all storage options
+    let priceMin = null;         // null = no floor
+    let priceMax = null;         // null = no ceiling
+    let onlyPromo = false;
+    let onlyBulk = false;
+    let onlyInStock = false;
+
+    // Draft copies edited inside the filter drawer — only committed to the "current*"
+    // state above when the user taps "Show results", so browsing the drawer never
+    // re-filters the grid behind it until they're done.
+    let draftBrands = [];
+    let draftRams = [];
+    let draftRoms = [];
+    let whatsappNumber = '2347051548082'; // fallback if settings doc isn't set yet
+    let deliveryFeePerItem = 750;
+    let deliveryDiscountRate = 0.10;
+    let generalBulkSavingsPercent = 0;
+    let generalBulkSavingsMinQty = 0;
+
+    // Product detail modal state
+    let pmProduct = null;
+    let pmQty = 1;
+
+    async function init() {
+        try {
+            const [prods, settings] = await Promise.all([getProducts(), getSettings()]);
+            products = prods;
+            if (settings.whatsapp) whatsappNumber = settings.whatsapp;
+            if (settings.deliveryFeePerItem != null) deliveryFeePerItem = settings.deliveryFeePerItem;
+            if (settings.deliveryDiscountPercent != null) deliveryDiscountRate = settings.deliveryDiscountPercent / 100;
+            if (settings.bulkSavingsPercent != null) generalBulkSavingsPercent = settings.bulkSavingsPercent;
+            if (settings.bulkSavingsMinQty != null) generalBulkSavingsMinQty = settings.bulkSavingsMinQty;
+            document.getElementById("loader").classList.add("hidden");
+        } catch (e) {
+            document.getElementById("loader").innerHTML = `<p class="text-red-500">Failed to load catalog. Check your connection.</p>`;
+            console.error(e);
+            return;
+        }
+        loadUserData();
+        applyIncomingLink();
+        if (window.location.hash === '#cart' && cart.length > 0) {
+            showCart();
+        }
+        document.getElementById("search").addEventListener("keyup", renderFilteredGrid);
+        document.getElementById("sortSelect").addEventListener("change", (e) => { currentSort = e.target.value; renderFilteredGrid(); });
+        document.getElementById("filterPriceMin").addEventListener("input", updateFilterApplyLabel);
+        document.getElementById("filterPriceMax").addEventListener("input", updateFilterApplyLabel);
+        document.getElementById("filterPromo").addEventListener("change", updateFilterApplyLabel);
+        document.getElementById("filterBulk").addEventListener("change", updateFilterApplyLabel);
+        document.getElementById("filterInStock").addEventListener("change", updateFilterApplyLabel);
+    }
+
+    // Handles hero-carousel links from the homepage: shop.html?category=Laptops or shop.html?product=abc123
+    function applyIncomingLink() {
+        const params = new URLSearchParams(window.location.search);
+        const categoryParam = params.get('category');
+        const productParam = params.get('product');
+
+        if (categoryParam && products.some(p => p.category === categoryParam)) {
+            currentCategory = categoryParam;
+        }
+        renderCategoryButtons();
+        renderFilteredGrid();
+
+        if (productParam) {
+            const p = products.find(i => i.id === productParam);
+            if (p) openProductModal(productParam);
+        }
+    }
+
+    function renderCategoryButtons() {
+        const cats = ['All', ...new Set(products.map(p => p.category))];
+        let html = cats.map(c => `
+            <button onclick="filterByCategory('${c}')"
+                    class="whitespace-nowrap px-5 py-2 rounded-full border text-xs font-bold transition-all ${currentCategory === c ? 'active-cat' : 'bg-white dark:bg-[#182420] text-gray-500 dark:text-gray-300 border-gray-200 dark:border-[#2a3835]'}">
+                ${c}
+            </button>
+        `).join('');
+        // Quick-access bulk-savings toggle, sitting right in the category scroller so it's
+        // one tap away — same as the category pills, not tucked inside the filter drawer.
+        html += `
+            <button onclick="toggleQuickBulk()"
+                    class="whitespace-nowrap px-5 py-2 rounded-full border text-xs font-bold transition-all flex items-center gap-1.5 ${onlyBulk ? 'active-cat' : 'bg-white dark:bg-[#182420] text-gray-500 dark:text-gray-300 border-gray-200 dark:border-[#2a3835]'}">
+                <i class="fas fa-tags"></i> Bulk Savings
+            </button>
+        `;
+        document.getElementById("catFilters").innerHTML = html;
+    }
+
+    // Toggles the bulk-savings filter straight from the quick-access pill, without opening
+    // the full filter drawer. Kept in sync with the drawer's own "Bulk savings available"
+    // checkbox since both read/write the same onlyBulk state.
+    function toggleQuickBulk() {
+        onlyBulk = !onlyBulk;
+        renderCategoryButtons();
+        renderFilteredGrid();
+        updateFilterBadge();
+        renderActiveFilterChips();
+    }
+
+    function filterByCategory(cat) {
+        currentCategory = cat;
+        // Brand/RAM/storage options are scoped to the selected category (a "Sensors" brand
+        // rarely means anything under "Laptops"), so a stale pick from the old category would
+        // otherwise silently keep filtering the grid after switching. Price/promo/bulk/in-stock
+        // are category-agnostic and carry over.
+        currentBrands = [];
+        currentRams = [];
+        currentRoms = [];
+        renderCategoryButtons();
+        renderFilteredGrid();
+        updateFilterBadge();
+    }
+
+    // Every variant across a product counts as one candidate the product-level filters
+    // (price/RAM/storage) can match against — a product passes if ANY of its variants fits,
+    // since that's the variant a shopper would actually pick.
+    function productVariantsList(p) {
+        return p.variants || [];
+    }
+
+    function getFilteredSortedProducts() {
+        const term = document.getElementById("search").value.toLowerCase();
+        let list = products.filter(p => {
+            const matchesCategory = currentCategory === 'All' || p.category === currentCategory;
+            const matchesBrand = currentBrands.length === 0 || currentBrands.includes(p.brand);
+            const matchesSearch = !term || p.name.toLowerCase().includes(term) ||
+                (p.category || '').toLowerCase().includes(term) || (p.brand || '').toLowerCase().includes(term);
+
+            const variants = productVariantsList(p);
+            const matchesPrice = (priceMin == null && priceMax == null) || variants.some(v => {
+                const price = variantUnitPrice(v);
+                return (priceMin == null || price >= priceMin) && (priceMax == null || price <= priceMax);
+            });
+            const matchesRam = currentRams.length === 0 || variants.some(v => currentRams.includes(v.ram));
+            const matchesRom = currentRoms.length === 0 || variants.some(v => currentRoms.includes(v.rom));
+            const matchesPromo = !onlyPromo || productHasPromo(p);
+            const matchesBulk = !onlyBulk || !!bestBulkSavings(p);
+            const outOfStock = p.inStock === false || variants.every(v => v.inStock === false);
+            const matchesInStock = !onlyInStock || !outOfStock;
+
+            return matchesCategory && matchesBrand && matchesSearch && matchesPrice &&
+                   matchesRam && matchesRom && matchesPromo && matchesBulk && matchesInStock;
+        });
+
+        if (currentSort === 'price-asc') list = [...list].sort((a, b) => productPriceRange(a).min - productPriceRange(b).min);
+        else if (currentSort === 'price-desc') list = [...list].sort((a, b) => productPriceRange(b).min - productPriceRange(a).min);
+        else if (currentSort === 'name-asc') list = [...list].sort((a, b) => a.name.localeCompare(b.name));
+
+        return list;
+    }
+
+    function renderFilteredGrid() {
+        renderProducts(getFilteredSortedProducts());
+    }
+
+    /* ---------------- FILTERS DRAWER ---------------- */
+
+    // Products in scope for populating filter options: current category + search term,
+    // but NOT the filters being edited themselves — so opening "Brand" always shows every
+    // brand available in this category, not just the ones matching an already-ticked brand.
+    function productsInCategoryScope() {
+        const term = document.getElementById("search").value.toLowerCase();
+        return products.filter(p => {
+            const matchesCategory = currentCategory === 'All' || p.category === currentCategory;
+            const matchesSearch = !term || p.name.toLowerCase().includes(term) ||
+                (p.category || '').toLowerCase().includes(term) || (p.brand || '').toLowerCase().includes(term);
+            return matchesCategory && matchesSearch;
+        });
+    }
+
+    function chipHTML(value, selected, onclick) {
+        return `<button type="button" onclick="${onclick}" class="px-3.5 py-2 rounded-full border text-xs font-bold transition-all ${selected ? 'active-cat' : 'bg-gray-50 dark:bg-[#1c2925] text-gray-500 dark:text-gray-300 border-gray-200 dark:border-[#2a3835]'}">${value}</button>`;
+    }
+
+    function toggleDraft(arr, value) {
+        const idx = arr.indexOf(value);
+        if (idx === -1) arr.push(value); else arr.splice(idx, 1);
+    }
+
+    function toggleDraftBrand(b) { toggleDraft(draftBrands, b); renderFilterDrawer(); }
+    function toggleDraftRam(r) { toggleDraft(draftRams, r); renderFilterDrawer(); }
+    function toggleDraftRom(r) { toggleDraft(draftRoms, r); renderFilterDrawer(); }
+
+    // Rebuilds the drawer's option chips from the in-scope products (so RAM/Storage sections
+    // only appear when a category actually has those specs — e.g. Laptops, not Sensors) and
+    // reflects the current draft selections.
+    function renderFilterDrawer() {
+        const scoped = productsInCategoryScope();
+        const variants = scoped.flatMap(productVariantsList);
+
+        const brands = [...new Set(scoped.map(p => p.brand).filter(Boolean))].sort();
+        const brandWrap = document.getElementById('filterBrandWrap');
+        if (brands.length > 0) {
+            brandWrap.classList.remove('hidden');
+            document.getElementById('filterBrandChips').innerHTML = brands
+                .map(b => chipHTML(b, draftBrands.includes(b), `toggleDraftBrand('${b.replace(/'/g, "\\'")}')`)).join('');
+        } else {
+            brandWrap.classList.add('hidden');
+        }
+
+        const rams = [...new Set(variants.map(v => v.ram).filter(Boolean))]
+            .sort((a, b) => (parseInt(a, 10) || 0) - (parseInt(b, 10) || 0));
+        const ramWrap = document.getElementById('filterRamWrap');
+        if (rams.length > 0) {
+            ramWrap.classList.remove('hidden');
+            document.getElementById('filterRamChips').innerHTML = rams
+                .map(r => chipHTML(r, draftRams.includes(r), `toggleDraftRam('${r.replace(/'/g, "\\'")}')`)).join('');
+        } else {
+            ramWrap.classList.add('hidden');
+        }
+
+        const roms = [...new Set(variants.map(v => v.rom).filter(Boolean))]
+            .sort((a, b) => (parseInt(a, 10) || 0) - (parseInt(b, 10) || 0));
+        const romWrap = document.getElementById('filterRomWrap');
+        if (roms.length > 0) {
+            romWrap.classList.remove('hidden');
+            document.getElementById('filterRomChips').innerHTML = roms
+                .map(r => chipHTML(r, draftRoms.includes(r), `toggleDraftRom('${r.replace(/'/g, "\\'")}')`)).join('');
+        } else {
+            romWrap.classList.add('hidden');
+        }
+
+        const prices = variants.map(variantUnitPrice).filter(p => p > 0);
+        const hint = document.getElementById('filterPriceHint');
+        hint.textContent = prices.length
+            ? `Range in ${currentCategory === 'All' ? 'catalog' : currentCategory}: ₦${Math.min(...prices).toLocaleString()} – ₦${Math.max(...prices).toLocaleString()}`
+            : '';
+
+        updateFilterApplyLabel();
+    }
+
+    function openFilters() {
+        draftBrands = [...currentBrands];
+        draftRams = [...currentRams];
+        draftRoms = [...currentRoms];
+        document.getElementById('filterPriceMin').value = priceMin != null ? priceMin : '';
+        document.getElementById('filterPriceMax').value = priceMax != null ? priceMax : '';
+        document.getElementById('filterPromo').checked = onlyPromo;
+        document.getElementById('filterBulk').checked = onlyBulk;
+        document.getElementById('filterInStock').checked = onlyInStock;
+        renderFilterDrawer();
+        document.getElementById('filtersModal').classList.remove('hidden');
+    }
+
+    function closeFilters() {
+        document.getElementById('filtersModal').classList.add('hidden');
+    }
+
+    // Live count of how many products the DRAFT selections would return, shown on the
+    // apply button so the user knows what tapping it will do before committing.
+    function updateFilterApplyLabel() {
+        const min = document.getElementById('filterPriceMin').value.trim();
+        const max = document.getElementById('filterPriceMax').value.trim();
+        const draftMin = min ? parseInt(min, 10) : null;
+        const draftMax = max ? parseInt(max, 10) : null;
+        const draftPromo = document.getElementById('filterPromo').checked;
+        const draftBulk = document.getElementById('filterBulk').checked;
+        const draftInStock = document.getElementById('filterInStock').checked;
+
+        const term = document.getElementById("search").value.toLowerCase();
+        const count = products.filter(p => {
+            const matchesCategory = currentCategory === 'All' || p.category === currentCategory;
+            const matchesSearch = !term || p.name.toLowerCase().includes(term) ||
+                (p.category || '').toLowerCase().includes(term) || (p.brand || '').toLowerCase().includes(term);
+            const matchesBrand = draftBrands.length === 0 || draftBrands.includes(p.brand);
+            const variants = productVariantsList(p);
+            const matchesPrice = (draftMin == null && draftMax == null) || variants.some(v => {
+                const price = variantUnitPrice(v);
+                return (draftMin == null || price >= draftMin) && (draftMax == null || price <= draftMax);
+            });
+            const matchesRam = draftRams.length === 0 || variants.some(v => draftRams.includes(v.ram));
+            const matchesRom = draftRoms.length === 0 || variants.some(v => draftRoms.includes(v.rom));
+            const matchesPromo = !draftPromo || productHasPromo(p);
+            const matchesBulk = !draftBulk || !!bestBulkSavings(p);
+            const outOfStock = p.inStock === false || variants.every(v => v.inStock === false);
+            const matchesInStock = !draftInStock || !outOfStock;
+            return matchesCategory && matchesSearch && matchesBrand && matchesPrice &&
+                   matchesRam && matchesRom && matchesPromo && matchesBulk && matchesInStock;
+        }).length;
+
+        document.getElementById('filterApplyLabel').textContent = `Show ${count} result${count === 1 ? '' : 's'}`;
+    }
+
+    function applyFilters() {
+        currentBrands = [...draftBrands];
+        currentRams = [...draftRams];
+        currentRoms = [...draftRoms];
+        const min = document.getElementById('filterPriceMin').value.trim();
+        const max = document.getElementById('filterPriceMax').value.trim();
+        priceMin = min ? parseInt(min, 10) : null;
+        priceMax = max ? parseInt(max, 10) : null;
+        onlyPromo = document.getElementById('filterPromo').checked;
+        onlyBulk = document.getElementById('filterBulk').checked;
+        onlyInStock = document.getElementById('filterInStock').checked;
+        closeFilters();
+        renderCategoryButtons();
+        renderFilteredGrid();
+        updateFilterBadge();
+        renderActiveFilterChips();
+    }
+
+    function clearFilters() {
+        currentBrands = []; draftBrands = [];
+        currentRams = []; draftRams = [];
+        currentRoms = []; draftRoms = [];
+        priceMin = null; priceMax = null;
+        onlyPromo = false; onlyBulk = false; onlyInStock = false;
+        document.getElementById('filterPriceMin').value = '';
+        document.getElementById('filterPriceMax').value = '';
+        document.getElementById('filterPromo').checked = false;
+        document.getElementById('filterBulk').checked = false;
+        document.getElementById('filterInStock').checked = false;
+        renderFilterDrawer();
+        renderCategoryButtons();
+        renderFilteredGrid();
+        updateFilterBadge();
+        renderActiveFilterChips();
+    }
+
+    function activeFilterCount() {
+        return currentBrands.length + currentRams.length + currentRoms.length +
+            (priceMin != null ? 1 : 0) + (priceMax != null ? 1 : 0) +
+            (onlyPromo ? 1 : 0) + (onlyBulk ? 1 : 0) + (onlyInStock ? 1 : 0);
+    }
+
+    function updateFilterBadge() {
+        const count = activeFilterCount();
+        const badge = document.getElementById('filterBadge');
+        badge.textContent = count;
+        badge.classList.toggle('hidden', count === 0);
+        badge.classList.toggle('flex', count > 0);
+    }
+
+    // Removable pill trail under the search bar summarizing every active filter, so the
+    // user can see (and undo) their picks without reopening the whole drawer.
+    function renderActiveFilterChips() {
+        const wrap = document.getElementById('activeFilterChips');
+        const pills = [];
+        currentBrands.forEach(b => pills.push({ label: b, onclick: `removeBrandChip('${b.replace(/'/g, "\\'")}')` }));
+        currentRams.forEach(r => pills.push({ label: `${r} RAM`, onclick: `removeRamChip('${r.replace(/'/g, "\\'")}')` }));
+        currentRoms.forEach(r => pills.push({ label: `${r} Storage`, onclick: `removeRomChip('${r.replace(/'/g, "\\'")}')` }));
+        if (priceMin != null || priceMax != null) {
+            const label = priceMin != null && priceMax != null ? `₦${priceMin.toLocaleString()}–₦${priceMax.toLocaleString()}`
+                : priceMin != null ? `Over ₦${priceMin.toLocaleString()}` : `Under ₦${priceMax.toLocaleString()}`;
+            pills.push({ label, onclick: `removePriceChip()` });
+        }
+        if (onlyPromo) pills.push({ label: 'On promo', onclick: `removeToggleChip('onlyPromo')` });
+        if (onlyBulk) pills.push({ label: 'Bulk savings', onclick: `removeToggleChip('onlyBulk')` });
+        if (onlyInStock) pills.push({ label: 'In stock', onclick: `removeToggleChip('onlyInStock')` });
+
+        if (pills.length === 0) {
+            wrap.classList.add('hidden');
+            wrap.innerHTML = '';
+            return;
+        }
+        wrap.classList.remove('hidden');
+        wrap.innerHTML = pills.map(p => `
+            <button type="button" onclick="${p.onclick}" class="active-cat flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold">
+                ${p.label} <i class="fas fa-xmark"></i>
+            </button>`).join('');
+    }
+
+    function removeBrandChip(b) { currentBrands = currentBrands.filter(x => x !== b); renderFilteredGrid(); updateFilterBadge(); renderActiveFilterChips(); }
+    function removeRamChip(r) { currentRams = currentRams.filter(x => x !== r); renderFilteredGrid(); updateFilterBadge(); renderActiveFilterChips(); }
+    function removeRomChip(r) { currentRoms = currentRoms.filter(x => x !== r); renderFilteredGrid(); updateFilterBadge(); renderActiveFilterChips(); }
+    function removePriceChip() { priceMin = null; priceMax = null; renderFilteredGrid(); updateFilterBadge(); renderActiveFilterChips(); }
+    function removeToggleChip(key) {
+        if (key === 'onlyPromo') onlyPromo = false;
+        else if (key === 'onlyBulk') onlyBulk = false;
+        else if (key === 'onlyInStock') onlyInStock = false;
+        renderCategoryButtons();
+        renderFilteredGrid(); updateFilterBadge(); renderActiveFilterChips();
+    }
+
+    // The variant a shop-card's quick +/- stepper (and "Add") acts on, absent a variant
+    // pick from the modal: the first in-stock variant, else just the first.
+    function getDefaultVariant(p) {
+        const variants = p.variants || [];
+        return variants.find(v => v.inStock !== false) || variants[0] || null;
+    }
+
+    // Most attractive bulk-savings offer across a product's variants, for the catalog
+    // teaser badge — not tied to whichever variant the card's stepper happens to control,
+    // since this is just "here's an incentive to buy more", not a live quote.
+    function bestBulkSavings(p) {
+        let best = null;
+        (p.variants || []).forEach(v => {
+            const b = resolveBulkSavings(v, generalBulkSavingsPercent, generalBulkSavingsMinQty);
+            if (b.percent > 0 && b.minQty > 0 && (!best || b.percent > best.percent)) best = b;
+        });
+        return best;
+    }
+
+    function requestTileHTML(full) {
+        return `
+            <div onclick="showRequestModal()" class="product-card request-tile ${full ? 'col-span-full' : ''}"
+                 style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; cursor:pointer; ${full ? 'padding:24px;' : ''}">
+                <i class="fas fa-magnifying-glass-dollar" style="font-size:${full ? '1.8rem' : '1.6rem'}; color:#00B09B; margin-bottom:${full ? '10px' : '8px'};"></i>
+                <h3 style="font-size:${full ? '0.9rem' : '0.82rem'}; font-weight:800; margin-bottom:4px;">Can't find what you want?</h3>
+                <p style="font-size:${full ? '0.78rem' : '0.72rem'}; color:#777; margin-bottom:0;">Tell us your budget — we'll source it.</p>
+            </div>`;
+    }
+
+    function renderProducts(list) {
+        const grid = document.getElementById("grid");
+        grid.innerHTML = "";
+        if (list.length === 0) {
+            grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-400 font-bold">Nothing matched — but we can still help.</div>`;
+            grid.innerHTML += requestTileHTML(true);
+            return;
+        }
+        list.forEach(p => {
+            const range = productPriceRange(p);
+            const priceLabel = range.min === range.max ? `₦${range.min.toLocaleString()}` : `From ₦${range.min.toLocaleString()}`;
+            const promo = productHasPromo(p);
+            const origRange = productOriginalPriceRange(p);
+            const origPriceLabel = origRange.min === origRange.max ? `₦${origRange.min.toLocaleString()}` : `From ₦${origRange.min.toLocaleString()}`;
+            const maxDiscountPercent = promo ? Math.max(...(p.variants || []).map(variantDiscountPercent)) : 0;
+            const thumb = (p.variants && p.variants[0] && p.variants[0].image) || '';
+            const outOfStock = p.inStock === false || (p.variants || []).every(v => v.inStock === false);
+
+            // Best bulk-savings offer across the product's variants — a teaser badge so
+            // customers see the incentive to buy more right in the catalog, before opening
+            // the product modal (where the exact per-variant figure is shown).
+            const bulk = bestBulkSavings(p);
+
+            // The cart line this card's quick +/- stepper controls: the product's default
+            // (first in-stock, else first) variant, no upgrades — mirrors addPmToCart's
+            // lineId shape so it's the exact same line whether added here or via the modal.
+            const defaultVariant = getDefaultVariant(p);
+            const defaultLineId = defaultVariant ? `${p.id}::${defaultVariant.id}::` : null;
+            const cardLine = defaultLineId ? cart.find(i => i.lineId === defaultLineId) : null;
+            const otherQty = cart.filter(i => i.productId === p.id && i.lineId !== defaultLineId)
+                .reduce((a, b) => a + b.quantity, 0);
+
+            grid.innerHTML += `
+                <div class="product-card bg-white dark:bg-[#182420] dark:border-[#2a3835] p-3 rounded-[24px] shadow-sm flex flex-col">
+                    <div class="relative mb-3">
+                        <img src="${thumb || 'https://via.placeholder.com/300?text=' + encodeURIComponent(p.name)}" class="h-32 md:h-40 w-full object-contain rounded-xl bg-gray-50 dark:bg-[#1c2925]">
+                        ${promo ? `<span class="absolute top-1.5 left-1.5 bg-[#00B09B] text-white text-[9px] font-black px-1.5 py-0.5 rounded-md shadow">-${Math.round(maxDiscountPercent)}%</span>` : ''}
+                    </div>
+                    <span class="text-[9px] font-black uppercase text-teal tracking-wider mb-1">${p.brand ? p.brand + ' · ' : ''}${p.category}</span>
+                    <h3 class="font-bold text-gray-800 dark:text-gray-100 leading-tight text-xs md:text-sm flex-grow mb-2">${p.name}</h3>
+                    <div class="mb-1 flex items-baseline gap-1.5 flex-wrap">
+                        ${promo ? `<span class="text-gray-400 text-[10px] line-through">${origPriceLabel}</span>` : ''}
+                        <span class="text-gray-900 dark:text-gray-100 font-black text-sm md:text-base">${priceLabel}</span>
+                    </div>
+                    ${bulk ? `<p class="text-[9px] font-black text-teal mb-2 flex items-center gap-1"><i class="fas fa-tags"></i>Buy ${bulk.minQty}+, ${promo ? `save an extra ${bulk.percent}%` : `save ${bulk.percent}%`}</p>` : `<div class="mb-2"></div>`}
+                    <div class="mt-auto">
+                        ${outOfStock ? `
+                            <button disabled class="bg-gray-200 dark:bg-[#2a3835] text-gray-400 w-full py-2.5 rounded-xl font-bold text-xs cursor-not-allowed">Out of Stock</button>
+                        ` : cardLine ? `
+                            <div class="flex items-center justify-center gap-2 bg-gray-50 dark:bg-[#1c2925] p-1 rounded-xl">
+                                <button onclick="changeCardQty('${p.id}',-1)" class="w-8 h-8 bg-white dark:bg-[#182420] dark:text-gray-100 rounded-lg shadow-sm font-bold">-</button>
+                                <input type="text" inputmode="numeric" pattern="[0-9]*" value="${cardLine.quantity}" onfocus="this.select()" onchange="setCardQty('${p.id}', this.value)" class="font-black text-sm w-10 text-center dark:text-gray-100 bg-white dark:bg-[#182420] rounded-lg py-1.5 outline-none">
+                                <button onclick="changeCardQty('${p.id}',1)" class="w-8 h-8 bg-white dark:bg-[#182420] dark:text-gray-100 rounded-lg shadow-sm font-bold">+</button>
+                            </div>
+                            <button onclick="openProductModal('${p.id}')" class="w-full text-center text-[10px] text-gray-400 mt-1 underline decoration-dotted">${otherQty > 0 ? `+${otherQty} more in other options` : 'Change option'}</button>
+                        ` : `
+                            <button onclick="openProductModal('${p.id}')" class="bg-gray-900 text-white w-full py-2.5 rounded-xl font-bold text-xs hover:bg-black transition-colors">View Options</button>
+                        `}
+                    </div>
+                </div>`;
+        });
+        grid.innerHTML += requestTileHTML(false);
+    }
+
+    /* ---------------- PRODUCT DETAIL MODAL ---------------- */
+
+    function openProductModal(productId) {
+        const p = products.find(x => x.id === productId);
+        if (!p) return;
+        pmProduct = p;
+        pmQty = 1;
+        document.getElementById('pmName').textContent = p.name;
+        document.getElementById('pmMeta').textContent = [p.brand, p.category].filter(Boolean).join(' · ');
+        document.getElementById('pmDesc').textContent = p.desc || '';
+
+        const variantSel = document.getElementById('pmVariant');
+        variantSel.innerHTML = (p.variants || []).map(v => `
+            <option value="${v.id}" ${v.inStock === false ? 'disabled' : ''}>
+                ${variantLabel(v)} — ₦${variantUnitPrice(v).toLocaleString()}${hasPromo(v) ? ` (was ₦${v.price.toLocaleString()}, -${Math.round(variantDiscountPercent(v))}%)` : ''}${v.inStock === false ? ' (Out of stock)' : ''}
+            </option>
+        `).join('');
+        // Explicitly select the same "default" variant the shop-card stepper uses (first
+        // in-stock, else first) — don't rely on the browser's implicit first-option
+        // selection, which is what let the dropdown and the card's already-in-cart line
+        // fall out of sync in the first place.
+        const cardDefaultVariant = getDefaultVariant(p);
+        if (cardDefaultVariant) variantSel.value = cardDefaultVariant.id;
+        variantSel.onchange = syncPmQtyToCart;
+
+        const upgrades = p.upgrades || [];
+        const upgradesWrap = document.getElementById('pmUpgradesWrap');
+        if (upgrades.length > 0) {
+            upgradesWrap.classList.remove('hidden');
+            document.getElementById('pmUpgrades').innerHTML = upgrades.map((u, i) => `
+                <label class="flex items-center justify-between bg-white dark:bg-[#182420] border border-gray-200 dark:border-[#2a3835] rounded-lg p-2.5 text-xs dark:text-gray-100">
+                    <span class="flex items-center gap-2"><input type="checkbox" class="pm-upgrade-check" data-upgrade-idx="${i}"> ${u.name}</span>
+                    <span class="font-bold text-teal">+₦${(u.price || 0).toLocaleString()}</span>
+                </label>
+            `).join('');
+            document.querySelectorAll('.pm-upgrade-check').forEach(cb => cb.addEventListener('change', syncPmQtyToCart));
+        } else {
+            upgradesWrap.classList.add('hidden');
+            document.getElementById('pmUpgrades').innerHTML = '';
+        }
+
+        syncPmQtyToCart();
+        document.getElementById('productModal').classList.remove('hidden');
+    }
+
+    // Reads whichever cart line matches the currently selected variant + upgrades combo
+    // and pulls its quantity into the modal, so the modal always mirrors the cart instead
+    // of silently starting over at 1 when that combo already has items in the cart.
+    function findMatchingCartLine() {
+        const v = getSelectedVariant();
+        if (!v || !pmProduct) return null;
+        const upgrades = getSelectedUpgrades();
+        const upgradeIds = upgrades.map(u => u.id).sort().join(',');
+        const lineId = `${pmProduct.id}::${v.id}::${upgradeIds}`;
+        return cart.find(i => i.lineId === lineId) || null;
+    }
+
+    function syncPmQtyToCart() {
+        const line = findMatchingCartLine();
+        pmQty = line ? line.quantity : 1;
+        document.getElementById('pmQty').value = pmQty;
+        const label = document.getElementById('pmAddBtnLabel');
+        const icon = document.getElementById('pmAddBtnIcon');
+        if (line) {
+            label.textContent = 'Update Cart';
+            icon.className = 'fas fa-rotate';
+        } else {
+            label.textContent = 'Add to Cart';
+            icon.className = 'fas fa-shopping-basket';
+        }
+        updateProductModalPrice();
+    }
+
+    function getSelectedVariant() {
+        if (!pmProduct) return null;
+        const id = document.getElementById('pmVariant').value;
+        return (pmProduct.variants || []).find(v => v.id === id);
+    }
+
+    function getSelectedUpgrades() {
+        if (!pmProduct) return [];
+        return [...document.querySelectorAll('.pm-upgrade-check:checked')]
+            .map(cb => pmProduct.upgrades[parseInt(cb.dataset.upgradeIdx, 10)]);
+    }
+
+    function updateProductModalPrice() {
+        const v = getSelectedVariant();
+        const img = document.getElementById('pmImage');
+        img.src = (v && v.image) || (pmProduct.variants[0] && pmProduct.variants[0].image) || 'https://via.placeholder.com/300?text=' + encodeURIComponent(pmProduct.name);
+
+        const base = variantUnitPrice(v);
+        const selectedUpgrades = getSelectedUpgrades();
+        const upgradesTotal = selectedUpgrades.reduce((a, u) => a + (u.price || 0), 0);
+        const unit = base + upgradesTotal;
+        const preDiscountTotal = unit * pmQty;
+
+        const bulk = resolveBulkSavings(v, generalBulkSavingsPercent, generalBulkSavingsMinQty);
+        const bulkDiscount = calcBulkSavingsForLine(unit, pmQty, bulk.percent, bulk.minQty);
+        const actualTotal = preDiscountTotal - bulkDiscount;
+        document.getElementById('pmPrice').textContent = actualTotal.toLocaleString();
+        document.getElementById('pmDeliveryFee').textContent = resolveDeliveryFee(v, deliveryFeePerItem).toLocaleString();
+
+        const bulkHint = document.getElementById('pmBulkHint');
+        if (bulk.percent > 0 && bulk.minQty > 0) {
+            // If this variant is already on promo, the bulk cut stacks on top of that price —
+            // say "extra"/"on top of the promo" so it's clear this isn't the whole discount,
+            // and the struck-through price above isn't being second-guessed once qty is met.
+            const variantPromo = hasPromo(v);
+            if (pmQty >= bulk.minQty) {
+                bulkHint.textContent = variantPromo
+                    ? `🎉 Extra bulk savings applied: -${bulk.percent}% on top of the promo price, for ${bulk.minQty}+ units`
+                    : `🎉 Bulk savings applied: -${bulk.percent}% for ${bulk.minQty}+ units`;
+            } else {
+                bulkHint.textContent = variantPromo
+                    ? `Buy ${bulk.minQty - pmQty} more for an extra ${bulk.percent}% off this item (on top of the promo)`
+                    : `Buy ${bulk.minQty - pmQty} more for ${bulk.percent}% off this item`;
+            }
+            bulkHint.classList.remove('hidden');
+        } else {
+            bulkHint.classList.add('hidden');
+        }
+
+        document.getElementById('pmUnitPrice').textContent = base.toLocaleString();
+        const unitOrigEl = document.getElementById('pmUnitOriginal');
+        if (v && hasPromo(v)) {
+            unitOrigEl.textContent = `₦${(v.price || 0).toLocaleString()}`;
+            unitOrigEl.classList.remove('hidden');
+        } else {
+            unitOrigEl.classList.add('hidden');
+        }
+
+        document.getElementById('pmUpgradeLines').innerHTML = selectedUpgrades.map(u => `
+            <div class="flex justify-between items-center px-1">
+                <span class="text-[11px] text-gray-400">+ ${u.name}</span>
+                <span class="text-[11px] font-bold text-gray-500 dark:text-gray-400">₦${(u.price || 0).toLocaleString()}/unit</span>
+            </div>
+        `).join('');
+
+        const origUnit = (v ? (v.price || 0) : 0) + upgradesTotal;
+        const origTotal = origUnit * pmQty;
+        const origEl = document.getElementById('pmOriginalPrice');
+        const pctEl = document.getElementById('pmDiscountPercent');
+        if (v && origTotal > actualTotal) {
+            origEl.textContent = `₦${origTotal.toLocaleString()}`;
+            pctEl.textContent = `-${(((origTotal - actualTotal) / origTotal) * 100).toFixed(1)}%`;
+            origEl.classList.remove('hidden');
+            pctEl.classList.remove('hidden');
+        } else {
+            origEl.classList.add('hidden');
+            pctEl.classList.add('hidden');
+        }
+    }
+
+    function changePmQty(delta) {
+        pmQty = Math.max(1, pmQty + delta);
+        document.getElementById('pmQty').value = pmQty;
+        updateProductModalPrice();
+    }
+
+    // Direct edit of the modal's quantity field, same idea as the cart's setQty.
+    function setPmQty(value) {
+        const n = parseInt(value, 10);
+        if (Number.isFinite(n) && n >= 1) pmQty = n;
+        document.getElementById('pmQty').value = pmQty;
+        updateProductModalPrice();
+    }
+
+    function hideProductModal() {
+        document.getElementById('productModal').classList.add('hidden');
+        pmProduct = null;
+    }
+
+    function addPmToCart() {
+        const v = getSelectedVariant();
+        if (!v) return alert('Please choose an option.');
+        const upgrades = getSelectedUpgrades();
+        const upgradesTotal = upgrades.reduce((a, u) => a + (u.price || 0), 0);
+        const unitBasePrice = variantUnitPrice(v);
+        const originalUnitBasePrice = v.price || 0;
+        const unitPrice = unitBasePrice + upgradesTotal;
+        const originalUnitPrice = originalUnitBasePrice + upgradesTotal;
+        const upgradeIds = upgrades.map(u => u.id).sort().join(',');
+        const lineId = `${pmProduct.id}::${v.id}::${upgradeIds}`;
+        const bulk = resolveBulkSavings(v, generalBulkSavingsPercent, generalBulkSavingsMinQty);
+
+        // pmQty is synced from the matching cart line when the modal opens (or when the
+        // variant/upgrades selection changes), so it already reflects "current cart qty
+        // for this exact combo" — set the line to it rather than adding on top, or every
+        // qty edit here would double up on what's already in the cart.
+        const existing = cart.find(i => i.lineId === lineId);
+        if (existing) {
+            existing.quantity = pmQty;
+        } else {
+            cart.push({
+                lineId,
+                productId: pmProduct.id,
+                variantId: v.id,
+                productName: pmProduct.name,
+                variantLabel: variantLabel(v),
+                upgradeNames: upgrades.map(u => u.name),
+                upgradeItems: upgrades.map(u => ({ name: u.name, price: u.price || 0 })),
+                unitBasePrice,
+                originalUnitBasePrice,
+                unitPrice,
+                originalUnitPrice,
+                unitDeliveryFee: (v.deliveryFee != null && v.deliveryFee !== '') ? v.deliveryFee : null,
+                deliveryRoute: v.deliveryRoute === 'separate' ? 'separate' : 'general',
+                bulkSavingsPercent: bulk.percent,
+                bulkSavingsMinQty: bulk.minQty,
+                image: v.image || '',
+                quantity: pmQty
+            });
+        }
+        localStorage.setItem(CKEY, JSON.stringify(cart));
+        updateCartCount();
+        renderFilteredGrid(); // so the card's stepper reflects this line once the cart is closed
+        hideProductModal();
+        showCart();
+    }
+
+    /* ---------------- CART ---------------- */
+
+    function changeQty(lineId, delta) {
+        const item = cart.find(i => i.lineId === lineId);
+        if (item) {
+            item.quantity += delta;
+            if (item.quantity <= 0) cart = cart.filter(i => i.lineId !== lineId);
+            saveAndSync();
+        }
+    }
+
+    // Direct edit of the quantity field — lets a bulk buyer type "63" instead of tapping + 63 times.
+    // Ignores empty/non-numeric/zero input rather than removing the line; use the "-" button to remove.
+    function setQty(lineId, value) {
+        const item = cart.find(i => i.lineId === lineId);
+        if (!item) return;
+        const n = parseInt(value, 10);
+        if (Number.isFinite(n) && n >= 1) item.quantity = n;
+        saveAndSync();
+    }
+
+    // Shop-card quick stepper: +/- on the product's default variant, right in the catalog,
+    // without opening the modal. Shares addPmToCart's lineId shape so it's the same cart
+    // line either way — increment here, then open the modal, and the quantity carries over.
+    function changeCardQty(productId, delta) {
+        const p = products.find(x => x.id === productId);
+        const defaultVariant = p && getDefaultVariant(p);
+        if (!defaultVariant) return;
+        const lineId = `${productId}::${defaultVariant.id}::`;
+        let item = cart.find(i => i.lineId === lineId);
+        if (!item) {
+            if (delta <= 0) return;
+            const bulk = resolveBulkSavings(defaultVariant, generalBulkSavingsPercent, generalBulkSavingsMinQty);
+            item = {
+                lineId,
+                productId: p.id,
+                variantId: defaultVariant.id,
+                productName: p.name,
+                variantLabel: variantLabel(defaultVariant),
+                upgradeNames: [],
+                upgradeItems: [],
+                unitBasePrice: variantUnitPrice(defaultVariant),
+                originalUnitBasePrice: defaultVariant.price || 0,
+                unitPrice: variantUnitPrice(defaultVariant),
+                originalUnitPrice: defaultVariant.price || 0,
+                unitDeliveryFee: (defaultVariant.deliveryFee != null && defaultVariant.deliveryFee !== '') ? defaultVariant.deliveryFee : null,
+                deliveryRoute: defaultVariant.deliveryRoute === 'separate' ? 'separate' : 'general',
+                bulkSavingsPercent: bulk.percent,
+                bulkSavingsMinQty: bulk.minQty,
+                image: defaultVariant.image || '',
+                quantity: 1
+            };
+            cart.push(item);
+        } else {
+            item.quantity += delta;
+            if (item.quantity <= 0) cart = cart.filter(i => i.lineId !== lineId);
+        }
+        localStorage.setItem(CKEY, JSON.stringify(cart));
+        updateCartCount();
+        renderFilteredGrid();
+    }
+
+    // Direct edit of the card's quantity field, same idea as the cart's setQty.
+    function setCardQty(productId, value) {
+        const n = parseInt(value, 10);
+        if (!Number.isFinite(n) || n < 1) return renderFilteredGrid(); // ignore bad input, redraw to reset the field
+        const p = products.find(x => x.id === productId);
+        const defaultVariant = p && getDefaultVariant(p);
+        if (!defaultVariant) return;
+        const lineId = `${productId}::${defaultVariant.id}::`;
+        let item = cart.find(i => i.lineId === lineId);
+        if (!item) {
+            changeCardQty(productId, 1);
+            item = cart.find(i => i.lineId === lineId);
+        }
+        if (item) item.quantity = n;
+        localStorage.setItem(CKEY, JSON.stringify(cart));
+        updateCartCount();
+        renderFilteredGrid();
+    }
+
+    // Include/exclude a line from checkout without removing it from the cart —
+    // so a customer who can't afford everything today can uncheck items and come back for them later.
+    function toggleIncluded(lineId) {
+        const item = cart.find(i => i.lineId === lineId);
+        if (item) {
+            item.included = (item.included === false) ? true : false;
+            saveAndSync();
+        }
+    }
+
+    function includedCartItems() {
+        return cart.filter(i => i.included !== false);
+    }
+
+    function saveAndSync() {
+        localStorage.setItem(CKEY, JSON.stringify(cart));
+        updateCartCount();
+        renderFilteredGrid(); // keep the shop-card steppers in sync with cart-modal edits
+        if (!document.getElementById("cartModal").classList.contains("hidden") &&
+            !document.getElementById("cartStep").classList.contains("hidden")) showCart();
+    }
+
+    function updateCartCount() {
+        const totalQty = cart.reduce((a, b) => a + b.quantity, 0);
+        const countEl = document.getElementById("count");
+        countEl.textContent = totalQty;
+        if (totalQty > 0) countEl.classList.add('has-items');
+    }
+
+    function cartTotals(items) {
+        const list = items || includedCartItems();
+        const subtotal = list.reduce((a, b) => a + (b.unitPrice * b.quantity), 0);
+        const bulkSummary = buildBulkSavingsSummary(list.map(item => ({
+            unitPrice: item.unitPrice,
+            quantity: item.quantity,
+            bulkSavingsPercent: item.bulkSavingsPercent,
+            bulkSavingsMinQty: item.bulkSavingsMinQty
+        })));
+        const deliveryFee = calcGroupedDeliveryFee(
+            list.map(item => ({
+                quantity: item.quantity,
+                unitDeliveryFee: item.unitDeliveryFee,
+                deliveryRoute: item.deliveryRoute || 'general',
+                productId: item.productId,
+                variantId: item.variantId || item.lineId // fallback for cart lines saved before this feature existed
+            })),
+            deliveryFeePerItem,
+            deliveryDiscountRate
+        );
+        return { subtotal, bulkSavings: bulkSummary.savings, deliveryFee, total: subtotal - bulkSummary.savings + deliveryFee };
+    }
+
+    // Fills the subtotal/delivery/total block. suffix is '' for the cart step's ids (subtotal, total, ...)
+    // or 'Co' for the checkout step's ids (subtotalCo, totalCo, ...) — same look, two places.
+    function renderTotalsBlock(suffix, items) {
+        const totals = cartTotals(items);
+        document.getElementById("subtotal" + suffix).textContent = totals.subtotal.toLocaleString();
+        document.getElementById("deliveryFeeDisplay" + suffix).textContent = totals.deliveryFee.toLocaleString();
+        document.getElementById("total" + suffix).textContent = totals.total.toLocaleString();
+
+        const bulkRow = document.getElementById("bulkSavingsRow" + suffix);
+        if (totals.bulkSavings > 0) {
+            document.getElementById("bulkSavingsAmount" + suffix).textContent = totals.bulkSavings.toLocaleString();
+            bulkRow.classList.remove("hidden");
+        } else {
+            bulkRow.classList.add("hidden");
+        }
+
+        const priceSavings = buildPriceSavingsSummary(items.map(item => ({
+            unitPrice: item.unitPrice,
+            originalUnitPrice: item.originalUnitPrice,
+            quantity: item.quantity
+        })));
+        const subOrigEl = document.getElementById("subtotalOriginal" + suffix);
+        const subPctEl = document.getElementById("subtotalSavingsPercent" + suffix);
+        if (priceSavings.savings > 0) {
+            subOrigEl.textContent = `₦${priceSavings.naiveTotal.toLocaleString()}`;
+            subPctEl.textContent = `-${priceSavings.savingsPercent.toFixed(1)}%`;
+            subOrigEl.classList.remove("hidden");
+            subPctEl.classList.remove("hidden");
+        } else {
+            subOrigEl.classList.add("hidden");
+            subPctEl.classList.add("hidden");
+        }
+
+        const breakdown = buildDeliveryFeeSummary(
+            items.map(item => ({
+                quantity: item.quantity,
+                unitDeliveryFee: item.unitDeliveryFee,
+                deliveryRoute: item.deliveryRoute || 'general',
+                productId: item.productId,
+                variantId: item.variantId || item.lineId
+            })),
+            deliveryFeePerItem,
+            deliveryDiscountRate
+        );
+        const naiveEl = document.getElementById("deliveryNaive" + suffix);
+        const pctEl = document.getElementById("deliverySavingsPercent" + suffix);
+        if (breakdown.savings > 0) {
+            naiveEl.textContent = `₦${breakdown.naiveTotal.toLocaleString()}`;
+            pctEl.textContent = `-${breakdown.savingsPercent.toFixed(1)}%`;
+            naiveEl.classList.remove("hidden");
+            pctEl.classList.remove("hidden");
+        } else {
+            naiveEl.classList.add("hidden");
+            pctEl.classList.add("hidden");
+        }
+
+        const totalNaive = priceSavings.naiveTotal + breakdown.naiveTotal;
+        const totalSavings = totalNaive - totals.total;
+        const totalOrigEl = document.getElementById("totalOriginal" + suffix);
+        const totalPctEl = document.getElementById("totalSavingsPercent" + suffix);
+        const totalSavedWrap = document.getElementById("totalSavedWrap" + suffix);
+        if (totalSavings > 0) {
+            totalOrigEl.textContent = `₦${totalNaive.toLocaleString()}`;
+            totalPctEl.textContent = `-${((totalSavings / totalNaive) * 100).toFixed(1)}%`;
+            document.getElementById("totalSavedAmount" + suffix).textContent = totalSavings.toLocaleString();
+            totalOrigEl.classList.remove("hidden");
+            totalPctEl.classList.remove("hidden");
+            totalSavedWrap.classList.remove("hidden");
+        } else {
+            totalOrigEl.classList.add("hidden");
+            totalPctEl.classList.add("hidden");
+            totalSavedWrap.classList.add("hidden");
+        }
+    }
+
+    // Per-line nudge/confirmation: "applied" once qty meets the cutoff, otherwise a nudge
+    // toward it. Empty string when the line has no bulk savings at all. hasPromoFlag marks
+    // whether this line's item price is already discounted — if so, the bulk % is framed as
+    // stacking "extra" on top, so it never reads as replacing (or matching) the promo cut.
+    function bulkLineHint(i, indented, hasPromoFlag) {
+        const percent = i.bulkSavingsPercent;
+        const minQty = i.bulkSavingsMinQty;
+        if (!percent || !minQty) return '';
+        const pad = indented ? ' pl-6' : '';
+        if (i.quantity >= minQty) {
+            const label = hasPromoFlag ? `🎉 Extra bulk savings applied: -${percent}% (on top of promo)` : `🎉 Bulk savings applied: -${percent}%`;
+            return `<p class="text-[10px] text-teal font-bold${pad}">${label}</p>`;
+        }
+        const label = hasPromoFlag ? `Add ${minQty - i.quantity} more for an extra ${percent}% off (on top of promo)` : `Add ${minQty - i.quantity} more for ${percent}% off`;
+        return `<p class="text-[10px] text-gray-400${pad}">${label}</p>`;
+    }
+
+    function showCart() {
+        if (cart.length === 0) return hideCart();
+        document.getElementById("cartStep").classList.remove("hidden");
+        document.getElementById("checkoutStep").classList.add("hidden");
+        document.getElementById("confirmStep").classList.add("hidden");
+        const container = document.getElementById("cartItems");
+        container.innerHTML = cart.map(i => {
+            const included = i.included !== false;
+            const origLineTotal = (i.originalUnitPrice != null ? i.originalUnitPrice : i.unitPrice) * i.quantity;
+            const lineTotal = i.unitPrice * i.quantity;
+            const lineHasPromo = origLineTotal > lineTotal;
+            const baseUnit = i.unitBasePrice != null ? i.unitBasePrice : i.unitPrice;
+            const baseOrigUnit = i.originalUnitBasePrice != null ? i.originalUnitBasePrice : baseUnit;
+            const baseHasPromo = baseOrigUnit > baseUnit;
+            const upgradeItems = i.upgradeItems || [];
+            return `
+            <div class="flex justify-between items-center border-b border-gray-50 dark:border-[#2a3835] pb-3">
+                <div class="flex-1 pr-4 transition-opacity ${included ? '' : 'opacity-40'}">
+                    <label class="flex items-center gap-2">
+                        <input type="checkbox" ${included ? 'checked' : ''} onchange="toggleIncluded('${i.lineId}')" class="w-4 h-4 accent-teal rounded shrink-0" title="Include in order">
+                        <p class="font-bold text-gray-800 dark:text-gray-100 text-sm leading-tight">${i.productName}</p>
+                    </label>
+                    <p class="text-[11px] text-gray-400 pl-6">${i.variantLabel}${i.upgradeNames.length ? ' · ' + i.upgradeNames.join(', ') : ''}</p>
+                    <p class="text-[10px] text-gray-400 pl-6"><i class="fas fa-tag mr-1"></i>Item ${baseHasPromo ? `<span class="line-through">₦${baseOrigUnit.toLocaleString()}</span> ` : ''}₦${baseUnit.toLocaleString()}/unit</p>
+                    ${upgradeItems.map(u => `<p class="text-[10px] text-gray-400 pl-6">+ ${u.name} ₦${(u.price || 0).toLocaleString()}/unit</p>`).join('')}
+                    <p class="text-[10px] text-gray-400 pl-6"><i class="fas fa-truck-fast mr-1"></i>Delivery ₦${(i.unitDeliveryFee != null ? i.unitDeliveryFee : deliveryFeePerItem).toLocaleString()}/unit</p>
+                    ${bulkLineHint(i, true, baseHasPromo)}
+                    <p class="text-xs font-bold flex items-center gap-1.5 pl-6">
+                        ${lineHasPromo ? `<span class="text-gray-400 text-[10px] line-through">₦${origLineTotal.toLocaleString()}</span><span class="text-[9px] font-black text-teal">-${(((origLineTotal - lineTotal) / origLineTotal) * 100).toFixed(0)}%</span>` : ''}
+                        <span class="text-teal">₦${lineTotal.toLocaleString()}</span>
+                    </p>
+                </div>
+                <div class="flex items-center gap-2 bg-gray-50 dark:bg-[#1c2925] p-1 rounded-xl shrink-0">
+                    <button onclick="changeQty('${i.lineId}',-1)" class="w-7 h-7 bg-white dark:bg-[#182420] dark:text-gray-100 rounded-lg shadow-sm font-bold">-</button>
+                    <input type="text" inputmode="numeric" pattern="[0-9]*" value="${i.quantity}" onfocus="this.select()" onchange="setQty('${i.lineId}', this.value)" class="font-black text-sm w-9 text-center dark:text-gray-100 bg-white dark:bg-[#182420] rounded-lg py-1 outline-none">
+                    <button onclick="changeQty('${i.lineId}',1)" class="w-7 h-7 bg-white dark:bg-[#182420] dark:text-gray-100 rounded-lg shadow-sm font-bold">+</button>
+                </div>
+            </div>
+        `;
+        }).join('');
+
+        const included = includedCartItems();
+        document.getElementById("cartExcludedNote").classList.toggle("hidden", included.length >= cart.length);
+        renderTotalsBlock("", included);
+
+        const reviewBtn = document.getElementById("reviewBtn");
+        reviewBtn.disabled = included.length === 0;
+        reviewBtn.innerHTML = included.length === 0
+            ? `Select items to continue`
+            : `<i class="fas fa-arrow-right"></i> Review Order`;
+
+        document.getElementById("cartModal").classList.remove("hidden");
+    }
+
+    // Frozen at the moment "Review Order" is tapped, so step 2 stays a stable confirmation
+    // even though nothing in the cart can actually change while it's showing.
+    let checkoutSnapshot = [];
+
+    // Step 2 — immutable confirmation of only the checked items. Nothing here is editable;
+    // to change quantities or what's included, the customer goes back to the cart.
+    function goToCheckout() {
+        const included = includedCartItems();
+        if (included.length === 0) return;
+        const name = document.getElementById("custName").value.trim();
+        const phone = document.getElementById("custPhone").value.trim();
+        const addr = document.getElementById("custAddr").value.trim();
+        if (!name || !phone || !addr) return alert("Please fill in your name, phone, and address.");
+
+        checkoutSnapshot = included.map(i => ({ ...i }));
+        localStorage.setItem(UKEY, JSON.stringify({ name, phone, addr }));
+
+        document.getElementById("cartStep").classList.add("hidden");
+        document.getElementById("confirmStep").classList.add("hidden");
+        document.getElementById("checkoutStep").classList.remove("hidden");
+
+        document.getElementById("coName").textContent = name;
+        document.getElementById("coPhone").textContent = phone;
+        document.getElementById("coAddr").textContent = addr;
+
+        document.getElementById("checkoutItems").innerHTML = checkoutSnapshot.map(i => {
+            const origLineTotal = (i.originalUnitPrice != null ? i.originalUnitPrice : i.unitPrice) * i.quantity;
+            const lineTotal = i.unitPrice * i.quantity;
+            const lineHasPromo = origLineTotal > lineTotal;
+            const baseUnit = i.unitBasePrice != null ? i.unitBasePrice : i.unitPrice;
+            const baseOrigUnit = i.originalUnitBasePrice != null ? i.originalUnitBasePrice : baseUnit;
+            const baseHasPromo = baseOrigUnit > baseUnit;
+            const upgradeItems = i.upgradeItems || [];
+            return `
+            <div class="flex justify-between items-center border-b border-gray-50 dark:border-[#2a3835] pb-3">
+                <div class="flex-1 pr-4">
+                    <p class="font-bold text-gray-800 dark:text-gray-100 text-sm leading-tight">${i.productName}</p>
+                    <p class="text-[11px] text-gray-400">${i.variantLabel}${i.upgradeNames.length ? ' · ' + i.upgradeNames.join(', ') : ''}</p>
+                    <p class="text-[10px] text-gray-400"><i class="fas fa-tag mr-1"></i>Item ${baseHasPromo ? `<span class="line-through">₦${baseOrigUnit.toLocaleString()}</span> ` : ''}₦${baseUnit.toLocaleString()}/unit</p>
+                    ${upgradeItems.map(u => `<p class="text-[10px] text-gray-400">+ ${u.name} ₦${(u.price || 0).toLocaleString()}/unit</p>`).join('')}
+                    <p class="text-[10px] text-gray-400"><i class="fas fa-truck-fast mr-1"></i>Delivery ₦${(i.unitDeliveryFee != null ? i.unitDeliveryFee : deliveryFeePerItem).toLocaleString()}/unit</p>
+                    ${bulkLineHint(i, false, baseHasPromo)}
+                    <p class="text-xs font-bold flex items-center gap-1.5">
+                        ${lineHasPromo ? `<span class="text-gray-400 text-[10px] line-through">₦${origLineTotal.toLocaleString()}</span><span class="text-[9px] font-black text-teal">-${(((origLineTotal - lineTotal) / origLineTotal) * 100).toFixed(0)}%</span>` : ''}
+                        <span class="text-teal">₦${lineTotal.toLocaleString()}</span>
+                    </p>
+                </div>
+                <span class="font-black text-sm text-gray-500 dark:text-gray-400 shrink-0">× ${i.quantity}</span>
+            </div>
+        `;
+        }).join('');
+
+        renderTotalsBlock("Co", checkoutSnapshot);
+    }
+
+    function backToCart() {
+        document.getElementById("checkoutStep").classList.add("hidden");
+        showCart();
+    }
+
+    function hideCart() {
+        document.getElementById("cartModal").classList.add("hidden");
+    }
+
+    function loadUserData() {
+        const user = JSON.parse(localStorage.getItem(UKEY)) || {};
+        document.getElementById("custName").value = user.name || "";
+        document.getElementById("custPhone").value = user.phone || "";
+        document.getElementById("custAddr").value = user.addr || "";
+    }
+
+    async function submitOrder() {
+        if (checkoutSnapshot.length === 0) return;
+
+        const user = JSON.parse(localStorage.getItem(UKEY)) || {};
+        const name = user.name || "";
+        const phone = user.phone || "";
+        const addr = user.addr || "";
+
+        const submitBtn = document.getElementById("submitBtn");
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Placing order...`;
+
+        const totals = cartTotals(checkoutSnapshot);
+
+        try {
+            const trackingCode = await placeOrder({
+                items: checkoutSnapshot.map(i => ({
+                    productId: i.productId,
+                    name: i.productName,
+                    variant: i.variantLabel,
+                    upgrades: i.upgradeNames,
+                    price: i.unitPrice,
+                    quantity: i.quantity
+                })),
+                customerName: name,
+                phone,
+                address: addr,
+                subtotal: totals.subtotal,
+                deliveryFee: totals.deliveryFee,
+                total: totals.total
+            });
+
+            // Remember this order on this device — powers the "My Orders" list on track.html,
+            // no login involved, purely local convenience.
+            try {
+                const myOrders = JSON.parse(localStorage.getItem('eazylife_my_orders')) || [];
+                if (!myOrders.includes(trackingCode)) myOrders.unshift(trackingCode);
+                localStorage.setItem('eazylife_my_orders', JSON.stringify(myOrders.slice(0, 50)));
+            } catch (e) { /* non-critical */ }
+
+            document.getElementById('trackingCodeDisplay').textContent = trackingCode;
+            document.getElementById('trackLink').href = `track.html?code=${trackingCode}`;
+
+            // Build an optional WhatsApp confirmation link (not required — order already saved)
+            let msg = `*EAZYLIFE - NEW ORDER*%0A%0A*Tracking Code:* ${trackingCode}%0A%0A`;
+            checkoutSnapshot.forEach(i => {
+                msg += `• ${i.productName} (${i.variantLabel}${i.upgradeNames.length ? ', ' + i.upgradeNames.join(', ') : ''})%0A  Qty: ${i.quantity} | ₦${(i.unitPrice * i.quantity).toLocaleString()}%0A%0A`;
+            });
+            msg += `Subtotal: ₦${totals.subtotal.toLocaleString()}%0ADelivery: ₦${totals.deliveryFee.toLocaleString()}%0A*TOTAL: ₦${totals.total.toLocaleString()}*%0A%0A*Name:* ${name}%0A*Phone:* ${phone}%0A*Address:* ${addr}`;
+            document.getElementById("waConfirmLink").href = `https://wa.me/${whatsappNumber}?text=${msg}`;
+
+            // Only the items that were actually ordered leave the cart — anything left unchecked
+            // stays behind so the customer can pick up where they left off.
+            cart = cart.filter(i => i.included === false);
+            localStorage.setItem(CKEY, JSON.stringify(cart));
+            updateCartCount();
+            checkoutSnapshot = [];
+
+            document.getElementById("checkoutStep").classList.add("hidden");
+            document.getElementById("confirmStep").classList.remove("hidden");
+        } catch (e) {
+            console.error(e);
+            alert("Something went wrong placing your order. Please try again or message us on WhatsApp.");
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `<i class="fas fa-check-circle"></i> Place Order`;
+        }
+    }
+
+    /* ---------------- REQUEST MODAL ("can't find what you want") ---------------- */
+
+    function showRequestModal() {
+        document.getElementById('requestStep').classList.remove('hidden');
+        document.getElementById('requestConfirmStep').classList.add('hidden');
+        document.getElementById('requestModal').classList.remove('hidden');
+    }
+
+    function hideRequestModal() {
+        document.getElementById('requestModal').classList.add('hidden');
+    }
+
+    async function submitRequest() {
+        const name = document.getElementById('reqName').value.trim();
+        const phone = document.getElementById('reqPhone').value.trim();
+        const category = document.getElementById('reqCategory').value;
+        const budget = document.getElementById('reqBudget').value.trim();
+        const need = document.getElementById('reqNeed').value.trim();
+
+        if (!name || !phone || !need) return alert("Please share your name, phone, and what you're looking for.");
+
+        const btn = document.getElementById('requestSubmitBtn');
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Sending...`;
+
+        try {
+            await placeRequest({
+                name, phone, need,
+                category: category || null,
+                budget: budget ? parseInt(budget, 10) : null
+            });
+
+            let msg = `*EAZYLIFE - CUSTOM REQUEST*%0A%0A*Looking for:* ${need}%0A`;
+            if (category) msg += `*Category:* ${category}%0A`;
+            if (budget) msg += `*Budget:* ₦${parseInt(budget, 10).toLocaleString()}%0A`;
+            msg += `%0A*Name:* ${name}%0A*Phone:* ${phone}`;
+            document.getElementById('reqWaConfirmLink').href = `https://wa.me/${whatsappNumber}?text=${msg}`;
+
+            document.getElementById('requestStep').classList.add('hidden');
+            document.getElementById('requestConfirmStep').classList.remove('hidden');
+        } catch (e) {
+            console.error(e);
+            alert("Something went wrong sending your request. Please try again or message us on WhatsApp.");
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fas fa-paper-plane"></i> Send Request`;
+        }
+    }
+
+    // Expose functions used by inline onclick handlers (module scripts are not global by default)
+    window.filterByCategory = filterByCategory;
+    window.openProductModal = openProductModal;
+    window.hideProductModal = hideProductModal;
+    window.changePmQty = changePmQty;
+    window.setPmQty = setPmQty;
+    window.addPmToCart = addPmToCart;
+    window.changeQty = changeQty;
+    window.setQty = setQty;
+    window.changeCardQty = changeCardQty;
+    window.setCardQty = setCardQty;
+    window.toggleIncluded = toggleIncluded;
+    window.showCart = showCart;
+    window.goToCheckout = goToCheckout;
+    window.backToCart = backToCart;
+    window.hideCart = hideCart;
+    window.submitOrder = submitOrder;
+    window.showRequestModal = showRequestModal;
+    window.hideRequestModal = hideRequestModal;
+    window.submitRequest = submitRequest;
+    window.openFilters = openFilters;
+    window.closeFilters = closeFilters;
+    window.applyFilters = applyFilters;
+    window.clearFilters = clearFilters;
+    window.toggleDraftBrand = toggleDraftBrand;
+    window.toggleDraftRam = toggleDraftRam;
+    window.toggleDraftRom = toggleDraftRom;
+    window.removeBrandChip = removeBrandChip;
+    window.removeRamChip = removeRamChip;
+    window.removeRomChip = removeRomChip;
+    window.removePriceChip = removePriceChip;
+    window.removeToggleChip = removeToggleChip;
+    window.toggleQuickBulk = toggleQuickBulk;
+
+    init();
+</script>
+</body>
+</html>

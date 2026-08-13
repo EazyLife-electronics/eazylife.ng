@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Your Order | EazyLife</title>
+    <link rel="icon" type="image/png" href="assets/pictures/icon_dark.png" />
+    <link rel="apple-touch-icon" href="assets/pictures/icon_dark.png" />
+    <script>
+        (function () {
+            var saved = localStorage.getItem('eazylife-theme');
+            var theme = saved || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            if (theme === 'dark') document.documentElement.classList.add('dark');
+        })();
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { darkMode: 'class' }</script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root { --teal: #00B09B; --lime: #8DC63F; --dark: #1a2e2b; }
+        body { font-family: 'DM Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        h1, h2, .font-syne { font-family: 'Poppins', sans-serif; }
+        .bg-eazylife { background: linear-gradient(135deg, #00B09B, #8DC63F); }
+        .text-teal { color: var(--teal); }
+        .dark body { background: #0f1715; }
+        .nav-menu { position: relative; }
+        .nav-menu-panel { position: absolute; top: calc(100% + 8px); left: 0; background: #fff; border: 1px solid #eee; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); padding: 8px; min-width: 170px; z-index: 60; }
+        .dark .nav-menu-panel { background: #182420; border-color: #2a3835; }
+        .nav-menu-panel a { display: block; padding: 10px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; color: #1a2e2b; }
+        .dark .nav-menu-panel a { color: #eef2f0; }
+        .nav-menu-panel a:hover { background: #f0fdfb; }
+        .dark .nav-menu-panel a:hover { background: #1c2925; }
+        .track-input { text-transform: uppercase; letter-spacing: 0.05em; }
+        .step-line { flex: 1; height: 3px; background: #e5e7eb; }
+        .dark .step-line { background: #2a3835; }
+        .step-line.done { background: var(--teal); }
+        .step-dot { width: 32px; height: 32px; border-radius: 999px; display: flex; align-items: center; justify-content: center; background: #e5e7eb; color: #9ca3af; font-size: 0.8rem; }
+        .dark .step-dot { background: #2a3835; color: #6b7a76; }
+        .step-dot.done { background: var(--teal); color: #fff; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-[#0f1715] pb-16">
+
+<header class="bg-white/90 dark:bg-[#0f1715]/90 backdrop-blur-md border-b dark:border-[#2a3835] sticky top-0 z-50 p-4 shadow-sm">
+    <div class="max-w-2xl mx-auto flex justify-between items-center">
+        <a href="index.html" class="flex items-center gap-2">
+            <img id="navLogo" src="assets/pictures/logo_black_transparent.png" class="h-9" alt="EazyLife">
+        </a>
+        <div class="flex items-center gap-2">
+            <button id="themeToggle" type="button" aria-label="Toggle dark mode" class="w-10 h-10 rounded-full border border-gray-200 dark:border-[#2a3835] dark:bg-[#182420] flex items-center justify-center text-gray-700 dark:text-gray-200">
+                <i class="fas fa-moon"></i>
+            </button>
+            <div class="nav-menu">
+                <button id="navMenuBtn" type="button" aria-label="Open menu" class="w-10 h-10 rounded-full border border-gray-200 dark:border-[#2a3835] dark:bg-[#182420] flex items-center justify-center text-gray-700 dark:text-gray-200">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div id="navMenuPanel" class="nav-menu-panel hidden">
+                    <a href="index.html"><i class="fas fa-house fa-fw"></i> Home</a>
+                    <a href="shop.html"><i class="fas fa-shopping-basket fa-fw"></i> Shop</a>
+                    <a href="index.html#services"><i class="fas fa-layer-group fa-fw"></i> Services</a>
+                    <a href="index.html#contact"><i class="fas fa-address-card fa-fw"></i> Contact</a>
+                </div>
+            </div>
+            <a href="https://wa.me/2347051548082" target="_blank" class="w-10 h-10 rounded-full bg-[#25D366] text-white flex items-center justify-center">
+                <i class="fab fa-whatsapp"></i>
+            </a>
+        </div>
+    </div>
+</header>
+
+<main class="max-w-2xl mx-auto p-4">
+    <div class="mt-6 mb-6 text-center">
+        <h1 class="text-2xl font-black text-gray-900 dark:text-gray-100 tracking-tight">Track Your Order</h1>
+        <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Enter the tracking code from your order confirmation.</p>
+    </div>
+
+    <div class="flex gap-2 mb-8">
+        <input id="trackInput" placeholder="EZ-XXXXXX" maxlength="12"
+               class="track-input flex-1 p-4 rounded-2xl border-none shadow-sm focus:ring-2 focus:ring-[#00B09B] outline-none dark:bg-[#182420] dark:text-gray-100 font-bold text-center">
+        <button onclick="trackOrder()" id="trackBtn" class="bg-gray-900 text-white px-6 rounded-2xl font-bold text-sm">
+            <i class="fas fa-magnifying-glass"></i>
+        </button>
+    </div>
+
+    <div id="trackResult"></div>
+
+    <div id="myOrdersSection" class="hidden mt-10">
+        <h2 class="text-sm font-black uppercase text-gray-400 mb-3 px-1">Your Orders on This Device</h2>
+        <div id="myOrdersList" class="space-y-3"></div>
+    </div>
+</main>
+
+<script>
+    function applyShopThemeVisuals() {
+        var isDark = document.documentElement.classList.contains('dark');
+        var logo = document.getElementById('navLogo');
+        var icon = document.querySelector('#themeToggle i');
+        logo.src = isDark ? 'assets/pictures/logo_white_transparent.png' : 'assets/pictures/logo_black_transparent.png';
+        if (icon) icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+    }
+    applyShopThemeVisuals();
+
+    document.getElementById('themeToggle').addEventListener('click', function () {
+        var isDark = document.documentElement.classList.toggle('dark');
+        localStorage.setItem('eazylife-theme', isDark ? 'dark' : 'light');
+        applyShopThemeVisuals();
+    });
+
+    var menuBtn = document.getElementById('navMenuBtn');
+    var menuPanel = document.getElementById('navMenuPanel');
+    menuBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        menuPanel.classList.toggle('hidden');
+    });
+    document.addEventListener('click', function (e) {
+        if (!menuPanel.classList.contains('hidden') && !menuPanel.contains(e.target) && e.target !== menuBtn) {
+            menuPanel.classList.add('hidden');
+        }
+    });
+</script>
+
+<script type="module">
+    import { getOrderByTrackingCode } from './js/store.mjs';
+
+    const STATUS_STEPS = [
+        { key: 'new', label: 'Order Placed', icon: 'fa-check' },
+        { key: 'confirmed', label: 'Confirmed', icon: 'fa-box' },
+        { key: 'delivered', label: 'Delivered', icon: 'fa-house' }
+    ];
+
+    // Mirrors admin/js/admin-app.mjs — only the codes that are meant to be customer-facing.
+    const CANCEL_REASONS = {
+        out_of_stock: 'Out of stock',
+        payment_failed: 'Payment could not be confirmed'
+    };
+
+    function cancelReasonLabel(order) {
+        if (!order.cancelReason) return null;
+        if (order.cancelReason === 'other') return order.cancelCustomerNote || null;
+        return CANCEL_REASONS[order.cancelReason] || null;
+    }
+
+    function renderTimeline(status) {
+        const currentIdx = STATUS_STEPS.findIndex(s => s.key === status);
+        return `
+            <div class="flex items-center mb-6">
+                ${STATUS_STEPS.map((s, i) => `
+                    ${i > 0 ? `<div class="step-line ${i <= currentIdx ? 'done' : ''}"></div>` : ''}
+                    <div class="flex flex-col items-center gap-1">
+                        <div class="step-dot ${i <= currentIdx ? 'done' : ''}"><i class="fas ${s.icon}"></i></div>
+                        <span class="text-[10px] font-bold text-gray-500 dark:text-gray-400 whitespace-nowrap">${s.label}</span>
+                    </div>
+                `).join('')}
+            </div>`;
+    }
+
+    function statusBadgeClass(status) {
+        if (status === 'cancelled') return 'bg-red-100 text-red-700';
+        if (status === 'delivered') return 'bg-green-100 text-green-700';
+        if (status === 'confirmed') return 'bg-blue-100 text-blue-700';
+        return 'bg-yellow-100 text-yellow-700';
+    }
+
+    function renderOrderCard(order, compact) {
+        const itemsHtml = (order.items || []).map(i => `${i.name}${i.variant ? ' (' + i.variant + ')' : ''} × ${i.quantity}`).join(', ');
+        const created = order.createdAt?.toDate ? order.createdAt.toDate().toLocaleString() : '';
+        if (compact) {
+            return `
+                <a href="track.html?code=${order.trackingCode}" onclick="event.preventDefault(); document.getElementById('trackInput').value='${order.trackingCode}'; trackOrder();"
+                   class="block bg-white dark:bg-[#182420] border border-gray-100 dark:border-[#2a3835] rounded-2xl p-4 shadow-sm">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-black text-sm text-gray-800 dark:text-gray-100">${order.trackingCode}</span>
+                        <span class="text-[10px] font-bold uppercase px-2 py-1 rounded-full ${statusBadgeClass(order.status)}">${order.status || 'new'}</span>
+                    </div>
+                    <p class="text-xs text-gray-400">${created}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">${itemsHtml}</p>
+                </a>`;
+        }
+        const isCancelled = order.status === 'cancelled';
+        const reasonLabel = cancelReasonLabel(order);
+        return `
+            <div class="bg-white dark:bg-[#182420] border border-gray-100 dark:border-[#2a3835] rounded-2xl p-5 shadow-sm">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <p class="text-[10px] font-black uppercase text-gray-400">Tracking Code</p>
+                        <p class="text-xl font-black text-teal">${order.trackingCode}</p>
+                    </div>
+                    <p class="text-xs text-gray-400 text-right">${created}</p>
+                </div>
+                ${isCancelled ? `
+                    <div class="bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/50 rounded-xl p-4 mb-4">
+                        <p class="text-sm font-black text-red-700 dark:text-red-400 mb-1"><i class="fas fa-circle-xmark mr-1"></i> Order Cancelled</p>
+                        <p class="text-xs text-red-600 dark:text-red-300">${reasonLabel ? reasonLabel : "We're unable to fulfill this order. Please reach out to us if you'd like to know more."}</p>
+                    </div>
+                ` : renderTimeline(order.status || 'new')}
+                <div class="border-t border-gray-100 dark:border-[#2a3835] pt-4">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-1"><b class="text-gray-700 dark:text-gray-200">Items:</b> ${itemsHtml}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-1"><b class="text-gray-700 dark:text-gray-200">Delivery to:</b> ${order.address || ''}</p>
+                    <p class="text-sm font-black text-gray-900 dark:text-gray-100 mt-2">Total: ₦${(order.total || 0).toLocaleString()}</p>
+                </div>
+            </div>`;
+    }
+
+    window.trackOrder = async function () {
+        const input = document.getElementById('trackInput');
+        const code = input.value.trim();
+        const resultEl = document.getElementById('trackResult');
+        if (!code) return;
+
+        const btn = document.getElementById('trackBtn');
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
+        resultEl.innerHTML = '';
+
+        try {
+            const order = await getOrderByTrackingCode(code);
+            if (!order) {
+                resultEl.innerHTML = `<div class="text-center py-8 text-gray-400 text-sm">No order found for "${code}". Double-check the code and try again.</div>`;
+            } else {
+                resultEl.innerHTML = renderOrderCard(order, false);
+                // Remember it locally too, in case they typed a code that wasn't already saved on this device
+                try {
+                    const myOrders = JSON.parse(localStorage.getItem('eazylife_my_orders')) || [];
+                    if (!myOrders.includes(order.trackingCode)) {
+                        myOrders.unshift(order.trackingCode);
+                        localStorage.setItem('eazylife_my_orders', JSON.stringify(myOrders.slice(0, 50)));
+                    }
+                } catch (e) { /* non-critical */ }
+            }
+        } catch (err) {
+            resultEl.innerHTML = `<div class="text-center py-8 text-red-400 text-sm">Something went wrong looking that up. Please try again.</div>`;
+            console.error(err);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fas fa-magnifying-glass"></i>`;
+        }
+    };
+
+    async function loadMyOrders() {
+        let myOrders = [];
+        try { myOrders = JSON.parse(localStorage.getItem('eazylife_my_orders')) || []; } catch (e) {}
+        if (myOrders.length === 0) return;
+
+        document.getElementById('myOrdersSection').classList.remove('hidden');
+        const listEl = document.getElementById('myOrdersList');
+        listEl.innerHTML = `<p class="text-center text-gray-400 text-xs py-4">Loading...</p>`;
+
+        const results = await Promise.all(myOrders.map(code => getOrderByTrackingCode(code).catch(() => null)));
+        const found = results.filter(Boolean);
+        listEl.innerHTML = found.length
+            ? found.map(o => renderOrderCard(o, true)).join('')
+            : `<p class="text-center text-gray-400 text-xs py-4">No saved orders found.</p>`;
+    }
+
+    // If arriving with ?code=XXXX (e.g. from the checkout confirmation link), auto-fill and track
+    const params = new URLSearchParams(window.location.search);
+    const incomingCode = params.get('code');
+    if (incomingCode) {
+        document.getElementById('trackInput').value = incomingCode;
+        window.trackOrder();
+    }
+
+    document.getElementById('trackInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') window.trackOrder();
+    });
+
+    loadMyOrders();
+</script>
+</body>
+</html>

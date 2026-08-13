@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EazyLife Customers</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body { font-family:'DM Sans',sans-serif; }
+    h1,h2,h3,.font-syne { font-family:'Poppins',sans-serif; }
+    .tab-active { background:#111827!important;color:#fff!important; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen text-gray-900">
+<header class="bg-white border-b sticky top-0 z-40 px-4 py-4 shadow-sm flex items-center justify-between">
+  <div><h1 class="font-extrabold text-lg">EazyLife <span class="text-[#00B09B]">Customers</span></h1><p class="text-[10px] text-gray-400">Customer directory & account history</p></div>
+  <a href="./index.html" class="text-gray-500 text-xs font-bold"><i class="fas fa-arrow-left"></i> Admin</a>
+</header>
+<main class="max-w-4xl mx-auto p-4 pb-12">
+  <section class="bg-white rounded-[24px] shadow-sm p-5 mb-5">
+    <div class="flex flex-wrap gap-2 items-end">
+      <label class="flex-1 min-w-[220px]"><span class="block text-[10px] uppercase font-black text-gray-400 mb-1">Search</span><input id="search" placeholder="Customer name or phone..." class="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 outline-none focus:ring-2 focus:ring-[#00B09B]"></label>
+      <label><span class="block text-[10px] uppercase font-black text-gray-400 mb-1">From</span><input id="from" type="date" class="p-3 rounded-xl bg-gray-50 border border-gray-200 text-sm outline-none"></label>
+      <label><span class="block text-[10px] uppercase font-black text-gray-400 mb-1">To</span><input id="to" type="date" class="p-3 rounded-xl bg-gray-50 border border-gray-200 text-sm outline-none"></label>
+      <button id="applyDates" class="p-3 rounded-xl bg-gray-900 text-white text-xs font-bold">Apply</button>
+      <button id="refresh" class="p-3 rounded-xl bg-gray-100 text-gray-700 text-xs font-bold">Refresh</button>
+    </div>
+  </section>
+  <section class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+    <div class="bg-white rounded-2xl p-4 shadow-sm"><p class="text-[10px] uppercase font-black text-gray-400">Customers</p><p id="statCustomers" class="text-xl font-black mt-1">0</p></div>
+    <div class="bg-white rounded-2xl p-4 shadow-sm"><p class="text-[10px] uppercase font-black text-gray-400">Purchases</p><p id="statPurchases" class="text-xl font-black mt-1">₦0</p></div>
+    <div class="bg-white rounded-2xl p-4 shadow-sm"><p class="text-[10px] uppercase font-black text-gray-400">Collected</p><p id="statPaid" class="text-xl font-black mt-1 text-[#00B09B]">₦0</p></div>
+    <div class="bg-white rounded-2xl p-4 shadow-sm"><p class="text-[10px] uppercase font-black text-gray-400">Outstanding</p><p id="statBalance" class="text-xl font-black mt-1 text-red-600">₦0</p></div>
+  </section>
+  <p id="status" class="text-xs text-gray-400 mb-3 px-1">Loading customers...</p>
+  <section id="customerList" class="grid gap-3"></section>
+  <section id="profile" class="hidden mt-6"></section>
+</main>
+<script type="module" src="./js/customers.mjs"></script>
+<script>
+  // WhatsApp requires international format. Convert Nigerian local numbers
+  // such as 08012345678 to 2348012345678 before opening wa.me.
+  function normalizeWhatsAppLinks(root = document) {
+    root.querySelectorAll('a[href^="https://wa.me/"]').forEach(link => {
+      try {
+        const url = new URL(link.href);
+        let digits = url.pathname.replace(/^\/\+?/, '').replace(/\D/g, '');
+        if (digits.startsWith('0') && digits.length === 11) digits = '234' + digits.slice(1);
+        else if (digits.startsWith('234') && digits.length === 13) { /* already correct */ }
+        else if (digits.length === 10) digits = '234' + digits;
+        if (digits.startsWith('234') && digits.length === 13) link.href = `https://wa.me/${digits}`;
+      } catch (_) {}
+    });
+  }
+  new MutationObserver(() => normalizeWhatsAppLinks()).observe(document.body, { childList: true, subtree: true });
+  document.addEventListener('DOMContentLoaded', () => normalizeWhatsAppLinks());
+</script>
+</body>
+</html>
