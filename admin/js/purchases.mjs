@@ -3,7 +3,7 @@
 // Purchases are kept in their own Admin tab. Product data is subscribed only after
 // authentication so the variant dropdown is populated reliably.
 import { initFirebase } from '../../js/firebase.mjs';
-import { collection, doc, getDocs, onSnapshot, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { collection, doc, getDoc, getDocs, onSnapshot, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { ensureSupplierRecord } from './suppliers.mjs';
 import './purchase-void.mjs';
@@ -18,7 +18,7 @@ let purchaseHistory = [];
 
 function money(v) { return `₦${Number(v || 0).toLocaleString()}`; }
 function escapeHtml(v) {
-  return String(v ?? '').replace(/[&<>'\"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[c]));
+  return String(v ?? '').replace(/[&<>'\"] /g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[c]));
 }
 function label(v, i) {
   const bits = [v?.processor, v?.ram, v?.rom, v?.color].filter(Boolean);
@@ -177,7 +177,9 @@ function installPanel() {
     updateTotal();
   });
   document.getElementById('clearPurchaseBtn').onclick = () => {
-    document.getElementById('purchaseSupplier').value = '';
+    const supplierInput = document.getElementById('purchaseSupplier');
+    supplierInput.value = '';
+    delete supplierInput.dataset.supplierId;
     document.getElementById('purchaseReference').value = '';
     document.getElementById('purchaseVariant').value = '';
     document.getElementById('purchaseQty').value = '';
@@ -194,7 +196,9 @@ function installPanel() {
 }
 
 async function receivePurchase() {
-  const supplierInput = document.getElementById('purchaseSupplier').value.trim();
+  const supplierInputEl = document.getElementById('purchaseSupplier');
+  const supplierInput = supplierInputEl.value.trim();
+  const selectedSupplierId = supplierInputEl.dataset.supplierId || '';
   const reference = document.getElementById('purchaseReference').value.trim();
   const selected = document.getElementById('purchaseVariant').value;
   const qty = parseInt(document.getElementById('purchaseQty').value, 10);
@@ -212,10 +216,20 @@ async function receivePurchase() {
   const variantInfo = variantOptions().find(v => v.productId === productId && v.variantId === variantId);
 
   try {
-    // Resolve the typed name against the supplier master first. Existing suppliers
-    // reuse their canonical name; new suppliers are automatically created as
-    // master records so the purchase and Supplier Records stay in sync.
-    const supplierRecord = await ensureSupplierRecord(supplierInput);
+    let supplierRecord;
+    if (selectedSupplierId) {
+      const supplierRef = doc(db, 'suppliers', selectedSupplierId);
+      const supplierSnap = await getDoc(supplierRef);
+      if (!supplierSnap.exists()) {
+        delete supplierInputEl.dataset.supplierId;
+        throw new Error('The selected Supplier Master record no longer exists. Refresh and select the supplier again.');
+      }
+      supplierRecord = { id: supplierSnap.id, ...supplierSnap.data(), created: false };
+    } else {
+      // A new supplier name is allowed. ensureSupplierRecord reuses an existing
+      // canonical record when the name matches, or creates a new master record.
+      supplierRecord = await ensureSupplierRecord(supplierInput);
+    }
     const supplier = supplierRecord.name;
 
     await runTransaction(db, async tx => {
