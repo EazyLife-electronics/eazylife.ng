@@ -5,7 +5,7 @@
 import { initFirebase } from '../../js/firebase.mjs';
 import { collection, doc, getDocs, onSnapshot, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import './suppliers.mjs';
+import { ensureSupplierRecord } from './suppliers.mjs';
 import './purchase-void.mjs';
 
 const { db, auth } = initFirebase();
@@ -18,7 +18,7 @@ let purchaseHistory = [];
 
 function money(v) { return `₦${Number(v || 0).toLocaleString()}`; }
 function escapeHtml(v) {
-  return String(v ?? '').replace(/[&<>'"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[c]));
+  return String(v ?? '').replace(/[&<>'\"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[c]));
 }
 function label(v, i) {
   const bits = [v?.processor, v?.ram, v?.rom, v?.color].filter(Boolean);
@@ -126,7 +126,7 @@ function installPanel() {
   wrap.innerHTML = `
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-4">
-        <div><h2 class="font-black text-lg">Receive Purchase</h2><p class="text-[11px] text-gray-400">Record supplier stock received and its actual buying cost. This increases inventory and creates a purchase record.</p></div>
+        <div><h2 class="font-black text-lg">Receive Purchase</h2><p class="text-[11px] text-gray-400">Record supplier stock received and its actual buying cost. New supplier names are automatically added to Supplier Records.</p></div>
         <span id="purchaseTotal" class="text-sm font-black">Total: ₦0</span>
       </div>
       <div class="grid md:grid-cols-2 gap-2">
@@ -158,7 +158,7 @@ function installPanel() {
 
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
-        <div><h2 class="font-black text-lg">Supplier Directory</h2><p class="text-[11px] text-gray-400">Suppliers are grouped automatically from your purchase records. No duplicate supplier records are created here.</p></div>
+        <div><h2 class="font-black text-lg">Supplier Directory</h2><p class="text-[11px] text-gray-400">Suppliers are grouped automatically from your purchase records. Supplier master records are kept separately for contact and business details.</p></div>
         <input id="supplierSearch" placeholder="Search suppliers..." class="w-full md:w-64 p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none">
       </div>
       <div id="supplierRows" class="grid gap-2"><p class="text-xs text-gray-400">Loading suppliers...</p></div>
@@ -194,13 +194,13 @@ function installPanel() {
 }
 
 async function receivePurchase() {
-  const supplier = document.getElementById('purchaseSupplier').value.trim();
+  const supplierInput = document.getElementById('purchaseSupplier').value.trim();
   const reference = document.getElementById('purchaseReference').value.trim();
   const selected = document.getElementById('purchaseVariant').value;
   const qty = parseInt(document.getElementById('purchaseQty').value, 10);
   const unitCost = Number(document.getElementById('purchaseCost').value || 0);
   const notes = document.getElementById('purchaseNotes').value.trim();
-  if (!supplier) return showMessage('Supplier name is required.', true);
+  if (!supplierInput) return showMessage('Supplier name is required.', true);
   if (!selected) return showMessage('Select a product variant.', true);
   if (!Number.isInteger(qty) || qty <= 0) return showMessage('Quantity must be a positive whole number.', true);
   if (!Number.isFinite(unitCost) || unitCost < 0) return showMessage('Enter a valid unit cost.', true);
@@ -212,6 +212,12 @@ async function receivePurchase() {
   const variantInfo = variantOptions().find(v => v.productId === productId && v.variantId === variantId);
 
   try {
+    // Resolve the typed name against the supplier master first. Existing suppliers
+    // reuse their canonical name; new suppliers are automatically created as
+    // master records so the purchase and Supplier Records stay in sync.
+    const supplierRecord = await ensureSupplierRecord(supplierInput);
+    const supplier = supplierRecord.name;
+
     await runTransaction(db, async tx => {
       const snap = await tx.get(productRef);
       if (!snap.exists()) throw new Error('Product no longer exists.');
@@ -224,7 +230,7 @@ async function receivePurchase() {
       variants[index] = { ...variants[index], stockQty: next, inStock: true, costPrice: unitCost };
       tx.update(productRef, { variants, inStock: true });
       tx.set(purchaseRef, {
-        supplier, reference, productId, variantId,
+        supplier, supplierId: supplierRecord.id, reference, productId, variantId,
         productName: product.name || variantInfo?.productName || '',
         variantLabel: label(variants[index], index),
         sku: variants[index].sku || variantInfo?.sku || '',
@@ -238,11 +244,11 @@ async function receivePurchase() {
         variantLabel: label(variants[index], index), type: 'purchase_received',
         quantity: qty, previousQty: current, newQty: next,
         reason: 'Purchase received', reference: reference || supplier,
-        purchaseId: purchaseRef.id, supplier, unitCost, totalCost: qty * unitCost,
+        purchaseId: purchaseRef.id, supplier, supplierId: supplierRecord.id, unitCost, totalCost: qty * unitCost,
         createdAt: serverTimestamp()
       });
     });
-    showMessage(`Received ${qty} unit${qty === 1 ? '' : 's'} successfully. Stock is now updated.`, false);
+    showMessage(`Received ${qty} unit${qty === 1 ? '' : 's'} successfully. Stock is now updated and the supplier record is synced.`, false);
     document.getElementById('clearPurchaseBtn').click();
     await loadPurchases();
   } catch (e) {
