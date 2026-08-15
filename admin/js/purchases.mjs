@@ -1,9 +1,7 @@
 // admin/js/purchases.mjs
 // Stage 5: supplier purchase / stock receiving workflow.
-// Purchases are kept in their own Admin tab. Product data is subscribed only after
-// authentication so the variant dropdown is populated reliably.
 import { initFirebase } from '../../js/firebase.mjs';
-import { collection, doc, getDocs, onSnapshot, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { collection, doc, getDoc, getDocs, onSnapshot, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { ensureSupplierRecord } from './suppliers.mjs';
 import './purchase-void.mjs';
@@ -81,7 +79,6 @@ function installTab() {
       panel.classList.add('hidden');
     });
   }
-
   tabInstalled = true;
   return true;
 }
@@ -96,13 +93,11 @@ function startProducts() {
     if (message) showMessage(`Could not load products: ${error.message}`, true);
   });
 }
-
 function stopProducts() {
   if (unsubscribeProducts) unsubscribeProducts();
   unsubscribeProducts = null;
   products = [];
 }
-
 function showPurchasesTab(button, panel) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
   button.classList.add('tab-active');
@@ -119,7 +114,6 @@ function installPanel() {
   const panel = document.getElementById('purchaseContent');
   if (!panel) return;
   panelInstalled = true;
-
   const wrap = document.createElement('div');
   wrap.id = 'purchaseReceivingPanel';
   wrap.className = 'space-y-4';
@@ -137,30 +131,18 @@ function installPanel() {
         <input id="purchaseCost" type="number" min="0" step="1" placeholder="Unit cost (₦)" class="p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none">
         <textarea id="purchaseNotes" rows="2" placeholder="Notes (optional)" class="p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none md:col-span-2"></textarea>
       </div>
-      <div class="flex gap-2 mt-3">
-        <button id="receivePurchaseBtn" class="flex-1 bg-gray-900 text-white py-3 rounded-xl font-bold text-sm">Receive Stock</button>
-        <button id="clearPurchaseBtn" class="bg-gray-100 text-gray-500 px-4 rounded-xl font-bold text-sm">Clear</button>
-      </div>
+      <div class="flex gap-2 mt-3"><button id="receivePurchaseBtn" class="flex-1 bg-gray-900 text-white py-3 rounded-xl font-bold text-sm">Receive Stock</button><button id="clearPurchaseBtn" class="bg-gray-100 text-gray-500 px-4 rounded-xl font-bold text-sm">Clear</button></div>
       <p id="purchaseMessage" class="text-xs mt-3 hidden"></p>
     </div>
-
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
         <div><h2 class="font-black text-lg">Purchase History</h2><p class="text-[11px] text-gray-400">Review received purchases without leaving the Purchases tab.</p></div>
-        <div class="flex gap-2 w-full md:w-auto">
-          <input id="purchaseHistorySearch" placeholder="Search supplier, reference, SKU..." class="flex-1 md:w-72 p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none">
-          <button id="purchaseHistoryRefresh" class="bg-gray-100 text-gray-600 px-4 rounded-xl font-bold text-xs">Refresh</button>
-        </div>
+        <div class="flex gap-2 w-full md:w-auto"><input id="purchaseHistorySearch" placeholder="Search supplier, reference, SKU..." class="flex-1 md:w-72 p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"><button id="purchaseHistoryRefresh" class="bg-gray-100 text-gray-600 px-4 rounded-xl font-bold text-xs">Refresh</button></div>
       </div>
-      <div id="purchaseHistorySummary" class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4"></div>
-      <div id="purchaseRows" class="space-y-2"><p class="text-xs text-gray-400">Loading...</p></div>
+      <div id="purchaseHistorySummary" class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4"></div><div id="purchaseRows" class="space-y-2"><p class="text-xs text-gray-400">Loading...</p></div>
     </div>
-
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
-        <div><h2 class="font-black text-lg">Supplier Directory</h2><p class="text-[11px] text-gray-400">Suppliers are grouped automatically from your purchase records. Supplier master records are kept separately for contact and business details.</p></div>
-        <input id="supplierSearch" placeholder="Search suppliers..." class="w-full md:w-64 p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none">
-      </div>
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4"><div><h2 class="font-black text-lg">Supplier Directory</h2><p class="text-[11px] text-gray-400">Suppliers are grouped automatically from your purchase records. Supplier master records are kept separately for contact and business details.</p></div><input id="supplierSearch" placeholder="Search suppliers..." class="w-full md:w-64 p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"></div>
       <div id="supplierRows" class="grid gap-2"><p class="text-xs text-gray-400">Loading suppliers...</p></div>
     </div>`;
   panel.appendChild(wrap);
@@ -171,13 +153,11 @@ function installPanel() {
   const updateTotal = () => { total.textContent = `Total: ${money((Number(qty.value) || 0) * (Number(cost.value) || 0))}`; };
   qty.addEventListener('input', updateTotal);
   cost.addEventListener('input', updateTotal);
-  document.getElementById('purchaseVariant').addEventListener('change', e => {
-    const option = e.target.selectedOptions[0];
-    if (option?.dataset.cost && !cost.value) cost.value = option.dataset.cost;
-    updateTotal();
-  });
+  document.getElementById('purchaseVariant').addEventListener('change', e => { const option = e.target.selectedOptions[0]; if (option?.dataset.cost && !cost.value) cost.value = option.dataset.cost; updateTotal(); });
   document.getElementById('clearPurchaseBtn').onclick = () => {
-    document.getElementById('purchaseSupplier').value = '';
+    const supplierInput = document.getElementById('purchaseSupplier');
+    supplierInput.value = '';
+    delete supplierInput.dataset.supplierId;
     document.getElementById('purchaseReference').value = '';
     document.getElementById('purchaseVariant').value = '';
     document.getElementById('purchaseQty').value = '';
@@ -189,12 +169,14 @@ function installPanel() {
   document.getElementById('receivePurchaseBtn').onclick = receivePurchase;
   document.getElementById('purchaseHistorySearch').addEventListener('input', renderPurchaseHistory);
   document.getElementById('purchaseHistoryRefresh').onclick = loadPurchases;
-  document.getElementById('supplierSearch').addEventListener('input', () => renderSuppliers());
+  document.getElementById('supplierSearch').addEventListener('input', renderSuppliers);
   loadPurchases();
 }
 
 async function receivePurchase() {
-  const supplierInput = document.getElementById('purchaseSupplier').value.trim();
+  const supplierInputEl = document.getElementById('purchaseSupplier');
+  const supplierInput = supplierInputEl.value.trim();
+  const selectedSupplierId = supplierInputEl.dataset.supplierId || '';
   const reference = document.getElementById('purchaseReference').value.trim();
   const selected = document.getElementById('purchaseVariant').value;
   const qty = parseInt(document.getElementById('purchaseQty').value, 10);
@@ -212,10 +194,17 @@ async function receivePurchase() {
   const variantInfo = variantOptions().find(v => v.productId === productId && v.variantId === variantId);
 
   try {
-    // Resolve the typed name against the supplier master first. Existing suppliers
-    // reuse their canonical name; new suppliers are automatically created as
-    // master records so the purchase and Supplier Records stay in sync.
-    const supplierRecord = await ensureSupplierRecord(supplierInput);
+    let supplierRecord;
+    if (selectedSupplierId) {
+      const supplierSnap = await getDoc(doc(db, 'suppliers', selectedSupplierId));
+      if (!supplierSnap.exists()) {
+        delete supplierInputEl.dataset.supplierId;
+        throw new Error('The selected Supplier Master record no longer exists. Refresh and select the supplier again.');
+      }
+      supplierRecord = { id: supplierSnap.id, ...supplierSnap.data(), created: false };
+    } else {
+      supplierRecord = await ensureSupplierRecord(supplierInput);
+    }
     const supplier = supplierRecord.name;
 
     await runTransaction(db, async tx => {
@@ -229,24 +218,8 @@ async function receivePurchase() {
       const next = current + qty;
       variants[index] = { ...variants[index], stockQty: next, inStock: true, costPrice: unitCost };
       tx.update(productRef, { variants, inStock: true });
-      tx.set(purchaseRef, {
-        supplier, supplierId: supplierRecord.id, reference, productId, variantId,
-        productName: product.name || variantInfo?.productName || '',
-        variantLabel: label(variants[index], index),
-        sku: variants[index].sku || variantInfo?.sku || '',
-        quantity: qty, unitCost, totalCost: qty * unitCost, notes,
-        status: 'received', createdAt: serverTimestamp()
-      });
-      tx.set(movementRef, {
-        productId, variantId,
-        sku: variants[index].sku || variantInfo?.sku || '',
-        productName: product.name || variantInfo?.productName || '',
-        variantLabel: label(variants[index], index), type: 'purchase_received',
-        quantity: qty, previousQty: current, newQty: next,
-        reason: 'Purchase received', reference: reference || supplier,
-        purchaseId: purchaseRef.id, supplier, supplierId: supplierRecord.id, unitCost, totalCost: qty * unitCost,
-        createdAt: serverTimestamp()
-      });
+      tx.set(purchaseRef, { supplier, supplierId: supplierRecord.id, reference, productId, variantId, productName: product.name || variantInfo?.productName || '', variantLabel: label(variants[index], index), sku: variants[index].sku || variantInfo?.sku || '', quantity: qty, unitCost, totalCost: qty * unitCost, notes, status: 'received', createdAt: serverTimestamp() });
+      tx.set(movementRef, { productId, variantId, sku: variants[index].sku || variantInfo?.sku || '', productName: product.name || variantInfo?.productName || '', variantLabel: label(variants[index], index), type: 'purchase_received', quantity: qty, previousQty: current, newQty: next, reason: 'Purchase received', reference: reference || supplier, purchaseId: purchaseRef.id, supplier, supplierId: supplierRecord.id, unitCost, totalCost: qty * unitCost, createdAt: serverTimestamp() });
     });
     showMessage(`Received ${qty} unit${qty === 1 ? '' : 's'} successfully. Stock is now updated and the supplier record is synced.`, false);
     document.getElementById('clearPurchaseBtn').click();
@@ -270,11 +243,7 @@ async function loadPurchases() {
   el.innerHTML = '<p class="text-xs text-gray-400 py-3">Loading purchases...</p>';
   try {
     const snap = await getDocs(collection(db, 'purchases'));
-    purchaseHistory = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => {
-      const at = a.createdAt?.toMillis?.() || 0;
-      const bt = b.createdAt?.toMillis?.() || 0;
-      return bt - at;
-    });
+    purchaseHistory = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
     renderPurchaseHistory();
   } catch (e) {
     purchaseHistory = [];
@@ -288,43 +257,15 @@ function renderPurchaseHistory() {
   const summary = document.getElementById('purchaseHistorySummary');
   if (!el) return;
   const query = String(document.getElementById('purchaseHistorySearch')?.value || '').trim().toLowerCase();
-  const filtered = purchaseHistory.filter(p => {
-    if (!query) return true;
-    return [p.supplier, p.reference, p.productName, p.variantLabel, p.sku, p.notes].some(v => String(v || '').toLowerCase().includes(query));
-  });
+  const filtered = purchaseHistory.filter(p => !query || [p.supplier, p.reference, p.productName, p.variantLabel, p.sku, p.notes].some(v => String(v || '').toLowerCase().includes(query)));
   const totalQty = filtered.reduce((sum, p) => sum + Number(p.quantity || 0), 0);
   const totalValue = filtered.reduce((sum, p) => sum + Number(p.totalCost || 0), 0);
-  const suppliers = new Set(filtered.map(p => String(p.supplier || '').trim()).filter(Boolean)).size;
-  if (summary) {
-    summary.innerHTML = [
-      ['Purchases', filtered.length],
-      ['Units received', totalQty.toLocaleString()],
-      ['Purchase value', money(totalValue)],
-      ['Suppliers', suppliers]
-    ].map(([title, value]) => `<div class="rounded-xl bg-gray-50 border border-gray-100 p-3"><p class="text-[10px] text-gray-400 font-bold uppercase">${title}</p><p class="text-sm font-black mt-1">${value}</p></div>`).join('');
-  }
-  if (!filtered.length) {
-    el.innerHTML = `<div class="py-8 text-center text-xs text-gray-400">${query ? 'No purchases match your search.' : 'No purchases recorded yet.'}</div>`;
-    renderSuppliers();
-    return;
-  }
+  const supplierCount = new Set(filtered.map(p => String(p.supplier || '').trim()).filter(Boolean)).size;
+  if (summary) summary.innerHTML = [['Purchases', filtered.length], ['Units received', totalQty.toLocaleString()], ['Purchase value', money(totalValue)], ['Suppliers', supplierCount]].map(([title, value]) => `<div class="rounded-xl bg-gray-50 border border-gray-100 p-3"><p class="text-[10px] text-gray-400 font-bold uppercase">${title}</p><p class="text-sm font-black mt-1">${value}</p></div>`).join('');
+  if (!filtered.length) { el.innerHTML = `<div class="py-8 text-center text-xs text-gray-400">${query ? 'No purchases match your search.' : 'No purchases recorded yet.'}</div>`; renderSuppliers(); return; }
   el.innerHTML = filtered.map(p => `
     <div data-purchase-id="${escapeHtml(p.id)}" data-purchase-status="${escapeHtml(p.status || 'received')}" class="border border-gray-100 rounded-xl p-3 hover:border-gray-200">
-      <div class="flex flex-col md:flex-row md:items-center gap-2">
-        <div class="flex-grow min-w-0">
-          <div class="flex flex-wrap items-center gap-2">
-            <p class="text-xs font-black truncate">${escapeHtml(p.productName || 'Product')} · ${escapeHtml(p.variantLabel || '')}</p>
-            <span class="purchase-status text-[9px] font-bold px-2 py-1 rounded-full ${p.status === 'voided' ? 'bg-red-50 text-red-500' : 'bg-gray-100 text-gray-500'}">${p.status === 'voided' ? 'VOIDED' : 'RECEIVED'}</span>
-          </div>
-          <p class="text-[10px] text-gray-400 mt-1">${escapeHtml(p.supplier || 'Supplier')} ${p.reference ? `· ${escapeHtml(p.reference)}` : ''} · ${escapeHtml(p.sku || 'No SKU')}</p>
-          <p class="text-[10px] text-gray-400 mt-1">${dateText(p.createdAt)}${p.voidReason ? ` · Void reason: ${escapeHtml(p.voidReason)}` : ''}</p>
-        </div>
-        <div class="grid grid-cols-3 md:flex gap-4 md:items-center text-right">
-          <div><p class="text-[9px] text-gray-400">QTY</p><p class="text-xs font-black">${Number(p.quantity || 0).toLocaleString()}</p></div>
-          <div><p class="text-[9px] text-gray-400">UNIT COST</p><p class="text-xs font-black">${money(p.unitCost)}</p></div>
-          <div><p class="text-[9px] text-gray-400">TOTAL</p><p class="text-xs font-black">${money(p.totalCost)}</p></div>
-        </div>
-      </div>
+      <div class="flex flex-col md:flex-row md:items-center gap-2"><div class="flex-grow min-w-0"><div class="flex flex-wrap items-center gap-2"><p class="text-xs font-black truncate">${escapeHtml(p.productName || 'Product')} · ${escapeHtml(p.variantLabel || '')}</p><span class="purchase-status text-[9px] font-bold px-2 py-1 rounded-full ${p.status === 'voided' ? 'bg-red-50 text-red-500' : 'bg-gray-100 text-gray-500'}">${p.status === 'voided' ? 'VOIDED' : 'RECEIVED'}</span></div><p class="text-[10px] text-gray-400 mt-1">${escapeHtml(p.supplier || 'Supplier')} ${p.reference ? `· ${escapeHtml(p.reference)}` : ''} · ${escapeHtml(p.sku || 'No SKU')}</p><p class="text-[10px] text-gray-400 mt-1">${dateText(p.createdAt)}${p.voidReason ? ` · Void reason: ${escapeHtml(p.voidReason)}` : ''}</p></div><div class="grid grid-cols-3 md:flex gap-4 md:items-center text-right"><div><p class="text-[9px] text-gray-400">QTY</p><p class="text-xs font-black">${Number(p.quantity || 0).toLocaleString()}</p></div><div><p class="text-[9px] text-gray-400">UNIT COST</p><p class="text-xs font-black">${money(p.unitCost)}</p></div><div><p class="text-[9px] text-gray-400">TOTAL</p><p class="text-xs font-black">${money(p.totalCost)}</p></div></div></div>
       <div class="purchase-actions flex justify-end gap-2">${p.status === 'voided' ? '<span class="text-[10px] text-gray-400 font-bold py-2">No further action</span>' : ''}</div>
       ${p.notes ? `<p class="text-[10px] text-gray-500 mt-2 border-t border-gray-50 pt-2">${escapeHtml(p.notes)}</p>` : ''}
     </div>`).join('');
@@ -336,7 +277,6 @@ function renderSuppliers() {
   if (!el) return;
   const query = String(document.getElementById('supplierSearch')?.value || '').trim().toLowerCase();
   const map = new Map();
-
   purchaseHistory.forEach(p => {
     const name = String(p.supplier || '').trim();
     if (!name) return;
@@ -350,41 +290,13 @@ function renderSuppliers() {
     const previousTime = item.lastPurchase?.createdAt?.toMillis?.() || 0;
     if (time > previousTime) item.lastPurchase = p;
   });
-
-  const suppliers = [...map.values()]
-    .filter(s => !query || s.name.toLowerCase().includes(query))
-    .sort((a, b) => b.value - a.value);
-
-  if (!suppliers.length) {
-    el.innerHTML = `<div class="py-8 text-center text-xs text-gray-400">${query ? 'No suppliers match your search.' : 'No suppliers found yet. Suppliers appear here after the first purchase is received.'}</div>`;
-    return;
-  }
-
-  el.innerHTML = suppliers.map(s => `
-    <button type="button" data-supplier="${escapeHtml(s.name)}" class="supplier-filter w-full text-left border border-gray-100 rounded-xl p-3 hover:border-gray-200 bg-white">
-      <div class="flex flex-col md:flex-row md:items-center gap-3">
-        <div class="flex-grow min-w-0">
-          <p class="text-sm font-black truncate">${escapeHtml(s.name)}</p>
-          <p class="text-[10px] text-gray-400 mt-1">${s.purchases} purchase${s.purchases === 1 ? '' : 's'} · ${s.units.toLocaleString()} unit${s.units === 1 ? '' : 's'} · Last purchase ${dateText(s.lastPurchase?.createdAt)}</p>
-        </div>
-        <div class="text-right">
-          <p class="text-[9px] text-gray-400 uppercase">Purchase value</p>
-          <p class="text-xs font-black">${money(s.value)}</p>
-        </div>
-      </div>
-    </button>`).join('');
-
-  el.querySelectorAll('.supplier-filter').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const supplier = btn.dataset.supplier || '';
-      const search = document.getElementById('purchaseHistorySearch');
-      if (search) {
-        search.value = supplier;
-        renderPurchaseHistory();
-        document.getElementById('purchaseRows')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    });
-  });
+  const suppliers = [...map.values()].filter(s => !query || s.name.toLowerCase().includes(query)).sort((a, b) => b.value - a.value);
+  if (!suppliers.length) { el.innerHTML = `<div class="py-8 text-center text-xs text-gray-400">${query ? 'No suppliers match your search.' : 'No suppliers found yet. Suppliers appear here after the first purchase is received.'}</div>`; return; }
+  el.innerHTML = suppliers.map(s => `<button type="button" data-supplier="${escapeHtml(s.name)}" class="supplier-filter w-full text-left border border-gray-100 rounded-xl p-3 hover:border-gray-200 bg-white"><div class="flex flex-col md:flex-row md:items-center gap-3"><div class="flex-grow min-w-0"><p class="text-sm font-black truncate">${escapeHtml(s.name)}</p><p class="text-[10px] text-gray-400 mt-1">${s.purchases} purchase${s.purchases === 1 ? '' : 's'} · ${s.units.toLocaleString()} unit${s.units === 1 ? '' : 's'} · Last purchase ${dateText(s.lastPurchase?.createdAt)}</p></div><div class="text-right"><p class="text-[9px] text-gray-400 uppercase">Purchase value</p><p class="text-xs font-black">${money(s.value)}</p></div></div></button>`).join('');
+  el.querySelectorAll('.supplier-filter').forEach(btn => btn.addEventListener('click', () => {
+    const search = document.getElementById('purchaseHistorySearch');
+    if (search) { search.value = btn.dataset.supplier || ''; renderPurchaseHistory(); document.getElementById('purchaseRows')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  }));
 }
 
 function boot() {
@@ -395,7 +307,6 @@ function boot() {
     else if (document.getElementById('panel-purchases') && !document.getElementById('panel-purchases').classList.contains('hidden')) startProducts();
   });
 }
-
 const observer = new MutationObserver(() => installTab());
 if (document.body) observer.observe(document.body, { childList: true, subtree: true });
 boot();
