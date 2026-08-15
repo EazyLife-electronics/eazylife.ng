@@ -14,8 +14,6 @@ service cloud.firestore {
     }
 
     match /orders/{orderId} {
-      // Customers may place orders, but the Admin account is the only account
-      // allowed to read the full order collection or change/delete orders.
       allow create: if request.resource.data.keys().hasAll(['items', 'customerName', 'phone', 'total'])
                     && request.resource.data.total is number
                     && request.resource.data.items is list;
@@ -24,8 +22,6 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
 
       match /payments/{paymentId} {
-        // Payments are private financial records. Only the designated Admin can
-        // read or create them; customers never write payment ledger entries.
         allow read, create, update, delete: if isAdmin();
       }
     }
@@ -64,6 +60,22 @@ service cloud.firestore {
     }
 
     match /suppliers/{supplierId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
+    match /deliveryPersonnel/{personId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
+    match /deliveryTypes/{typeId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
+    match /deliveryCheckpoints/{checkpointId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
+    match /deliveries/{deliveryId} {
       allow read, create, update, delete: if isAdmin();
     }
   }
