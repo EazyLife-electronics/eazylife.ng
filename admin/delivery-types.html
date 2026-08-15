@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Delivery Types</title><script src="https://cdn.tailwindcss.com"></script></head>
+<body class="bg-slate-50 text-slate-900"><main class="max-w-5xl mx-auto p-5">
+<header class="mb-6"><a href="delivery.html" class="text-sm text-emerald-700">← Delivery</a><h1 class="text-2xl font-black mt-3">Delivery Types</h1><p class="text-sm text-slate-500">Define how an order gets to the customer.</p></header>
+<section class="bg-white border rounded-2xl p-4 mb-5"><form id="form" class="grid md:grid-cols-[1fr_2fr_auto] gap-3"><input id="name" required class="border rounded-xl px-3 py-2" placeholder="Type name e.g. Home Delivery"><input id="description" class="border rounded-xl px-3 py-2" placeholder="Description"><button class="bg-slate-900 text-white rounded-xl px-5 py-2 font-bold">Add</button></form></section>
+<section id="list" class="grid md:grid-cols-2 gap-4"></section></main>
+<script type="module">
+import {watchDeliveryTypes,addDeliveryType,updateDeliveryType,deleteDeliveryType} from './js/delivery-store.mjs';
+const list=document.querySelector('#list');
+document.querySelector('#form').addEventListener('submit',async e=>{e.preventDefault();await addDeliveryType({name:name.value.trim(),description:description.value.trim(),active:true,createdAt:Date.now(),updatedAt:Date.now()});e.target.reset();});
+watchDeliveryTypes(items=>{list.innerHTML=items.length?items.map(x=>`<article class="bg-white border rounded-2xl p-4"><div class="flex justify-between gap-3"><div><h2 class="font-black">${esc(x.name)}</h2><p class="text-sm text-slate-500">${esc(x.description||'')}</p></div><span class="text-xs font-bold ${x.active!==false?'text-emerald-700':'text-slate-400'}">${x.active!==false?'ACTIVE':'INACTIVE'}</span></div><div class="flex gap-2 mt-4"><button data-toggle="${x.id}" data-active="${x.active!==false}" class="px-3 py-2 rounded-lg border text-sm font-bold">${x.active!==false?'Disable':'Enable'}</button><button data-delete="${x.id}" class="px-3 py-2 rounded-lg border border-red-200 text-red-600 text-sm font-bold">Delete</button></div></article>`).join(''):'<p class="text-slate-500">No delivery types yet.</p>');});
+list.addEventListener('click',async e=>{const t=e.target;if(t.dataset.toggle)await updateDeliveryType(t.dataset.toggle,{active:t.dataset.active!=='true',updatedAt:Date.now()});if(t.dataset.delete&&confirm('Delete this delivery type?'))await deleteDeliveryType(t.dataset.delete);});
+function esc(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
+</script></body></html>
