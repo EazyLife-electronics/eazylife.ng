@@ -4,6 +4,7 @@
 import { initFirebase } from '../../js/firebase.mjs';
 import { collection, doc, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import './order-delivery-bridge.mjs';
 
 const { db, auth } = initFirebase();
 let currentUser = null;
