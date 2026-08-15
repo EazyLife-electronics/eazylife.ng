@@ -1,0 +1,57 @@
+// admin/js/delivery.mjs
+// Admin Delivery module: personnel, eligible orders, assignments, types and checkpoints.
+import {
+  watchDeliveryPersonnel, addDeliveryPersonnel, updateDeliveryPersonnel, deleteDeliveryPersonnel,
+  watchDeliveryTypes, addDeliveryType, updateDeliveryType, deleteDeliveryType,
+  watchDeliveryCheckpoints, addDeliveryCheckpoint, updateDeliveryCheckpoint, deleteDeliveryCheckpoint,
+  watchOrders, createDelivery, watchDeliveries, updateDelivery
+} from '../../js/store.mjs';
+
+const root = document.getElementById('deliveryContent');
+if (!root) throw new Error('Delivery panel is missing from admin/index.html');
+
+let personnel = [], types = [], checkpoints = [], orders = [], deliveries = [];
+let unsub = [];
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money = v => `₦${Number(v || 0).toLocaleString()}`;
+
+function render() {
+  const eligible = orders.filter(o => ['confirmed','shipped'].includes(String(o.status || '').toLowerCase()));
+  const active = deliveries.filter(d => !['delivered','cancelled','returned'].includes(String(d.status || '').toLowerCase()));
+  root.innerHTML = `
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+      ${stat('Eligible orders', eligible.length)}${stat('Active deliveries', active.length)}${stat('Delivery personnel', personnel.filter(p=>p.active!==false).length)}${stat('Checkpoints', checkpoints.length)}
+    </div>
+    <div class="flex gap-2 mb-4 overflow-x-auto">
+      <button class="delivery-subtab active px-4 py-2 rounded-full bg-gray-900 text-white text-xs font-bold" data-section="queue">Delivery Queue</button>
+      <button class="delivery-subtab px-4 py-2 rounded-full bg-gray-100 text-xs font-bold" data-section="people">Delivery Personnel</button>
+      <button class="delivery-subtab px-4 py-2 rounded-full bg-gray-100 text-xs font-bold" data-section="types">Delivery Types</button>
+      <button class="delivery-subtab px-4 py-2 rounded-full bg-gray-100 text-xs font-bold" data-section="checkpoints">Checkpoints</button>
+    </div>
+    <div id="deliverySubpanel"></div>`;
+  document.querySelectorAll('.delivery-subtab').forEach(b => b.onclick = () => { document.querySelectorAll('.delivery-subtab').forEach(x=>x.classList.remove('active','bg-gray-900','text-white')); document.querySelectorAll('.delivery-subtab').forEach(x=>x.classList.add('bg-gray-100')); b.classList.add('active','bg-gray-900','text-white'); b.classList.remove('bg-gray-100'); renderSection(b.dataset.section); });
+  renderSection('queue');
+}
+function stat(label,value){return `<div class="bg-white rounded-2xl p-4 shadow-sm"><div class="text-[10px] uppercase font-black text-gray-400">${label}</div><div class="text-2xl font-black mt-1">${value}</div></div>`;}
+function renderSection(section){
+  const el=document.getElementById('deliverySubpanel'); if(!el)return;
+  if(section==='queue') return renderQueue(el);
+  if(section==='people') return renderPeople(el);
+  if(section==='types') return renderTypes(el);
+  renderCheckpoints(el);
+}
+function renderQueue(el){
+  const eligible=orders.filter(o=>['confirmed','shipped'].includes(String(o.status||'').toLowerCase()));
+  el.innerHTML=`<div class="bg-white rounded-2xl p-5 shadow-sm mb-4"><h2 class="font-black text-lg">Delivery Queue</h2><p class="text-xs text-gray-400 mt-1">Only confirmed or shipped orders can be assigned for delivery.</p></div><div class="grid gap-3">${eligible.length?eligible.map(orderCard).join(''):'<div class="bg-white rounded-2xl p-8 text-center text-sm text-gray-400">No orders are currently eligible for delivery.</div>'}</div>`;
+  el.querySelectorAll('[data-assign]').forEach(btn=>btn.onclick=async()=>{const order=orders.find(o=>o.id===btn.dataset.assign);const type=document.querySelector(`[data-type-for="${btn.dataset.assign}"]`)?.value;const person=document.querySelector(`[data-person-for="${btn.dataset.assign}"]`)?.value;if(!person||!type)return alert('Select a delivery person and delivery type first.');try{await createDelivery({orderId:order.id,customerId:order.customerId||order.customer?.id||'',assignedTo:person,deliveryType:type,status:'assigned',address:order.address||order.customer?.address||'',phone:order.phone||order.customer?.phone||'',checkpointId:'',createdAt:new Date()});alert('Delivery assigned.');}catch(e){alert(`Could not assign delivery: ${e.message}`)}});
+}
+function orderCard(o){const existing=deliveries.find(d=>d.orderId===o.id&&!['cancelled','returned'].includes(d.status));return `<div class="bg-white rounded-2xl p-4 shadow-sm"><div class="flex justify-between gap-3"><div><div class="font-black">${esc(o.trackingCode||o.id)}</div><div class="text-sm text-gray-700 mt-1">${esc(o.customerName||o.customer?.name||'Customer')}</div><div class="text-xs text-gray-400 mt-1">${esc(o.address||o.customer?.address||'No address')}</div></div><div class="text-right"><div class="font-black">${money(o.total||o.amount)}</div><div class="text-[10px] uppercase font-black text-teal-600 mt-1">${esc(o.status)}</div></div></div>${existing?`<div class="mt-3 p-3 rounded-xl bg-gray-50 text-xs"><b>Delivery:</b> ${esc(personName(existing.assignedTo))} · ${esc(existing.deliveryType)} · <b>${esc(existing.status)}</b></div>`:`<div class="grid grid-cols-1 md:grid-cols-3 gap-2 mt-4"><select data-person-for="${esc(o.id)}" class="p-2.5 bg-gray-50 rounded-xl border border-gray-200 text-xs"><option value="">Assign personnel</option>${personnel.filter(p=>p.active!==false).map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('')}</select><select data-type-for="${esc(o.id)}" class="p-2.5 bg-gray-50 rounded-xl border border-gray-200 text-xs"><option value="">Delivery type</option>${types.filter(t=>t.active!==false).map(t=>`<option value="${esc(t.id)}">${esc(t.name)}</option>`).join('')}</select><button data-assign="${esc(o.id)}" class="bg-gray-900 text-white rounded-xl font-bold text-xs">Assign Delivery</button></div>`}</div>`;}
+function personName(id){return personnel.find(p=>p.id===id)?.name||id||'Unassigned';}
+function renderPeople(el){el.innerHTML=`<div class="bg-white rounded-2xl p-5 shadow-sm mb-4"><div class="flex justify-between items-center"><div><h2 class="font-black text-lg">Delivery Personnel</h2><p class="text-xs text-gray-400">Manage the people who receive delivery assignments.</p></div><button id="addPerson" class="bg-gray-900 text-white px-4 py-2 rounded-xl text-xs font-bold">+ Add</button></div></div><div class="grid gap-3">${personnel.map(p=>`<div class="bg-white rounded-2xl p-4 shadow-sm flex justify-between gap-3"><div><b>${esc(p.name)}</b><div class="text-xs text-gray-400 mt-1">${esc(p.phone||'No phone')} · ${esc(p.email||'No email')}</div><div class="text-[10px] mt-1 font-bold ${p.active===false?'text-red-500':'text-teal-600'}">${p.active===false?'INACTIVE':'ACTIVE'}</div></div><div class="flex gap-2"><button data-edit-person="${p.id}" class="text-xs font-bold text-teal-600">Edit</button><button data-delete-person="${p.id}" class="text-xs font-bold text-red-500">Delete</button></div></div>`).join('')}</div>`;document.getElementById('addPerson').onclick=()=>personPrompt();el.querySelectorAll('[data-edit-person]').forEach(b=>b.onclick=()=>personPrompt(personnel.find(p=>p.id===b.dataset.editPerson)));el.querySelectorAll('[data-delete-person]').forEach(b=>b.onclick=async()=>{if(confirm('Delete this delivery person?'))await deleteDeliveryPersonnel(b.dataset.deletePerson)});}
+async function personPrompt(p){const name=prompt('Name',p?.name||'');if(!name)return;const phone=prompt('Phone',p?.phone||'')||'';const email=prompt('Email',p?.email||'')||'';const active=confirm('Set this person as ACTIVE?');if(p)await updateDeliveryPersonnel(p.id,{name,phone,email,active});else await addDeliveryPersonnel({name,phone,email,active,createdAt:new Date()});}
+function renderTypes(el){el.innerHTML=`<div class="bg-white rounded-2xl p-5 shadow-sm mb-4"><div class="flex justify-between items-center"><div><h2 class="font-black text-lg">Delivery Types</h2><p class="text-xs text-gray-400">Examples: Drop Point, Home Delivery / Logistics.</p></div><button id="addType" class="bg-gray-900 text-white px-4 py-2 rounded-xl text-xs font-bold">+ Add</button></div></div><div class="grid gap-3">${types.map(t=>`<div class="bg-white rounded-2xl p-4 shadow-sm flex justify-between"><div><b>${esc(t.name)}</b><div class="text-xs text-gray-400">${esc(t.description||'')}</div></div><button data-delete-type="${t.id}" class="text-xs font-bold text-red-500">Delete</button></div>`).join('')}</div>`;document.getElementById('addType').onclick=async()=>{const name=prompt('Delivery type name');if(name)await addDeliveryType({name,active:true,createdAt:new Date()})};el.querySelectorAll('[data-delete-type]').forEach(b=>b.onclick=async()=>{if(confirm('Delete this delivery type?'))await deleteDeliveryType(b.dataset.deleteType)});}
+function renderCheckpoints(el){el.innerHTML=`<div class="bg-white rounded-2xl p-5 shadow-sm mb-4"><div class="flex justify-between items-center"><div><h2 class="font-black text-lg">Delivery Checkpoints</h2><p class="text-xs text-gray-400">Manage drop points and operational checkpoints.</p></div><button id="addCheckpoint" class="bg-gray-900 text-white px-4 py-2 rounded-xl text-xs font-bold">+ Add</button></div></div><div class="grid gap-3">${checkpoints.map(c=>`<div class="bg-white rounded-2xl p-4 shadow-sm flex justify-between"><div><b>${esc(c.name)}</b><div class="text-xs text-gray-400">${esc(c.address||'')}</div></div><button data-delete-checkpoint="${c.id}" class="text-xs font-bold text-red-500">Delete</button></div>`).join('')}</div>`;document.getElementById('addCheckpoint').onclick=async()=>{const name=prompt('Checkpoint name');if(name){const address=prompt('Address / description')||'';await addDeliveryCheckpoint({name,address,active:true,createdAt:new Date()})}};el.querySelectorAll('[data-delete-checkpoint]').forEach(b=>b.onclick=async()=>{if(confirm('Delete this checkpoint?'))await deleteDeliveryCheckpoint(b.dataset.deleteCheckpoint)});}
+
+unsub.push(watchDeliveryPersonnel(v=>{personnel=v;render()}),watchDeliveryTypes(v=>{types=v;render()}),watchDeliveryCheckpoints(v=>{checkpoints=v;render()}),watchOrders(v=>{orders=v;render()}),watchDeliveries(v=>{deliveries=v;render()}));
+window.addEventListener('beforeunload',()=>unsub.forEach(fn=>fn&&fn()));
+render();
