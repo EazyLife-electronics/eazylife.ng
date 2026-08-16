@@ -5,6 +5,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check.js";
 // This module only injects markup on Admin pages. It is safe to load from the
 // shared Firebase module and, importantly, runs before admin-app.mjs starts.
 import "../admin/js/settings-ui.mjs";
@@ -19,6 +20,12 @@ const firebaseConfig = {
   measurementId: "G-07CCF0NFEQ"
 };
 
+// TODO: replace with the reCAPTCHA v3 site key from Firebase Console ->
+// Build -> App Check -> Apps -> Register (web) -> reCAPTCHA v3. Until this
+// is a real key, App Check tokens won't validate, so leave enforcement OFF
+// in the console until this is set and deployed. See README-app-check.md.
+const RECAPTCHA_V3_SITE_KEY = 'REPLACE_WITH_RECAPTCHA_V3_SITE_KEY';
+
 let cached = null;
 
 export function initFirebase() {
@@ -26,6 +33,22 @@ export function initFirebase() {
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const auth = getAuth(app);
+
+  // App Check attaches a signed attestation token to every Firestore request,
+  // so once enforcement is turned on in the console, scripted/bot traffic
+  // (e.g. brute-forcing order tracking codes) gets rejected before it ever
+  // reaches Firestore. Safe to initialize even before enforcement is enabled.
+  if (RECAPTCHA_V3_SITE_KEY && RECAPTCHA_V3_SITE_KEY !== 'REPLACE_WITH_RECAPTCHA_V3_SITE_KEY') {
+    try {
+      initializeAppCheck(app, {
+        provider: new ReCaptchaV3Provider(RECAPTCHA_V3_SITE_KEY),
+        isTokenAutoRefreshEnabled: true
+      });
+    } catch (err) {
+      console.warn('App Check could not initialize:', err);
+    }
+  }
+
   cached = { app, db, auth };
 
   // Admin-only modules are loaded after Firebase is initialized so they can
