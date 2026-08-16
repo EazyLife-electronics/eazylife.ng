@@ -644,6 +644,13 @@
   <script type="module">
     import { getApprovedReviews, getHeroes, getProducts, getSettings } from './js/store.mjs';
 
+    // Escapes text before it's inserted via innerHTML. Reviews are public-write
+    // (anyone can submit one, pending your approval) so r.name/r.text/r.title
+    // must never go into the page unescaped, even though you approve them first.
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>'"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[c]));
+    }
+
     // ── REVIEWS ──
     async function loadReviews() {
       const grid = document.getElementById('reviewsGrid');
@@ -655,9 +662,9 @@
         }
         grid.innerHTML = reviews.map(r => `
           <div class="review-card">
-            <div class="stars">${'★'.repeat(r.stars || 0)}${'☆'.repeat(5 - (r.stars || 0))}</div>
-            <p class="text">"${r.text}"</p>
-            <div class="who">${r.name}<span>${r.title || ''}</span></div>
+            <div class="stars">${'★'.repeat(Math.max(0, Math.min(5, r.stars || 0)))}${'☆'.repeat(5 - Math.max(0, Math.min(5, r.stars || 0)))}</div>
+            <p class="text">"${escapeHtml(r.text)}"</p>
+            <div class="who">${escapeHtml(r.name)}<span>${escapeHtml(r.title || '')}</span></div>
           </div>
         `).join('');
       } catch (err) {
@@ -674,12 +681,12 @@
     }
     function heroSlideHTML(h, decorative) {
       return `
-        <a href="${linkFor(h)}" class="hero-slide"${decorative ? ' aria-hidden="true" tabindex="-1"' : ''}>
-          <img src="${h.image || 'https://via.placeholder.com/280x160?text=' + encodeURIComponent(h.title || 'EazyLife')}" alt="${decorative ? '' : (h.title || '')}">
+        <a href="${escapeHtml(linkFor(h))}" class="hero-slide"${decorative ? ' aria-hidden="true" tabindex="-1"' : ''}>
+          <img src="${h.image ? escapeHtml(h.image) : 'assets/pictures/placeholder.svg'}" alt="${decorative ? '' : escapeHtml(h.title || '')}" loading="lazy" width="280" height="160">
           <div class="slide-body">
-            <h4>${h.title || ''}</h4>
-            <p>${h.subtitle || ''}</p>
-            <span class="slide-cta">${h.ctaText || 'View'} <i class="fas fa-arrow-right" style="font-size:0.6rem;"></i></span>
+            <h4>${escapeHtml(h.title || '')}</h4>
+            <p>${escapeHtml(h.subtitle || '')}</p>
+            <span class="slide-cta">${escapeHtml(h.ctaText || 'View')} <i class="fas fa-arrow-right" style="font-size:0.6rem;"></i></span>
           </div>
         </a>
       `;
@@ -768,11 +775,11 @@
           return `
             <a href="shop.html?product=${encodeURIComponent(p.id)}" class="product-card">
               <div class="thumb">
-                <img src="${thumb || 'https://via.placeholder.com/150?text=' + encodeURIComponent(p.name)}" alt="${p.name}">
+                <img src="${thumb ? escapeHtml(thumb) : 'assets/pictures/placeholder.svg'}" alt="${escapeHtml(p.name)}" loading="lazy" width="150" height="110">
                 ${promo ? `<span class="badge-promo">-${Math.round(maxDiscountPercent)}%</span>` : ''}
               </div>
-              <div class="cat">${p.category || ''}</div>
-              <h4>${p.name}</h4>
+              <div class="cat">${escapeHtml(p.category || '')}</div>
+              <h4>${escapeHtml(p.name)}</h4>
               <div class="price">${promo ? `<span class="old">${origPriceLabel}</span> ` : ''}${priceLabel}</div>
               ${bulk ? `<div class="bulk-hint"><i class="fas fa-tags"></i>Buy ${bulk.minQty}+, ${promo ? `save an extra ${bulk.percent}%` : `save ${bulk.percent}%`}</div>` : ''}
             </a>
