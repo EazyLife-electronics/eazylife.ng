@@ -123,6 +123,13 @@
 <script type="module">
     import { getOrderByTrackingCode } from './js/store.mjs';
 
+    // Escapes text before it's inserted via innerHTML. This page is public —
+    // anyone with a tracking code can view an order, so customer-entered
+    // fields (address, item/variant labels) must never be trusted as-is.
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>'"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[c]));
+    }
+
     const STATUS_STEPS = [
         { key: 'new', label: 'Order Placed', icon: 'fa-check' },
         { key: 'confirmed', label: 'Confirmed', icon: 'fa-box' },
@@ -163,28 +170,29 @@
     }
 
     function renderOrderCard(order, compact) {
-        const itemsHtml = (order.items || []).map(i => `${i.name}${i.variant ? ' (' + i.variant + ')' : ''} × ${i.quantity}`).join(', ');
+        const itemsHtml = (order.items || []).map(i => `${escapeHtml(i.name)}${i.variant ? ' (' + escapeHtml(i.variant) + ')' : ''} × ${Number(i.quantity) || 0}`).join(', ');
         const created = order.createdAt?.toDate ? order.createdAt.toDate().toLocaleString() : '';
+        const trackingCode = escapeHtml(order.trackingCode);
         if (compact) {
             return `
-                <a href="track.html?code=${order.trackingCode}" onclick="event.preventDefault(); document.getElementById('trackInput').value='${order.trackingCode}'; trackOrder();"
+                <a href="track.html?code=${trackingCode}" onclick="event.preventDefault(); document.getElementById('trackInput').value='${trackingCode}'; trackOrder();"
                    class="block bg-white dark:bg-[#182420] border border-gray-100 dark:border-[#2a3835] rounded-2xl p-4 shadow-sm">
                     <div class="flex justify-between items-center mb-1">
-                        <span class="font-black text-sm text-gray-800 dark:text-gray-100">${order.trackingCode}</span>
-                        <span class="text-[10px] font-bold uppercase px-2 py-1 rounded-full ${statusBadgeClass(order.status)}">${order.status || 'new'}</span>
+                        <span class="font-black text-sm text-gray-800 dark:text-gray-100">${trackingCode}</span>
+                        <span class="text-[10px] font-bold uppercase px-2 py-1 rounded-full ${statusBadgeClass(order.status)}">${escapeHtml(order.status || 'new')}</span>
                     </div>
                     <p class="text-xs text-gray-400">${created}</p>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">${itemsHtml}</p>
                 </a>`;
         }
         const isCancelled = order.status === 'cancelled';
-        const reasonLabel = cancelReasonLabel(order);
+        const reasonLabel = escapeHtml(cancelReasonLabel(order));
         return `
             <div class="bg-white dark:bg-[#182420] border border-gray-100 dark:border-[#2a3835] rounded-2xl p-5 shadow-sm">
                 <div class="flex justify-between items-start mb-4">
                     <div>
                         <p class="text-[10px] font-black uppercase text-gray-400">Tracking Code</p>
-                        <p class="text-xl font-black text-teal">${order.trackingCode}</p>
+                        <p class="text-xl font-black text-teal">${trackingCode}</p>
                     </div>
                     <p class="text-xs text-gray-400 text-right">${created}</p>
                 </div>
@@ -196,7 +204,7 @@
                 ` : renderTimeline(order.status || 'new')}
                 <div class="border-t border-gray-100 dark:border-[#2a3835] pt-4">
                     <p class="text-xs text-gray-500 dark:text-gray-400 mb-1"><b class="text-gray-700 dark:text-gray-200">Items:</b> ${itemsHtml}</p>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-1"><b class="text-gray-700 dark:text-gray-200">Delivery to:</b> ${order.address || ''}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-1"><b class="text-gray-700 dark:text-gray-200">Delivery to:</b> ${escapeHtml(order.address || '')}</p>
                     <p class="text-sm font-black text-gray-900 dark:text-gray-100 mt-2">Total: ₦${(order.total || 0).toLocaleString()}</p>
                 </div>
             </div>`;
