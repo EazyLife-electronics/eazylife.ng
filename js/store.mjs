@@ -115,6 +115,23 @@ export async function getOrderByTrackingCode(code) {
   return snap.exists() ? { id: snap.id, ...snap.data() } : null;
 }
 
+// Links an order to the delivery record created for it, so the public
+// tracking page can fetch that one delivery directly by ID (a plain `get`,
+// same trust model as order lookup) instead of needing broader read access
+// to the deliveries collection.
+export async function linkOrderToDelivery(orderId, deliveryId) {
+  await updateDoc(doc(db, 'orders', orderId), { deliveryId });
+}
+
+// Public read: anyone with an order's tracking code can already see that
+// order's full details (see the `orders` Firestore rule), so exposing the
+// one delivery record it links to is the same trust boundary, not a new one.
+export async function getDelivery(deliveryId) {
+  if (!deliveryId) return null;
+  const snap = await getDoc(doc(db, 'deliveries', deliveryId));
+  return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+}
+
 export function watchOrders(callback) {
   const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
   return onSnapshot(q, (snap) => {

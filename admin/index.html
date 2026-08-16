@@ -43,6 +43,7 @@
             <button data-tab="reviews" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Reviews</button>
             <button data-tab="requests" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Requests</button>
             <button data-tab="orders" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Orders</button>
+            <button data-tab="delivery" id="deliveryTabBtn" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Delivery</button>
             <button data-tab="settings" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Settings</button>
         </div>
         <div id="panel-products" class="tab-panel">
@@ -69,6 +70,7 @@
         <div id="panel-reviews" class="tab-panel hidden"><div class="bg-white p-6 rounded-[24px] shadow-sm mb-6"><h2 class="font-black text-lg mb-1">Add Review</h2><p class="text-xs text-gray-400 mb-4">Paste in a review you received by email (Formspree). New reviews are unapproved until you toggle them live.</p><form id="reviewAddForm" class="space-y-3"><input id="rvName" placeholder="Customer name" required class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"><input id="rvTitle" placeholder="Title" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"><select id="rvStars" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"><option value="5">★★★★★ (5)</option><option value="4">★★★★☆ (4)</option><option value="3">★★★☆☆ (3)</option><option value="2">★★☆☆☆ (2)</option><option value="1">★☆☆☆☆ (1)</option></select><textarea id="rvText" placeholder="Review text" required rows="3" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"></textarea><label class="flex items-center gap-2 text-xs text-gray-500 font-bold px-1"><input type="checkbox" id="rvApproved" checked> Publish immediately (approved)</label><button type="submit" class="bg-gray-900 text-white w-full py-3 rounded-xl font-bold text-sm">Save Review</button></form></div><div id="reviewList" class="grid gap-3"></div></div>
         <div id="panel-requests" class="tab-panel hidden"><p class="text-xs text-gray-400 mb-4 px-1">"Can't find what you want" and budget-based sourcing requests from the shop. Move each through New → Contacted → Fulfilled.</p><div id="requestList" class="grid gap-3"></div></div>
         <div id="panel-orders" class="tab-panel hidden"><div id="orderList" class="grid gap-3"></div></div>
+        <div id="panel-delivery" class="tab-panel hidden"><div id="deliveryContent"></div></div>
         <div id="panel-settings" class="tab-panel hidden"><div id="settingsContent"></div></div>
     </div>
 </div>
@@ -76,16 +78,21 @@
 <script type="module" src="js/settings-ui.mjs"></script>
 <script type="module" src="js/admin-app.mjs"></script>
 <script type="module" src="js/purchases.mjs"></script>
+<script type="module" src="js/order-delivery-bridge.mjs"></script>
 <script type="module">
 import { initInventory } from "./js/inventory.mjs";
 import { initInventoryReports } from "./js/inventory-reports.mjs";
+import { initDelivery } from "./js/delivery.mjs";
 let stopInventory=null;
 let stopReports=null;
+let stopDelivery=null;
 const inventoryBtn=document.getElementById("inventoryTabBtn");
 const reportsBtn=document.getElementById("reportsTabBtn");
+const deliveryBtn=document.getElementById("deliveryTabBtn");
 function showPanel(tab){document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("tab-active"));document.querySelector(`[data-tab="${tab}"]`).classList.add("tab-active");document.querySelectorAll(".tab-panel").forEach(p=>p.classList.add("hidden"));document.getElementById(`panel-${tab}`).classList.remove("hidden");}
 inventoryBtn.addEventListener("click",()=>{showPanel("inventory");if(stopReports){stopReports();stopReports=null;}if(!stopInventory)stopInventory=initInventory();});
 reportsBtn.addEventListener("click",()=>{showPanel("reports");if(stopInventory){stopInventory();stopInventory=null;}if(!stopReports)stopReports=initInventoryReports();});
+deliveryBtn.addEventListener("click",()=>{showPanel("delivery");if(!stopDelivery)stopDelivery=initDelivery();});
 </script>
 </body>
 </html>

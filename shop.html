@@ -451,6 +451,11 @@
     const CKEY = "eazylife_cart_v2";
     const UKEY = "eazylife_user_v2";
 
+    // Escapes text before it's inserted via innerHTML template strings.
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>'"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[c]));
+    }
+
     let products = [];
     let cart = JSON.parse(localStorage.getItem(CKEY)) || [];
     let currentCategory = 'All';
@@ -899,11 +904,11 @@
             grid.innerHTML += `
                 <div class="product-card bg-white dark:bg-[#182420] dark:border-[#2a3835] p-3 rounded-[24px] shadow-sm flex flex-col">
                     <div class="relative mb-3">
-                        <img src="${thumb || 'https://via.placeholder.com/300?text=' + encodeURIComponent(p.name)}" class="h-32 md:h-40 w-full object-contain rounded-xl bg-gray-50 dark:bg-[#1c2925]">
+                        <img src="${thumb ? escapeHtml(thumb) : 'assets/pictures/placeholder.svg'}" loading="lazy" class="h-32 md:h-40 w-full object-contain rounded-xl bg-gray-50 dark:bg-[#1c2925]">
                         ${promo ? `<span class="absolute top-1.5 left-1.5 bg-[#00B09B] text-white text-[9px] font-black px-1.5 py-0.5 rounded-md shadow">-${Math.round(maxDiscountPercent)}%</span>` : ''}
                     </div>
-                    <span class="text-[9px] font-black uppercase text-teal tracking-wider mb-1">${p.brand ? p.brand + ' · ' : ''}${p.category}</span>
-                    <h3 class="font-bold text-gray-800 dark:text-gray-100 leading-tight text-xs md:text-sm flex-grow mb-2">${p.name}</h3>
+                    <span class="text-[9px] font-black uppercase text-teal tracking-wider mb-1">${p.brand ? escapeHtml(p.brand) + ' · ' : ''}${escapeHtml(p.category || '')}</span>
+                    <h3 class="font-bold text-gray-800 dark:text-gray-100 leading-tight text-xs md:text-sm flex-grow mb-2">${escapeHtml(p.name)}</h3>
                     <div class="mb-1 flex items-baseline gap-1.5 flex-wrap">
                         ${promo ? `<span class="text-gray-400 text-[10px] line-through">${origPriceLabel}</span>` : ''}
                         <span class="text-gray-900 dark:text-gray-100 font-black text-sm md:text-base">${priceLabel}</span>
@@ -1016,7 +1021,7 @@
     function updateProductModalPrice() {
         const v = getSelectedVariant();
         const img = document.getElementById('pmImage');
-        img.src = (v && v.image) || (pmProduct.variants[0] && pmProduct.variants[0].image) || 'https://via.placeholder.com/300?text=' + encodeURIComponent(pmProduct.name);
+        img.src = (v && v.image) || (pmProduct.variants[0] && pmProduct.variants[0].image) || 'assets/pictures/placeholder.svg';
 
         const base = variantUnitPrice(v);
         const selectedUpgrades = getSelectedUpgrades();

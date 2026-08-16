@@ -121,7 +121,14 @@
 </script>
 
 <script type="module">
-    import { getOrderByTrackingCode } from './js/store.mjs';
+    import { getOrderByTrackingCode, getDelivery } from './js/store.mjs';
+
+    // Escapes text before it's inserted via innerHTML. This page is public —
+    // anyone with a tracking code can view an order, so customer-entered
+    // fields (address, item/variant labels) must never be trusted as-is.
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>'"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[c]));
+    }
 
     const STATUS_STEPS = [
         { key: 'new', label: 'Order Placed', icon: 'fa-check' },
@@ -162,29 +169,83 @@
         return 'bg-yellow-100 text-yellow-700';
     }
 
+    // Separate from STATUS_STEPS above (which is the order lifecycle: New →
+    // Confirmed → Delivered). This is the physical delivery's own progress
+    // once a rider is on the case — different information, shown once it exists.
+    const DELIVERY_STEPS = [
+        { key: 'assigned', label: 'Preparing', icon: 'fa-box' },
+        { key: 'picked_up', label: 'Picked Up', icon: 'fa-dolly' },
+        { key: 'in_transit', label: 'On The Way', icon: 'fa-truck' },
+        { key: 'delivered', label: 'Delivered', icon: 'fa-house' }
+    ];
+
+    function deliveryStepIndex(status) {
+        // 'checkpoint' is an operational sub-state of "in transit" from the
+        // customer's point of view — same step, not a separate one.
+        const effective = status === 'checkpoint' ? 'in_transit' : status;
+        return DELIVERY_STEPS.findIndex(s => s.key === effective);
+    }
+
+    function renderDeliveryTimeline(status) {
+        const currentIdx = deliveryStepIndex(status);
+        return `
+            <div class="flex items-center mb-3">
+                ${DELIVERY_STEPS.map((s, i) => `
+                    ${i > 0 ? `<div class="step-line ${i <= currentIdx ? 'done' : ''}"></div>` : ''}
+                    <div class="flex flex-col items-center gap-1">
+                        <div class="step-dot ${i <= currentIdx ? 'done' : ''}"><i class="fas ${s.icon}"></i></div>
+                        <span class="text-[10px] font-bold text-gray-500 dark:text-gray-400 whitespace-nowrap">${s.label}</span>
+                    </div>
+                `).join('')}
+            </div>`;
+    }
+
+    function renderDeliverySection(delivery) {
+        if (!delivery) return '';
+        if (['failed', 'returned'].includes(delivery.status)) {
+            return `
+                <div class="border-t border-gray-100 dark:border-[#2a3835] pt-4 mt-4">
+                    <div class="bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/40 rounded-xl p-4">
+                        <p class="text-sm font-black text-amber-700 dark:text-amber-400 mb-1"><i class="fas fa-triangle-exclamation mr-1"></i> ${delivery.status === 'failed' ? 'Delivery Attempt Unsuccessful' : 'Delivery Returned'}</p>
+                        <p class="text-xs text-amber-600 dark:text-amber-300">We'll be in touch to sort this out — feel free to reach out to us too.</p>
+                    </div>
+                </div>`;
+        }
+        const riderLine = delivery.assignedToName ? `<p class="text-xs text-gray-500 dark:text-gray-400 mb-1"><b class="text-gray-700 dark:text-gray-200">Rider:</b> ${escapeHtml(delivery.assignedToName)}</p>` : '';
+        const typeLine = delivery.deliveryType ? `<p class="text-xs text-gray-500 dark:text-gray-400 mb-1"><b class="text-gray-700 dark:text-gray-200">Delivery type:</b> ${escapeHtml(delivery.deliveryType)}</p>` : '';
+        const checkpointLine = delivery.lastCheckpointName ? `<p class="text-xs text-gray-500 dark:text-gray-400"><b class="text-gray-700 dark:text-gray-200">Last seen:</b> ${escapeHtml(delivery.lastCheckpointName)}</p>` : '';
+        return `
+            <div class="border-t border-gray-100 dark:border-[#2a3835] pt-4 mt-4">
+                <p class="text-[10px] font-black uppercase text-gray-400 mb-3">Delivery Progress</p>
+                ${renderDeliveryTimeline(delivery.status)}
+                ${riderLine}${typeLine}${checkpointLine}
+            </div>`;
+    }
+
     function renderOrderCard(order, compact) {
-        const itemsHtml = (order.items || []).map(i => `${i.name}${i.variant ? ' (' + i.variant + ')' : ''} × ${i.quantity}`).join(', ');
+        const itemsHtml = (order.items || []).map(i => `${escapeHtml(i.name)}${i.variant ? ' (' + escapeHtml(i.variant) + ')' : ''} × ${Number(i.quantity) || 0}`).join(', ');
         const created = order.createdAt?.toDate ? order.createdAt.toDate().toLocaleString() : '';
+        const trackingCode = escapeHtml(order.trackingCode);
         if (compact) {
             return `
-                <a href="track.html?code=${order.trackingCode}" onclick="event.preventDefault(); document.getElementById('trackInput').value='${order.trackingCode}'; trackOrder();"
+                <a href="track.html?code=${trackingCode}" onclick="event.preventDefault(); document.getElementById('trackInput').value='${trackingCode}'; trackOrder();"
                    class="block bg-white dark:bg-[#182420] border border-gray-100 dark:border-[#2a3835] rounded-2xl p-4 shadow-sm">
                     <div class="flex justify-between items-center mb-1">
-                        <span class="font-black text-sm text-gray-800 dark:text-gray-100">${order.trackingCode}</span>
-                        <span class="text-[10px] font-bold uppercase px-2 py-1 rounded-full ${statusBadgeClass(order.status)}">${order.status || 'new'}</span>
+                        <span class="font-black text-sm text-gray-800 dark:text-gray-100">${trackingCode}</span>
+                        <span class="text-[10px] font-bold uppercase px-2 py-1 rounded-full ${statusBadgeClass(order.status)}">${escapeHtml(order.status || 'new')}</span>
                     </div>
                     <p class="text-xs text-gray-400">${created}</p>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">${itemsHtml}</p>
                 </a>`;
         }
         const isCancelled = order.status === 'cancelled';
-        const reasonLabel = cancelReasonLabel(order);
+        const reasonLabel = escapeHtml(cancelReasonLabel(order));
         return `
             <div class="bg-white dark:bg-[#182420] border border-gray-100 dark:border-[#2a3835] rounded-2xl p-5 shadow-sm">
                 <div class="flex justify-between items-start mb-4">
                     <div>
                         <p class="text-[10px] font-black uppercase text-gray-400">Tracking Code</p>
-                        <p class="text-xl font-black text-teal">${order.trackingCode}</p>
+                        <p class="text-xl font-black text-teal">${trackingCode}</p>
                     </div>
                     <p class="text-xs text-gray-400 text-right">${created}</p>
                 </div>
@@ -196,9 +257,10 @@
                 ` : renderTimeline(order.status || 'new')}
                 <div class="border-t border-gray-100 dark:border-[#2a3835] pt-4">
                     <p class="text-xs text-gray-500 dark:text-gray-400 mb-1"><b class="text-gray-700 dark:text-gray-200">Items:</b> ${itemsHtml}</p>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-1"><b class="text-gray-700 dark:text-gray-200">Delivery to:</b> ${order.address || ''}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-1"><b class="text-gray-700 dark:text-gray-200">Delivery to:</b> ${escapeHtml(order.address || '')}</p>
                     <p class="text-sm font-black text-gray-900 dark:text-gray-100 mt-2">Total: ₦${(order.total || 0).toLocaleString()}</p>
                 </div>
+                <div id="deliverySection-${trackingCode}"></div>
             </div>`;
     }
 
@@ -219,6 +281,15 @@
                 resultEl.innerHTML = `<div class="text-center py-8 text-gray-400 text-sm">No order found for "${code}". Double-check the code and try again.</div>`;
             } else {
                 resultEl.innerHTML = renderOrderCard(order, false);
+                // Delivery progress loads separately (and only once a delivery
+                // record actually exists) so the main order details show up
+                // immediately without waiting on a second network round-trip.
+                if (order.status !== 'cancelled' && order.deliveryId) {
+                    getDelivery(order.deliveryId).then(delivery => {
+                        const section = document.getElementById(`deliverySection-${order.trackingCode}`);
+                        if (section && delivery) section.innerHTML = renderDeliverySection(delivery);
+                    }).catch(err => console.error('Could not load delivery progress:', err));
+                }
                 // Remember it locally too, in case they typed a code that wasn't already saved on this device
                 try {
                     const myOrders = JSON.parse(localStorage.getItem('eazylife_my_orders')) || [];
