@@ -111,14 +111,19 @@ function queue(el) {
   el.querySelectorAll('[data-record-checkpoint]').forEach(sel => sel.onchange = async () => {
     if (!sel.value) return;
     const d = deliveries.find(x => x.id === sel.dataset.recordCheckpoint);
+    const cp = checkpoints.find(x => x.id === sel.value);
     if (!d) return;
     try {
       await updateDelivery(d.id, {
         status: d.status === 'in_transit' ? 'checkpoint' : d.status,
         lastCheckpointId: sel.value,
+        // Denormalized so the public tracking page (track.html) can show a
+        // checkpoint name without needing read access to the admin-only
+        // deliveryCheckpoints collection.
+        lastCheckpointName: cp?.name || '',
         lastCheckpointAt: Date.now(),
         updatedAt: Date.now(),
-        checkpoints: [...(d.checkpoints || []), { checkpointId: sel.value, at: Date.now() }]
+        checkpoints: [...(d.checkpoints || []), { checkpointId: sel.value, checkpointName: cp?.name || '', at: Date.now() }]
       });
     } catch (err) {
       alert(err.message);

@@ -1,9 +1,12 @@
 // Bridges confirmed orders into the delivery queue without changing the existing order workflow.
+import { initFirebase } from '../../js/firebase.mjs';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { watchOrders } from '../../js/store.mjs';
 import { createDeliveryFromOrder } from './delivery-operations.mjs';
 
 let orders = [];
 let queued = false;
+let unsubOrders = null;
 
 function esc(value) {
   return String(value ?? '').replace(/[&<>\"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -65,9 +68,19 @@ function init() {
   const list = document.getElementById('orderList');
   if (!list) return setTimeout(init, 150);
 
-  watchOrders(next => {
-    orders = next;
-    renderButtons();
+  // watchOrders() requires an authenticated admin (see the `orders` Firestore
+  // rule). Subscribing immediately on page load — before login — makes that
+  // first call fail with permission-denied, and Firestore's onSnapshot does
+  // NOT auto-retry a listener that already errored out once, even after you
+  // do log in. Gating this behind onAuthStateChanged (re-subscribing on every
+  // login/logout) is what admin-app.mjs and purchases.mjs already do; this
+  // module just hadn't followed the same pattern.
+  const { auth } = initFirebase();
+  onAuthStateChanged(auth, (user) => {
+    if (unsubOrders) { unsubOrders(); unsubOrders = null; }
+    orders = [];
+    if (!user) return;
+    unsubOrders = watchOrders(next => { orders = next; renderButtons(); });
   });
 
   const observer = new MutationObserver(() => {

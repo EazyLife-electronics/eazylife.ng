@@ -76,7 +76,13 @@ service cloud.firestore {
     }
 
     match /deliveries/{deliveryId} {
-      allow read, create, update, delete: if isAdmin();
+      // Public `get` only (never `list`): the tracking page fetches one
+      // specific delivery by ID, which it can only learn from the order's
+      // own `deliveryId` field after looking that order up by tracking code —
+      // same one-way trust model already used for `orders` below. `list`
+      // stays admin-only so the whole collection can't be enumerated.
+      allow get: if true;
+      allow list, create, update, delete: if isAdmin();
     }
   }
 }
