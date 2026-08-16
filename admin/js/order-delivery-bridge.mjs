@@ -1,6 +1,6 @@
 // Bridges confirmed orders into the delivery queue without changing the existing order workflow.
 import { watchOrders } from '../../js/store.mjs';
-import { createDeliveryFromOrder } from './delivery-store.mjs';
+import { createDeliveryFromOrder } from './delivery-operations.mjs';
 
 let orders = [];
 let queued = false;

@@ -1,10 +1,25 @@
 // admin/js/delivery-operations.mjs
-import { createDelivery, updateDelivery } from './delivery-store.mjs';
-import { buildDeliveryFromOrder, applyDeliveryTransition } from './delivery-lifecycle.mjs';
+import { createDelivery, updateDelivery, findActiveDeliveryForOrder } from './delivery-store.mjs';
+import { buildDeliveryFromOrder, applyDeliveryTransition, isOrderEligibleForDelivery } from './delivery-lifecycle.mjs';
 
 export async function createDeliveryForOrder(order, options = {}) {
   const delivery = buildDeliveryFromOrder(order, options);
   return createDelivery(delivery);
+}
+
+// Used by the "Send to Delivery" button on the Orders tab. Unlike
+// createDeliveryForOrder above (which always creates a new record, used by
+// the Delivery Queue's own "Create Delivery" flow with an explicit
+// personnel/type selection), this is idempotent: if the order already has
+// an active delivery, it returns that instead of creating a duplicate.
+export async function createDeliveryFromOrder(order) {
+  if (!isOrderEligibleForDelivery(order)) {
+    throw new Error('Only confirmed orders can be sent to delivery.');
+  }
+  const existing = await findActiveDeliveryForOrder(order.id);
+  if (existing) return { id: existing.id, alreadyExists: true };
+  const ref = await createDelivery(buildDeliveryFromOrder(order));
+  return { id: ref.id, alreadyExists: false };
 }
 
 export async function assignDeliveryPerson(delivery, person) {
@@ -22,7 +37,12 @@ export async function transitionDelivery(delivery, nextState, meta = {}) {
 }
 
 export function deliveryContactUrl(phone, message = '') {
-  const digits = String(phone || '').replace(/\D/g, '');
+  // Nigerian numbers can arrive as 0805..., 234805..., or +234805... — WhatsApp's
+  // wa.me links need the country-code form with no plus and no leading zero
+  // (same normalization used for customer contact in admin-orders.mjs).
+  let digits = String(phone || '').replace(/\D/g, '');
   if (!digits) return '';
+  if (digits.startsWith('0')) digits = '234' + digits.slice(1);
+  else if (!digits.startsWith('234') && digits.length === 10) digits = '234' + digits;
   return `https://wa.me/${digits}${message ? `?text=${encodeURIComponent(message)}` : ''}`;
 }
