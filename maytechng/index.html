@@ -3,664 +3,3898 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MAYTECH Oil &amp; Gas Engineering | LPG, Pipeline &amp; Tank Services — Nigeria</title>
-<meta name="description" content="MAYTECH Oil and Gas Engineering: LPG dispenser &amp; pump supply, petrol station pipeline installation, tank calibration, pressure testing and dispenser maintenance across Lagos, Ogun, Abuja, Port Harcourt and beyond.">
+
+<title>MAYTECH Oil & Gas Engineering | LPG, Pipeline & Tank Services</title>
+
+<meta name="description" content="MAYTECH Oil and Gas Engineering provides LPG dispenser and pump supply, petrol station pipeline installation, tank calibration, pressure testing and dispenser maintenance in Nigeria.">
+
+<meta name="theme-color" content="#0B2138">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
 <style>
-  :root{
-    --ink:#0B2138;
-    --ink-2:#0F2C48;
-    --ink-3:#153A5C;
-    --line:#BFD9E2;
-    --line-dim:#5C7C8C;
-    --paper:#EDE8DB;
-    --paper-2:#E3DDC9;
-    --amber:#E8A23D;
-    --amber-dark:#C97F1F;
-    --steel:#8FA6B2;
-    --white:#F7F5EF;
-    --danger:#C1502E;
-    --maxw:1120px;
-  }
-  *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  body{
-    margin:0;
-    background:var(--ink);
-    color:var(--white);
-    font-family:'IBM Plex Sans',sans-serif;
-    line-height:1.55;
-    -webkit-font-smoothing:antialiased;
-  }
-  h1,h2,h3,h4{
-    font-family:'Bebas Neue',sans-serif;
-    font-weight:400;
-    letter-spacing:0.02em;
-    margin:0;
-    color:var(--white);
-  }
-  .mono{font-family:'IBM Plex Mono',monospace;}
-  a{color:inherit;}
-  img{max-width:100%;display:block;}
-  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px;}
-  .eyebrow{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:12px;
-    letter-spacing:0.18em;
-    text-transform:uppercase;
-    color:var(--amber);
-    display:flex;align-items:center;gap:10px;
-    margin-bottom:14px;
-  }
-  .eyebrow::before{content:"";width:22px;height:1px;background:var(--amber);display:inline-block;}
-  @media (prefers-reduced-motion: reduce){
-    *{animation:none !important; transition:none !important;}
-  }
 
-  /* ---------- pipeline spine ---------- */
+:root{
+  --ink:#0B2138;
+  --ink-2:#0F2C48;
+  --ink-3:#153A5C;
+
+  --line:#BFD9E2;
+  --line-dim:#5C7C8C;
+
+  --paper:#EDE8DB;
+  --paper-2:#E3DDC9;
+
+  --amber:#E8A23D;
+  --amber-dark:#C97F1F;
+
+  --steel:#8FA6B2;
+  --white:#F7F5EF;
+
+  --danger:#C1502E;
+
+  --body-bg:var(--ink);
+  --section-bg:var(--ink);
+  --card-bg:var(--ink-2);
+  --card-border:var(--ink-3);
+  --text-main:var(--white);
+  --text-soft:var(--line);
+  --text-muted:var(--steel);
+
+  --maxw:1120px;
+}
+
+/* =========================================================
+   LIGHT MODE
+========================================================= */
+
+html[data-theme="light"]{
+  --ink:#F3F0E8;
+  --ink-2:#E8E3D6;
+  --ink-3:#C9C1AE;
+
+  --line:#243D4F;
+  --line-dim:#687A84;
+
+  --steel:#526671;
+  --white:#142A3B;
+
+  --body-bg:#F3F0E8;
+  --section-bg:#F3F0E8;
+  --card-bg:#E8E3D6;
+  --card-border:#C9C1AE;
+
+  --text-main:#142A3B;
+  --text-soft:#314B5D;
+  --text-muted:#526671;
+}
+
+/* =========================================================
+   GLOBAL
+========================================================= */
+
+*{
+  box-sizing:border-box;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  margin:0;
+  background:var(--body-bg);
+  color:var(--text-main);
+  font-family:'IBM Plex Sans',sans-serif;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  transition:
+    background .25s ease,
+    color .25s ease;
+}
+
+h1,
+h2,
+h3,
+h4{
+  font-family:'Bebas Neue',sans-serif;
+  font-weight:400;
+  letter-spacing:.02em;
+  margin:0;
+  color:var(--text-main);
+}
+
+.mono{
+  font-family:'IBM Plex Mono',monospace;
+}
+
+a{
+  color:inherit;
+}
+
+img{
+  max-width:100%;
+  display:block;
+}
+
+button,
+input,
+select,
+textarea{
+  font:inherit;
+}
+
+.wrap{
+  max-width:var(--maxw);
+  margin:0 auto;
+  padding:0 24px;
+}
+
+.eyebrow{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:12px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--amber);
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:14px;
+}
+
+.eyebrow::before{
+  content:"";
+  width:22px;
+  height:1px;
+  background:var(--amber);
+  display:inline-block;
+}
+
+@media (prefers-reduced-motion:reduce){
+  *{
+    animation:none!important;
+    transition:none!important;
+  }
+}
+
+/* =========================================================
+   PIPELINE SPINE
+========================================================= */
+
+.spine{
+  position:absolute;
+  left:28px;
+  top:0;
+  bottom:0;
+  width:2px;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      var(--line-dim) 0 6px,
+      transparent 6px 12px
+    );
+  z-index:1;
+}
+
+.station{
+  position:relative;
+  padding-left:64px;
+}
+
+.station::before{
+  content:"";
+  position:absolute;
+  left:20px;
+  top:6px;
+  width:16px;
+  height:16px;
+  border:2px solid var(--amber);
+  border-radius:50%;
+  background:var(--body-bg);
+  z-index:2;
+}
+
+.station-tag{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;
+  letter-spacing:.14em;
+  color:var(--steel);
+  text-transform:uppercase;
+  margin-bottom:8px;
+}
+
+@media(max-width:760px){
+
   .spine{
-    position:absolute;
-    left:28px;
-    top:0;
-    bottom:0;
-    width:2px;
-    background:repeating-linear-gradient(to bottom, var(--line-dim) 0 6px, transparent 6px 12px);
-    z-index:1;
+    left:14px;
   }
+
   .station{
-    position:relative;
-    padding-left:64px;
+    padding-left:42px;
   }
+
   .station::before{
-    content:"";
-    position:absolute;
-    left:20px;
-    top:6px;
-    width:16px;height:16px;
-    border:2px solid var(--amber);
-    border-radius:50%;
-    background:var(--ink);
-    z-index:2;
-  }
-  .station-tag{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:11px;
-    letter-spacing:0.14em;
-    color:var(--steel);
-    text-transform:uppercase;
-    margin-bottom:8px;
-  }
-  @media (max-width:760px){
-    .spine{left:14px;}
-    .station{padding-left:42px;}
-    .station::before{left:6px;width:13px;height:13px;}
+    left:6px;
+    width:13px;
+    height:13px;
   }
 
-  /* ---------- header / nav ---------- */
-  header{
-    position:sticky;top:0;z-index:50;
-    background:rgba(11,33,56,0.92);
-    backdrop-filter:blur(6px);
-    border-bottom:1px solid var(--ink-3);
-  }
-  .nav{
-    max-width:var(--maxw);margin:0 auto;padding:16px 24px;
-    display:flex;align-items:center;justify-content:space-between;gap:20px;
-  }
-  .logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
-  .logo-mark{
-    width:34px;height:34px;flex:none;
-    border:2px solid var(--amber);
-    border-radius:50%;
-    display:flex;align-items:center;justify-content:center;
-  }
-  .logo-mark svg{width:18px;height:18px;}
-  .logo-text{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.04em;line-height:1;}
-  .logo-text span{display:block;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:0.16em;color:var(--steel);text-transform:uppercase;margin-top:2px;}
-  nav.links{display:flex;gap:26px;font-size:14px;font-weight:500;}
-  nav.links a{text-decoration:none;color:var(--line);opacity:0.85;position:relative;padding-bottom:3px;}
-  nav.links a:hover{opacity:1;color:var(--amber);}
-  .btn{
-    display:inline-flex;align-items:center;gap:8px;
-    font-family:'IBM Plex Mono',monospace;
-    font-size:13px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;
-    padding:11px 18px;
-    border:none;cursor:pointer;text-decoration:none;
-    clip-path:polygon(0 0,calc(100% - 10px) 0,100% 100%,10px 100%);
-  }
-  .btn-amber{background:var(--amber);color:var(--ink);}
-  .btn-amber:hover{background:var(--amber-dark);}
-  .btn-outline{background:transparent;color:var(--line);border:1px solid var(--line-dim);clip-path:none;padding:10px 17px;}
-  .btn-outline:hover{border-color:var(--amber);color:var(--amber);}
-  .navbtn{display:none;}
-  @media (min-width:900px){.navbtn{display:inline-flex;}}
-  .burger{display:none;background:none;border:1px solid var(--line-dim);color:var(--line);padding:8px 10px;font-family:'IBM Plex Mono',monospace;cursor:pointer;}
-  @media (max-width:899px){
-    nav.links{display:none;}
-    .burger{display:inline-flex;}
-  }
-  #mobileMenu{
-    display:none;flex-direction:column;gap:2px;
-    background:var(--ink-2);border-top:1px solid var(--ink-3);
-  }
-  #mobileMenu.open{display:flex;}
-  #mobileMenu a{padding:14px 24px;text-decoration:none;color:var(--line);border-bottom:1px solid var(--ink-3);font-size:14px;}
+}
 
-  /* ---------- hero ---------- */
-  .hero{position:relative;overflow:hidden;padding:70px 0 60px;border-bottom:1px solid var(--ink-3);
-    background:
-      radial-gradient(600px 300px at 85% -10%, rgba(232,162,61,0.10), transparent 60%),
-      repeating-linear-gradient(0deg, rgba(191,217,226,0.035) 0 1px, transparent 1px 32px),
-      repeating-linear-gradient(90deg, rgba(191,217,226,0.035) 0 1px, transparent 1px 32px);
-  }
-  .hero-grid{display:grid;grid-template-columns:1.1fr 0.9fr;gap:48px;align-items:center;}
-  @media (max-width:900px){.hero-grid{grid-template-columns:1fr;}}
-  .hero h1{font-size:clamp(40px,6vw,64px);line-height:0.98;}
-  .hero h1 em{font-style:normal;color:var(--amber);}
-  .hero p.lede{font-size:17px;color:var(--line);max-width:46ch;margin-top:18px;}
-  .hero-actions{display:flex;gap:14px;margin-top:30px;flex-wrap:wrap;}
-  .hero-specs{display:flex;gap:26px;margin-top:38px;flex-wrap:wrap;}
-  .hero-specs div{font-family:'IBM Plex Mono',monospace;}
-  .hero-specs .n{font-size:26px;color:var(--amber);font-weight:600;}
-  .hero-specs .l{font-size:11px;color:var(--steel);letter-spacing:0.1em;text-transform:uppercase;}
+/* =========================================================
+   HEADER
+========================================================= */
 
-  /* process diagram (signature element) */
-  .flow-card{
-    border:1px solid var(--ink-3);background:var(--ink-2);padding:26px 22px 22px;
-  }
-  .flow-title{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.16em;color:var(--steel);text-transform:uppercase;margin-bottom:18px;display:flex;justify-content:space-between;}
-  .flow{display:flex;flex-direction:column;}
-  .flow-step{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:26px;}
-  .flow-step:last-child{padding-bottom:0;}
-  .flow-step::before{
-    content:"";position:absolute;left:15px;top:32px;bottom:0;width:2px;
-    background:repeating-linear-gradient(to bottom, var(--amber) 0 4px, transparent 4px 9px);
-    opacity:0.6;
-  }
-  .flow-step:last-child::before{display:none;}
-  .flow-dot{
-    width:32px;height:32px;flex:none;border-radius:50%;border:2px solid var(--amber);
-    display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;
-    font-size:12px;color:var(--amber);background:var(--ink);z-index:1;
-  }
-  .flow-step h4{font-size:19px;letter-spacing:0.03em;}
-  .flow-step p{margin:4px 0 0;font-size:13.5px;color:var(--steel);}
+header{
+  position:sticky;
+  top:0;
+  z-index:50;
 
-  section{padding:64px 0;position:relative;}
-  .section-alt{background:var(--ink-2);}
-  .head-row{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:34px;flex-wrap:wrap;}
-  .head-row h2{font-size:clamp(30px,4vw,42px);}
-  .head-row p{color:var(--steel);max-width:46ch;font-size:14.5px;margin-top:8px;}
+  background:color-mix(
+    in srgb,
+    var(--body-bg) 94%,
+    transparent
+  );
 
-  /* why choose */
-  .why-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--ink-3);border:1px solid var(--ink-3);}
-  @media (max-width:900px){.why-grid{grid-template-columns:repeat(2,1fr);}}
-  @media (max-width:520px){.why-grid{grid-template-columns:1fr;}}
-  .why-item{background:var(--ink);padding:24px 20px;}
-  .why-item .ico{color:var(--amber);margin-bottom:12px;}
-  .why-item h4{font-size:16px;font-family:'IBM Plex Sans',sans-serif;font-weight:600;}
-  .why-item p{font-size:13px;color:var(--steel);margin:6px 0 0;}
+  backdrop-filter:blur(10px);
 
-  /* services */
-  .svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
-  @media (max-width:900px){.svc-grid{grid-template-columns:repeat(2,1fr);}}
-  @media (max-width:620px){.svc-grid{grid-template-columns:1fr;}}
-  .svc-card{
-    background:var(--ink);border:1px solid var(--ink-3);padding:22px;
-    display:flex;flex-direction:column;gap:10px;transition:border-color .2s, transform .2s;
+  border-bottom:1px solid var(--card-border);
+
+  transition:
+    background .25s ease,
+    border-color .25s ease;
+}
+
+.nav{
+  max-width:var(--maxw);
+  margin:0 auto;
+  padding:14px 24px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  text-decoration:none;
+}
+
+.logo-mark{
+  width:36px;
+  height:36px;
+  flex:none;
+
+  border:2px solid var(--amber);
+  border-radius:50%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.logo-mark svg{
+  width:19px;
+  height:19px;
+}
+
+.logo-text{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:23px;
+  letter-spacing:.04em;
+  line-height:1;
+}
+
+.logo-text span{
+  display:block;
+
+  font-family:'IBM Plex Mono',monospace;
+  font-size:9px;
+  letter-spacing:.16em;
+
+  color:var(--steel);
+
+  text-transform:uppercase;
+
+  margin-top:3px;
+}
+
+nav.links{
+  display:flex;
+  gap:25px;
+  font-size:14px;
+  font-weight:500;
+}
+
+nav.links a{
+  text-decoration:none;
+  color:var(--text-soft);
+  opacity:.9;
+  position:relative;
+  padding-bottom:3px;
+}
+
+nav.links a:hover{
+  opacity:1;
+  color:var(--amber);
+}
+
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+
+  font-family:'IBM Plex Mono',monospace;
+  font-size:13px;
+  font-weight:600;
+  letter-spacing:.04em;
+
+  text-transform:uppercase;
+
+  padding:11px 18px;
+
+  border:none;
+  cursor:pointer;
+
+  text-decoration:none;
+
+  clip-path:
+    polygon(
+      0 0,
+      calc(100% - 10px) 0,
+      100% 100%,
+      10px 100%
+    );
+
+  transition:
+    background .2s ease,
+    color .2s ease,
+    border-color .2s ease;
+}
+
+.btn-amber{
+  background:var(--amber);
+  color:#0B2138;
+}
+
+.btn-amber:hover{
+  background:var(--amber-dark);
+}
+
+.btn-outline{
+  background:transparent;
+  color:var(--text-soft);
+
+  border:1px solid var(--line-dim);
+
+  clip-path:none;
+  padding:10px 17px;
+}
+
+.btn-outline:hover{
+  border-color:var(--amber);
+  color:var(--amber);
+}
+
+.navbtn{
+  display:none;
+}
+
+/* THEME SWITCH */
+
+.theme-toggle{
+  width:42px;
+  height:42px;
+
+  border:1px solid var(--line-dim);
+  background:transparent;
+
+  color:var(--text-soft);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:pointer;
+
+  border-radius:50%;
+
+  transition:
+    border-color .2s ease,
+    color .2s ease,
+    transform .2s ease;
+}
+
+.theme-toggle:hover{
+  border-color:var(--amber);
+  color:var(--amber);
+  transform:rotate(12deg);
+}
+
+.theme-toggle svg{
+  width:19px;
+  height:19px;
+}
+
+.header-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.burger{
+  display:none;
+
+  background:none;
+  border:1px solid var(--line-dim);
+
+  color:var(--text-soft);
+
+  padding:8px 10px;
+
+  font-family:'IBM Plex Mono',monospace;
+
+  cursor:pointer;
+}
+
+@media(min-width:900px){
+
+  .navbtn{
+    display:inline-flex;
   }
-  .svc-card:hover{border-color:var(--amber);transform:translateY(-2px);}
-  .svc-num{font-family:'IBM Plex Mono',monospace;color:var(--line-dim);font-size:12px;}
-  .svc-card h3{font-size:22px;letter-spacing:0.02em;}
-  .svc-card ul{margin:0;padding-left:18px;color:var(--steel);font-size:13px;}
-  .svc-card ul li{margin-bottom:3px;}
-  .svc-card .more{margin-top:auto;color:var(--amber);font-family:'IBM Plex Mono',monospace;font-size:12px;text-decoration:none;letter-spacing:0.05em;}
 
-  /* products */
-  .prod-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
-  @media (max-width:900px){.prod-grid{grid-template-columns:repeat(2,1fr);}}
-  @media (max-width:520px){.prod-grid{grid-template-columns:1fr;}}
-  .prod-card{background:var(--ink-2);border:1px solid var(--ink-3);}
-  .prod-thumb{
-    aspect-ratio:4/3;background:
-      linear-gradient(135deg, var(--ink-3), var(--ink));
-    display:flex;align-items:center;justify-content:center;color:var(--line-dim);
-    border-bottom:1px solid var(--ink-3);
-  }
-  .prod-body{padding:14px 16px 16px;}
-  .prod-body h4{font-size:16px;font-family:'IBM Plex Sans',sans-serif;font-weight:600;}
-  .prod-body p{font-size:12.5px;color:var(--steel);margin:6px 0 12px;}
-  .prod-cta{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--amber);letter-spacing:0.06em;text-transform:uppercase;}
+}
 
-  /* about */
-  .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;}
-  @media (max-width:840px){.about-grid{grid-template-columns:1fr;}}
-  .values{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;}
-  .values span{
-    font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.04em;
-    border:1px solid var(--line-dim);padding:7px 12px;color:var(--line);
-  }
-  .mv{margin-top:22px;}
-  .mv .k{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.12em;color:var(--amber);text-transform:uppercase;}
-  .mv p{margin:6px 0 0;color:var(--line);font-size:14.5px;}
+@media(max-width:899px){
 
-  /* industries */
-  .chip-row{display:flex;flex-wrap:wrap;gap:10px;}
-  .chip{
-    background:var(--ink);border:1px solid var(--ink-3);padding:10px 16px;font-size:13.5px;
-    display:flex;align-items:center;gap:8px;
+  nav.links{
+    display:none;
   }
-  .chip::before{content:"";width:6px;height:6px;background:var(--amber);flex:none;}
 
-  /* projects */
-  .proj-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
-  @media (max-width:900px){.proj-grid{grid-template-columns:1fr;}}
-  .proj-card{border:1px solid var(--ink-3);background:var(--ink);}
-  .proj-thumb{
-    aspect-ratio:16/10;
-    background:repeating-linear-gradient(45deg, var(--ink-3) 0 10px, var(--ink) 10px 20px);
-    display:flex;align-items:center;justify-content:center;
+  .navbtn{
+    display:none;
   }
-  .proj-thumb span{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--line-dim);letter-spacing:0.08em;}
-  .proj-body{padding:16px 18px 18px;}
-  .proj-body .loc{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--amber);letter-spacing:0.06em;text-transform:uppercase;}
-  .proj-body h4{font-size:18px;margin-top:6px;font-family:'IBM Plex Sans',sans-serif;font-weight:600;}
-  .proj-body p{font-size:13px;color:var(--steel);margin:6px 0 0;}
 
-  /* quote form - printed work-order look */
-  .ticket{
-    background:var(--paper);color:var(--ink);
-    border:1px solid var(--paper-2);
-    padding:34px clamp(20px,4vw,44px);
-    position:relative;
+  .burger{
+    display:inline-flex;
   }
-  .ticket::before{
-    content:"WORK ORDER REQUEST";
-    position:absolute;top:18px;right:22px;
-    font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.14em;color:#9a8f74;
-  }
-  .ticket h2{color:var(--ink);font-size:34px;}
-  .ticket .sub{color:#5b6a72;font-size:14px;max-width:52ch;margin-top:8px;}
-  form{margin-top:26px;display:grid;grid-template-columns:1fr 1fr;gap:16px 20px;}
-  @media (max-width:640px){form{grid-template-columns:1fr;}}
-  .field{display:flex;flex-direction:column;gap:6px;}
-  .field.full{grid-column:1/-1;}
-  .field label{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:#5b6a72;}
-  .field input,.field select,.field textarea{
-    background:#F7F4EA;border:1px solid #C9C1A6;padding:11px 12px;font-family:'IBM Plex Sans',sans-serif;font-size:14px;color:var(--ink);
-  }
-  .field input:focus,.field select:focus,.field textarea:focus{outline:2px solid var(--amber-dark);outline-offset:1px;}
-  .field textarea{resize:vertical;min-height:90px;}
-  .radio-row{display:flex;gap:16px;flex-wrap:wrap;margin-top:2px;}
-  .radio-row label{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ink);font-family:'IBM Plex Sans',sans-serif;text-transform:none;letter-spacing:0;}
-  .ticket .submit-row{grid-column:1/-1;display:flex;align-items:center;gap:16px;margin-top:6px;flex-wrap:wrap;}
-  .ticket .submit-row .note{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#7a7157;}
 
-  /* contact */
-  .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;}
-  @media (max-width:840px){.contact-grid{grid-template-columns:1fr;}}
-  .contact-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:16px;}
-  .contact-list li{display:flex;gap:14px;align-items:flex-start;}
-  .contact-list .ico{color:var(--amber);flex:none;margin-top:2px;}
-  .contact-list .k{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--steel);letter-spacing:0.1em;text-transform:uppercase;}
-  .contact-list .v{font-size:14.5px;color:var(--line);margin-top:2px;}
-  .map-box{
-    border:1px solid var(--ink-3);aspect-ratio:4/3;
-    background:
-      radial-gradient(circle at 50% 50%, rgba(232,162,61,0.14), transparent 55%),
-      repeating-linear-gradient(0deg, rgba(191,217,226,0.06) 0 1px, transparent 1px 26px),
-      repeating-linear-gradient(90deg, rgba(191,217,226,0.06) 0 1px, transparent 1px 26px),
-      var(--ink-2);
-    display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;
+}
+
+#mobileMenu{
+  display:none;
+  flex-direction:column;
+  gap:0;
+
+  background:var(--card-bg);
+
+  border-top:1px solid var(--card-border);
+}
+
+#mobileMenu.open{
+  display:flex;
+}
+
+#mobileMenu a{
+  padding:14px 24px;
+
+  text-decoration:none;
+
+  color:var(--text-soft);
+
+  border-bottom:1px solid var(--card-border);
+
+  font-size:14px;
+}
+
+#mobileMenu a:hover{
+  color:var(--amber);
+}
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero{
+  position:relative;
+  overflow:hidden;
+
+  padding:70px 0 60px;
+
+  border-bottom:1px solid var(--card-border);
+
+  background:
+    radial-gradient(
+      600px 300px at 85% -10%,
+      rgba(232,162,61,.12),
+      transparent 60%
+    ),
+
+    repeating-linear-gradient(
+      0deg,
+      rgba(191,217,226,.035) 0 1px,
+      transparent 1px 32px
+    ),
+
+    repeating-linear-gradient(
+      90deg,
+      rgba(191,217,226,.035) 0 1px,
+      transparent 1px 32px
+    );
+}
+
+.hero-grid{
+  display:grid;
+
+  grid-template-columns:
+    1.1fr
+    .9fr;
+
+  gap:48px;
+
+  align-items:center;
+}
+
+@media(max-width:900px){
+
+  .hero-grid{
+    grid-template-columns:1fr;
   }
-  .map-box span{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--steel);}
 
-  /* footer */
-  footer{background:var(--ink);border-top:1px solid var(--ink-3);padding:36px 0;}
-  .foot-row{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;}
-  .foot-row p{font-size:12.5px;color:var(--steel);margin:0;font-family:'IBM Plex Mono',monospace;}
-  .foot-links{display:flex;gap:18px;font-size:12.5px;}
-  .foot-links a{text-decoration:none;color:var(--steel);}
-  .foot-links a:hover{color:var(--amber);}
+}
 
-  /* whatsapp floating button */
+.hero h1{
+  font-size:clamp(40px,6vw,64px);
+  line-height:.98;
+}
+
+.hero h1 em{
+  font-style:normal;
+  color:var(--amber);
+}
+
+.hero p.lede{
+  font-size:17px;
+  color:var(--text-soft);
+  max-width:46ch;
+  margin-top:18px;
+}
+
+.hero-actions{
+  display:flex;
+  gap:14px;
+
+  margin-top:30px;
+
+  flex-wrap:wrap;
+}
+
+.hero-specs{
+  display:flex;
+
+  gap:26px;
+
+  margin-top:38px;
+
+  flex-wrap:wrap;
+}
+
+.hero-specs div{
+  font-family:'IBM Plex Mono',monospace;
+}
+
+.hero-specs .n{
+  font-size:26px;
+  color:var(--amber);
+  font-weight:600;
+}
+
+.hero-specs .l{
+  font-size:11px;
+  color:var(--steel);
+
+  letter-spacing:.1em;
+  text-transform:uppercase;
+}
+
+/* =========================================================
+   FLOW CARD
+========================================================= */
+
+.flow-card{
+  border:1px solid var(--card-border);
+
+  background:var(--card-bg);
+
+  padding:26px 22px 22px;
+
+  transition:
+    background .25s ease,
+    border-color .25s ease;
+}
+
+.flow-title{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;
+  letter-spacing:.16em;
+
+  color:var(--steel);
+
+  text-transform:uppercase;
+
+  margin-bottom:18px;
+
+  display:flex;
+  justify-content:space-between;
+}
+
+.flow{
+  display:flex;
+  flex-direction:column;
+}
+
+.flow-step{
+  display:flex;
+  gap:14px;
+
+  align-items:flex-start;
+
+  position:relative;
+
+  padding-bottom:26px;
+}
+
+.flow-step:last-child{
+  padding-bottom:0;
+}
+
+.flow-step::before{
+  content:"";
+
+  position:absolute;
+
+  left:15px;
+  top:32px;
+  bottom:0;
+
+  width:2px;
+
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      var(--amber) 0 4px,
+      transparent 4px 9px
+    );
+
+  opacity:.6;
+}
+
+.flow-step:last-child::before{
+  display:none;
+}
+
+.flow-dot{
+  width:32px;
+  height:32px;
+
+  flex:none;
+
+  border-radius:50%;
+
+  border:2px solid var(--amber);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-family:'IBM Plex Mono',monospace;
+  font-size:12px;
+
+  color:var(--amber);
+
+  background:var(--body-bg);
+
+  z-index:1;
+}
+
+.flow-step h4{
+  font-size:19px;
+}
+
+.flow-step p{
+  margin:4px 0 0;
+
+  font-size:13.5px;
+
+  color:var(--steel);
+}
+
+/* =========================================================
+   SECTIONS
+========================================================= */
+
+section{
+  padding:64px 0;
+  position:relative;
+}
+
+.section-alt{
+  background:var(--card-bg);
+}
+
+.head-row{
+  display:flex;
+
+  justify-content:space-between;
+  align-items:flex-end;
+
+  gap:24px;
+
+  margin-bottom:34px;
+
+  flex-wrap:wrap;
+}
+
+.head-row h2{
+  font-size:clamp(30px,4vw,42px);
+}
+
+.head-row p{
+  color:var(--steel);
+
+  max-width:46ch;
+
+  font-size:14.5px;
+
+  margin-top:8px;
+}
+
+/* =========================================================
+   WHY CHOOSE
+========================================================= */
+
+.why-grid{
+  display:grid;
+
+  grid-template-columns:
+    repeat(4,1fr);
+
+  gap:1px;
+
+  background:var(--card-border);
+
+  border:1px solid var(--card-border);
+}
+
+@media(max-width:900px){
+
+  .why-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+}
+
+@media(max-width:520px){
+
+  .why-grid{
+    grid-template-columns:1fr;
+  }
+
+}
+
+.why-item{
+  background:var(--body-bg);
+
+  padding:24px 20px;
+
+  transition:background .25s ease;
+}
+
+.why-item .ico{
+  color:var(--amber);
+
+  margin-bottom:12px;
+}
+
+.why-item h4{
+  font-size:16px;
+
+  font-family:'IBM Plex Sans',sans-serif;
+  font-weight:600;
+}
+
+.why-item p{
+  font-size:13px;
+
+  color:var(--steel);
+
+  margin:6px 0 0;
+}
+
+/* =========================================================
+   SERVICES
+========================================================= */
+
+.svc-grid{
+  display:grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap:18px;
+}
+
+@media(max-width:900px){
+
+  .svc-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+}
+
+@media(max-width:620px){
+
+  .svc-grid{
+    grid-template-columns:1fr;
+  }
+
+}
+
+.svc-card{
+  background:var(--body-bg);
+
+  border:1px solid var(--card-border);
+
+  padding:22px;
+
+  display:flex;
+  flex-direction:column;
+
+  gap:10px;
+
+  transition:
+    border-color .2s,
+    transform .2s;
+}
+
+.svc-card:hover{
+  border-color:var(--amber);
+
+  transform:translateY(-2px);
+}
+
+.svc-num{
+  font-family:'IBM Plex Mono',monospace;
+
+  color:var(--line-dim);
+
+  font-size:12px;
+}
+
+.svc-card h3{
+  font-size:22px;
+}
+
+.svc-card ul{
+  margin:0;
+
+  padding-left:18px;
+
+  color:var(--steel);
+
+  font-size:13px;
+}
+
+.svc-card ul li{
+  margin-bottom:3px;
+}
+
+.svc-card .more{
+  margin-top:auto;
+
+  color:var(--amber);
+
+  font-family:'IBM Plex Mono',monospace;
+
+  font-size:12px;
+
+  text-decoration:none;
+
+  letter-spacing:.05em;
+}
+
+/* =========================================================
+   PRODUCTS
+========================================================= */
+
+.prod-grid{
+  display:grid;
+
+  grid-template-columns:
+    repeat(4,1fr);
+
+  gap:16px;
+}
+
+@media(max-width:900px){
+
+  .prod-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+}
+
+@media(max-width:520px){
+
+  .prod-grid{
+    grid-template-columns:1fr;
+  }
+
+}
+
+.prod-card{
+  background:var(--card-bg);
+
+  border:1px solid var(--card-border);
+}
+
+.prod-thumb{
+  aspect-ratio:4/3;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--ink-3),
+      var(--ink)
+    );
+
+  display:flex;
+
+  align-items:center;
+  justify-content:center;
+
+  color:var(--line-dim);
+
+  border-bottom:1px solid var(--card-border);
+}
+
+.prod-body{
+  padding:14px 16px 16px;
+}
+
+.prod-body h4{
+  font-size:16px;
+
+  font-family:'IBM Plex Sans',sans-serif;
+
+  font-weight:600;
+}
+
+.prod-body p{
+  font-size:12.5px;
+
+  color:var(--steel);
+
+  margin:6px 0 12px;
+}
+
+.prod-cta{
+  font-family:'IBM Plex Mono',monospace;
+
+  font-size:11px;
+
+  color:var(--amber);
+
+  letter-spacing:.06em;
+
+  text-transform:uppercase;
+}
+
+/* =========================================================
+   ABOUT
+========================================================= */
+
+.about-grid{
+  display:grid;
+
+  grid-template-columns:
+    1fr
+    1fr;
+
+  gap:40px;
+
+  align-items:start;
+}
+
+@media(max-width:840px){
+
+  .about-grid{
+    grid-template-columns:1fr;
+  }
+
+}
+
+.values{
+  display:flex;
+
+  flex-wrap:wrap;
+
+  gap:10px;
+
+  margin-top:18px;
+}
+
+.values span{
+  font-family:'IBM Plex Mono',monospace;
+
+  font-size:12px;
+
+  letter-spacing:.04em;
+
+  border:1px solid var(--line-dim);
+
+  padding:7px 12px;
+
+  color:var(--text-soft);
+}
+
+.mv{
+  margin-top:22px;
+}
+
+.mv .k{
+  font-family:'IBM Plex Mono',monospace;
+
+  font-size:11px;
+
+  letter-spacing:.12em;
+
+  color:var(--amber);
+
+  text-transform:uppercase;
+}
+
+.mv p{
+  margin:6px 0 0;
+
+  color:var(--text-soft);
+
+  font-size:14.5px;
+}
+
+/* =========================================================
+   INDUSTRIES
+========================================================= */
+
+.chip-row{
+  display:flex;
+
+  flex-wrap:wrap;
+
+  gap:10px;
+}
+
+.chip{
+  background:var(--body-bg);
+
+  border:1px solid var(--card-border);
+
+  padding:10px 16px;
+
+  font-size:13.5px;
+
+  display:flex;
+
+  align-items:center;
+
+  gap:8px;
+}
+
+.chip::before{
+  content:"";
+
+  width:6px;
+  height:6px;
+
+  background:var(--amber);
+
+  flex:none;
+}
+
+/* =========================================================
+   PROJECTS
+========================================================= */
+
+.proj-grid{
+  display:grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap:16px;
+}
+
+@media(max-width:900px){
+
+  .proj-grid{
+    grid-template-columns:1fr;
+  }
+
+}
+
+.proj-card{
+  border:1px solid var(--card-border);
+
+  background:var(--body-bg);
+}
+
+.proj-thumb{
+  aspect-ratio:16/10;
+
+  background:
+    repeating-linear-gradient(
+      45deg,
+      var(--ink-3) 0 10px,
+      var(--ink) 10px 20px
+    );
+
+  display:flex;
+
+  align-items:center;
+  justify-content:center;
+}
+
+.proj-thumb span{
+  font-family:'IBM Plex Mono',monospace;
+
+  font-size:11px;
+
+  color:var(--line-dim);
+
+  letter-spacing:.08em;
+}
+
+.proj-body{
+  padding:16px 18px 18px;
+}
+
+.proj-body .loc{
+  font-family:'IBM Plex Mono',monospace;
+
+  font-size:11px;
+
+  color:var(--amber);
+
+  letter-spacing:.06em;
+
+  text-transform:uppercase;
+}
+
+.proj-body h4{
+  font-size:18px;
+
+  margin-top:6px;
+
+  font-family:'IBM Plex Sans',sans-serif;
+
+  font-weight:600;
+}
+
+.proj-body p{
+  font-size:13px;
+
+  color:var(--steel);
+
+  margin:6px 0 0;
+}
+
+/* =========================================================
+   QUOTE FORM
+========================================================= */
+
+.ticket{
+  background:var(--paper);
+
+  color:var(--ink);
+
+  border:1px solid var(--paper-2);
+
+  padding:34px clamp(20px,4vw,44px);
+
+  position:relative;
+}
+
+.ticket::before{
+  content:"WORK ORDER REQUEST";
+
+  position:absolute;
+
+  top:18px;
+  right:22px;
+
+  font-family:'IBM Plex Mono',monospace;
+
+  font-size:11px;
+
+  letter-spacing:.14em;
+
+  color:#9a8f74;
+}
+
+.ticket h2{
+  color:var(--ink);
+
+  font-size:34px;
+}
+
+.ticket .sub{
+  color:#5b6a72;
+
+  font-size:14px;
+
+  max-width:52ch;
+
+  margin-top:8px;
+}
+
+form{
+  margin-top:26px;
+
+  display:grid;
+
+  grid-template-columns:
+    1fr
+    1fr;
+
+  gap:16px 20px;
+}
+
+@media(max-width:640px){
+
+  form{
+    grid-template-columns:1fr;
+  }
+
+}
+
+.field{
+  display:flex;
+
+  flex-direction:column;
+
+  gap:6px;
+}
+
+.field.full{
+  grid-column:1/-1;
+}
+
+.field label{
+  font-family:'IBM Plex Mono',monospace;
+
+  font-size:11px;
+
+  letter-spacing:.08em;
+
+  text-transform:uppercase;
+
+  color:#5b6a72;
+}
+
+.field input,
+.field select,
+.field textarea{
+  background:#F7F4EA;
+
+  border:1px solid #C9C1A6;
+
+  padding:11px 12px;
+
+  font-family:'IBM Plex Sans',sans-serif;
+
+  font-size:14px;
+
+  color:#0B2138;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus{
+  outline:2px solid var(--amber-dark);
+
+  outline-offset:1px;
+}
+
+.field textarea{
+  resize:vertical;
+
+  min-height:90px;
+}
+
+.radio-row{
+  display:flex;
+
+  gap:16px;
+
+  flex-wrap:wrap;
+
+  margin-top:2px;
+}
+
+.radio-row label{
+  display:flex;
+
+  align-items:center;
+
+  gap:6px;
+
+  font-size:13px;
+
+  color:var(--ink);
+
+  font-family:'IBM Plex Sans',sans-serif;
+
+  text-transform:none;
+
+  letter-spacing:0;
+}
+
+.ticket .submit-row{
+  grid-column:1/-1;
+
+  display:flex;
+
+  align-items:center;
+
+  gap:16px;
+
+  margin-top:6px;
+
+  flex-wrap:wrap;
+}
+
+.ticket .submit-row .note{
+  font-family:'IBM Plex Mono',monospace;
+
+  font-size:11.5px;
+
+  color:#7a7157;
+}
+
+/* =========================================================
+   CONTACT
+========================================================= */
+
+.contact-grid{
+  display:grid;
+
+  grid-template-columns:
+    1fr
+    1fr;
+
+  gap:40px;
+}
+
+@media(max-width:840px){
+
+  .contact-grid{
+    grid-template-columns:1fr;
+  }
+
+}
+
+.contact-list{
+  list-style:none;
+
+  margin:0;
+
+  padding:0;
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:20px;
+}
+
+.contact-list li{
+  display:flex;
+
+  gap:14px;
+
+  align-items:flex-start;
+}
+
+.contact-list .ico{
+  color:var(--amber);
+
+  flex:none;
+
+  margin-top:2px;
+}
+
+.contact-list .k{
+  font-family:'IBM Plex Mono',monospace;
+
+  font-size:11px;
+
+  color:var(--steel);
+
+  letter-spacing:.1em;
+
+  text-transform:uppercase;
+}
+
+.contact-list .v{
+  font-size:14.5px;
+
+  color:var(--text-soft);
+
+  margin-top:2px;
+}
+
+.contact-list a{
+  text-decoration:none;
+}
+
+.contact-list a:hover{
+  color:var(--amber);
+}
+
+.map-box{
+  border:1px solid var(--card-border);
+
+  aspect-ratio:4/3;
+
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(232,162,61,.14),
+      transparent 55%
+    ),
+
+    repeating-linear-gradient(
+      0deg,
+      rgba(191,217,226,.06) 0 1px,
+      transparent 1px 26px
+    ),
+
+    repeating-linear-gradient(
+      90deg,
+      rgba(191,217,226,.06) 0 1px,
+      transparent 1px 26px
+    ),
+
+    var(--card-bg);
+
+  display:flex;
+
+  align-items:center;
+  justify-content:center;
+
+  flex-direction:column;
+
+  gap:12px;
+
+  text-align:center;
+}
+
+.map-box span{
+  font-family:'IBM Plex Mono',monospace;
+
+  font-size:12px;
+
+  color:var(--steel);
+}
+
+.map-button{
+  margin-top:5px;
+}
+
+/* =========================================================
+   SOCIAL LINKS
+========================================================= */
+
+.social-row{
+  display:flex;
+
+  flex-wrap:wrap;
+
+  gap:10px;
+
+  margin-top:25px;
+}
+
+.social-link{
+  display:inline-flex;
+
+  align-items:center;
+
+  gap:8px;
+
+  border:1px solid var(--card-border);
+
+  padding:9px 13px;
+
+  text-decoration:none;
+
+  color:var(--text-soft);
+
+  font-family:'IBM Plex Mono',monospace;
+
+  font-size:11px;
+
+  transition:
+    border-color .2s ease,
+    color .2s ease;
+}
+
+.social-link:hover{
+  border-color:var(--amber);
+
+  color:var(--amber);
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+footer{
+  background:var(--body-bg);
+
+  border-top:1px solid var(--card-border);
+
+  padding:36px 0;
+}
+
+.foot-row{
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  gap:20px;
+
+  flex-wrap:wrap;
+}
+
+.foot-row p{
+  font-size:12.5px;
+
+  color:var(--steel);
+
+  margin:0;
+
+  font-family:'IBM Plex Mono',monospace;
+}
+
+.foot-links{
+  display:flex;
+
+  gap:18px;
+
+  font-size:12.5px;
+
+  flex-wrap:wrap;
+}
+
+.foot-links a{
+  text-decoration:none;
+
+  color:var(--steel);
+}
+
+.foot-links a:hover{
+  color:var(--amber);
+}
+
+/* =========================================================
+   WHATSAPP FLOAT
+========================================================= */
+
+.wa-float{
+  position:fixed;
+
+  right:20px;
+  bottom:20px;
+
+  z-index:60;
+
+  background:#2FAE60;
+
+  color:#fff;
+
+  border-radius:50px;
+
+  display:flex;
+
+  align-items:center;
+
+  gap:10px;
+
+  padding:13px 18px 13px 13px;
+
+  text-decoration:none;
+
+  box-shadow:0 8px 24px rgba(0,0,0,.35);
+
+  font-family:'IBM Plex Sans',sans-serif;
+
+  font-weight:600;
+
+  font-size:14px;
+}
+
+.wa-float svg{
+  width:22px;
+  height:22px;
+
+  flex:none;
+}
+
+.wa-float span{
+  white-space:nowrap;
+}
+
+@media(max-width:520px){
+
+  .wa-float span{
+    display:none;
+  }
+
   .wa-float{
-    position:fixed;right:20px;bottom:20px;z-index:60;
-    background:#2FAE60;color:#fff;border-radius:50px;
-    display:flex;align-items:center;gap:10px;
-    padding:13px 18px 13px 13px;
-    text-decoration:none;
-    box-shadow:0 8px 24px rgba(0,0,0,0.35);
-    font-family:'IBM Plex Sans',sans-serif;font-weight:600;font-size:14px;
+    padding:13px;
   }
-  .wa-float svg{width:22px;height:22px;flex:none;}
-  .wa-float span{white-space:nowrap;}
-  @media (max-width:520px){.wa-float span{display:none;}.wa-float{padding:13px;}}
 
-  .quote-btn-top{position:relative;z-index:2;}
+}
+
+/* =========================================================
+   MOBILE HEADER
+========================================================= */
+
+@media(max-width:899px){
+
+  .nav{
+    padding:12px 18px;
+  }
+
+  .logo-text{
+    font-size:20px;
+  }
+
+  .header-actions{
+    gap:7px;
+  }
+
+  .theme-toggle{
+    width:38px;
+    height:38px;
+  }
+
+}
+
+/* =========================================================
+   SMALL SCREEN
+========================================================= */
+
+@media(max-width:480px){
+
+  .wrap{
+    padding:0 18px;
+  }
+
+  .hero{
+    padding:55px 0 50px;
+  }
+
+  section{
+    padding:54px 0;
+  }
+
+  .hero-specs{
+    gap:18px;
+  }
+
+  .hero-specs .n{
+    font-size:22px;
+  }
+
+  .flow-card{
+    padding:22px 17px;
+  }
+
+  .ticket::before{
+    display:none;
+  }
+
+}
+
+/* =========================================================
+   THEME TRANSITIONS
+========================================================= */
+
+body,
+header,
+footer,
+.flow-card,
+.why-item,
+.svc-card,
+.prod-card,
+.prod-thumb,
+.proj-card,
+.map-box,
+.chip,
+.social-link,
+.theme-toggle,
+.burger{
+  transition:
+    background .25s ease,
+    color .25s ease,
+    border-color .25s ease;
+}
+
 </style>
 </head>
+
 <body>
 
 <!-- =========================================================
-NOTE TO MAYTECH TEAM:
-- Replace the logo mark (inline SVG below) with your real logo if you have one.
-- Replace all [PHONE], [EMAIL], [ADDRESS] and the WhatsApp number placeholder
-  (2348000000000) with your real details — search "REPLACE" in this file.
-- Swap the placeholder image panels (labelled "IMAGE PLACEHOLDER" / diagonal
-  hatch pattern) for real photos of your team, sites and projects.
+     HEADER
 ========================================================= -->
 
 <header>
+
   <div class="nav">
+
     <a href="#home" class="logo">
+
       <span class="logo-mark">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#E8A23D" stroke-width="2"><path d="M4 20V10l8-6 8 6v10"/><path d="M9 20v-6h6v6"/></svg>
+
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#E8A23D"
+          stroke-width="2"
+        >
+          <path d="M4 20V10l8-6 8 6v10"/>
+          <path d="M9 20v-6h6v6"/>
+        </svg>
+
       </span>
-      <span class="logo-text">MAYTECH<span>Oil &amp; Gas Engineering</span></span>
+
+      <span class="logo-text">
+
+        MAYTECH
+
+        <span>
+          Oil &amp; Gas Engineering
+        </span>
+
+      </span>
+
     </a>
+
+
     <nav class="links">
+
       <a href="#about">About</a>
+
       <a href="#services">Services</a>
+
       <a href="#products">Products</a>
+
       <a href="#projects">Projects</a>
+
       <a href="#contact">Contact</a>
+
     </nav>
-    <a href="#quote" class="btn btn-amber navbtn">Request a Quote</a>
-    <button class="burger" onclick="document.getElementById('mobileMenu').classList.toggle('open')">MENU</button>
+
+
+    <div class="header-actions">
+
+      <!-- THEME SWITCH -->
+
+      <button
+        class="theme-toggle"
+        id="themeToggle"
+        type="button"
+        aria-label="Switch theme"
+        title="Switch light/dark mode"
+      >
+
+        <svg
+          id="themeIcon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2"/>
+          <path d="M12 20v2"/>
+          <path d="m4.93 4.93 1.41 1.41"/>
+          <path d="m17.66 17.66 1.41 1.41"/>
+          <path d="M2 12h2"/>
+          <path d="M20 12h2"/>
+          <path d="m6.34 17.66-1.41 1.41"/>
+          <path d="m19.07 4.93-1.41 1.41"/>
+        </svg>
+
+      </button>
+
+
+      <a
+        href="#quote"
+        class="btn btn-amber navbtn"
+      >
+        Request a Quote
+      </a>
+
+
+      <button
+        class="burger"
+        id="burger"
+        type="button"
+      >
+        MENU
+      </button>
+
+    </div>
+
   </div>
+
+
+  <!-- MOBILE MENU -->
+
   <div id="mobileMenu">
-    <a href="#about" onclick="document.getElementById('mobileMenu').classList.remove('open')">About</a>
-    <a href="#services" onclick="document.getElementById('mobileMenu').classList.remove('open')">Services</a>
-    <a href="#products" onclick="document.getElementById('mobileMenu').classList.remove('open')">Products</a>
-    <a href="#projects" onclick="document.getElementById('mobileMenu').classList.remove('open')">Projects</a>
-    <a href="#contact" onclick="document.getElementById('mobileMenu').classList.remove('open')">Contact</a>
-    <a href="#quote" onclick="document.getElementById('mobileMenu').classList.remove('open')">Request a Quote</a>
+
+    <a href="#about">About</a>
+
+    <a href="#services">Services</a>
+
+    <a href="#products">Products</a>
+
+    <a href="#projects">Projects</a>
+
+    <a href="#contact">Contact</a>
+
+    <a href="#quote">
+      Request a Quote
+    </a>
+
   </div>
+
 </header>
+
 
 <main id="home">
 
-  <!-- HERO -->
+  <!-- =======================================================
+       HERO
+  ======================================================== -->
+
   <section class="hero">
+
     <div class="wrap hero-grid">
+
       <div>
-        <div class="eyebrow">Oil &amp; Gas Engineering · Nigeria</div>
-        <h1>Reliable engineering,<br>from <em>tank</em> to <em>dispenser</em>.</h1>
-        <p class="lede">MAYTECH supplies LPG dispensers and pumps, installs petrol station pipelines, and delivers tank calibration, pressure testing and dispenser maintenance — built on safety, precision and fast technical response.</p>
+
+        <div class="eyebrow">
+          Oil &amp; Gas Engineering · Nigeria
+        </div>
+
+
+        <h1>
+          Reliable engineering,<br>
+          from <em>tank</em> to <em>dispenser</em>.
+        </h1>
+
+
+        <p class="lede">
+
+          MAYTECH Oil and Gas Engineering supplies LPG
+          dispensers and pumps, installs petrol station
+          pipelines, and provides tank calibration,
+          pressure testing and dispenser maintenance.
+
+        </p>
+
+
         <div class="hero-actions">
-          <a href="#quote" class="btn btn-amber">Request a Quote</a>
-          <a href="#contact" class="btn btn-outline">Talk to an Engineer</a>
+
+          <a
+            href="#quote"
+            class="btn btn-amber"
+          >
+            Request a Quote
+          </a>
+
+
+          <a
+            href="#contact"
+            class="btn btn-outline"
+          >
+            Talk to an Engineer
+          </a>
+
         </div>
+
+
         <div class="hero-specs">
-          <div><div class="n">05</div><div class="l">Core Services</div></div>
-          <div><div class="n">100%</div><div class="l">Safety-Led Process</div></div>
-          <div><div class="n">24/7</div><div class="l">Enquiry Response</div></div>
+
+          <div>
+            <div class="n">05</div>
+            <div class="l">Core Services</div>
+          </div>
+
+          <div>
+            <div class="n">LPG</div>
+            <div class="l">Equipment</div>
+          </div>
+
+          <div>
+            <div class="n">9–6</div>
+            <div class="l">Daily Hours</div>
+          </div>
+
         </div>
+
       </div>
+
+
+      <!-- SERVICE ROUTE -->
 
       <div class="flow-card">
-        <div class="flow-title"><span>Service Route</span><span>SPEC-001</span></div>
-        <div class="flow">
-          <div class="flow-step">
-            <div class="flow-dot">01</div>
-            <div><h4>Supply</h4><p>LPG dispensers, pumps &amp; components sourced and specified for your site.</p></div>
-          </div>
-          <div class="flow-step">
-            <div class="flow-dot">02</div>
-            <div><h4>Install</h4><p>Petrol station pipeline design, underground &amp; surface installation.</p></div>
-          </div>
-          <div class="flow-step">
-            <div class="flow-dot">03</div>
-            <div><h4>Calibrate &amp; Test</h4><p>Tank calibration and pressure testing to verify system integrity.</p></div>
-          </div>
-          <div class="flow-step">
-            <div class="flow-dot">04</div>
-            <div><h4>Maintain</h4><p>Preventive maintenance, fault diagnosis and emergency repair support.</p></div>
-          </div>
+
+        <div class="flow-title">
+
+          <span>
+            Service Route
+          </span>
+
+          <span>
+            SPEC-001
+          </span>
+
         </div>
+
+
+        <div class="flow">
+
+          <div class="flow-step">
+
+            <div class="flow-dot">
+              01
+            </div>
+
+            <div>
+
+              <h4>
+                Supply
+              </h4>
+
+              <p>
+                LPG dispensers, pumps and
+                components for petroleum and
+                LPG facilities.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="flow-step">
+
+            <div class="flow-dot">
+              02
+            </div>
+
+            <div>
+
+              <h4>
+                Install
+              </h4>
+
+              <p>
+                Petrol station pipeline design,
+                underground and surface
+                installation.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="flow-step">
+
+            <div class="flow-dot">
+              03
+            </div>
+
+            <div>
+
+              <h4>
+                Calibrate &amp; Test
+              </h4>
+
+              <p>
+                Calibration and pressure testing
+                of underground and surface tanks
+                and related systems.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="flow-step">
+
+            <div class="flow-dot">
+              04
+            </div>
+
+            <div>
+
+              <h4>
+                Maintain
+              </h4>
+
+              <p>
+                Dispenser maintenance, fault
+                diagnosis, repairs and technical
+                support.
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
       </div>
+
     </div>
+
   </section>
+
+
+  <!-- PIPELINE SPINE -->
 
   <div style="position:relative;">
-  <div class="spine"></div>
 
-  <!-- WHY CHOOSE -->
-  <section id="why">
-    <div class="wrap station">
-      <div class="station-tag">Station 01 // Why MAYTECH</div>
-      <div class="head-row">
-        <h2>Engineering you can put a tank on.</h2>
-        <p>Every job runs through the same disciplined process — experienced hands, tested equipment, and a safety-first standard.</p>
-      </div>
-    </div>
-    <div class="wrap">
-      <div class="why-grid">
-        <div class="why-item"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 6v6c0 5 4 9 9 10 5-1 9-5 9-10V6l-9-4Z"/></svg></div><h4>Experienced technical team</h4><p>Engineers trained on real petrol station and LPG site conditions.</p></div>
-        <div class="why-item"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div><h4>Fast technical response</h4><p>Enquiries and site issues are actioned without delay.</p></div>
-        <div class="why-item"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg></div><h4>Accurate calibration &amp; testing</h4><p>Tank calibration and pressure testing you can defend on paper.</p></div>
-        <div class="why-item"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 12h8M8 8h8M8 16h5"/></svg></div><h4>Quality equipment</h4><p>Dispensers, pumps and components chosen for durability.</p></div>
-      </div>
-    </div>
-  </section>
+    <div class="spine"></div>
 
-  <!-- SERVICES -->
-  <section id="services" class="section-alt">
-    <div class="wrap station">
-      <div class="station-tag">Station 02 // Services</div>
-      <div class="head-row">
-        <h2>What we do on site.</h2>
-        <p>Five core service lines, each run by engineers who specialise in it.</p>
-      </div>
-      <div class="svc-grid">
-        <div class="svc-card">
-          <div class="svc-num">SVC / 01</div>
-          <h3>LPG Dispensers &amp; Pumps</h3>
-          <ul><li>Dispenser &amp; pump supply</li><li>Components &amp; replacement parts</li><li>Equipment selection support</li><li>Installation &amp; technical support</li></ul>
-          <a href="#quote" class="more">Request a quote →</a>
-        </div>
-        <div class="svc-card">
-          <div class="svc-num">SVC / 02</div>
-          <h3>Pipeline Installation</h3>
-          <ul><li>Pipeline design support</li><li>Underground &amp; surface installation</li><li>Connections &amp; inspection</li><li>Testing &amp; maintenance</li></ul>
-          <a href="#quote" class="more">Request a quote →</a>
-        </div>
-        <div class="svc-card">
-          <div class="svc-num">SVC / 03</div>
-          <h3>Tank Calibration</h3>
-          <ul><li>Underground &amp; surface tanks</li><li>Petrol &amp; diesel tanks</li><li>Other storage applications</li></ul>
-          <a href="#quote" class="more">Request a quote →</a>
-        </div>
-        <div class="svc-card">
-          <div class="svc-num">SVC / 04</div>
-          <h3>Pressure Testing</h3>
-          <ul><li>Storage tanks &amp; fuel pipelines</li><li>LPG systems</li><li>Petrol station systems</li><li>Leak detection &amp; system integrity</li></ul>
-          <a href="#quote" class="more">Request a quote →</a>
-        </div>
-        <div class="svc-card">
-          <div class="svc-num">SVC / 05</div>
-          <h3>Dispenser Maintenance</h3>
-          <ul><li>Preventive maintenance</li><li>Fault diagnosis &amp; repair</li><li>Component replacement</li><li>Emergency support</li></ul>
-          <a href="#quote" class="more">Request a quote →</a>
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- PRODUCTS -->
-  <section id="products">
-    <div class="wrap station">
-      <div class="station-tag">Station 03 // Products</div>
-      <div class="head-row">
-        <h2>Equipment we supply.</h2>
-        <p>Pricing depends on specification, brand, quantity and exchange rate — request a quote for current pricing.</p>
-      </div>
-      <div class="prod-grid">
-        <div class="prod-card">
-          <div class="prod-thumb mono">IMAGE PLACEHOLDER</div>
-          <div class="prod-body"><h4>LPG Dispensers</h4><p>Filling-station grade dispensing units.</p><div class="prod-cta">Request Price →</div></div>
-        </div>
-        <div class="prod-card">
-          <div class="prod-thumb mono">IMAGE PLACEHOLDER</div>
-          <div class="prod-body"><h4>LPG Pumps</h4><p>Pumps for LPG facilities and stations.</p><div class="prod-cta">Request Price →</div></div>
-        </div>
-        <div class="prod-card">
-          <div class="prod-thumb mono">IMAGE PLACEHOLDER</div>
-          <div class="prod-body"><h4>Pump Components</h4><p>Core components for pump systems.</p><div class="prod-cta">Request Price →</div></div>
-        </div>
-        <div class="prod-card">
-          <div class="prod-thumb mono">IMAGE PLACEHOLDER</div>
-          <div class="prod-body"><h4>Replacement Parts</h4><p>Dispenser and pump accessories.</p><div class="prod-cta">Request Price →</div></div>
-        </div>
-      </div>
-    </div>
-  </section>
+    <!-- =====================================================
+         WHY MAYTECH
+    ====================================================== -->
 
-  <!-- ABOUT -->
-  <section id="about" class="section-alt">
-    <div class="wrap station">
-      <div class="station-tag">Station 04 // About MAYTECH</div>
-      <div class="about-grid">
-        <div>
-          <h2 style="font-size:clamp(28px,4vw,38px);">Who we are.</h2>
-          <p style="color:var(--line);margin-top:14px;">MAYTECH Oil and Gas Engineering delivers dependable engineering, equipment and maintenance solutions for petroleum and LPG businesses across Nigeria — from independent petrol stations to industrial fuel facilities.</p>
-          <div class="mv">
-            <div class="k">Mission</div>
-            <p>Providing dependable engineering, equipment and maintenance solutions to petroleum and LPG businesses.</p>
-          </div>
-          <div class="mv">
-            <div class="k">Vision</div>
-            <p>To become a trusted oil &amp; gas engineering and equipment-services company in Nigeria and beyond.</p>
-          </div>
+    <section id="why">
+
+      <div class="wrap station">
+
+        <div class="station-tag">
+          Station 01 // Why MAYTECH
         </div>
-        <div>
-          <div class="k mono" style="color:var(--amber);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;">Our Values</div>
-          <div class="values">
-            <span>Safety</span><span>Reliability</span><span>Professionalism</span><span>Integrity</span><span>Technical Excellence</span><span>Customer Satisfaction</span>
-          </div>
-          <div style="margin-top:30px;">
-            <div class="k mono" style="color:var(--amber);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px;">Who We Serve</div>
-            <div class="chip-row">
-              <div class="chip">Petrol station operators</div>
-              <div class="chip">LPG stations</div>
-              <div class="chip">Independent marketers</div>
-              <div class="chip">Oil &amp; gas companies</div>
-              <div class="chip">Industrial facilities</div>
-              <div class="chip">Engineering contractors</div>
-              <div class="chip">Tank farm operators</div>
-              <div class="chip">Fleet operators</div>
+
+
+        <div class="head-row">
+
+          <h2>
+            Engineering you can put a tank on.
+          </h2>
+
+          <p>
+            Every job runs through a disciplined process
+            built around reliability, technical competence
+            and safety.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="wrap">
+
+        <div class="why-grid">
+
+          <div class="why-item">
+
+            <div class="ico">
+
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M12 2 3 6v6c0 5 4 9 9 10 5-1 9-5 9-10V6l-9-4Z"/>
+              </svg>
+
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- PROJECTS -->
-  <section id="projects">
-    <div class="wrap station">
-      <div class="station-tag">Station 05 // Projects</div>
-      <div class="head-row">
-        <h2>Recent work.</h2>
-        <p>A sample of completed installations and site services. Replace with your own project photos and details.</p>
-      </div>
-      <div class="proj-grid">
-        <div class="proj-card">
-          <div class="proj-thumb"><span>IMAGE PLACEHOLDER</span></div>
-          <div class="proj-body"><div class="loc">Lagos</div><h4>Petrol Station Pipeline Installation</h4><p>Full underground pipeline design and installation for a filling station.</p></div>
-        </div>
-        <div class="proj-card">
-          <div class="proj-thumb"><span>IMAGE PLACEHOLDER</span></div>
-          <div class="proj-body"><div class="loc">Ogun State</div><h4>Underground Tank Calibration</h4><p>Calibration service for underground storage tanks.</p></div>
-        </div>
-        <div class="proj-card">
-          <div class="proj-thumb"><span>IMAGE PLACEHOLDER</span></div>
-          <div class="proj-body"><div class="loc">Lagos</div><h4>LPG Dispenser Maintenance</h4><p>Confidential Client — scheduled preventive maintenance programme.</p></div>
-        </div>
-      </div>
-    </div>
-  </section>
+            <h4>
+              Experienced technical team
+            </h4>
 
-  <!-- QUOTE -->
-  <section id="quote" class="section-alt">
-    <div class="wrap station">
-      <div class="station-tag">Station 06 // Request a Quote</div>
-      <div class="ticket">
-        <h2>Request a Quote</h2>
-        <p class="sub">Tell us about the job and we'll get back to you with pricing and next steps.</p>
-        <form onsubmit="event.preventDefault(); alert('Thanks — this demo form doesn\'t send yet. Connect it to your email or a form service like Formspree to go live.');">
-          <div class="field"><label>Name</label><input type="text" required></div>
-          <div class="field"><label>Company Name</label><input type="text"></div>
-          <div class="field"><label>Phone Number</label><input type="tel" required></div>
-          <div class="field"><label>Email Address</label><input type="email" required></div>
-          <div class="field"><label>Service(s) Required</label>
-            <select required>
-              <option value="">Select a service…</option>
-              <option>LPG Dispenser / Pump</option>
-              <option>Pipeline Installation</option>
-              <option>Tank Calibration</option>
-              <option>Pressure Testing</option>
-              <option>Dispenser Maintenance</option>
-              <option>Other</option>
-            </select>
+            <p>
+              Technical support for petrol station,
+              LPG and fuel system requirements.
+            </p>
+
           </div>
-          <div class="field"><label>Location</label><input type="text" placeholder="e.g. Lagos, Ogun, Abuja…"></div>
-          <div class="field full"><label>Project Description</label><textarea placeholder="Tell us about the site and what you need."></textarea></div>
-          <div class="field full">
-            <label>Preferred Contact Method</label>
-            <div class="radio-row">
-              <label><input type="radio" name="contact-method" checked> Phone Call</label>
-              <label><input type="radio" name="contact-method"> WhatsApp</label>
-              <label><input type="radio" name="contact-method"> Email</label>
+
+
+          <div class="why-item">
+
+            <div class="ico">
+
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="12" cy="12" r="9"/>
+                <path d="M12 7v5l3 3"/>
+              </svg>
+
             </div>
-          </div>
-          <div class="field full"><label>Attachment (optional)</label><input type="file"></div>
-          <div class="submit-row">
-            <button type="submit" class="btn btn-amber">Submit Request</button>
-            <span class="note">// Routed directly to MAYTECH's enquiry inbox</span>
-          </div>
-        </form>
-      </div>
-    </div>
-  </section>
 
-  <!-- CONTACT -->
-  <section id="contact">
-    <div class="wrap station">
-      <div class="station-tag">Station 07 // Contact</div>
-      <div class="head-row"><h2>Get in touch.</h2></div>
-      <div class="contact-grid">
-        <ul class="contact-list">
-          <li><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 6-9 12-9 12S3 16 3 10a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg></span><div><div class="k">Office Address</div><div class="v">[REPLACE — office address, city, state]</div></div></li>
-          <li><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.5 2.1L8 9.7a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2Z"/></svg></span><div><div class="k">Phone</div><div class="v">[REPLACE — phone number]</div></div></li>
-          <li><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12a10 10 0 1 1-5.9-9.1"/><path d="M12 6v6l4 2"/></svg></span><div><div class="k">Business Hours</div><div class="v">Mon – Sat, 8:00 AM – 6:00 PM</div></div></li>
-          <li><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></span><div><div class="k">Email</div><div class="v">[REPLACE — email address]</div></div></li>
-        </ul>
-        <div class="map-box"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#8FA6B2" stroke-width="1.5"><path d="M21 10c0 6-9 12-9 12S3 16 3 10a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg><span>Google Map embed goes here</span></div>
-      </div>
-    </div>
-  </section>
+            <h4>
+              Fast technical response
+            </h4>
 
-  </div><!-- end spine wrap -->
+            <p>
+              We respond to enquiries and
+              technical requirements promptly.
+            </p>
+
+          </div>
+
+
+          <div class="why-item">
+
+            <div class="ico">
+
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M3 12h4l3 8 4-16 3 8h4"/>
+              </svg>
+
+            </div>
+
+            <h4>
+              Calibration &amp; testing
+            </h4>
+
+            <p>
+              Tank calibration and pressure
+              testing for fuel and LPG systems.
+            </p>
+
+          </div>
+
+
+          <div class="why-item">
+
+            <div class="ico">
+
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <rect
+                  x="4"
+                  y="4"
+                  width="16"
+                  height="16"
+                  rx="2"
+                />
+                <path d="M8 12h8"/>
+                <path d="M8 8h8"/>
+                <path d="M8 16h5"/>
+              </svg>
+
+            </div>
+
+            <h4>
+              Quality equipment
+            </h4>
+
+            <p>
+              LPG dispensers, pumps and
+              components for station applications.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         SERVICES
+    ====================================================== -->
+
+    <section
+      id="services"
+      class="section-alt"
+    >
+
+      <div class="wrap station">
+
+        <div class="station-tag">
+          Station 02 // Services
+        </div>
+
+
+        <div class="head-row">
+
+          <h2>
+            What we do on site.
+          </h2>
+
+          <p>
+            Our services cover equipment supply,
+            installation, testing, calibration and
+            maintenance.
+          </p>
+
+        </div>
+
+
+        <div class="svc-grid">
+
+
+          <!-- SERVICE 01 -->
+
+          <div class="svc-card">
+
+            <div class="svc-num">
+              SVC / 01
+            </div>
+
+            <h3>
+              LPG Dispensers &amp; Pumps
+            </h3>
+
+            <ul>
+
+              <li>
+                LPG dispenser supply
+              </li>
+
+              <li>
+                LPG pump supply
+              </li>
+
+              <li>
+                Components and parts
+              </li>
+
+              <li>
+                Equipment selection support
+              </li>
+
+            </ul>
+
+            <a
+              href="#quote"
+              class="more"
+            >
+              Request a quote →
+            </a>
+
+          </div>
+
+
+          <!-- SERVICE 02 -->
+
+          <div class="svc-card">
+
+            <div class="svc-num">
+              SVC / 02
+            </div>
+
+            <h3>
+              Pipeline Installation
+            </h3>
+
+            <ul>
+
+              <li>
+                Petrol station pipeline installation
+              </li>
+
+              <li>
+                Underground pipelines
+              </li>
+
+              <li>
+                Surface pipelines
+              </li>
+
+              <li>
+                Connections and inspection
+              </li>
+
+            </ul>
+
+            <a
+              href="#quote"
+              class="more"
+            >
+              Request a quote →
+            </a>
+
+          </div>
+
+
+          <!-- SERVICE 03 -->
+
+          <div class="svc-card">
+
+            <div class="svc-num">
+              SVC / 03
+            </div>
+
+            <h3>
+              Tank Calibration
+            </h3>
+
+            <ul>
+
+              <li>
+                Underground tanks
+              </li>
+
+              <li>
+                Surface tanks
+              </li>
+
+              <li>
+                Petrol and diesel tanks
+              </li>
+
+              <li>
+                Storage tank calibration
+              </li>
+
+            </ul>
+
+            <a
+              href="#quote"
+              class="more"
+            >
+              Request a quote →
+            </a>
+
+          </div>
+
+
+          <!-- SERVICE 04 -->
+
+          <div class="svc-card">
+
+            <div class="svc-num">
+              SVC / 04
+            </div>
+
+            <h3>
+              Pressure Testing
+            </h3>
+
+            <ul>
+
+              <li>
+                Tank pressure testing
+              </li>
+
+              <li>
+                Fuel pipelines
+              </li>
+
+              <li>
+                LPG systems
+              </li>
+
+              <li>
+                System integrity testing
+              </li>
+
+            </ul>
+
+            <a
+              href="#quote"
+              class="more"
+            >
+              Request a quote →
+            </a>
+
+          </div>
+
+
+          <!-- SERVICE 05 -->
+
+          <div class="svc-card">
+
+            <div class="svc-num">
+              SVC / 05
+            </div>
+
+            <h3>
+              Dispenser Maintenance
+            </h3>
+
+            <ul>
+
+              <li>
+                Preventive maintenance
+              </li>
+
+              <li>
+                Fault diagnosis
+              </li>
+
+              <li>
+                Component replacement
+              </li>
+
+              <li>
+                Repair and technical support
+              </li>
+
+            </ul>
+
+            <a
+              href="#quote"
+              class="more"
+            >
+              Request a quote →
+            </a>
+
+          </div>
+
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         PRODUCTS
+    ====================================================== -->
+
+    <section id="products">
+
+      <div class="wrap station">
+
+        <div class="station-tag">
+          Station 03 // Products
+        </div>
+
+
+        <div class="head-row">
+
+          <h2>
+            Equipment we supply.
+          </h2>
+
+          <p>
+            Contact MAYTECH for current availability,
+            specification and pricing.
+          </p>
+
+        </div>
+
+
+        <div class="prod-grid">
+
+
+          <div class="prod-card">
+
+            <div class="prod-thumb mono">
+              LPG DISPENSER
+            </div>
+
+            <div class="prod-body">
+
+              <h4>
+                LPG Dispensers
+              </h4>
+
+              <p>
+                Filling-station grade LPG dispensing
+                equipment.
+              </p>
+
+              <div class="prod-cta">
+                Request Price →
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div class="prod-card">
+
+            <div class="prod-thumb mono">
+              LPG PUMP
+            </div>
+
+            <div class="prod-body">
+
+              <h4>
+                LPG Pumps
+              </h4>
+
+              <p>
+                Pumps and equipment for LPG
+                facilities and stations.
+              </p>
+
+              <div class="prod-cta">
+                Request Price →
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div class="prod-card">
+
+            <div class="prod-thumb mono">
+              COMPONENTS
+            </div>
+
+            <div class="prod-body">
+
+              <h4>
+                Pump Components
+              </h4>
+
+              <p>
+                Components and accessories for
+                pumping systems.
+              </p>
+
+              <div class="prod-cta">
+                Request Price →
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div class="prod-card">
+
+            <div class="prod-thumb mono">
+              PARTS
+            </div>
+
+            <div class="prod-body">
+
+              <h4>
+                Replacement Parts
+              </h4>
+
+              <p>
+                Dispenser, pump and system
+                replacement components.
+              </p>
+
+              <div class="prod-cta">
+                Request Price →
+              </div>
+
+            </div>
+
+          </div>
+
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         ABOUT
+    ====================================================== -->
+
+    <section
+      id="about"
+      class="section-alt"
+    >
+
+      <div class="wrap station">
+
+        <div class="station-tag">
+          Station 04 // About MAYTECH
+        </div>
+
+
+        <div class="about-grid">
+
+
+          <div>
+
+            <h2 style="font-size:clamp(28px,4vw,38px);">
+              Who we are.
+            </h2>
+
+
+            <p
+              style="
+                color:var(--text-soft);
+                margin-top:14px;
+              "
+            >
+
+              MAYTECH Oil and Gas Engineering provides
+              engineering, equipment and maintenance
+              solutions for petroleum and LPG businesses.
+
+              Our work covers LPG equipment, petrol
+              station pipelines, tank calibration,
+              pressure testing and dispenser maintenance.
+
+            </p>
+
+
+            <div class="mv">
+
+              <div class="k">
+                Mission
+              </div>
+
+              <p>
+                Providing dependable engineering,
+                equipment and maintenance solutions
+                to petroleum and LPG businesses.
+              </p>
+
+            </div>
+
+
+            <div class="mv">
+
+              <div class="k">
+                Vision
+              </div>
+
+              <p>
+                To become a trusted oil &amp; gas
+                engineering and equipment-services
+                company in Nigeria and beyond.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div>
+
+            <div
+              class="k mono"
+              style="
+                color:var(--amber);
+                font-size:11px;
+                letter-spacing:.12em;
+                text-transform:uppercase;
+              "
+            >
+              Our Values
+            </div>
+
+
+            <div class="values">
+
+              <span>
+                Safety
+              </span>
+
+              <span>
+                Reliability
+              </span>
+
+              <span>
+                Professionalism
+              </span>
+
+              <span>
+                Integrity
+              </span>
+
+              <span>
+                Technical Excellence
+              </span>
+
+              <span>
+                Customer Satisfaction
+              </span>
+
+            </div>
+
+
+            <div style="margin-top:30px;">
+
+              <div
+                class="k mono"
+                style="
+                  color:var(--amber);
+                  font-size:11px;
+                  letter-spacing:.12em;
+                  text-transform:uppercase;
+                  margin-bottom:12px;
+                "
+              >
+                Who We Serve
+              </div>
+
+
+              <div class="chip-row">
+
+                <div class="chip">
+                  Petrol station operators
+                </div>
+
+                <div class="chip">
+                  LPG stations
+                </div>
+
+                <div class="chip">
+                  Independent marketers
+                </div>
+
+                <div class="chip">
+                  Oil &amp; gas companies
+                </div>
+
+                <div class="chip">
+                  Industrial facilities
+                </div>
+
+                <div class="chip">
+                  Engineering contractors
+                </div>
+
+                <div class="chip">
+                  Tank farm operators
+                </div>
+
+                <div class="chip">
+                  Fleet operators
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         PROJECTS
+    ====================================================== -->
+
+    <section id="projects">
+
+      <div class="wrap station">
+
+        <div class="station-tag">
+          Station 05 // Projects
+        </div>
+
+
+        <div class="head-row">
+
+          <h2>
+            Recent work.
+          </h2>
+
+          <p>
+            Project photographs and detailed project
+            records can be added here as MAYTECH's
+            portfolio grows.
+          </p>
+
+        </div>
+
+
+        <div class="proj-grid">
+
+
+          <div class="proj-card">
+
+            <div class="proj-thumb">
+
+              <span>
+                PROJECT PHOTO
+              </span>
+
+            </div>
+
+            <div class="proj-body">
+
+              <div class="loc">
+                Nigeria
+              </div>
+
+              <h4>
+                Petrol Station Pipeline Installation
+              </h4>
+
+              <p>
+                Pipeline installation and related
+                technical works for petroleum
+                station applications.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="proj-card">
+
+            <div class="proj-thumb">
+
+              <span>
+                PROJECT PHOTO
+              </span>
+
+            </div>
+
+            <div class="proj-body">
+
+              <div class="loc">
+                Nigeria
+              </div>
+
+              <h4>
+                Underground Tank Calibration
+              </h4>
+
+              <p>
+                Calibration services for underground
+                fuel storage tanks.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="proj-card">
+
+            <div class="proj-thumb">
+
+              <span>
+                PROJECT PHOTO
+              </span>
+
+            </div>
+
+            <div class="proj-body">
+
+              <div class="loc">
+                Nigeria
+              </div>
+
+              <h4>
+                LPG Dispenser Maintenance
+              </h4>
+
+              <p>
+                Preventive maintenance, diagnosis
+                and technical support for LPG
+                dispensing equipment.
+              </p>
+
+            </div>
+
+          </div>
+
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         QUOTE
+    ====================================================== -->
+
+    <section
+      id="quote"
+      class="section-alt"
+    >
+
+      <div class="wrap station">
+
+        <div class="station-tag">
+          Station 06 // Request a Quote
+        </div>
+
+
+        <div class="ticket">
+
+          <h2>
+            Request a Quote
+          </h2>
+
+
+          <p class="sub">
+            Tell MAYTECH about your project and we'll
+            get back to you with pricing and next steps.
+          </p>
+
+
+          <form
+            id="quoteForm"
+          >
+
+
+            <div class="field">
+
+              <label>
+                Name
+              </label>
+
+              <input
+                type="text"
+                name="name"
+                required
+              >
+
+            </div>
+
+
+            <div class="field">
+
+              <label>
+                Company Name
+              </label>
+
+              <input
+                type="text"
+                name="company"
+              >
+
+            </div>
+
+
+            <div class="field">
+
+              <label>
+                Phone Number
+              </label>
+
+              <input
+                type="tel"
+                name="phone"
+                required
+              >
+
+            </div>
+
+
+            <div class="field">
+
+              <label>
+                Email Address
+              </label>
+
+              <input
+                type="email"
+                name="email"
+                required
+              >
+
+            </div>
+
+
+            <div class="field">
+
+              <label>
+                Service Required
+              </label>
+
+              <select
+                name="service"
+                required
+              >
+
+                <option value="">
+                  Select a service…
+                </option>
+
+                <option>
+                  LPG Dispenser / Pump
+                </option>
+
+                <option>
+                  Pipeline Installation
+                </option>
+
+                <option>
+                  Tank Calibration
+                </option>
+
+                <option>
+                  Pressure Testing
+                </option>
+
+                <option>
+                  Dispenser Maintenance
+                </option>
+
+                <option>
+                  Other
+                </option>
+
+              </select>
+
+            </div>
+
+
+            <div class="field">
+
+              <label>
+                Location
+              </label>
+
+              <input
+                type="text"
+                name="location"
+                placeholder="e.g. Ibadan, Lagos, Ogun..."
+              >
+
+            </div>
+
+
+            <div class="field full">
+
+              <label>
+                Project Description
+              </label>
+
+              <textarea
+                name="message"
+                placeholder="Tell us about the site and what you need."
+              ></textarea>
+
+            </div>
+
+
+            <div class="field full">
+
+              <label>
+                Preferred Contact Method
+              </label>
+
+
+              <div class="radio-row">
+
+                <label>
+
+                  <input
+                    type="radio"
+                    name="contact-method"
+                    value="Phone Call"
+                    checked
+                  >
+
+                  Phone Call
+
+                </label>
+
+
+                <label>
+
+                  <input
+                    type="radio"
+                    name="contact-method"
+                    value="WhatsApp"
+                  >
+
+                  WhatsApp
+
+                </label>
+
+
+                <label>
+
+                  <input
+                    type="radio"
+                    name="contact-method"
+                    value="Email"
+                  >
+
+                  Email
+
+                </label>
+
+              </div>
+
+            </div>
+
+
+            <div class="submit-row">
+
+              <button
+                type="submit"
+                class="btn btn-amber"
+              >
+                Submit Request
+              </button>
+
+
+              <span class="note">
+                // Enquiry will open WhatsApp with your request
+              </span>
+
+            </div>
+
+
+          </form>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         CONTACT
+    ====================================================== -->
+
+    <section id="contact">
+
+      <div class="wrap station">
+
+        <div class="station-tag">
+          Station 07 // Contact
+        </div>
+
+
+        <div class="head-row">
+
+          <h2>
+            Get in touch.
+          </h2>
+
+        </div>
+
+
+        <div class="contact-grid">
+
+
+          <div>
+
+
+            <ul class="contact-list">
+
+
+              <!-- ADDRESS -->
+
+              <li>
+
+                <span class="ico">
+
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M21 10c0 6-9 12-9 12S3 16 3 10a9 9 0 0 1 18 0Z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                  </svg>
+
+                </span>
+
+
+                <div>
+
+                  <div class="k">
+                    Office Address
+                  </div>
+
+                  <div class="v">
+                    Atere Junction,<br>
+                    Along Ojo-Ekun Road,<br>
+                    Odo-Ona Elewe,<br>
+                    Ibadan, Oyo State, Nigeria.
+                  </div>
+
+                </div>
+
+              </li>
+
+
+              <!-- PHONE -->
+
+              <li>
+
+                <span class="ico">
+
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.5 2.1L8 9.7a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2Z"/>
+                  </svg>
+
+                </span>
+
+
+                <div>
+
+                  <div class="k">
+                    Phone
+                  </div>
+
+                  <div class="v">
+
+                    <a href="tel:+2348102783964">
+                      +234 810 278 3964
+                    </a>
+
+                  </div>
+
+                </div>
+
+              </li>
+
+
+              <!-- HOURS -->
+
+              <li>
+
+                <span class="ico">
+
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <circle cx="12" cy="12" r="9"/>
+                    <path d="M12 7v5l3 3"/>
+                  </svg>
+
+                </span>
+
+
+                <div>
+
+                  <div class="k">
+                    Business Hours
+                  </div>
+
+                  <div class="v">
+
+                    Monday – Sunday<br>
+                    9:00 AM – 6:00 PM
+
+                  </div>
+
+                </div>
+
+              </li>
+
+
+              <!-- EMAIL -->
+
+              <li>
+
+                <span class="ico">
+
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <rect
+                      x="3"
+                      y="5"
+                      width="18"
+                      height="14"
+                      rx="2"
+                    />
+
+                    <path d="m3 7 9 6 9-6"/>
+
+                  </svg>
+
+                </span>
+
+
+                <div>
+
+                  <div class="k">
+                    Email
+                  </div>
+
+                  <div class="v">
+
+                    <a href="mailto:adeoyemay@gmail.com">
+                      adeoyemay@gmail.com
+                    </a>
+
+                  </div>
+
+                </div>
+
+              </li>
+
+
+            </ul>
+
+
+            <!-- SOCIAL -->
+
+            <div class="social-row">
+
+
+              <a
+                class="social-link"
+                href="https://www.facebook.com/share/18HDNiYKc8/"
+                target="_blank"
+                rel="noopener"
+              >
+
+                Facebook
+
+              </a>
+
+
+              <a
+                class="social-link"
+                href="https://www.instagram.com/adeoye8003/"
+                target="_blank"
+                rel="noopener"
+              >
+
+                Instagram @adeoye8003
+
+              </a>
+
+
+              <a
+                class="social-link"
+                href="https://wa.me/2348102783964"
+                target="_blank"
+                rel="noopener"
+              >
+
+                WhatsApp
+
+              </a>
+
+
+            </div>
+
+
+          </div>
+
+
+          <!-- MAP -->
+
+          <div class="map-box">
+
+            <svg
+              width="34"
+              height="34"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#E8A23D"
+              stroke-width="1.5"
+            >
+
+              <path d="M21 10c0 6-9 12-9 12S3 16 3 10a9 9 0 0 1 18 0Z"/>
+
+              <circle
+                cx="12"
+                cy="10"
+                r="3"
+              />
+
+            </svg>
+
+
+            <span>
+              Atere Junction,<br>
+              Ojo-Ekun Road,<br>
+              Odo-Ona Elewe, Ibadan
+            </span>
+
+
+            <a
+              href="https://www.google.com/maps/search/?api=1&query=Atere+Junction+Along+Ojo-Ekun+Road+Odo-Ona+Elewe+Ibadan"
+              target="_blank"
+              rel="noopener"
+              class="btn btn-outline map-button"
+            >
+              Open in Google Maps
+            </a>
+
+          </div>
+
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+  </div>
 
 </main>
 
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+
 <footer>
+
   <div class="wrap foot-row">
-    <p>© 2026 MAYTECH Oil &amp; Gas Engineering. Serving Lagos, Ogun, Abuja, Port Harcourt, Ibadan, Benin &amp; Warri.</p>
+
+
+    <p>
+      © 2026 MAYTECH Oil &amp; Gas Engineering.
+      Atere Junction, Ibadan.
+    </p>
+
+
     <div class="foot-links">
-      <a href="#about">About</a><a href="#services">Services</a><a href="#projects">Projects</a><a href="#quote">Request a Quote</a>
+
+      <a href="#about">
+        About
+      </a>
+
+      <a href="#services">
+        Services
+      </a>
+
+      <a href="#projects">
+        Projects
+      </a>
+
+      <a href="#contact">
+        Contact
+      </a>
+
+      <a href="mailto:adeoyemay@gmail.com">
+        Email
+      </a>
+
     </div>
+
+
   </div>
+
 </footer>
 
-<!-- WhatsApp floating button — REPLACE phone number below -->
-<a class="wa-float" href="https://wa.me/2348102783964?text=Hello%20MAYTECH%2C%20I%20would%20like%20to%20enquire%20about%20your%20oil%20%26%20gas%20engineering%20services." target="_blank" rel="noopener">
-  <svg viewBox="0 0 24 24" fill="#fff"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.81.48 3.55 1.38 5.08L2 22l5.2-1.44a9.86 9.86 0 0 0 4.83 1.27h.01c5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2Zm0 17.9a8 8 0 0 1-4.08-1.12l-.29-.17-3.02.84.83-2.94-.19-.3a7.94 7.94 0 0 1-1.22-4.3c0-4.4 3.58-7.98 7.98-7.98 2.13 0 4.13.83 5.64 2.34a7.9 7.9 0 0 1 2.34 5.64c0 4.4-3.58 7.99-7.99 7.99Zm4.38-5.98c-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.02-.38-1.94-1.2-.72-.64-1.2-1.44-1.34-1.68-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.47-.4-.4-.54-.41-.14-.01-.3-.01-.46-.01-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.12 3.64.58.25 1.03.4 1.38.51.58.18 1.1.16 1.52.1.46-.07 1.42-.58 1.62-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z"/></svg>
-  <span>Chat on WhatsApp</span>
+
+<!-- =========================================================
+     WHATSAPP FLOATING BUTTON
+========================================================= -->
+
+<a
+  class="wa-float"
+  href="https://wa.me/2348102783964?text=Hello%20MAYTECH%2C%20I%20would%20like%20to%20enquire%20about%20your%20oil%20%26%20gas%20engineering%20services."
+  target="_blank"
+  rel="noopener"
+  aria-label="Chat with MAYTECH on WhatsApp"
+>
+
+  <svg
+    viewBox="0 0 24 24"
+    fill="#fff"
+  >
+
+    <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.81.48 3.55 1.38 5.08L2 22l5.2-1.44a9.86 9.86 0 0 0 4.83 1.27h.01c5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2Zm0 17.9a8 8 0 0 1-4.08-1.12l-.29-.17-3.02.84.83-2.94-.19-.3a7.94 7.94 0 0 1-1.22-4.3c0-4.4 3.58-7.98 7.98-7.98 2.13 0 4.13.83 5.64 2.34a7.9 7.9 0 0 1 2.34 5.64c0 4.4-3.58 7.99-7.99 7.99Zm4.38-5.98c-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.02-.38-1.94-1.2-.72-.64-1.2-1.44-1.34-1.68-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.47-.4-.4-.54-.41-.14-.01-.3-.01-.46-.01-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.12 3.64.58.25 1.03.4 1.38.51.58.18 1.1.16 1.52.1.46-.07 1.42-.58 1.62-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z"/>
+
+  </svg>
+
+
+  <span>
+    Chat on WhatsApp
+  </span>
+
 </a>
+
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
+
+<script>
+
+/* =========================================================
+   MOBILE MENU
+========================================================= */
+
+const burger =
+  document.getElementById("burger");
+
+const mobileMenu =
+  document.getElementById("mobileMenu");
+
+
+burger.addEventListener("click", function(){
+
+  mobileMenu.classList.toggle("open");
+
+});
+
+
+/* Close mobile menu when a link is clicked */
+
+document
+  .querySelectorAll("#mobileMenu a")
+  .forEach(function(link){
+
+    link.addEventListener("click", function(){
+
+      mobileMenu.classList.remove("open");
+
+    });
+
+  });
+
+
+/* =========================================================
+   LIGHT / DARK MODE
+========================================================= */
+
+const themeToggle =
+  document.getElementById("themeToggle");
+
+const themeIcon =
+  document.getElementById("themeIcon");
+
+
+function setTheme(theme){
+
+  document.documentElement
+    .setAttribute("data-theme", theme);
+
+
+  localStorage.setItem(
+    "maytech-theme",
+    theme
+  );
+
+
+  updateThemeIcon(theme);
+
+}
+
+
+function updateThemeIcon(theme){
+
+  if(theme === "light"){
+
+    /* Moon icon */
+
+    themeIcon.innerHTML = `
+      <path d="M21 12.79A9 9 0 1 1 11.21 3
+      7 7 0 0 0 21 12.79Z"/>
+    `;
+
+    themeToggle.setAttribute(
+      "aria-label",
+      "Switch to dark mode"
+    );
+
+    themeToggle.setAttribute(
+      "title",
+      "Switch to dark mode"
+    );
+
+  }else{
+
+    /* Sun icon */
+
+    themeIcon.innerHTML = `
+      <circle cx="12" cy="12" r="4"/>
+      <path d="M12 2v2"/>
+      <path d="M12 20v2"/>
+      <path d="m4.93 4.93 1.41 1.41"/>
+      <path d="m17.66 17.66 1.41 1.41"/>
+      <path d="M2 12h2"/>
+      <path d="M20 12h2"/>
+      <path d="m6.34 17.66-1.41 1.41"/>
+      <path d="m19.07 4.93-1.41 1.41"/>
+    `;
+
+    themeToggle.setAttribute(
+      "aria-label",
+      "Switch to light mode"
+    );
+
+    themeToggle.setAttribute(
+      "title",
+      "Switch to light mode"
+    );
+
+  }
+
+}
+
+
+/* Check saved theme */
+
+const savedTheme =
+  localStorage.getItem("maytech-theme");
+
+
+if(savedTheme){
+
+  setTheme(savedTheme);
+
+}else{
+
+  /* Use device preference */
+
+  const prefersLight =
+    window.matchMedia &&
+    window.matchMedia(
+      "(prefers-color-scheme: light)"
+    ).matches;
+
+
+  setTheme(
+    prefersLight
+      ? "light"
+      : "dark"
+  );
+
+}
+
+
+/* Toggle theme */
+
+themeToggle.addEventListener(
+  "click",
+  function(){
+
+    const current =
+      document.documentElement
+        .getAttribute("data-theme");
+
+
+    setTheme(
+      current === "dark"
+        ? "light"
+        : "dark"
+    );
+
+  }
+);
+
+
+/* =========================================================
+   QUOTE FORM
+========================================================= */
+
+const quoteForm =
+  document.getElementById("quoteForm");
+
+
+quoteForm.addEventListener(
+  "submit",
+  function(event){
+
+    event.preventDefault();
+
+
+    const formData =
+      new FormData(quoteForm);
+
+
+    const name =
+      formData.get("name") || "";
+
+
+    const company =
+      formData.get("company") || "";
+
+
+    const phone =
+      formData.get("phone") || "";
+
+
+    const email =
+      formData.get("email") || "";
+
+
+    const service =
+      formData.get("service") || "";
+
+
+    const location =
+      formData.get("location") || "";
+
+
+    const message =
+      formData.get("message") || "";
+
+
+    const contactMethod =
+      formData.get("contact-method") || "WhatsApp";
+
+
+    const whatsappMessage =
+
+`Hello MAYTECH,
+
+I would like to request a quote.
+
+Name: ${name}
+Company: ${company}
+Phone: ${phone}
+Email: ${email}
+
+Service Required:
+${service}
+
+Location:
+${location}
+
+Project Description:
+${message}
+
+Preferred Contact:
+${contactMethod}`;
+
+
+    const whatsappURL =
+      "https://wa.me/2348102783964?text="
+      +
+      encodeURIComponent(
+        whatsappMessage
+      );
+
+
+    window.open(
+      whatsappURL,
+      "_blank"
+    );
+
+  }
+);
+
+
+/* =========================================================
+   SMOOTH SCROLL + HEADER OFFSET
+========================================================= */
+
+document
+  .querySelectorAll('a[href^="#"]')
+  .forEach(function(anchor){
+
+    anchor.addEventListener(
+      "click",
+      function(event){
+
+        const targetID =
+          this.getAttribute("href");
+
+
+        if(
+          targetID === "#" ||
+          !targetID
+        ){
+          return;
+        }
+
+
+        const target =
+          document.querySelector(
+            targetID
+          );
+
+
+        if(!target){
+          return;
+        }
+
+
+        event.preventDefault();
+
+
+        const header =
+          document.querySelector("header");
+
+
+        const offset =
+          header
+            ? header.offsetHeight + 10
+            : 0;
+
+
+        const position =
+          target.getBoundingClientRect().top
+          +
+          window.pageYOffset
+          -
+          offset;
+
+
+        window.scrollTo({
+          top:position,
+          behavior:"smooth"
+        });
+
+      }
+    );
+
+  });
+
+</script>
 
 </body>
 </html>
