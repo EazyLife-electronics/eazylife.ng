@@ -32,9 +32,9 @@ export function initTabs() {
 // Lists images from assets/products/ or assets/heroes/ on GitHub so a non-technical
 // manager can click a thumbnail instead of typing/copying an image URL.
 
-// Update BRANCH if you later switch which branch GitHub Pages deploys from.
+// GitHub Pages deploys this repository from the main branch.
 const GITHUB_REPO = 'EazyLife-electronics/eazylife.ng';
-const GITHUB_BRANCH = 'firebase-v2';
+const GITHUB_BRANCH = 'main';
 
 let pickerTargetInput = null;
 
