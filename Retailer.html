@@ -1,0 +1,823 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light" />
+  <title>Reseller Price Finder | Jumia vs Jiji</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .product-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100 font-sans text-gray-800 min-h-screen">
+
+  <div class="max-w-6xl mx-auto px-4 py-8">
+
+    <!-- Header -->
+    <header class="text-center mb-8">
+      <h1 class="text-3xl md:text-4xl font-extrabold text-blue-900 tracking-tight">
+        🇳🇬 Reseller Price Finder
+      </h1>
+
+      <p class="text-gray-600 mt-2">
+        Compare prices across Jumia & Jiji (Lowest First)
+      </p>
+    </header>
+
+    <!-- Search Form -->
+    <section class="max-w-xl mx-auto mb-10">
+      <form id="searchForm" class="flex gap-2">
+
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Enter item name (e.g. iPhone 12 128GB)..."
+          required
+          autocomplete="off"
+          class="flex-1 min-w-0 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-sm"
+        />
+
+        <button
+          type="submit"
+          id="searchButton"
+          class="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold px-5 py-3 rounded-lg shadow transition-colors flex items-center justify-center min-w-[100px]"
+        >
+          <span id="btnText">Search</span>
+
+          <span
+            id="btnSpinner"
+            class="hidden border-2 border-white border-t-transparent rounded-full w-5 h-5 animate-spin"
+            aria-hidden="true"
+          ></span>
+        </button>
+
+      </form>
+
+      <p id="searchHint" class="text-xs text-gray-500 mt-2 text-center">
+        Search results depend on the availability and structure of the retailer websites.
+      </p>
+    </section>
+
+    <!-- Status Message -->
+    <div
+      id="statusMessage"
+      class="hidden mb-6 p-4 rounded-lg border text-sm"
+      role="status"
+      aria-live="polite"
+    ></div>
+
+    <!-- Stats Bar -->
+    <div
+      id="statsBar"
+      class="hidden justify-between items-center flex-wrap gap-2 mb-6 bg-white p-4 rounded-lg shadow-sm border border-gray-200"
+    >
+      <span class="text-gray-600 font-medium" id="statsCount"></span>
+
+      <span class="text-xs text-gray-400">
+        Sorted by lowest price
+      </span>
+    </div>
+
+    <!-- Results Grid -->
+    <main
+      id="resultsGrid"
+      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+      aria-live="polite"
+    ></main>
+
+  </div>
+
+  <script>
+    'use strict';
+
+    /**
+     * @typedef {Object} Product
+     * @property {string} source
+     * @property {string} title
+     * @property {number} price
+     * @property {string} link
+     * @property {string} image
+     */
+
+    /**
+     * @typedef {Object} SearchResponse
+     * @property {Product[]} results
+     * @property {string|null} error
+     */
+
+    const searchForm = document.getElementById('searchForm');
+    const searchInput = document.getElementById('searchInput');
+    const searchButton = document.getElementById('searchButton');
+    const btnText = document.getElementById('btnText');
+    const btnSpinner = document.getElementById('btnSpinner');
+    const resultsGrid = document.getElementById('resultsGrid');
+    const statsBar = document.getElementById('statsBar');
+    const statsCount = document.getElementById('statsCount');
+    const statusMessage = document.getElementById('statusMessage');
+
+    const CORS_PROXY = 'https://corsproxy.io/?';
+
+    const JUMIA_BASE = 'https://www.jumia.com.ng';
+    const JIJI_BASE = 'https://jiji.ng';
+
+    const PLACEHOLDER_IMAGE =
+      'https://via.placeholder.com/300x200.png?text=No+Image';
+
+    const REQUEST_TIMEOUT = 20000;
+
+    /**
+     * Convert a price string into a number.
+     *
+     * @param {string} priceStr
+     * @returns {number}
+     */
+    function parsePrice(priceStr) {
+      if (!priceStr) return Infinity;
+
+      const cleanStr = String(priceStr).replace(/[^0-9]/g, '');
+      const parsed = Number.parseInt(cleanStr, 10);
+
+      return Number.isFinite(parsed) ? parsed : Infinity;
+    }
+
+    /**
+     * Clean text safely.
+     *
+     * @param {string|null|undefined} value
+     * @returns {string}
+     */
+    function cleanText(value) {
+      return String(value || '').replace(/\s+/g, ' ').trim();
+    }
+
+    /**
+     * Make sure a URL is safe and absolute.
+     *
+     * @param {string|null|undefined} value
+     * @param {string} baseUrl
+     * @returns {string}
+     */
+    function makeAbsoluteUrl(value, baseUrl) {
+      const raw = cleanText(value);
+
+      if (!raw) return '';
+
+      try {
+        const url = new URL(raw, baseUrl);
+
+        if (url.protocol === 'http:' || url.protocol === 'https:') {
+          return url.href;
+        }
+
+        return '';
+      } catch (error) {
+        return '';
+      }
+    }
+
+    /**
+     * Fetch a webpage with a timeout.
+     *
+     * @param {string} url
+     * @returns {Promise<string>}
+     */
+    async function fetchHtml(url) {
+      const controller = new AbortController();
+
+      const timeoutId = setTimeout(() => {
+        controller.abort();
+      }, REQUEST_TIMEOUT);
+
+      try {
+        const response = await fetch(
+          CORS_PROXY + encodeURIComponent(url),
+          {
+            method: 'GET',
+            signal: controller.signal,
+            headers: {
+              'Accept': 'text/html,application/xhtml+xml'
+            }
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Request failed: ${response.status}`);
+        }
+
+        const html = await response.text();
+
+        if (!html || html.length < 100) {
+          throw new Error('Empty or incomplete response');
+        }
+
+        return html;
+
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    }
+
+    /**
+     * Parse HTML safely into a document.
+     *
+     * @param {string} html
+     * @returns {Document}
+     */
+    function parseHtml(html) {
+      const parser = new DOMParser();
+      return parser.parseFromString(html, 'text/html');
+    }
+
+    /**
+     * Get the first matching text from multiple selectors.
+     *
+     * @param {Element} element
+     * @param {string[]} selectors
+     * @returns {string}
+     */
+    function getText(element, selectors) {
+      for (const selector of selectors) {
+        const found = element.querySelector(selector);
+
+        if (found) {
+          const text = cleanText(found.textContent);
+
+          if (text) return text;
+        }
+      }
+
+      return '';
+    }
+
+    /**
+     * Get an attribute from multiple selectors.
+     *
+     * @param {Element} element
+     * @param {string[]} selectors
+     * @param {string} attribute
+     * @returns {string}
+     */
+    function getAttribute(element, selectors, attribute) {
+      for (const selector of selectors) {
+        const found = element.querySelector(selector);
+
+        if (found) {
+          const value = cleanText(found.getAttribute(attribute));
+
+          if (value) return value;
+        }
+      }
+
+      return '';
+    }
+
+    /**
+     * Find a usable image URL.
+     *
+     * @param {Element} element
+     * @returns {string}
+     */
+    function getImageUrl(element) {
+      const selectors = [
+        'img[data-src]',
+        'img[data-lazy-src]',
+        'img[src]'
+      ];
+
+      for (const selector of selectors) {
+        const image = element.querySelector(selector);
+
+        if (!image) continue;
+
+        const attributes = [
+          'data-src',
+          'data-lazy-src',
+          'data-original',
+          'src'
+        ];
+
+        for (const attribute of attributes) {
+          const value = cleanText(image.getAttribute(attribute));
+
+          if (value && !value.startsWith('data:')) {
+            const safeUrl = makeAbsoluteUrl(value, 'https://example.com');
+
+            if (safeUrl) return safeUrl;
+          }
+        }
+      }
+
+      return PLACEHOLDER_IMAGE;
+    }
+
+    /**
+     * Check that a product contains valid data.
+     *
+     * @param {Product} product
+     * @returns {boolean}
+     */
+    function isValidProduct(product) {
+      return Boolean(
+        product.title &&
+        Number.isFinite(product.price) &&
+        product.price > 0 &&
+        product.link
+      );
+    }
+
+    /**
+     * Remove duplicate products.
+     *
+     * @param {Product[]} products
+     * @returns {Product[]}
+     */
+    function removeDuplicates(products) {
+      const seen = new Set();
+
+      return products.filter((product) => {
+        const key = `${product.source}|${product.link}`;
+
+        if (seen.has(key)) return false;
+
+        seen.add(key);
+        return true;
+      });
+    }
+
+    /**
+     * Scrape Jumia Nigeria.
+     *
+     * @param {string} query
+     * @returns {Promise<SearchResponse>}
+     */
+    async function scrapeJumia(query) {
+      try {
+        const targetUrl =
+          `${JUMIA_BASE}/catalog/?q=${encodeURIComponent(query)}&sort=lowest_price`;
+
+        const htmlText = await fetchHtml(targetUrl);
+        const doc = parseHtml(htmlText);
+
+        const results = [];
+
+        const articles = doc.querySelectorAll(
+          'article.prd._fb, article[data-catalog-product]'
+        );
+
+        articles.forEach((element) => {
+          const title = getText(element, [
+            '.name',
+            '.info .name',
+            '[data-testid="product-title"]'
+          ]);
+
+          const rawPrice = getText(element, [
+            '.prc',
+            '[data-testid="product-price"]'
+          ]);
+
+          const relativeLink = getAttribute(
+            element,
+            ['a.core', 'a[href]'],
+            'href'
+          );
+
+          const link = makeAbsoluteUrl(relativeLink, JUMIA_BASE);
+
+          const product = {
+            source: 'Jumia',
+            title,
+            price: parsePrice(rawPrice),
+            link,
+            image: getImageUrl(element)
+          };
+
+          if (isValidProduct(product)) {
+            results.push(product);
+          }
+        });
+
+        return {
+          results: removeDuplicates(results),
+          error: null
+        };
+
+      } catch (error) {
+        console.error('Jumia Search Error:', error);
+
+        return {
+          results: [],
+          error: 'Jumia could not be reached.'
+        };
+      }
+    }
+
+    /**
+     * Scrape Jiji Nigeria.
+     *
+     * @param {string} query
+     * @returns {Promise<SearchResponse>}
+     */
+    async function scrapeJiji(query) {
+      try {
+        const targetUrl =
+          `${JIJI_BASE}/search?query=${encodeURIComponent(query)}&sort=price_asc`;
+
+        const htmlText = await fetchHtml(targetUrl);
+        const doc = parseHtml(htmlText);
+
+        const results = [];
+
+        const items = doc.querySelectorAll(
+          '.b-list-advert__item, [data-testid="listing-card"]'
+        );
+
+        items.forEach((element) => {
+          const title = getText(element, [
+            '.qa-advert-title',
+            '.b-advert-title',
+            '[data-testid="listing-title"]'
+          ]);
+
+          const rawPrice = getText(element, [
+            '.qa-advert-price',
+            '.b-advert-price',
+            '[data-testid="listing-price"]'
+          ]);
+
+          const relativeLink = getAttribute(
+            element,
+            ['a[href]'],
+            'href'
+          );
+
+          const link = makeAbsoluteUrl(relativeLink, JIJI_BASE);
+
+          const product = {
+            source: 'Jiji',
+            title,
+            price: parsePrice(rawPrice),
+            link,
+            image: getImageUrl(element)
+          };
+
+          if (isValidProduct(product)) {
+            results.push(product);
+          }
+        });
+
+        return {
+          results: removeDuplicates(results),
+          error: null
+        };
+
+      } catch (error) {
+        console.error('Jiji Search Error:', error);
+
+        return {
+          results: [],
+          error: 'Jiji could not be reached.'
+        };
+      }
+    }
+
+    /**
+     * Format Nigerian Naira.
+     *
+     * @param {number} amount
+     * @returns {string}
+     */
+    function formatNaira(amount) {
+      return `₦ ${amount.toLocaleString('en-NG')}`;
+    }
+
+    /**
+     * Display a status message.
+     *
+     * @param {string} message
+     * @param {'info'|'error'|'success'} type
+     */
+    function showStatus(message, type = 'info') {
+      statusMessage.textContent = message;
+      statusMessage.className =
+        'mb-6 p-4 rounded-lg border text-sm';
+
+      if (type === 'error') {
+        statusMessage.classList.add(
+          'bg-red-50',
+          'border-red-200',
+          'text-red-700'
+        );
+      } else if (type === 'success') {
+        statusMessage.classList.add(
+          'bg-green-50',
+          'border-green-200',
+          'text-green-700'
+        );
+      } else {
+        statusMessage.classList.add(
+          'bg-blue-50',
+          'border-blue-200',
+          'text-blue-700'
+        );
+      }
+    }
+
+    /**
+     * Hide the status message.
+     */
+    function hideStatus() {
+      statusMessage.textContent = '';
+      statusMessage.classList.add('hidden');
+    }
+
+    /**
+     * Show loading state.
+     *
+     * @param {boolean} loading
+     */
+    function setLoading(loading) {
+      searchButton.disabled = loading;
+      searchInput.disabled = loading;
+
+      btnText.classList.toggle('hidden', loading);
+      btnSpinner.classList.toggle('hidden', !loading);
+    }
+
+    /**
+     * Create a product card using DOM methods.
+     * This avoids inserting retailer-provided text as HTML.
+     *
+     * @param {Product} item
+     * @param {number} index
+     * @returns {HTMLDivElement}
+     */
+    function createProductCard(item, index) {
+      const card = document.createElement('div');
+
+      card.className =
+        'bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col hover:shadow-md transition-shadow relative';
+
+      if (index === 0) {
+        const badge = document.createElement('span');
+
+        badge.className =
+          'absolute top-2 left-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded shadow z-10';
+
+        badge.textContent = '🏆 CHEAPEST';
+
+        card.appendChild(badge);
+      }
+
+      const imageContainer = document.createElement('div');
+
+      imageContainer.className =
+        'h-48 w-full bg-gray-50 flex items-center justify-center overflow-hidden p-2';
+
+      const image = document.createElement('img');
+
+      image.className = 'product-image';
+      image.src = item.image || PLACEHOLDER_IMAGE;
+      image.alt = item.title;
+      image.loading = 'lazy';
+      image.referrerPolicy = 'no-referrer';
+
+      image.addEventListener('error', () => {
+        image.src = PLACEHOLDER_IMAGE;
+      }, { once: true });
+
+      imageContainer.appendChild(image);
+      card.appendChild(imageContainer);
+
+      const content = document.createElement('div');
+
+      content.className =
+        'p-4 flex-1 flex flex-col justify-between';
+
+      const topContent = document.createElement('div');
+
+      const sourceBadge = document.createElement('span');
+
+      sourceBadge.className =
+        item.source === 'Jumia'
+          ? 'inline-block bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider mb-2'
+          : 'inline-block bg-green-600 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider mb-2';
+
+      sourceBadge.textContent = item.source;
+
+      const title = document.createElement('h3');
+
+      title.className =
+        'text-sm font-medium text-gray-900 line-clamp-2 mb-2';
+
+      title.title = item.title;
+      title.textContent = item.title;
+
+      topContent.appendChild(sourceBadge);
+      topContent.appendChild(title);
+
+      const bottom = document.createElement('div');
+
+      bottom.className =
+        'mt-4 pt-3 border-t border-gray-100 flex items-center justify-between gap-2';
+
+      const priceContainer = document.createElement('div');
+
+      const priceLabel = document.createElement('span');
+
+      priceLabel.className = 'text-xs text-gray-400 block';
+      priceLabel.textContent = 'Price';
+
+      const price = document.createElement('span');
+
+      price.className =
+        'text-lg font-bold text-gray-900';
+
+      price.textContent = formatNaira(item.price);
+
+      priceContainer.appendChild(priceLabel);
+      priceContainer.appendChild(price);
+
+      const link = document.createElement('a');
+
+      link.href = item.link;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.className =
+        'text-blue-600 hover:text-blue-800 text-xs font-semibold underline whitespace-nowrap';
+
+      link.textContent = 'View Deal ↗';
+
+      bottom.appendChild(priceContainer);
+      bottom.appendChild(link);
+
+      content.appendChild(topContent);
+      content.appendChild(bottom);
+
+      card.appendChild(content);
+
+      return card;
+    }
+
+    /**
+     * Render product results.
+     *
+     * @param {Product[]} items
+     */
+    function renderResults(items) {
+      resultsGrid.replaceChildren();
+
+      const fragment = document.createDocumentFragment();
+
+      items.forEach((item, index) => {
+        fragment.appendChild(createProductCard(item, index));
+      });
+
+      resultsGrid.appendChild(fragment);
+    }
+
+    /**
+     * Render a message in the results area.
+     *
+     * @param {string} message
+     * @param {string} className
+     */
+    function renderMessage(message, className = 'text-gray-500') {
+      resultsGrid.replaceChildren();
+
+      const wrapper = document.createElement('div');
+
+      wrapper.className =
+        `col-span-full text-center py-12 ${className}`;
+
+      wrapper.textContent = message;
+
+      resultsGrid.appendChild(wrapper);
+    }
+
+    /**
+     * Show loading results.
+     */
+    function renderLoading() {
+      resultsGrid.innerHTML = `
+        <div class="col-span-full text-center py-16">
+          <div class="inline-block border-4 border-blue-600 border-t-transparent rounded-full w-10 h-10 animate-spin mb-4"></div>
+          <p class="text-gray-500 font-medium">
+            Fetching prices from Jumia & Jiji...
+          </p>
+          <p class="text-xs text-gray-400 mt-2">
+            This may take a few seconds.
+          </p>
+        </div>
+      `;
+    }
+
+    /**
+     * Search both retailers.
+     *
+     * @param {string} query
+     * @returns {Promise<Product[]>}
+     */
+    async function searchRetailers(query) {
+      const responses = await Promise.all([
+        scrapeJumia(query),
+        scrapeJiji(query)
+      ]);
+
+      const combinedData = responses.flatMap(
+        (response) => response.results
+      );
+
+      return combinedData
+        .filter(isValidProduct)
+        .sort((a, b) => a.price - b.price);
+    }
+
+    /**
+     * Search form handler.
+     *
+     * @param {SubmitEvent} event
+     */
+    async function handleSearch(event) {
+      event.preventDefault();
+
+      const query = searchInput.value.trim();
+
+      if (!query) return;
+
+      setLoading(true);
+      hideStatus();
+
+      statsBar.classList.add('hidden');
+      renderLoading();
+
+      try {
+        const sortedData = await searchRetailers(query);
+
+        if (sortedData.length > 0) {
+          statsCount.textContent =
+            `Found ${sortedData.length} results for "${query}"`;
+
+          statsBar.classList.remove('hidden');
+          statsBar.classList.add('flex');
+
+          renderResults(sortedData);
+
+          showStatus(
+            'Results loaded successfully. Prices may change on the retailer websites.',
+            'success'
+          );
+        } else {
+          renderMessage(
+            'No products found. Try a different search phrase.',
+            'text-gray-500'
+          );
+
+          showStatus(
+            'No results were returned. The retailer websites may have blocked the request or changed their page structure.',
+            'error'
+          );
+        }
+
+      } catch (error) {
+        console.error('Search Error:', error);
+
+        statsBar.classList.add('hidden');
+
+        renderMessage(
+          'Unable to fetch products. Please try again later.',
+          'text-red-500'
+        );
+
+        showStatus(
+          'The search failed. Check your internet connection or try again.',
+          'error'
+        );
+
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    searchForm.addEventListener('submit', handleSearch);
+
+  </script>
+
+</body>
+</html>
