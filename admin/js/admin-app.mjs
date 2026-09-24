@@ -14,6 +14,7 @@ import {
 
 import { initTabs, initImagePicker } from './admin-shared.mjs';
 import { getShopEazyAccess, describeShopEazyRole } from './shopeazy-access.mjs';
+import { initShopEazyPartners } from './shopeazy-partners.mjs';
 import { initProducts, renderProducts } from './admin-products.mjs';
 import { initHeroes, renderHeroes, setProductsForHeroLinks } from './admin-heroes.mjs';
 import { initReviews, renderReviews } from './admin-reviews.mjs';
@@ -53,13 +54,16 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
 
 document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
 
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
   if (user) {
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('dashboard').classList.remove('hidden');
     const access = await initializeShopEazyAccess(user);
     if (access?.role === 'ADMIN') {
       startDashboard();
+    } else if (['PARTNER_MANAGER'].includes(access?.role)) {
+      showShopEazyRoleShell(access);
+      initShopEazyPartners(access);
     } else {
       showShopEazyRoleShell(access);
     }
@@ -111,6 +115,11 @@ function showShopEazyRoleShell(access) {
   });
 
   accessPanel?.classList.remove('hidden');
+
+  if (access?.role === 'PARTNER_MANAGER') {
+    document.getElementById('partnersTabBtn')?.classList.remove('hidden');
+    document.getElementById('panel-partners')?.classList.remove('hidden');
+  }
 
   if (!access?.role) {
     message.textContent = 'No ShopEazy role is assigned to this account. Ask an administrator to assign a role.';
