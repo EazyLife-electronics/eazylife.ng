@@ -59,6 +59,7 @@ onAuthStateChanged(auth, async (user) => {
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('dashboard').classList.remove('hidden');
     const access = await initializeShopEazyAccess(user);
+    window.shopEazyAccess = access;
     if (access?.role === 'ADMIN') {
       initShopEazyPartners(access);
       startDashboard();
@@ -120,6 +121,7 @@ function showShopEazyRoleShell(access) {
   if (access?.role === 'PARTNER_MANAGER') {
     document.getElementById('partnersTabBtn')?.classList.remove('hidden');
     document.getElementById('panel-partners')?.classList.remove('hidden');
+    document.getElementById('inventoryTabBtn')?.classList.remove('hidden');
   }
 
   if (!access?.role) {
