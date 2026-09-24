@@ -819,3 +819,17 @@ The controlled implementation sequence is now:
 13. Validate with test orders, concurrent-approval tests, reassignment tests, and reconciliation before enabling production behavior.
 
 This document is a blueprint only. No Firestore collections or production data are changed by updating it.
+
+
+## Role and security foundation
+
+ShopEazy supports a role hierarchy without requiring seller-owned accounts:
+
+- ADMIN — full ShopEazy administration.
+- PARTNER_MANAGER — manages partner and outlet operations.
+- PARTNER_STAFF — operates within the assigned partner.
+- OUTLET_STAFF — operates within the assigned outlet.
+
+The intended Firebase Authentication custom claims are shopEazyRole, shopEazyPartnerId, and shopEazyOutletId. The current security foundation preserves the existing administrator email path while adding these claims for future role assignment. Partner and outlet operational collections are protected separately from the legacy public storefront collections.
+
+Least-privilege access is deliberately staged: return records and the audit ledger remain administrator/manager controlled until dedicated operational UI workflows are implemented. Firestore security rules are not treated as a substitute for server-side authorization; future role assignment should use a trusted Firebase Admin SDK environment.
