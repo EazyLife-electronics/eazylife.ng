@@ -3,10 +3,61 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function isAdmin() {
-      return request.auth != null
-        && request.auth.token.email == 'damzyeazy@gmail.com';
+    // ShopEazy role claims are intentionally separate from the legacy
+    // email-based admin check. Claims can later be issued by a trusted
+    // server/Admin SDK without changing document data.
+    function signedIn() {
+      return request.auth != null;
     }
+
+    function isAdmin() {
+      return signedIn()
+        && (
+          request.auth.token.email == 'damzyeazy@gmail.com'
+          || request.auth.token.shopEazyRole == 'ADMIN'
+        );
+    }
+
+    function shopEazyRole(role) {
+      return signedIn() && request.auth.token.shopEazyRole == role;
+    }
+
+    function isPartnerManager() {
+      return shopEazyRole('PARTNER_MANAGER');
+    }
+
+    function isPartnerStaff() {
+      return shopEazyRole('PARTNER_STAFF');
+    }
+
+    function isOutletStaff() {
+      return shopEazyRole('OUTLET_STAFF');
+    }
+
+    function hasPartner(partnerId) {
+      return signedIn() && request.auth.token.shopEazyPartnerId == partnerId;
+    }
+
+    function hasOutlet(outletId) {
+      return signedIn() && request.auth.token.shopEazyOutletId == outletId;
+    }
+
+    function canManagePartners() {
+      return isAdmin() || isPartnerManager();
+    }
+
+    function canManageOutlet(outletId) {
+      return isAdmin()
+        || isPartnerManager()
+        || (isPartnerStaff() && hasPartner(resource.data.partnerId))
+        || (isOutletStaff() && hasOutlet(outletId));
+    }
+
+    function canReadOutlet(outletId) {
+      return canManageOutlet(outletId);
+    }
+
+    // ---------------- LEGACY / EXISTING APP ----------------
 
     match /products/{productId} {
       allow read: if true;
@@ -23,6 +74,13 @@ service cloud.firestore {
 
       match /payments/{paymentId} {
         allow read, create, update, delete: if isAdmin();
+      }
+
+      match /fulfillmentGroups/{groupId} {
+        // ShopEazy fulfillment groups are operationally controlled. Customer
+        // tracking does not expose this subcollection directly.
+        allow read: if isAdmin();
+        allow write: if isAdmin();
       }
     }
 
@@ -76,13 +134,53 @@ service cloud.firestore {
     }
 
     match /deliveries/{deliveryId} {
-      // Public `get` only (never `list`): the tracking page fetches one
-      // specific delivery by ID, which it can only learn from the order's
-      // own `deliveryId` field after looking that order up by tracking code —
-      // same one-way trust model already used for `orders` below. `list`
-      // stays admin-only so the whole collection can't be enumerated.
       allow get: if true;
       allow list, create, update, delete: if isAdmin();
     }
+
+    // ---------------- SHOP-EAZY ROLE-BASED DATA ----------------
+
+    match /partners/{partnerId} {
+      allow get: if isAdmin()
+        || isPartnerManager()
+        || (isPartnerStaff() && hasPartner(partnerId));
+      allow list: if isAdmin() || isPartnerManager();
+      allow create, update, delete: if isAdmin() || isPartnerManager();
+    }
+
+    match /outlets/{outletId} {
+      allow get: if isAdmin()
+        || isPartnerManager()
+        || (isPartnerStaff() && hasPartner(resource.data.partnerId))
+        || (isOutletStaff() && hasOutlet(outletId));
+      allow list: if isAdmin() || isPartnerManager();
+      allow create, update, delete: if isAdmin() || isPartnerManager();
+    }
+
+    match /outletInventory/{inventoryId} {
+      // inventoryId is deterministic: {outletId}__{variantId}
+      allow get: if isAdmin()
+        || isPartnerManager()
+        || (isPartnerStaff() && hasPartner(resource.data.partnerId))
+        || (isOutletStaff() && hasOutlet(resource.data.outletId));
+      allow list: if isAdmin() || isPartnerManager();
+      allow create, update, delete: if isAdmin() || isPartnerManager();
+    }
+
+    match /shopEazyAudit/{auditId} {
+      allow read: if isAdmin() || isPartnerManager();
+      allow create: if isAdmin();
+      allow update, delete: if false;
+    }
+
+    match /shopEazyReturns/{returnId} {
+      // Returns are intentionally admin/manager-controlled until the
+      // dedicated operational UI and least-privilege workflows are built.
+      allow read: if isAdmin() || isPartnerManager();
+      allow write: if isAdmin();
+    }
+
+    // Inventory movements remain admin-only for now because they are an
+    // immutable operational ledger and are written by trusted transactions.
   }
 }
