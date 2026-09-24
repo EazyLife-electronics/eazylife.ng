@@ -893,3 +893,290 @@ export async function getShopEazyOrderAllocationSummary(orderId) {
   });
 }
 \n
+
+/* ---------------- SHOP-EAZY: ATOMIC ORDER APPROVAL ---------------- */
+// Approval is the point at which ShopEazy commits outlet stock.
+// Every affected inventory, fulfillment-group, movement, audit, and order
+// write is part of one Firestore transaction. No external side effects belong
+// inside the transaction callback because Firestore may retry it.
+
+const SHOP_EAZY_PARTIAL_RESOLUTIONS = [
+  'WAIT_FOR_STOCK',
+  'CUSTOMER_ACCEPTED',
+  'SUBSTITUTION',
+  'CANCEL_REMAINDER'
+];
+
+const SHOP_EAZY_APPROVAL_ELIGIBLE = ['NEW', 'PROCESSING'];
+const SHOP_EAZY_NON_APPROVAL_GROUP_STATUSES = [
+  'PICKING', 'READY', 'DISPATCHED', 'DELIVERED', 'CANCELLED', 'RETURNED'
+];
+
+function shopEazyApprovalError(message) {
+  const error = new Error(message);
+  error.code = 'SHOP_EAZY_APPROVAL_FAILED';
+  return error;
+}
+
+function shopEazyNormalizeResolution(path) {
+  const normalized = String(path || '').trim().toUpperCase();
+  if (!SHOP_EAZY_PARTIAL_RESOLUTIONS.includes(normalized)) {
+    throw shopEazyApprovalError('A valid partial approval resolution path is required.');
+  }
+  return normalized;
+}
+
+/**
+ * Atomically approves a ShopEazy order allocation.
+ *
+ * FULL:
+ *   every ordered unit must already be allocated; all allocated quantities
+ *   are approved and deducted.
+ *
+ * PARTIAL:
+ *   only currently allocated quantities are approved/deducted; unallocated
+ *   quantities remain explicit and must have a resolution path.
+ *
+ * Allocation data is re-read from Firestore. The browser cannot supply or
+ * override the authoritative approved quantities.
+ */
+export async function approveShopEazyOrder({
+  orderId,
+  actorUid,
+  approvalMode = 'FULL',
+  resolutionPath = null,
+  resolutionNote = null
+} = {}) {
+  const normalizedOrderId = cleanRequiredString(orderId, 'Order ID');
+  const actor = cleanRequiredString(actorUid, 'Actor UID');
+  const mode = String(approvalMode || 'FULL').trim().toUpperCase();
+  if (!['FULL', 'PARTIAL'].includes(mode)) {
+    throw shopEazyApprovalError('approvalMode must be FULL or PARTIAL.');
+  }
+  const normalizedResolution = mode === 'PARTIAL'
+    ? shopEazyNormalizeResolution(resolutionPath)
+    : null;
+
+  const orderRef = doc(db, 'orders', normalizedOrderId);
+
+  return runTransaction(db, async tx => {
+    // ---------------- READ PHASE ----------------
+    const orderSnap = await tx.get(orderRef);
+    if (!orderSnap.exists()) throw shopEazyApprovalError('Order does not exist.');
+
+    const order = orderSnap.data();
+    const orderStatus = String(order.status || '').trim().toUpperCase();
+    const approvalStatus = String(order.approvalStatus || 'NOT_REVIEWED').trim().toUpperCase();
+
+    if (order.inventoryApplied === true) {
+      throw shopEazyApprovalError('This order has already had inventory applied.');
+    }
+    if (!SHOP_EAZY_APPROVAL_ELIGIBLE.includes(orderStatus)) {
+      throw shopEazyApprovalError(`Order is not approval-eligible in status ${orderStatus || 'UNKNOWN'}.`);
+    }
+    if (['APPROVED', 'REJECTED'].includes(approvalStatus)) {
+      throw shopEazyApprovalError(`Order approval status ${approvalStatus} cannot be approved again.`);
+    }
+
+    const orderItems = Array.isArray(order.items) ? order.items : [];
+    if (!orderItems.length) throw shopEazyApprovalError('Order has no items to approve.');
+
+    const groupsSnap = await tx.get(collection(db, 'orders', normalizedOrderId, 'fulfillmentGroups'));
+    const groups = groupsSnap.docs.map(groupDoc => ({
+      ref: groupDoc.ref,
+      id: groupDoc.id,
+      data: groupDoc.data(),
+      items: Array.isArray(groupDoc.data().items) ? groupDoc.data().items : []
+    }));
+
+    if (!groups.length) throw shopEazyApprovalError('No fulfillment groups exist for this order.');
+
+    // Build authoritative allocation totals from Firestore.
+    const itemPlans = orderItems.map((item, index) => ({
+      index,
+      orderItemId: shopEazyOrderItemId(index),
+      productId: item.productId || null,
+      variantId: item.variantId || null,
+      sku: item.sku || '',
+      orderedQuantity: validateNonNegativeInteger(item.quantity, 'Order quantity'),
+      allocatedQuantity: 0,
+      approvedQuantity: 0,
+      unallocatedQuantity: 0,
+      groupPlans: []
+    }));
+
+    for (const group of groups) {
+      const groupStatus = String(group.data.status || 'UNALLOCATED').trim().toUpperCase();
+      if (SHOP_EAZY_NON_APPROVAL_GROUP_STATUSES.includes(groupStatus)) {
+        throw shopEazyApprovalError(`Fulfillment group ${group.id} is already in status ${groupStatus} and cannot be approved.`);
+      }
+
+      const outletRef = doc(db, 'outlets', group.data.outletId || '__missing__');
+      const outletSnap = await tx.get(outletRef);
+      if (!outletSnap.exists()) throw shopEazyApprovalError(`Outlet for fulfillment group ${group.id} does not exist.`);
+      const outlet = outletSnap.data();
+      if (String(outlet.status || '').trim().toUpperCase() !== 'ACTIVE' || outlet.fulfillmentEnabled !== true) {
+        throw shopEazyApprovalError(`Outlet ${group.data.outletId || group.id} is not active and fulfillment-enabled.`);
+      }
+
+      for (const groupItem of group.items) {
+        const index = Number(groupItem.orderItemIndex);
+        const plan = itemPlans[index];
+        if (!plan || groupItem.orderItemId !== shopEazyOrderItemId(index)) {
+          throw shopEazyApprovalError(`Invalid order-item reference in fulfillment group ${group.id}.`);
+        }
+        if (groupItem.productId !== plan.productId || groupItem.variantId !== plan.variantId) {
+          throw shopEazyApprovalError(`Product/variant mismatch in fulfillment group ${group.id}.`);
+        }
+
+        const allocated = validateNonNegativeInteger(groupItem.quantityAllocated || 0, 'Allocated quantity');
+        const existingApproved = validateNonNegativeInteger(groupItem.quantityApproved || 0, 'Approved quantity');
+        const fulfilled = validateNonNegativeInteger(groupItem.quantityFulfilled || 0, 'Fulfilled quantity');
+        if (existingApproved > allocated) throw shopEazyApprovalError(`Approved quantity exceeds allocation in group ${group.id}.`);
+        if (fulfilled > existingApproved) throw shopEazyApprovalError(`Fulfilled quantity exceeds approved quantity in group ${group.id}.`);
+        if (existingApproved > 0 || fulfilled > 0) {
+          throw shopEazyApprovalError(`Fulfillment group ${group.id} already contains committed quantity.`);
+        }
+
+        plan.allocatedQuantity += allocated;
+        plan.groupPlans.push({ group, groupItem, allocated });
+      }
+    }
+
+    // Validate allocation totals before deciding what gets committed.
+    for (const plan of itemPlans) {
+      if (!plan.variantId) throw shopEazyApprovalError(`Order item ${plan.index} has no variant ID.`);
+      if (plan.allocatedQuantity > plan.orderedQuantity) {
+        throw shopEazyApprovalError(`Item ${plan.index} allocates more than ordered.`);
+      }
+      plan.unallocatedQuantity = plan.orderedQuantity - plan.allocatedQuantity;
+      if (mode === 'FULL' && plan.unallocatedQuantity > 0) {
+        throw shopEazyApprovalError(`Full approval requires complete allocation for item ${plan.index}; ${plan.unallocatedQuantity} unit(s) remain unallocated.`);
+      }
+      plan.approvedQuantity = plan.allocatedQuantity;
+      if (mode === 'PARTIAL' && plan.approvedQuantity === 0 && plan.unallocatedQuantity === 0) {
+        throw shopEazyApprovalError(`Item ${plan.index} has no approvable quantity.`);
+      }
+    }
+
+    // Inventory reads are all performed inside the transaction.
+    const inventoryPlans = [];
+    for (const plan of itemPlans) {
+      for (const gp of plan.groupPlans) {
+        if (gp.allocated === 0) continue;
+        const inventoryId = shopEazyInventoryId(gp.group.data.outletId, plan.variantId);
+        const inventoryRef = doc(db, 'outletInventory', inventoryId);
+        const inventorySnap = await tx.get(inventoryRef);
+        if (!inventorySnap.exists()) {
+          throw shopEazyApprovalError(`Outlet inventory record is missing for outlet ${gp.group.data.outletId}, variant ${plan.variantId}.`);
+        }
+        const inventory = inventorySnap.data();
+        if (inventory.active === false) {
+          throw shopEazyApprovalError(`Outlet inventory is inactive for outlet ${gp.group.data.outletId}, variant ${plan.variantId}.`);
+        }
+        if (inventory.productId !== plan.productId || inventory.variantId !== plan.variantId) {
+          throw shopEazyApprovalError(`Outlet inventory does not match the order item for outlet ${gp.group.data.outletId}.`);
+        }
+        const current = validateNonNegativeInteger(inventory.quantityOnHand, 'Outlet quantityOnHand');
+        if (current < gp.allocated) {
+          throw shopEazyApprovalError(`Insufficient stock at outlet ${gp.group.data.outletId}. Available: ${current}, required: ${gp.allocated}.`);
+        }
+        inventoryPlans.push({ plan, gp, inventoryRef, inventorySnap, inventory, current });
+      }
+    }
+
+    // ---------------- WRITE PHASE ----------------
+    const nowFields = { updatedAt: serverTimestamp() };
+
+    for (const entry of inventoryPlans) {
+      const next = entry.current - entry.gp.allocated;
+      tx.update(entry.inventoryRef, {
+        quantityOnHand: next,
+        updatedAt: serverTimestamp()
+      });
+
+      const movementRef = doc(collection(db, 'inventoryMovements'));
+      tx.set(movementRef, {
+        productId: entry.plan.productId,
+        variantId: entry.plan.variantId,
+        sku: entry.plan.sku,
+        outletId: entry.gp.group.data.outletId,
+        partnerId: entry.gp.group.data.partnerId || entry.inventory.partnerId || null,
+        movementType: 'sale',
+        quantityChange: -entry.gp.allocated,
+        previousQuantity: entry.current,
+        newQuantity: next,
+        referenceType: 'orderApproval',
+        referenceId: normalizedOrderId,
+        fulfillmentGroupId: entry.gp.group.id,
+        actorUid: actor,
+        createdAt: serverTimestamp()
+      });
+    }
+
+    for (const group of groups) {
+      const nextItems = group.items.map(groupItem => {
+        const index = Number(groupItem.orderItemIndex);
+        const plan = itemPlans[index];
+        if (!plan) return groupItem;
+        const allocated = validateNonNegativeInteger(groupItem.quantityAllocated || 0, 'Allocated quantity');
+        return {
+          ...groupItem,
+          quantityApproved: allocated,
+          quantityFulfilled: 0
+        };
+      });
+      const hasApproved = nextItems.some(item => Number(item.quantityApproved || 0) > 0);
+      tx.update(group.ref, {
+        items: nextItems,
+        status: hasApproved ? 'APPROVED' : 'UNALLOCATED',
+        updatedAt: serverTimestamp()
+      });
+    }
+
+    const totalOrdered = itemPlans.reduce((sum, p) => sum + p.orderedQuantity, 0);
+    const totalApproved = itemPlans.reduce((sum, p) => sum + p.approvedQuantity, 0);
+    const totalUnallocated = itemPlans.reduce((sum, p) => sum + p.unallocatedQuantity, 0);
+
+    const auditRef = doc(collection(db, 'shopEazyAudit'));
+    tx.set(auditRef, {
+      action: 'ORDER_APPROVED',
+      orderId: normalizedOrderId,
+      approvalMode: mode,
+      approvalStatus: mode === 'FULL' ? 'APPROVED' : 'PARTIAL',
+      orderedQuantity: totalOrdered,
+      approvedQuantity: totalApproved,
+      unallocatedQuantity: totalUnallocated,
+      resolutionPath: normalizedResolution,
+      resolutionNote: resolutionNote ?? null,
+      actorUid: actor,
+      createdAt: serverTimestamp()
+    });
+
+    tx.update(orderRef, {
+      status: 'APPROVED',
+      approvalStatus: mode === 'FULL' ? 'APPROVED' : 'PARTIAL',
+      inventoryApplied: true,
+      fulfillmentSummary: {
+        orderedQuantity: totalOrdered,
+        approvedQuantity: totalApproved,
+        unallocatedQuantity: totalUnallocated
+      },
+      partialResolution: mode === 'PARTIAL'
+        ? { path: normalizedResolution, note: resolutionNote ?? null }
+        : null,
+      approvedAt: serverTimestamp(),
+      approvedBy: actor,
+      updatedAt: serverTimestamp()
+    });
+
+    return {
+      orderId: normalizedOrderId,
+      approvalStatus: mode === 'FULL' ? 'APPROVED' : 'PARTIAL',
+      orderedQuantity: totalOrdered,
+      approvedQuantity: totalApproved,
+      unallocatedQuantity: totalUnallocated
+    };
+  });
+}
+\n
