@@ -21,6 +21,7 @@ export async function getShopEazyAccess(user) {
 
   return {
     authenticated: true,
+    uid: user.uid,
     role,
     partnerId: claims.shopEazyPartnerId || null,
     outletId: claims.shopEazyOutletId || null,
