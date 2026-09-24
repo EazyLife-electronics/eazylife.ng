@@ -1527,3 +1527,252 @@ export async function reassignShopEazyOrderQuantity({
     };
   });
 }
+
+/* ---------------- SHOP-EAZY: FULFILLMENT OPERATIONS ---------------- */
+// Fulfillment is deliberately separate from approval. Approval commits stock;
+// these transitions record the physical handling of that committed quantity.
+// A group may only move through the defined operational sequence.
+
+const SHOP_EAZY_FULFILLMENT_TRANSITIONS = {
+  APPROVED: ['PICKING'],
+  PICKING: ['READY'],
+  READY: ['DISPATCHED'],
+  DISPATCHED: ['DELIVERED']
+};
+
+const SHOP_EAZY_FULFILLMENT_STATUSES = [
+  'APPROVED', 'PICKING', 'READY', 'DISPATCHED', 'DELIVERED'
+];
+
+function shopEazyNormalizeFulfillmentStatus(status) {
+  const normalized = String(status || '').trim().toUpperCase();
+  if (!SHOP_EAZY_FULFILLMENT_STATUSES.includes(normalized)) {
+    throw shopEazyApprovalError(`Invalid fulfillment status: ${normalized || 'UNKNOWN'}.`);
+  }
+  return normalized;
+}
+
+function shopEazyDeriveOverallFulfillmentStatus(groups) {
+  const active = groups.filter(group =>
+    !['CANCELLED', 'RETURNED', 'UNALLOCATED'].includes(
+      String(group.status || '').trim().toUpperCase()
+    )
+  );
+  if (!active.length) return 'APPROVED';
+
+  const statuses = active.map(group => String(group.status || '').trim().toUpperCase());
+  if (statuses.every(status => status === 'DELIVERED')) return 'DELIVERED';
+  if (statuses.some(status => status === 'DISPATCHED')) return 'OUT_FOR_DELIVERY';
+  if (statuses.some(status => ['PICKING', 'READY'].includes(status))) return 'FULFILLING';
+  return 'APPROVED';
+}
+
+/**
+ * Advances one fulfillment group by exactly one allowed state.
+ *
+ * APPROVED → PICKING → READY → DISPATCHED → DELIVERED
+ *
+ * The transition is transactional so the group cannot be advanced from stale
+ * state. At DELIVERED, quantityFulfilled is set to quantityApproved for every
+ * group item. No inventory is deducted here because approval already did that.
+ */
+export async function advanceShopEazyFulfillmentGroup({
+  orderId,
+  groupId,
+  nextStatus,
+  actorUid,
+  note = null
+} = {}) {
+  const normalizedOrderId = cleanRequiredString(orderId, 'Order ID');
+  const normalizedGroupId = cleanRequiredString(groupId, 'Group ID');
+  const actor = cleanRequiredString(actorUid, 'Actor UID');
+  const requestedStatus = shopEazyNormalizeFulfillmentStatus(nextStatus);
+
+  const orderRef = doc(db, 'orders', normalizedOrderId);
+  const groupRef = doc(
+    db,
+    'orders',
+    normalizedOrderId,
+    'fulfillmentGroups',
+    normalizedGroupId
+  );
+
+  return runTransaction(db, async tx => {
+    const orderSnap = await tx.get(orderRef);
+    const groupSnap = await tx.get(groupRef);
+
+    if (!orderSnap.exists()) throw shopEazyApprovalError('Order does not exist.');
+    if (!groupSnap.exists()) throw shopEazyApprovalError('Fulfillment group does not exist.');
+
+    const order = orderSnap.data();
+    const group = groupSnap.data();
+    const currentStatus = shopEazyNormalizeFulfillmentStatus(group.status);
+
+    if (order.inventoryApplied !== true) {
+      throw shopEazyApprovalError('Fulfillment cannot begin before inventory has been committed.');
+    }
+    if (['CANCELLED', 'RETURNED'].includes(String(order.status || '').trim().toUpperCase())) {
+      throw shopEazyApprovalError('Cancelled or returned orders cannot enter fulfillment.');
+    }
+
+    const allowed = SHOP_EAZY_FULFILLMENT_TRANSITIONS[currentStatus] || [];
+    if (!allowed.includes(requestedStatus)) {
+      throw shopEazyApprovalError(
+        `Invalid fulfillment transition: ${currentStatus} → ${requestedStatus}.`
+      );
+    }
+
+    const items = Array.isArray(group.items) ? group.items : [];
+    if (!items.length) throw shopEazyApprovalError('Fulfillment group has no items.');
+
+    let approvedTotal = 0;
+    let fulfilledTotal = 0;
+
+    const nextItems = items.map(item => {
+      const approved = validateNonNegativeInteger(
+        item.quantityApproved || 0,
+        'Approved quantity'
+      );
+      const fulfilled = validateNonNegativeInteger(
+        item.quantityFulfilled || 0,
+        'Fulfilled quantity'
+      );
+      const allocated = validateNonNegativeInteger(
+        item.quantityAllocated || 0,
+        'Allocated quantity'
+      );
+
+      if (approved > allocated) {
+        throw shopEazyApprovalError('Approved quantity exceeds allocated quantity.');
+      }
+      if (fulfilled > approved) {
+        throw shopEazyApprovalError('Fulfilled quantity exceeds approved quantity.');
+      }
+      if (approved <= 0) {
+        throw shopEazyApprovalError('A fulfillment group must contain approved quantity.');
+      }
+
+      approvedTotal += approved;
+      fulfilledTotal += fulfilled;
+
+      return requestedStatus === 'DELIVERED'
+        ? { ...item, quantityFulfilled: approved }
+        : { ...item };
+    });
+
+    // A group cannot be delivered with an internally incomplete quantity
+    // record. The delivered transition closes the physical fulfillment.
+    if (requestedStatus === 'DELIVERED' && approvedTotal <= 0) {
+      throw shopEazyApprovalError('Cannot deliver an empty fulfillment group.');
+    }
+
+    const nextGroupsSnap = await tx.get(
+      collection(db, 'orders', normalizedOrderId, 'fulfillmentGroups')
+    );
+    const nextGroups = nextGroupsSnap.docs.map(docSnap => ({
+      id: docSnap.id,
+      ref: docSnap.ref,
+      data: docSnap.data()
+    }));
+
+    // Use the requested next status for this group while deriving the overall
+    // order status from the authoritative group states.
+    const statusForOrder = nextGroups.map(entry =>
+      entry.id === normalizedGroupId
+        ? requestedStatus
+        : String(entry.data.status || 'UNALLOCATED').trim().toUpperCase()
+    );
+
+    const overallStatus = shopEazyDeriveOverallFulfillmentStatus(
+      statusForOrder.map(status => ({ status }))
+    );
+
+    tx.update(groupRef, {
+      items: nextItems,
+      status: requestedStatus,
+      updatedAt: serverTimestamp(),
+      ...(note ? { fulfillmentNote: note } : {}),
+      lastActionBy: actor,
+      lastActionAt: serverTimestamp()
+    });
+
+    const auditRef = doc(collection(db, 'shopEazyAudit'));
+    tx.set(auditRef, {
+      action: 'FULFILLMENT_GROUP_STATUS_CHANGED',
+      orderId: normalizedOrderId,
+      groupId: normalizedGroupId,
+      outletId: group.outletId || null,
+      previousStatus: currentStatus,
+      newStatus: requestedStatus,
+      approvedQuantity: approvedTotal,
+      previouslyFulfilledQuantity: fulfilledTotal,
+      actorUid: actor,
+      note: note ?? null,
+      createdAt: serverTimestamp()
+    });
+
+    tx.update(orderRef, {
+      status: overallStatus,
+      updatedAt: serverTimestamp(),
+      ...(requestedStatus === 'DELIVERED' && overallStatus === 'DELIVERED'
+        ? { deliveredAt: serverTimestamp(), deliveredBy: actor }
+        : {})
+    });
+
+    return {
+      orderId: normalizedOrderId,
+      groupId: normalizedGroupId,
+      previousStatus: currentStatus,
+      status: requestedStatus,
+      orderStatus: overallStatus
+    };
+  });
+}
+
+/**
+ * Returns the current fulfillment state for an order, including group-level
+ * progress. This is read-only and derives the aggregate from Firestore.
+ */
+export async function getShopEazyFulfillmentSummary(orderId) {
+  const normalizedOrderId = cleanRequiredString(orderId, 'Order ID');
+  const orderSnap = await getDoc(doc(db, 'orders', normalizedOrderId));
+  if (!orderSnap.exists()) throw shopEazyApprovalError('Order does not exist.');
+
+  const groupsSnap = await getDocs(
+    collection(db, 'orders', normalizedOrderId, 'fulfillmentGroups')
+  );
+
+  const groups = groupsSnap.docs.map(groupDoc => {
+    const group = groupDoc.data();
+    const items = Array.isArray(group.items) ? group.items : [];
+    const approvedQuantity = items.reduce(
+      (sum, item) => sum + validateNonNegativeInteger(item.quantityApproved || 0, 'Approved quantity'),
+      0
+    );
+    const fulfilledQuantity = items.reduce(
+      (sum, item) => sum + validateNonNegativeInteger(item.quantityFulfilled || 0, 'Fulfilled quantity'),
+      0
+    );
+    if (fulfilledQuantity > approvedQuantity) {
+      throw shopEazyApprovalError(`Fulfilled quantity exceeds approved quantity in group ${groupDoc.id}.`);
+    }
+
+    return {
+      groupId: groupDoc.id,
+      outletId: group.outletId || null,
+      partnerId: group.partnerId || null,
+      status: String(group.status || 'UNALLOCATED').trim().toUpperCase(),
+      approvedQuantity,
+      fulfilledQuantity,
+      remainingQuantity: approvedQuantity - fulfilledQuantity
+    };
+  });
+
+  return {
+    orderId: normalizedOrderId,
+    orderStatus: orderSnap.data().status || null,
+    groups,
+    totalApprovedQuantity: groups.reduce((sum, group) => sum + group.approvedQuantity, 0),
+    totalFulfilledQuantity: groups.reduce((sum, group) => sum + group.fulfilledQuantity, 0)
+  };
+}
