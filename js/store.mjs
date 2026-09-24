@@ -792,6 +792,18 @@ export async function allocateShopEazyOrderItem({
       throw new Error(`Allocation exceeds ordered quantity. Ordered: ${orderedQuantity}, other outlets: ${otherAllocated}, requested here: ${requestedAllocation}.`);
     }
 
+    // Allocation changes are planning-only. Once any quantity for this item
+    // has been approved/fulfilled, it must be moved through the dedicated
+    // reassignment transaction so committed stock is restored/deducted safely.
+    for (const entry of allGroups) {
+      const existing = entry.items.find(i => i?.orderItemId === shopEazyOrderItemId(itemIndex));
+      const existingApproved = existing ? validateNonNegativeInteger(existing.quantityApproved || 0, 'Approved quantity') : 0;
+      const existingFulfilled = existing ? validateNonNegativeInteger(existing.quantityFulfilled || 0, 'Fulfilled quantity') : 0;
+      if (existingApproved > 0 || existingFulfilled > 0 || ['APPROVED', 'PICKING', 'READY', 'DISPATCHED', 'DELIVERED', 'CANCELLED', 'RETURNED'].includes(String(entry.data.status || '').toUpperCase())) {
+        throw new Error('This order item has already entered committed fulfillment and cannot be changed with allocation planning. Use controlled reassignment instead.');
+      }
+    }
+
     for (const entry of allGroups) {
       let nextItems = entry.items.filter(i => i?.orderItemId !== shopEazyOrderItemId(itemIndex));
       const existing = entry.items.find(i => i?.orderItemId === shopEazyOrderItemId(itemIndex));
