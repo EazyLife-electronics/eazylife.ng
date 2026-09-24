@@ -2295,3 +2295,94 @@ export async function getShopEazyReturn(returnId) {
   const snap = await getDoc(doc(db, 'shopEazyReturns', id));
   return snap.exists() ? { id: snap.id, ...snap.data() } : null;
 }
+
+
+/* ---------------- SHOP-EAZY: STAFF ROLE ASSIGNMENTS ---------------- */
+
+/**
+ * Stores the administrator-approved ShopEazy access profile for a Firebase
+ * Authentication user. This does not itself mint or modify Auth custom claims.
+ * A trusted backend/Admin SDK must synchronize these values to the user's
+ * Firebase Auth custom claims.
+ */
+export async function createShopEazyStaffProfile({
+  uid, email = null, displayName = null, role, partnerId = null, outletId = null, actorUid
+} = {}) {
+  const userUid = cleanRequiredString(uid, 'User UID');
+  const actor = cleanRequiredString(actorUid, 'Actor UID');
+  const normalizedRole = String(role || '').trim().toUpperCase();
+  const allowedRoles = ['ADMIN', 'PARTNER_MANAGER', 'PARTNER_STAFF', 'OUTLET_STAFF'];
+
+  if (!allowedRoles.includes(normalizedRole)) throw new Error('Invalid ShopEazy role.');
+
+  if (['PARTNER_STAFF'].includes(normalizedRole) && !partnerId) {
+    throw new Error('Partner staff must have a partner ID.');
+  }
+  if (normalizedRole === 'OUTLET_STAFF' && !outletId) {
+    throw new Error('Outlet staff must have an outlet ID.');
+  }
+  if (['ADMIN', 'PARTNER_MANAGER'].includes(normalizedRole) && (partnerId || outletId)) {
+    throw new Error(normalizedRole + ' does not use partner or outlet assignment.');
+  }
+
+  const profileRef = doc(db, 'shopEazyStaff', userUid);
+  const profile = {
+    uid: userUid,
+    email: email ?? null,
+    displayName: displayName ?? null,
+    role: normalizedRole,
+    partnerId: partnerId ?? null,
+    outletId: outletId ?? null,
+    active: true,
+    claimsSyncStatus: 'PENDING',
+    createdBy: actor,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  };
+
+  await setDoc(profileRef, profile);
+  return { id: userUid, ...profile };
+}
+
+export async function updateShopEazyStaffProfile({
+  uid, role, partnerId = null, outletId = null, active = true, actorUid
+} = {}) {
+  const userUid = cleanRequiredString(uid, 'User UID');
+  const actor = cleanRequiredString(actorUid, 'Actor UID');
+  const normalizedRole = String(role || '').trim().toUpperCase();
+  const allowedRoles = ['ADMIN', 'PARTNER_MANAGER', 'PARTNER_STAFF', 'OUTLET_STAFF'];
+
+  if (!allowedRoles.includes(normalizedRole)) throw new Error('Invalid ShopEazy role.');
+  if (normalizedRole === 'PARTNER_STAFF' && !partnerId) throw new Error('Partner staff must have a partner ID.');
+  if (normalizedRole === 'OUTLET_STAFF' && !outletId) throw new Error('Outlet staff must have an outlet ID.');
+  if (['ADMIN', 'PARTNER_MANAGER'].includes(normalizedRole) && (partnerId || outletId)) {
+    throw new Error(normalizedRole + ' does not use partner or outlet assignment.');
+  }
+
+  const profileRef = doc(db, 'shopEazyStaff', userUid);
+  const snap = await getDoc(profileRef);
+  if (!snap.exists()) throw new Error('ShopEazy staff profile does not exist.');
+
+  await updateDoc(profileRef, {
+    role: normalizedRole,
+    partnerId: partnerId ?? null,
+    outletId: outletId ?? null,
+    active: active === true,
+    claimsSyncStatus: 'PENDING',
+    updatedBy: actor,
+    updatedAt: serverTimestamp()
+  });
+
+  return { id: userUid, ...((await getDoc(profileRef)).data()) };
+}
+
+export async function getShopEazyStaffProfile(uid) {
+  const userUid = cleanRequiredString(uid, 'User UID');
+  const snap = await getDoc(doc(db, 'shopEazyStaff', userUid));
+  return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+}
+
+export async function getShopEazyStaffProfiles() {
+  const snap = await getDocs(collection(db, 'shopEazyStaff'));
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
