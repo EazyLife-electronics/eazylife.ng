@@ -15,6 +15,7 @@ import {
 import { initTabs, initImagePicker } from './admin-shared.mjs';
 import { getShopEazyAccess, describeShopEazyRole } from './shopeazy-access.mjs';
 import { initShopEazyPartners } from './shopeazy-partners.mjs';
+import { initShopEazyOrders } from './shopeazy-orders.mjs';
 import { initProducts, renderProducts } from './admin-products.mjs';
 import { initHeroes, renderHeroes, setProductsForHeroLinks } from './admin-heroes.mjs';
 import { initReviews, renderReviews } from './admin-reviews.mjs';
@@ -62,6 +63,7 @@ onAuthStateChanged(auth, async (user) => {
     window.shopEazyAccess = access;
     if (access?.role === 'ADMIN') {
       initShopEazyPartners(access);
+      initShopEazyOrders(access);
       startDashboard();
     } else if (['PARTNER_MANAGER'].includes(access?.role)) {
       showShopEazyRoleShell(access);
@@ -123,6 +125,8 @@ function showShopEazyRoleShell(access) {
     document.getElementById('panel-partners')?.classList.remove('hidden');
     document.getElementById('inventoryTabBtn')?.classList.remove('hidden');
   }
+
+  document.getElementById('shopEazyOrdersTabBtn')?.classList.toggle('hidden', access?.role !== 'ADMIN');
 
   if (!access?.role) {
     message.textContent = 'No ShopEazy role is assigned to this account. Ask an administrator to assign a role.';
