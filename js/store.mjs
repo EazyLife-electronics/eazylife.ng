@@ -521,3 +521,151 @@ export async function updateShopEazyOutlet(outletId, updates = {}) {
   return updateDoc(doc(db, 'outlets', outletId), next);
 }
 \n
+
+/* ---------------- SHOP-EAZY: OUTLET INVENTORY ---------------- */
+// Outlet inventory is a separate stock ledger for ShopEazy. The legacy
+// products.variants[].stockQty field is deliberately left untouched here.
+// Inventory IDs are deterministic: outletId__variantId.
+
+function shopEazyInventoryId(outletId, variantId) {
+  const outlet = cleanRequiredString(outletId, 'Outlet ID');
+  const variant = cleanRequiredString(variantId, 'Variant ID');
+  return `${outlet}__${variant}`;
+}
+
+async function validateShopEazyOutletForInventory(outletId) {
+  const outlet = await getShopEazyOutlet(outletId);
+  if (!outlet) throw new Error('Outlet does not exist.');
+  if (outlet.status !== 'ACTIVE' || outlet.fulfillmentEnabled !== true) {
+    throw new Error('Outlet is not active for fulfillment.');
+  }
+  return outlet;
+}
+
+async function validateShopEazyVariant(productId, variantId) {
+  const productRef = doc(db, 'products', cleanRequiredString(productId, 'Product ID'));
+  const snap = await getDoc(productRef);
+  if (!snap.exists()) throw new Error('Product does not exist.');
+  const product = snap.data();
+  const variants = Array.isArray(product.variants) ? product.variants : [];
+  const index = variants.findIndex(v => v?.id === variantId);
+  if (index < 0) throw new Error('Product variant does not exist.');
+  return { product, variant: variants[index] };
+}
+
+/**
+ * Create or update an outlet inventory record without touching legacy stock.
+ * This is intended for controlled setup/reconciliation, not order approval.
+ */
+export async function setShopEazyOutletInventory({
+  outletId,
+  partnerId,
+  productId,
+  variantId,
+  quantityOnHand = 0,
+  reorderLevel = 0,
+  costPrice = null,
+  active = true
+} = {}) {
+  const outlet = await validateShopEazyOutletForInventory(outletId);
+  const { variant } = await validateShopEazyVariant(productId, variantId);
+  if (partnerId && partnerId !== outlet.partnerId) throw new Error('Partner does not own the selected outlet.');
+
+  const quantity = Number(quantityOnHand);
+  const reorder = Number(reorderLevel);
+  if (!Number.isInteger(quantity) || quantity < 0) throw new Error('quantityOnHand must be a non-negative integer.');
+  if (!Number.isInteger(reorder) || reorder < 0) throw new Error('reorderLevel must be a non-negative integer.');
+
+  const inventoryId = shopEazyInventoryId(outletId, variantId);
+  const inventoryRef = doc(db, 'outletInventory', inventoryId);
+  const snap = await getDoc(inventoryRef);
+  const data = {
+    productId,
+    variantId,
+    outletId,
+    partnerId: outlet.partnerId,
+    quantityOnHand: quantity,
+    reorderLevel: reorder,
+    costPrice: costPrice ?? null,
+    active: Boolean(active),
+    sku: variant.sku || '',
+    updatedAt: serverTimestamp()
+  };
+  if (!snap.exists()) data.createdAt = serverTimestamp();
+  return setDoc(inventoryRef, data, { merge: true });
+}
+
+export async function getShopEazyOutletInventory(outletId, variantId) {
+  if (!outletId || !variantId) return null;
+  const snap = await getDoc(doc(db, 'outletInventory', shopEazyInventoryId(outletId, variantId)));
+  return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+}
+
+export async function getShopEazyOutletInventoryForOutlet(outletId, { activeOnly = false } = {}) {
+  const snap = await getDocs(collection(db, 'outletInventory'));
+  return snap.docs
+    .map(d => ({ id: d.id, ...d.data() }))
+    .filter(item => item.outletId === outletId)
+    .filter(item => !activeOnly || item.active === true);
+}
+
+export async function getShopEazyOutletInventoryForVariant(variantId, { activeOnly = true } = {}) {
+  const snap = await getDocs(collection(db, 'outletInventory'));
+  return snap.docs
+    .map(d => ({ id: d.id, ...d.data() }))
+    .filter(item => item.variantId === variantId)
+    .filter(item => !activeOnly || item.active === true);
+}
+
+/**
+ * Record a controlled stock adjustment. All quantity and movement writes are
+ * in one Firestore transaction so the ledger cannot record a value different
+ * from the inventory document it describes.
+ */
+export async function adjustShopEazyOutletInventory({
+  outletId,
+  variantId,
+  quantityChange,
+  movementType = 'correction',
+  reason = null,
+  actorUid = null,
+  referenceType = null,
+  referenceId = null
+} = {}) {
+  const change = Number(quantityChange);
+  if (!Number.isInteger(change) || change === 0) throw new Error('quantityChange must be a non-zero integer.');
+  if (!['receipt', 'correction', 'transferIn', 'transferOut', 'return'].includes(movementType)) {
+    throw new Error('Invalid ShopEazy inventory movement type.');
+  }
+
+  const outlet = await validateShopEazyOutletForInventory(outletId);
+  const inventoryRef = doc(db, 'outletInventory', shopEazyInventoryId(outletId, variantId));
+  const movementRef = doc(collection(db, 'inventoryMovements'));
+
+  return runTransaction(db, async tx => {
+    const inventorySnap = await tx.get(inventoryRef);
+    if (!inventorySnap.exists()) throw new Error('Outlet inventory record does not exist. Initialize it before adjusting stock.');
+    const current = Number(inventorySnap.data().quantityOnHand);
+    if (!Number.isInteger(current) || current < 0) throw new Error('Outlet inventory contains an invalid quantity.');
+    const next = current + change;
+    if (next < 0) throw new Error(`Insufficient outlet stock. Current stock: ${current}, requested change: ${change}.`);
+
+    tx.update(inventoryRef, { quantityOnHand: next, updatedAt: serverTimestamp() });
+    tx.set(movementRef, {
+      productId: inventorySnap.data().productId,
+      variantId,
+      outletId,
+      partnerId: outlet.partnerId,
+      movementType,
+      quantityChange: change,
+      previousQuantity: current,
+      newQuantity: next,
+      referenceType: referenceType ?? 'manualAdjustment',
+      referenceId: referenceId ?? null,
+      reason: reason ?? null,
+      actorUid: actorUid ?? null,
+      createdAt: serverTimestamp()
+    });
+  });
+}
+\n
