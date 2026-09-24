@@ -99,6 +99,7 @@
 <script type="module" src="js/order-delivery-bridge.mjs"></script>
 <script type="module">
 import { initInventory } from "./js/inventory.mjs";
+import { initShopEazyInventory } from "./js/shopeazy-inventory.mjs";
 import { initInventoryReports } from "./js/inventory-reports.mjs";
 import { initDelivery } from "./js/delivery.mjs";
 let stopInventory=null;
@@ -108,7 +109,7 @@ const inventoryBtn=document.getElementById("inventoryTabBtn");
 const reportsBtn=document.getElementById("reportsTabBtn");
 const deliveryBtn=document.getElementById("deliveryTabBtn");
 function showPanel(tab){document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("tab-active"));document.querySelector(`[data-tab="${tab}"]`).classList.add("tab-active");document.querySelectorAll(".tab-panel").forEach(p=>p.classList.add("hidden"));document.getElementById(`panel-${tab}`).classList.remove("hidden");}
-inventoryBtn.addEventListener("click",()=>{showPanel("inventory");if(stopReports){stopReports();stopReports=null;}if(!stopInventory)stopInventory=initInventory();});
+inventoryBtn.addEventListener("click",()=>{showPanel("inventory");if(stopReports){stopReports();stopReports=null;}if(["ADMIN","PARTNER_MANAGER"].includes(window.shopEazyAccess?.role)){initShopEazyInventory(window.shopEazyAccess);}else if(!stopInventory)stopInventory=initInventory();});
 reportsBtn.addEventListener("click",()=>{showPanel("reports");if(stopInventory){stopInventory();stopInventory=null;}if(!stopReports)stopReports=initInventoryReports();});
 deliveryBtn.addEventListener("click",()=>{showPanel("delivery");if(!stopDelivery)stopDelivery=initDelivery();});
 </script>
