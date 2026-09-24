@@ -14,6 +14,8 @@ ShopEazy starts as one managed-retail business with a unified customer catalog.
 - Partner shops provide inventory and may provide physical outlets or fulfillment points.
 - Partners are not independent marketplace sellers in the first version: no seller-owned storefront, commission engine, or payout ledger is assumed.
 - A product can have multiple variants (for example, different storage, RAM, color, or configuration).
+- One customer order may be split across multiple outlets; the order model must preserve one customer order while recording the outlet allocation for each fulfilled portion.
+- Stock is deducted when an administrator approves the order, not when the customer first submits it.
 - Inventory availability must be tracked per outlet when outlet-level stock is introduced.
 - Existing EazyLife electronics data and workflows must remain intact until a reviewed migration is approved.
 
@@ -98,24 +100,24 @@ Preserve the existing order contract until the current checkout, fulfillment, ca
 
 For the target model, each order item should retain a stable reference to its product and variant, plus a snapshot of the customer-facing name, selected options, unit selling price, quantity, and line total at the time of purchase. Historical orders must not change when a catalog title or price is later edited.
 
-When fulfillment is outlet-based, record the chosen outlet against the relevant order item or fulfillment group. The precise shape depends on whether one customer order can be split across outlets.
+When fulfillment is outlet-based, record outlet allocation at the order-item level (or as explicit fulfillment groups) so one customer order can be split across multiple outlets. Keep each allocated quantity tied to its order item, variant, and outlet; the sum of allocated quantities must equal the item quantity when fully assigned. Track fulfillment status separately per outlet group if dispatch and delivery can progress independently.
 
 ## 4. Important design decisions still open
 
 Resolve these before implementation:
-1. Can one customer order be fulfilled by more than one outlet, or must the full order come from one outlet?
-2. When is stock deducted or reserved: order submission, payment confirmation, or manual approval?
-3. What happens to stock when an order is cancelled, expires, or is returned?
+1. What happens if an admin approves only part of an order, or one outlet cannot supply its assigned quantity?
+2. What happens to stock if an approved order is later cancelled, expires, or is returned?
+3. Does admin approval happen before or after payment, and can an order be approved in stages?
 4. Who can create partners/outlets and adjust their inventory?
 5. Is cost price common to a variant, or can it differ by partner/outlet?
-6. How are delivery fees calculated when the dispatch outlet changes?
+6. How are delivery fees calculated when an order is split across outlets?
 7. Which existing products and orders belong to ShopEazy versus the existing EazyLife storefront?
 
 ## 5. Migration and rollout principles
 
 1. **No destructive changes.** Do not delete or rename current collections or fields during the foundation stage.
 2. **Map before migrating.** Inventory all current product, variant, order, and movement fields and document the current transaction flow.
-3. **Keep checkout stable.** Do not alter order submission or stock deduction until the new data model and rollback plan are reviewed.
+3. **Keep checkout stable.** Do not alter order submission or stock deduction until the new data model and rollback plan are reviewed. Submitted orders should not decrement stock; admin approval is the planned stock-deduction point.
 4. **Introduce outlet inventory in parallel.** If approved, seed and validate the new outlet-level records before switching any live stock reads/writes.
 5. **Reconcile totals.** Compare per-variant legacy stock against the sum of outlet quantities before cutover; investigate every mismatch.
 6. **Protect access.** Define role-based access for administrators and partner staff before exposing partner-specific data. Do not rely on a client-side UI check as the security boundary.
@@ -125,7 +127,7 @@ Resolve these before implementation:
 ## 6. Suggested implementation sequence
 
 - Phase A — document current Firestore schemas and order/inventory transaction paths.
-- Phase B — confirm the open business decisions above.
+- Phase B — resolve the remaining approval, partial-allocation, cancellation/return, access, cost, and split-delivery decisions above.
 - Phase C — add partner and outlet records plus access rules in a test environment.
 - Phase D — add outlet inventory and movement records; validate with sample data.
 - Phase E — adapt admin inventory tools and fulfillment selection behind a controlled feature flag.
