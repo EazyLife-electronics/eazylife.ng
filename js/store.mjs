@@ -400,3 +400,124 @@ if (location.pathname.endsWith('/admin/') || location.pathname.endsWith('/admin/
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setupInventoryTab, { once: true });
   else setupInventoryTab();
 }
+
+/* ---------------- SHOP-EAZY: PARTNERS & OUTLETS ---------------- */
+// These helpers define the ShopEazy managed-retail data layer without
+// changing the existing EazyLife product/order/inventory behavior.
+// They are intentionally opt-in: no ShopEazy documents are created until
+// an admin workflow calls the create functions below.
+
+const SHOP_EAZY_PARTNER_STATUSES = ['ACTIVE', 'INACTIVE'];
+const SHOP_EAZY_OUTLET_STATUSES = ['ACTIVE', 'INACTIVE'];
+
+function cleanRequiredString(value, fieldName) {
+  const valueText = String(value ?? '').trim();
+  if (!valueText) throw new Error(`${fieldName} is required.`);
+  return valueText;
+}
+
+function cleanStatus(value, allowed, fieldName) {
+  const normalized = String(value || 'ACTIVE').trim().toUpperCase();
+  if (!allowed.includes(normalized)) {
+    throw new Error(`${fieldName} must be one of: ${allowed.join(', ')}.`);
+  }
+  return normalized;
+}
+
+function nowAuditFields() {
+  return { createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
+}
+
+/**
+ * Create a ShopEazy partner. Partners provide inventory/outlets but are not
+ * independent marketplace sellers.
+ */
+export async function createShopEazyPartner({ name, status = 'ACTIVE', contact = null, notes = null } = {}) {
+  const partner = {
+    name: cleanRequiredString(name, 'Partner name'),
+    status: cleanStatus(status, SHOP_EAZY_PARTNER_STATUSES, 'Partner status'),
+    contact: contact ?? null,
+    notes: notes ?? null,
+    ...nowAuditFields()
+  };
+  return addDoc(collection(db, 'partners'), partner);
+}
+
+export async function getShopEazyPartner(partnerId) {
+  if (!partnerId) return null;
+  const snap = await getDoc(doc(db, 'partners', partnerId));
+  return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+}
+
+export async function getShopEazyPartners() {
+  const snap = await getDocs(collection(db, 'partners'));
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+export async function updateShopEazyPartner(partnerId, updates = {}) {
+  if (!partnerId) throw new Error('Partner ID is required.');
+  const next = { ...updates };
+  if ('name' in next) next.name = cleanRequiredString(next.name, 'Partner name');
+  if ('status' in next) next.status = cleanStatus(next.status, SHOP_EAZY_PARTNER_STATUSES, 'Partner status');
+  next.updatedAt = serverTimestamp();
+  return updateDoc(doc(db, 'partners', partnerId), next);
+}
+
+/**
+ * Create an outlet belonging to a partner. The partner relationship is stored
+ * on the outlet itself so authorization can later be based on Firestore data.
+ */
+export async function createShopEazyOutlet({
+  partnerId,
+  name,
+  status = 'ACTIVE',
+  address = null,
+  serviceAreas = [],
+  fulfillmentEnabled = true,
+  operatingHours = null
+} = {}) {
+  const partnerRef = doc(db, 'partners', cleanRequiredString(partnerId, 'Partner ID'));
+  const partnerSnap = await getDoc(partnerRef);
+  if (!partnerSnap.exists()) throw new Error('Cannot create outlet: partner does not exist.');
+
+  const outlet = {
+    partnerId,
+    name: cleanRequiredString(name, 'Outlet name'),
+    status: cleanStatus(status, SHOP_EAZY_OUTLET_STATUSES, 'Outlet status'),
+    address: address ?? null,
+    serviceAreas: Array.isArray(serviceAreas) ? serviceAreas : [],
+    fulfillmentEnabled: Boolean(fulfillmentEnabled),
+    operatingHours: operatingHours ?? null,
+    ...nowAuditFields()
+  };
+  return addDoc(collection(db, 'outlets'), outlet);
+}
+
+export async function getShopEazyOutlet(outletId) {
+  if (!outletId) return null;
+  const snap = await getDoc(doc(db, 'outlets', outletId));
+  return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+}
+
+export async function getShopEazyOutlets({ partnerId = null, activeOnly = false } = {}) {
+  const snap = await getDocs(collection(db, 'outlets'));
+  return snap.docs
+    .map(d => ({ id: d.id, ...d.data() }))
+    .filter(outlet => !partnerId || outlet.partnerId === partnerId)
+    .filter(outlet => !activeOnly || (outlet.status === 'ACTIVE' && outlet.fulfillmentEnabled === true));
+}
+
+export async function updateShopEazyOutlet(outletId, updates = {}) {
+  if (!outletId) throw new Error('Outlet ID is required.');
+  const next = { ...updates };
+  if ('name' in next) next.name = cleanRequiredString(next.name, 'Outlet name');
+  if ('partnerId' in next) next.partnerId = cleanRequiredString(next.partnerId, 'Partner ID');
+  if ('status' in next) next.status = cleanStatus(next.status, SHOP_EAZY_OUTLET_STATUSES, 'Outlet status');
+  if ('serviceAreas' in next && !Array.isArray(next.serviceAreas)) {
+    throw new Error('Outlet serviceAreas must be an array.');
+  }
+  if ('fulfillmentEnabled' in next) next.fulfillmentEnabled = Boolean(next.fulfillmentEnabled);
+  next.updatedAt = serverTimestamp();
+  return updateDoc(doc(db, 'outlets', outletId), next);
+}
+\n
