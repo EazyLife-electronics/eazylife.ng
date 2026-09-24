@@ -669,3 +669,215 @@ export async function adjustShopEazyOutletInventory({
   });
 }
 \n
+
+/* ---------------- SHOP-EAZY: ORDER ALLOCATION / FULFILLMENT GROUPS ---------------- */
+// Allocation is planning data only. It does NOT deduct or reserve stock.
+// Stock is committed later by the atomic approval transaction.
+
+const SHOP_EAZY_GROUP_STATUSES = ['UNALLOCATED', 'ALLOCATED', 'APPROVED', 'PICKING', 'READY', 'DISPATCHED', 'DELIVERED', 'CANCELLED', 'RETURNED'];
+
+function shopEazyOrderItemId(index) {
+  return `item-${Number(index)}`;
+}
+
+function validateNonNegativeInteger(value, fieldName) {
+  const number = Number(value);
+  if (!Number.isInteger(number) || number < 0) throw new Error(`${fieldName} must be a non-negative integer.`);
+  return number;
+}
+
+function validateAllocationStatus(status) {
+  const normalized = String(status || 'UNALLOCATED').trim().toUpperCase();
+  if (!SHOP_EAZY_GROUP_STATUSES.includes(normalized)) {
+    throw new Error(`Invalid fulfillment group status: ${normalized}.`);
+  }
+  return normalized;
+}
+
+export async function getShopEazyFulfillmentGroups(orderId) {
+  if (!orderId) return [];
+  const snap = await getDocs(collection(db, 'orders', orderId, 'fulfillmentGroups'));
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+/**
+ * Creates an empty fulfillment group for an active fulfillment-enabled outlet.
+ * No inventory is changed and no quantity is reserved.
+ */
+export async function createShopEazyFulfillmentGroup({
+  orderId,
+  outletId,
+  groupId = null,
+  delivery = null,
+  status = 'UNALLOCATED'
+} = {}) {
+  const order = await getOrderByTrackingCode(orderId);
+  if (!order) throw new Error('Order does not exist.');
+  const outlet = await validateShopEazyOutletForInventory(outletId);
+  const normalizedStatus = validateAllocationStatus(status);
+  if (['APPROVED', 'PICKING', 'READY', 'DISPATCHED', 'DELIVERED', 'CANCELLED', 'RETURNED'].includes(normalizedStatus)) {
+    throw new Error('A newly created fulfillment group cannot start in a completed or committed state.');
+  }
+
+  const groupRef = groupId
+    ? doc(db, 'orders', orderId, 'fulfillmentGroups', groupId)
+    : doc(collection(db, 'orders', orderId, 'fulfillmentGroups'));
+  const groupIdValue = groupRef.id;
+  await setDoc(groupRef, {
+    outletId,
+    partnerId: outlet.partnerId,
+    status: normalizedStatus,
+    items: [],
+    delivery: delivery ?? null,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  });
+  return groupIdValue;
+}
+
+/**
+ * Allocate or reallocate an order item to an existing fulfillment group.
+ * The transaction validates the entire order allocation invariant:
+ * ordered = allocated + unallocated, and no group can allocate more than
+ * the order item quantity. This function intentionally never changes stock.
+ */
+export async function allocateShopEazyOrderItem({
+  orderId,
+  groupId,
+  orderItemIndex,
+  quantityAllocated,
+  actorUid = null,
+  note = null
+} = {}) {
+  const itemIndex = Number(orderItemIndex);
+  if (!Number.isInteger(itemIndex) || itemIndex < 0) throw new Error('orderItemIndex must be a non-negative integer.');
+  const requestedAllocation = validateNonNegativeInteger(quantityAllocated, 'quantityAllocated');
+  const orderRef = doc(db, 'orders', cleanRequiredString(orderId, 'Order ID'));
+  const groupRef = doc(db, 'orders', orderId, 'fulfillmentGroups', cleanRequiredString(groupId, 'Group ID'));
+
+  return runTransaction(db, async tx => {
+    const [orderSnap, groupSnap] = await Promise.all([tx.get(orderRef), tx.get(groupRef)]);
+    if (!orderSnap.exists()) throw new Error('Order does not exist.');
+    if (!groupSnap.exists()) throw new Error('Fulfillment group does not exist.');
+
+    const order = orderSnap.data();
+    const group = groupSnap.data();
+    const groupsSnap = await tx.get(collection(db, 'orders', orderId, 'fulfillmentGroups'));
+    const items = Array.isArray(order.items) ? order.items : [];
+    const orderItem = items[itemIndex];
+    if (!orderItem) throw new Error('Order item does not exist.');
+    if (!orderItem.variantId) throw new Error('Order item has no variant ID. Allocation cannot be made safely.');
+    if (['APPROVED', 'PICKING', 'READY', 'DISPATCHED', 'DELIVERED', 'CANCELLED', 'RETURNED'].includes(String(group.status || '').toUpperCase())) {
+      throw new Error('This fulfillment group can no longer be allocated or changed.');
+    }
+
+    const orderedQuantity = validateNonNegativeInteger(orderItem.quantity, 'Order quantity');
+    let totalAllocated = 0;
+    const allGroups = [];
+    groupsSnap.forEach(groupDoc => {
+      const data = groupDoc.data();
+      const groupItems = Array.isArray(data.items) ? data.items : [];
+      const match = groupItems.find(i => i?.orderItemId === shopEazyOrderItemId(itemIndex));
+      const qty = match ? validateNonNegativeInteger(match.quantityAllocated || 0, 'Existing allocated quantity') : 0;
+      if (qty) totalAllocated += qty;
+      allGroups.push({ ref: groupDoc.ref, data, items: groupItems });
+    });
+
+    const target = allGroups.find(g => g.ref.path === groupRef.path);
+    if (!target) throw new Error('Fulfillment group could not be read consistently.');
+    const targetExisting = target.items.find(i => i?.orderItemId === shopEazyOrderItemId(itemIndex));
+    const oldTargetQuantity = targetExisting ? validateNonNegativeInteger(targetExisting.quantityAllocated || 0, 'Existing target allocation') : 0;
+    const otherAllocated = totalAllocated - oldTargetQuantity;
+    if (otherAllocated + requestedAllocation > orderedQuantity) {
+      throw new Error(`Allocation exceeds ordered quantity. Ordered: ${orderedQuantity}, other outlets: ${otherAllocated}, requested here: ${requestedAllocation}.`);
+    }
+
+    for (const entry of allGroups) {
+      let nextItems = entry.items.filter(i => i?.orderItemId !== shopEazyOrderItemId(itemIndex));
+      const existing = entry.items.find(i => i?.orderItemId === shopEazyOrderItemId(itemIndex));
+      if (entry.ref.path === groupRef.path && requestedAllocation > 0) {
+        nextItems.push({
+          orderItemId: shopEazyOrderItemId(itemIndex),
+          orderItemIndex: itemIndex,
+          productId: orderItem.productId,
+          variantId: orderItem.variantId,
+          sku: orderItem.sku || '',
+          nameSnapshot: orderItem.name || '',
+          variantSnapshot: orderItem.variant || '',
+          quantityAllocated: requestedAllocation,
+          quantityApproved: validateNonNegativeInteger(existing?.quantityApproved || 0, 'Approved quantity'),
+          quantityFulfilled: validateNonNegativeInteger(existing?.quantityFulfilled || 0, 'Fulfilled quantity')
+        });
+      }
+
+      const groupAllocated = nextItems.reduce((sum, i) => sum + validateNonNegativeInteger(i.quantityAllocated || 0, 'Group allocation'), 0);
+      const nextStatus = groupAllocated > 0 ? 'ALLOCATED' : 'UNALLOCATED';
+      tx.update(entry.ref, {
+        items: nextItems,
+        status: nextStatus,
+        updatedAt: serverTimestamp(),
+        ...(entry.ref.path === groupRef.path && note ? { allocationNote: note, allocationActorUid: actorUid } : {})
+      });
+    }
+
+    const newTotalAllocated = otherAllocated + requestedAllocation;
+    const unallocatedQuantity = orderedQuantity - newTotalAllocated;
+    tx.update(orderRef, {
+      updatedAt: serverTimestamp(),
+      shopEazyAllocationSummary: {
+        ...(order.shopEazyAllocationSummary || {}),
+        lastChangedBy: actorUid ?? null,
+        lastChangedAt: serverTimestamp(),
+        lastChangedItemId: shopEazyOrderItemId(itemIndex),
+        lastOrderedQuantity: orderedQuantity,
+        lastAllocatedQuantity: newTotalAllocated,
+        lastUnallocatedQuantity: unallocatedQuantity
+      }
+    });
+
+    return { orderedQuantity, allocatedQuantity: newTotalAllocated, unallocatedQuantity };
+  });
+}
+
+/**
+ * Rebuilds a complete allocation summary from Firestore. This is useful for
+ * the admin review screen and deliberately reads the authoritative groups.
+ */
+export async function getShopEazyOrderAllocationSummary(orderId) {
+  const order = await getOrderByTrackingCode(orderId);
+  if (!order) throw new Error('Order does not exist.');
+  const groups = await getShopEazyFulfillmentGroups(orderId);
+  const items = Array.isArray(order.items) ? order.items : [];
+
+  return items.map((item, index) => {
+    const orderItemId = shopEazyOrderItemId(index);
+    const orderedQuantity = validateNonNegativeInteger(item.quantity, 'Order quantity');
+    const allocations = groups.map(group => {
+      const groupItem = (Array.isArray(group.items) ? group.items : []).find(i => i?.orderItemId === orderItemId);
+      return {
+        groupId: group.id,
+        outletId: group.outletId,
+        partnerId: group.partnerId,
+        quantityAllocated: validateNonNegativeInteger(groupItem?.quantityAllocated || 0, 'Allocated quantity'),
+        quantityApproved: validateNonNegativeInteger(groupItem?.quantityApproved || 0, 'Approved quantity'),
+        quantityFulfilled: validateNonNegativeInteger(groupItem?.quantityFulfilled || 0, 'Fulfilled quantity')
+      };
+    }).filter(a => a.quantityAllocated > 0 || a.quantityApproved > 0 || a.quantityFulfilled > 0);
+    const allocatedQuantity = allocations.reduce((sum, a) => sum + a.quantityAllocated, 0);
+    const approvedQuantity = allocations.reduce((sum, a) => sum + a.quantityApproved, 0);
+    if (allocatedQuantity > orderedQuantity) throw new Error(`Invalid allocation: item ${index} allocates more than ordered.`);
+    if (approvedQuantity > allocatedQuantity) throw new Error(`Invalid approval allocation: item ${index} approves more than allocated.`);
+    return {
+      orderItemId,
+      orderItemIndex: index,
+      productId: item.productId,
+      variantId: item.variantId,
+      orderedQuantity,
+      allocatedQuantity,
+      unallocatedQuantity: orderedQuantity - allocatedQuantity,
+      approvedQuantity,
+      allocations
+    };
+  });
+}
+\n
