@@ -102,6 +102,52 @@ For the target model, each order item should retain a stable reference to its pr
 
 When fulfillment is outlet-based, record outlet allocation at the order-item level (or as explicit fulfillment groups) so one customer order can be split across multiple outlets. Keep each allocated quantity tied to its order item, variant, and outlet; the sum of allocated quantities must equal the item quantity when fully assigned. Track fulfillment status separately per outlet group if dispatch and delivery can progress independently.
 
+## 3A. Product information and media experience
+
+ShopEazy should treat product presentation as part of the catalog design, not merely a storefront styling task.
+
+### Product information
+
+A product should support richer customer-facing information than the current short description alone. The target catalog should be able to represent:
+- product name, brand, category, and subcategory
+- short summary and full description
+- key features/highlights
+- structured specifications where useful (for example dimensions, material, compatibility, processor, RAM, storage, battery, or other category-specific attributes)
+- variant-specific attributes such as colour, configuration, storage, and RAM
+- SKU and pricing information
+- availability information supplied by the inventory system
+
+Descriptive catalog information should remain separate from outlet stock quantities.
+
+### Multiple product images
+
+The target product model should support a gallery rather than a single image URL. At minimum, the media model should support:
+- a primary/cover image
+- multiple additional gallery images
+- explicit image ordering
+- optional alt text/caption
+- optional association of an image with a particular variant when variant-specific photography is needed
+
+Do not force every product to have variant-specific images; shared product gallery images remain valid.
+
+### Customer image viewer
+
+The product page should support:
+- thumbnail/gallery navigation
+- changing the main image by tapping a thumbnail
+- full-screen viewing
+- pinch-to-zoom on touch devices
+- zoom controls and pan on larger screens
+- swipe navigation between gallery images on mobile
+
+Large images should be loaded efficiently so the experience remains practical on slower mobile connections. Use appropriately sized/compressed images and lazy-load non-primary gallery images where practical.
+
+### Admin media management
+
+The admin product editor should eventually allow authorized staff to add, remove, reorder, and designate the primary product image, with optional variant association and alt text. The media workflow should be designed alongside the eventual Firebase Storage/security model rather than storing an uncontrolled collection of arbitrary external URLs.
+
+This richer presentation layer must not change the existing live storefront until the catalog/data design is approved.
+
 ## 4. Important design decisions still open
 
 Resolve these before implementation:
