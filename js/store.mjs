@@ -1179,3 +1179,351 @@ export async function approveShopEazyOrder({
     };
   });
 }
+
+/* ---------------- SHOP-EAZY: CONTROLLED REASSIGNMENT ---------------- */
+// Moves an already-approved, still-unfulfilled quantity between outlets.
+// Approval committed the sale at the source outlet; reassignment therefore
+// restores source stock and commits the same quantity at the destination.
+// This is one transaction, so the physical stock and fulfillment allocation
+// change together.
+
+const SHOP_EAZY_REASSIGNMENT_BLOCKED_GROUP_STATUSES = [
+  'PICKING', 'READY', 'DISPATCHED', 'DELIVERED', 'CANCELLED', 'RETURNED'
+];
+
+export async function reassignShopEazyOrderQuantity({
+  orderId,
+  sourceGroupId,
+  destinationGroupId = null,
+  destinationOutletId = null,
+  orderItemId,
+  quantity,
+  actorUid,
+  reason
+} = {}) {
+  const normalizedOrderId = cleanRequiredString(orderId, 'Order ID');
+  const sourceId = cleanRequiredString(sourceGroupId, 'Source group ID');
+  const itemId = cleanRequiredString(orderItemId, 'Order item ID');
+  const actor = cleanRequiredString(actorUid, 'Actor UID');
+  const moveQuantity = validateNonNegativeInteger(quantity, 'Reassignment quantity');
+  if (moveQuantity <= 0) throw shopEazyApprovalError('Reassignment quantity must be greater than zero.');
+  const moveReason = cleanRequiredString(reason, 'Reassignment reason');
+
+  if (!destinationGroupId && !destinationOutletId) {
+    throw shopEazyApprovalError('Provide a destination group ID or destination outlet ID.');
+  }
+
+  const sourceGroupRef = doc(db, 'orders', normalizedOrderId, 'fulfillmentGroups', sourceId);
+  const destinationGroupRef = destinationGroupId
+    ? doc(db, 'orders', normalizedOrderId, 'fulfillmentGroups', cleanRequiredString(destinationGroupId, 'Destination group ID'))
+    : doc(collection(db, 'orders', normalizedOrderId, 'fulfillmentGroups'));
+
+  const orderRef = doc(db, 'orders', normalizedOrderId);
+
+  return runTransaction(db, async tx => {
+    // ---------------- READ PHASE ----------------
+    const orderSnap = await tx.get(orderRef);
+    const sourceSnap = await tx.get(sourceGroupRef);
+    if (!orderSnap.exists()) throw shopEazyApprovalError('Order does not exist.');
+    if (!sourceSnap.exists()) throw shopEazyApprovalError('Source fulfillment group does not exist.');
+
+    const order = orderSnap.data();
+    if (order.inventoryApplied !== true) {
+      throw shopEazyApprovalError('Order inventory has not been committed; ordinary allocation should be used instead.');
+    }
+    if (['CANCELLED', 'RETURNED'].includes(String(order.status || '').trim().toUpperCase())) {
+      throw shopEazyApprovalError('Cancelled or returned orders cannot be reassigned.');
+    }
+
+    const source = sourceSnap.data();
+    const sourceStatus = String(source.status || 'UNALLOCATED').trim().toUpperCase();
+    if (SHOP_EAZY_REASSIGNMENT_BLOCKED_GROUP_STATUSES.includes(sourceStatus)) {
+      throw shopEazyApprovalError(`Source fulfillment group is already in status ${sourceStatus}.`);
+    }
+
+    const sourceItem = (Array.isArray(source.items) ? source.items : [])
+      .find(item => item?.orderItemId === itemId);
+    if (!sourceItem) throw shopEazyApprovalError('Order item is not present in the source fulfillment group.');
+
+    const sourceApproved = validateNonNegativeInteger(sourceItem.quantityApproved || 0, 'Source approved quantity');
+    const sourceFulfilled = validateNonNegativeInteger(sourceItem.quantityFulfilled || 0, 'Source fulfilled quantity');
+    const sourceAllocated = validateNonNegativeInteger(sourceItem.quantityAllocated || 0, 'Source allocated quantity');
+
+    if (sourceApproved < moveQuantity) {
+      throw shopEazyApprovalError(`Cannot reassign ${moveQuantity} unit(s); source has only ${sourceApproved} approved.`);
+    }
+    if (sourceFulfilled > sourceApproved) {
+      throw shopEazyApprovalError('Source fulfillment data is invalid.');
+    }
+    const availableToMove = sourceApproved - sourceFulfilled;
+    if (moveQuantity > availableToMove) {
+      throw shopEazyApprovalError(`Only ${availableToMove} approved but unfulfilled unit(s) can be reassigned.`);
+    }
+    if (moveQuantity > sourceAllocated) {
+      throw shopEazyApprovalError('Reassignment quantity cannot exceed the source allocation.');
+    }
+
+    const sourceOutletId = cleanRequiredString(source.outletId, 'Source outlet ID');
+    const sourceVariantId = cleanRequiredString(sourceItem.variantId, 'Source variant ID');
+    const sourceProductId = cleanRequiredString(sourceItem.productId, 'Source product ID');
+
+    // Resolve destination group. A new group may be created atomically when
+    // only destinationOutletId is supplied.
+    let destinationSnap = null;
+    let destination = null;
+    if (destinationGroupId) {
+      destinationSnap = await tx.get(destinationGroupRef);
+      if (!destinationSnap.exists()) throw shopEazyApprovalError('Destination fulfillment group does not exist.');
+      destination = destinationSnap.data();
+    } else {
+      const outletRef = doc(db, 'outlets', cleanRequiredString(destinationOutletId, 'Destination outlet ID'));
+      const outletSnap = await tx.get(outletRef);
+      if (!outletSnap.exists()) throw shopEazyApprovalError('Destination outlet does not exist.');
+      destination = {
+        outletId: cleanRequiredString(destinationOutletId, 'Destination outlet ID'),
+        partnerId: outletSnap.data().partnerId || null,
+        status: 'APPROVED',
+        items: [],
+        delivery: null
+      };
+    }
+
+    const destinationOutletIdValue = cleanRequiredString(destination.outletId, 'Destination outlet ID');
+    if (destinationOutletIdValue === sourceOutletId) {
+      throw shopEazyApprovalError('Source and destination outlets are the same.');
+    }
+
+    const destinationOutletRef = doc(db, 'outlets', destinationOutletIdValue);
+    const destinationOutletSnap = await tx.get(destinationOutletRef);
+    if (!destinationOutletSnap.exists()) throw shopEazyApprovalError('Destination outlet does not exist.');
+    const destinationOutlet = destinationOutletSnap.data();
+    if (String(destinationOutlet.status || '').trim().toUpperCase() !== 'ACTIVE' || destinationOutlet.fulfillmentEnabled !== true) {
+      throw shopEazyApprovalError(`Destination outlet ${destinationOutletIdValue} is not active and fulfillment-enabled.`);
+    }
+
+    if (destinationGroupId) {
+      const destinationStatus = String(destination.status || 'UNALLOCATED').trim().toUpperCase();
+      if (SHOP_EAZY_REASSIGNMENT_BLOCKED_GROUP_STATUSES.includes(destinationStatus)) {
+        throw shopEazyApprovalError(`Destination fulfillment group is already in status ${destinationStatus}.`);
+      }
+    }
+
+    const destinationItems = Array.isArray(destination.items) ? destination.items : [];
+    const destinationExisting = destinationItems.find(item => item?.orderItemId === itemId);
+    if (destinationExisting) {
+      if (destinationExisting.productId !== sourceProductId || destinationExisting.variantId !== sourceVariantId) {
+        throw shopEazyApprovalError('Destination order-item product/variant does not match the source.');
+      }
+      if (validateNonNegativeInteger(destinationExisting.quantityFulfilled || 0, 'Destination fulfilled quantity') > 0) {
+        throw shopEazyApprovalError('Destination order item has already begun fulfillment.');
+      }
+    }
+
+    const orderItemIndex = Number(String(itemId).replace(/^item-/, ''));
+    if (!Number.isInteger(orderItemIndex) || orderItemIndex < 0 || !order.items?.[orderItemIndex]) {
+      throw shopEazyApprovalError('Order item ID does not map to a valid order item.');
+    }
+    const orderItem = order.items[orderItemIndex];
+    const orderedQuantity = validateNonNegativeInteger(orderItem.quantity, 'Order quantity');
+
+    // Destination inventory is the stock being newly committed. Source and
+    // destination inventory must both be read before any write.
+    const sourceInventoryRef = doc(db, 'outletInventory', shopEazyInventoryId(sourceOutletId, sourceVariantId));
+    const destinationInventoryRef = doc(db, 'outletInventory', shopEazyInventoryId(destinationOutletIdValue, sourceVariantId));
+    if (sourceInventoryRef.path === destinationInventoryRef.path) {
+      throw shopEazyApprovalError('Source and destination inventory records are identical.');
+    }
+
+    const sourceInventorySnap = await tx.get(sourceInventoryRef);
+    const destinationInventorySnap = await tx.get(destinationInventoryRef);
+    if (!sourceInventorySnap.exists()) throw shopEazyApprovalError('Source outlet inventory record does not exist.');
+    if (!destinationInventorySnap.exists()) throw shopEazyApprovalError('Destination outlet inventory record does not exist.');
+
+    const sourceInventory = sourceInventorySnap.data();
+    const destinationInventory = destinationInventorySnap.data();
+    const sourceCurrent = validateNonNegativeInteger(sourceInventory.quantityOnHand, 'Source quantityOnHand');
+    const destinationCurrent = validateNonNegativeInteger(destinationInventory.quantityOnHand, 'Destination quantityOnHand');
+
+    if (sourceInventory.productId !== sourceProductId || sourceInventory.variantId !== sourceVariantId) {
+      throw shopEazyApprovalError('Source inventory does not match the approved order item.');
+    }
+    if (destinationInventory.productId !== sourceProductId || destinationInventory.variantId !== sourceVariantId) {
+      throw shopEazyApprovalError('Destination inventory does not match the approved order item.');
+    }
+    if (destinationInventory.active === false) {
+      throw shopEazyApprovalError('Destination outlet inventory is inactive.');
+    }
+    if (destinationCurrent < moveQuantity) {
+      throw shopEazyApprovalError(`Insufficient destination stock. Available: ${destinationCurrent}, required: ${moveQuantity}.`);
+    }
+
+    // Verify the order-level approved quantity remains invariant after the move.
+    const groupsSnap = await tx.get(collection(db, 'orders', normalizedOrderId, 'fulfillmentGroups'));
+    let totalApproved = 0;
+    for (const groupDoc of groupsSnap.docs) {
+      for (const item of (Array.isArray(groupDoc.data().items) ? groupDoc.data().items : [])) {
+        if (item?.orderItemId === itemId) {
+          totalApproved += validateNonNegativeInteger(item.quantityApproved || 0, 'Approved quantity');
+        }
+      }
+    }
+    if (totalApproved > orderedQuantity) {
+      throw shopEazyApprovalError('Existing approved quantity exceeds ordered quantity.');
+    }
+
+    // ---------------- WRITE PHASE ----------------
+    const sourceNext = sourceCurrent + moveQuantity;
+    const destinationNext = destinationCurrent - moveQuantity;
+
+    tx.update(sourceInventoryRef, {
+      quantityOnHand: sourceNext,
+      updatedAt: serverTimestamp()
+    });
+    tx.update(destinationInventoryRef, {
+      quantityOnHand: destinationNext,
+      updatedAt: serverTimestamp()
+    });
+
+    const sourceMovementRef = doc(collection(db, 'inventoryMovements'));
+    tx.set(sourceMovementRef, {
+      productId: sourceProductId,
+      variantId: sourceVariantId,
+      sku: sourceItem.sku || orderItem.sku || '',
+      outletId: sourceOutletId,
+      partnerId: source.partnerId || sourceInventory.partnerId || null,
+      movementType: 'transferIn',
+      quantityChange: moveQuantity,
+      previousQuantity: sourceCurrent,
+      newQuantity: sourceNext,
+      referenceType: 'orderReassignment',
+      referenceId: normalizedOrderId,
+      sourceOutletId,
+      destinationOutletId: destinationOutletIdValue,
+      actorUid: actor,
+      reason: moveReason,
+      createdAt: serverTimestamp()
+    });
+
+    const destinationMovementRef = doc(collection(db, 'inventoryMovements'));
+    tx.set(destinationMovementRef, {
+      productId: sourceProductId,
+      variantId: sourceVariantId,
+      sku: sourceItem.sku || orderItem.sku || '',
+      outletId: destinationOutletIdValue,
+      partnerId: destination.partnerId || destinationInventory.partnerId || null,
+      movementType: 'transferOut',
+      quantityChange: -moveQuantity,
+      previousQuantity: destinationCurrent,
+      newQuantity: destinationNext,
+      referenceType: 'orderReassignment',
+      referenceId: normalizedOrderId,
+      sourceOutletId,
+      destinationOutletId: destinationOutletIdValue,
+      actorUid: actor,
+      reason: moveReason,
+      createdAt: serverTimestamp()
+    });
+
+    const nextSourceItems = (Array.isArray(source.items) ? source.items : []).map(item =>
+      item?.orderItemId === itemId
+        ? {
+            ...item,
+            quantityAllocated: validateNonNegativeInteger(item.quantityAllocated || 0, 'Source allocated quantity') - moveQuantity,
+            quantityApproved: sourceApproved - moveQuantity,
+            quantityFulfilled: sourceFulfilled
+          }
+        : item
+    ).filter(item => item.quantityAllocated > 0 || item.quantityApproved > 0 || item.quantityFulfilled > 0);
+
+    const nextDestinationItems = destinationItems.some(item => item?.orderItemId === itemId)
+      ? destinationItems.map(item =>
+          item?.orderItemId === itemId
+            ? {
+                ...item,
+                productId: sourceProductId,
+                variantId: sourceVariantId,
+                sku: sourceItem.sku || item.sku || '',
+                nameSnapshot: sourceItem.nameSnapshot || item.nameSnapshot || orderItem.name || '',
+                variantSnapshot: sourceItem.variantSnapshot || item.variantSnapshot || orderItem.variant || '',
+                quantityAllocated: validateNonNegativeInteger(item.quantityAllocated || 0, 'Destination allocated quantity') + moveQuantity,
+                quantityApproved: validateNonNegativeInteger(item.quantityApproved || 0, 'Destination approved quantity') + moveQuantity,
+                quantityFulfilled: validateNonNegativeInteger(item.quantityFulfilled || 0, 'Destination fulfilled quantity')
+              }
+            : item
+        )
+      : [
+          ...destinationItems,
+          {
+            orderItemId: itemId,
+            orderItemIndex,
+            productId: sourceProductId,
+            variantId: sourceVariantId,
+            sku: sourceItem.sku || orderItem.sku || '',
+            nameSnapshot: sourceItem.nameSnapshot || orderItem.name || '',
+            variantSnapshot: sourceItem.variantSnapshot || orderItem.variant || '',
+            quantityAllocated: moveQuantity,
+            quantityApproved: moveQuantity,
+            quantityFulfilled: 0
+          }
+        ];
+
+    tx.update(sourceGroupRef, {
+      items: nextSourceItems,
+      status: nextSourceItems.length ? 'APPROVED' : 'UNALLOCATED',
+      updatedAt: serverTimestamp()
+    });
+
+    if (destinationGroupId) {
+      tx.update(destinationGroupRef, {
+        items: nextDestinationItems,
+        status: 'APPROVED',
+        updatedAt: serverTimestamp()
+      });
+    } else {
+      tx.set(destinationGroupRef, {
+        outletId: destinationOutletIdValue,
+        partnerId: destination.partnerId || destinationOutlet.partnerId || null,
+        status: 'APPROVED',
+        items: nextDestinationItems,
+        delivery: null,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+    }
+
+    const auditRef = doc(collection(db, 'shopEazyAudit'));
+    tx.set(auditRef, {
+      action: 'ORDER_ALLOCATION_REASSIGNED',
+      orderId: normalizedOrderId,
+      orderItemId: itemId,
+      sourceGroupId: sourceId,
+      destinationGroupId: destinationGroupRef.id,
+      sourceOutletId,
+      destinationOutletId: destinationOutletIdValue,
+      quantity: moveQuantity,
+      reason: moveReason,
+      actorUid: actor,
+      createdAt: serverTimestamp()
+    });
+
+    tx.update(orderRef, {
+      updatedAt: serverTimestamp(),
+      shopEazyAllocationSummary: {
+        ...(order.shopEazyAllocationSummary || {}),
+        lastChangedBy: actor,
+        lastChangedAt: serverTimestamp(),
+        lastChangedItemId: itemId,
+        lastChangeType: 'REASSIGNMENT'
+      }
+    });
+
+    return {
+      orderId: normalizedOrderId,
+      orderItemId: itemId,
+      quantityReassigned: moveQuantity,
+      sourceOutletId,
+      destinationOutletId: destinationOutletIdValue,
+      destinationGroupId: destinationGroupRef.id
+    };
+  });
+}
