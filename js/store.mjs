@@ -1991,3 +1991,307 @@ export async function cancelShopEazyApprovedOrder({
     };
   });
 }
+
+
+/**
+ * Opens a post-dispatch return/refusal. No inventory is changed.
+ * Quantities are tied to the original fulfillment group and order item.
+ */
+export async function requestShopEazyReturn({
+  orderId, actorUid, items, reason = null, customerNote = null, receivingOutletId = null
+} = {}) {
+  const id = cleanRequiredString(orderId, 'Order ID');
+  const actor = cleanRequiredString(actorUid, 'Actor UID');
+  if (!Array.isArray(items) || !items.length) throw new Error('At least one return item is required.');
+
+  const orderRef = doc(db, 'orders', id);
+  const returnRef = doc(collection(db, 'shopEazyReturns'));
+
+  return runTransaction(db, async tx => {
+    const orderSnap = await tx.get(orderRef);
+    if (!orderSnap.exists()) throw new Error('Order does not exist.');
+
+    const order = orderSnap.data();
+    const status = String(order.status || '').trim().toUpperCase();
+    if (!['OUT_FOR_DELIVERY', 'DELIVERED'].includes(status)) {
+      throw new Error('Returns/refusals can only be opened after dispatch.');
+    }
+
+    const groupsSnap = await tx.get(collection(db, 'orders', id, 'fulfillmentGroups'));
+    const groups = groupsSnap.docs.map(groupDoc => ({ id: groupDoc.id, ref: groupDoc.ref, data: groupDoc.data() }));
+    const normalized = [];
+
+    for (const request of items) {
+      const groupId = cleanRequiredString(request?.groupId, 'Return fulfillment group ID');
+      const orderItemId = cleanRequiredString(request?.orderItemId, 'Return order item ID');
+      const quantity = shopEazyPositiveInteger(request?.quantity, 'Return quantity');
+      const group = groups.find(entry => entry.id === groupId);
+      if (!group) throw new Error('Fulfillment group ' + groupId + ' does not exist.');
+
+      const groupStatus = String(group.data.status || '').trim().toUpperCase();
+      if (!['DISPATCHED', 'DELIVERED'].includes(groupStatus)) {
+        throw new Error('Group ' + groupId + ' has not been dispatched.');
+      }
+
+      const groupItem = (Array.isArray(group.data.items) ? group.data.items : [])
+        .find(item => item?.orderItemId === orderItemId);
+      if (!groupItem) throw new Error('Order item ' + orderItemId + ' is not in group ' + groupId + '.');
+
+      const fulfilled = validateNonNegativeInteger(groupItem.quantityFulfilled || 0, 'Fulfilled quantity');
+      const alreadyReturned = validateNonNegativeInteger(groupItem.quantityReturned || 0, 'Returned quantity');
+      if (fulfilled <= 0) throw new Error('Only physically fulfilled quantities can be returned.');
+
+      const remaining = fulfilled - alreadyReturned;
+      if (quantity > remaining) {
+        throw new Error('Return quantity ' + quantity + ' exceeds remaining returnable quantity ' + remaining + '.');
+      }
+
+      normalized.push({
+        groupId,
+        orderItemId,
+        productId: groupItem.productId,
+        variantId: groupItem.variantId,
+        quantity,
+        originalOutletId: group.data.outletId || null
+      });
+    }
+
+    tx.set(returnRef, {
+      orderId: id,
+      status: 'RETURN_REQUESTED',
+      reason: reason ?? null,
+      customerNote: customerNote ?? null,
+      receivingOutletId: receivingOutletId ?? null,
+      requestedBy: actor,
+      items: normalized.map(item => ({
+        ...item,
+        status: 'RETURN_REQUESTED',
+        disposition: null,
+        receivedQuantity: 0,
+        inspectedQuantity: 0
+      })),
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+
+    for (const group of groups) {
+      const touched = normalized.filter(item => item.groupId === group.id);
+      if (!touched.length) continue;
+      const nextItems = (Array.isArray(group.data.items) ? group.data.items : []).map(groupItem => {
+        const added = touched
+          .filter(item => item.orderItemId === groupItem.orderItemId)
+          .reduce((sum, item) => sum + item.quantity, 0);
+        return added
+          ? { ...groupItem, quantityReturned: validateNonNegativeInteger(groupItem.quantityReturned || 0, 'Returned quantity') + added }
+          : groupItem;
+      });
+      tx.update(group.ref, { items: nextItems, updatedAt: serverTimestamp() });
+    }
+
+    tx.update(orderRef, {
+      status: 'RETURN_REQUESTED',
+      returnStatus: 'RETURN_REQUESTED',
+      updatedAt: serverTimestamp()
+    });
+
+    const auditRef = doc(collection(db, 'shopEazyAudit'));
+    tx.set(auditRef, {
+      action: 'ORDER_RETURN_REQUESTED',
+      orderId: id,
+      returnId: returnRef.id,
+      actorUid: actor,
+      reason: reason ?? null,
+      createdAt: serverTimestamp()
+    });
+
+    return { returnId: returnRef.id, orderId: id, status: 'RETURN_REQUESTED' };
+  });
+}
+
+/**
+ * Records physical receipt. Receipt does not make goods sellable.
+ */
+export async function receiveShopEazyReturn({
+  returnId, actorUid, receivedItems, receivingOutletId, note = null
+} = {}) {
+  const returnIdValue = cleanRequiredString(returnId, 'Return ID');
+  const actor = cleanRequiredString(actorUid, 'Actor UID');
+  const outletId = cleanRequiredString(receivingOutletId, 'Receiving outlet ID');
+  if (!Array.isArray(receivedItems) || !receivedItems.length) throw new Error('Received return items are required.');
+
+  const returnRef = doc(db, 'shopEazyReturns', returnIdValue);
+  const outletRef = doc(db, 'outlets', outletId);
+
+  return runTransaction(db, async tx => {
+    const returnSnap = await tx.get(returnRef);
+    const outletSnap = await tx.get(outletRef);
+    if (!returnSnap.exists()) throw new Error('Return record does not exist.');
+    if (!outletSnap.exists()) throw new Error('Receiving outlet does not exist.');
+
+    const record = returnSnap.data();
+    if (String(record.status || '').trim().toUpperCase() !== 'RETURN_REQUESTED') {
+      throw new Error('Return is not awaiting receipt.');
+    }
+    if (String(outletSnap.data().status || '').trim().toUpperCase() !== 'ACTIVE') {
+      throw new Error('Receiving outlet is not active.');
+    }
+
+    const returnItems = Array.isArray(record.items) ? record.items : [];
+    const nextItems = returnItems.map(item => {
+      const received = receivedItems
+        .filter(entry => entry?.groupId === item.groupId && entry?.orderItemId === item.orderItemId)
+        .reduce((sum, entry) => sum + shopEazyPositiveInteger(entry.quantity, 'Received quantity'), 0);
+      if (received !== item.quantity) {
+        throw new Error('Received quantity for ' + item.orderItemId + ' must equal the requested return quantity.');
+      }
+      return { ...item, receivedQuantity: received, receivingOutletId: outletId, status: 'RETURN_RECEIVED' };
+    });
+
+    tx.update(returnRef, {
+      status: 'RETURN_RECEIVED',
+      receivingOutletId: outletId,
+      items: nextItems,
+      receivedBy: actor,
+      receivedAt: serverTimestamp(),
+      receiveNote: note ?? null,
+      updatedAt: serverTimestamp()
+    });
+
+    const auditRef = doc(collection(db, 'shopEazyAudit'));
+    tx.set(auditRef, {
+      action: 'RETURN_RECEIVED',
+      orderId: record.orderId,
+      returnId: returnIdValue,
+      receivingOutletId: outletId,
+      actorUid: actor,
+      note: note ?? null,
+      createdAt: serverTimestamp()
+    });
+
+    return { returnId: returnIdValue, status: 'RETURN_RECEIVED' };
+  });
+}
+
+/**
+ * Inspects received goods. Only RESTOCKED quantities increase sellable stock.
+ * DAMAGED quantities are recorded but do not increase quantityOnHand.
+ */
+export async function inspectShopEazyReturn({
+  returnId, actorUid, items, note = null
+} = {}) {
+  const returnIdValue = cleanRequiredString(returnId, 'Return ID');
+  const actor = cleanRequiredString(actorUid, 'Actor UID');
+  if (!Array.isArray(items) || !items.length) throw new Error('Inspection items are required.');
+
+  const returnRef = doc(db, 'shopEazyReturns', returnIdValue);
+
+  return runTransaction(db, async tx => {
+    const returnSnap = await tx.get(returnRef);
+    if (!returnSnap.exists()) throw new Error('Return record does not exist.');
+
+    const record = returnSnap.data();
+    if (String(record.status || '').trim().toUpperCase() !== 'RETURN_RECEIVED') {
+      throw new Error('Return must be physically received before inspection.');
+    }
+
+    const returnItems = Array.isArray(record.items) ? record.items : [];
+    const nextItems = returnItems.map(item => {
+      const inspection = items.find(entry =>
+        entry?.groupId === item.groupId && entry?.orderItemId === item.orderItemId
+      );
+      if (!inspection) throw new Error('Missing inspection result for ' + item.orderItemId + '.');
+
+      const disposition = String(inspection.disposition || '').trim().toUpperCase();
+      if (!['RESTOCKED', 'DAMAGED'].includes(disposition)) {
+        throw new Error('Disposition must be RESTOCKED or DAMAGED.');
+      }
+
+      const quantity = shopEazyPositiveInteger(inspection.quantity, 'Inspected quantity');
+      if (quantity !== item.receivedQuantity) {
+        throw new Error('Inspected quantity for ' + item.orderItemId + ' must equal received quantity.');
+      }
+
+      return { ...item, inspectedQuantity: quantity, disposition, status: 'INSPECTED' };
+    });
+
+    // Read all receiving-outlet inventory before writing any inventory.
+    const writes = [];
+    for (const item of nextItems) {
+      if (item.disposition !== 'RESTOCKED') continue;
+
+      const outletId = cleanRequiredString(record.receivingOutletId, 'Receiving outlet ID');
+      const inventoryRef = doc(db, 'outletInventory', shopEazyInventoryId(outletId, item.variantId));
+      const inventorySnap = await tx.get(inventoryRef);
+      if (!inventorySnap.exists()) {
+        throw new Error('Inventory record does not exist for receiving outlet ' + outletId + '.');
+      }
+
+      const inventory = inventorySnap.data();
+      const current = validateNonNegativeInteger(inventory.quantityOnHand, 'quantityOnHand');
+      writes.push({ item, outletId, inventoryRef, inventory, current });
+    }
+
+    for (const change of writes) {
+      const next = change.current + change.item.inspectedQuantity;
+      tx.update(change.inventoryRef, {
+        quantityOnHand: next,
+        updatedAt: serverTimestamp()
+      });
+
+      const movementRef = doc(collection(db, 'inventoryMovements'));
+      tx.set(movementRef, {
+        productId: change.item.productId,
+        variantId: change.item.variantId,
+        outletId: change.outletId,
+        partnerId: change.inventory.partnerId || null,
+        movementType: 'return',
+        quantityChange: change.item.inspectedQuantity,
+        previousQuantity: change.current,
+        newQuantity: next,
+        referenceType: 'returnInspection',
+        referenceId: returnIdValue,
+        orderId: record.orderId,
+        originalFulfillmentGroupId: change.item.groupId,
+        actorUid: actor,
+        reason: 'Inspected return restocked as sellable',
+        createdAt: serverTimestamp()
+      });
+    }
+
+    const hasDamaged = nextItems.some(item => item.disposition === 'DAMAGED');
+    tx.update(returnRef, {
+      status: hasDamaged ? 'DAMAGED' : 'RESTOCKED',
+      items: nextItems,
+      inspectedBy: actor,
+      inspectedAt: serverTimestamp(),
+      inspectionNote: note ?? null,
+      updatedAt: serverTimestamp()
+    });
+
+    const auditRef = doc(collection(db, 'shopEazyAudit'));
+    tx.set(auditRef, {
+      action: 'RETURN_INSPECTED',
+      orderId: record.orderId,
+      returnId: returnIdValue,
+      actorUid: actor,
+      restockedQuantity: writes.reduce((sum, item) => sum + item.item.inspectedQuantity, 0),
+      damagedQuantity: nextItems
+        .filter(item => item.disposition === 'DAMAGED')
+        .reduce((sum, item) => sum + item.inspectedQuantity, 0),
+      note: note ?? null,
+      createdAt: serverTimestamp()
+    });
+
+    return {
+      returnId: returnIdValue,
+      status: hasDamaged ? 'DAMAGED' : 'RESTOCKED',
+      restockedQuantity: writes.reduce((sum, item) => sum + item.item.inspectedQuantity, 0)
+    };
+  });
+}
+
+export async function getShopEazyReturn(returnId) {
+  const id = cleanRequiredString(returnId, 'Return ID');
+  const snap = await getDoc(doc(db, 'shopEazyReturns', id));
+  return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+}
