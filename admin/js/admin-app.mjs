@@ -13,6 +13,7 @@ import {
 } from '../../js/store.mjs';
 
 import { initTabs, initImagePicker } from './admin-shared.mjs';
+import { getShopEazyAccess, describeShopEazyRole } from './shopeazy-access.mjs';
 import { initProducts, renderProducts } from './admin-products.mjs';
 import { initHeroes, renderHeroes, setProductsForHeroLinks } from './admin-heroes.mjs';
 import { initReviews, renderReviews } from './admin-reviews.mjs';
@@ -56,6 +57,7 @@ onAuthStateChanged(auth, (user) => {
   if (user) {
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('dashboard').classList.remove('hidden');
+    initializeShopEazyAccess(user);
     startDashboard();
   } else {
     document.getElementById('dashboard').classList.add('hidden');
@@ -67,6 +69,24 @@ onAuthStateChanged(auth, (user) => {
     if (unsubOrders) unsubOrders();
   }
 });
+
+async function initializeShopEazyAccess(user) {
+  const badge = document.getElementById('shopEazyAccessBadge');
+  if (!badge) return;
+
+  try {
+    const access = await getShopEazyAccess(user);
+    badge.textContent = access.role
+      ? 'ShopEazy · ' + describeShopEazyRole(access.role)
+      : 'ShopEazy · Unassigned';
+
+    badge.classList.remove('hidden');
+  } catch (error) {
+    console.error('ShopEazy access check failed:', error);
+    badge.textContent = 'ShopEazy · Access check failed';
+    badge.classList.remove('hidden');
+  }
+}
 
 function startDashboard() {
   unsubProducts = watchProducts((products) => {
