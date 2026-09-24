@@ -57,8 +57,12 @@ onAuthStateChanged(auth, (user) => {
   if (user) {
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('dashboard').classList.remove('hidden');
-    initializeShopEazyAccess(user);
-    startDashboard();
+    const access = await initializeShopEazyAccess(user);
+    if (access?.role === 'ADMIN') {
+      startDashboard();
+    } else {
+      showShopEazyRoleShell(access);
+    }
   } else {
     document.getElementById('dashboard').classList.add('hidden');
     document.getElementById('loginScreen').classList.remove('hidden');
@@ -81,11 +85,45 @@ async function initializeShopEazyAccess(user) {
       : 'ShopEazy · Unassigned';
 
     badge.classList.remove('hidden');
+    return access;
   } catch (error) {
     console.error('ShopEazy access check failed:', error);
     badge.textContent = 'ShopEazy · Access check failed';
     badge.classList.remove('hidden');
+    return null;
   }
+}
+
+function showShopEazyRoleShell(access) {
+  const dashboard = document.getElementById('dashboard');
+  const accessPanel = document.getElementById('shopEazyAccessPanel');
+  const message = document.getElementById('shopEazyAccessMessage');
+
+  // The existing legacy admin tabs are deliberately kept admin-only until
+  // their Firestore permissions and ShopEazy operational equivalents are
+  // connected to each role.
+  dashboard.querySelectorAll('.tab-btn').forEach((button) => {
+    button.classList.add('hidden');
+  });
+
+  dashboard.querySelectorAll('.tab-panel').forEach((panel) => {
+    panel.classList.add('hidden');
+  });
+
+  accessPanel?.classList.remove('hidden');
+
+  if (!access?.role) {
+    message.textContent = 'No ShopEazy role is assigned to this account. Ask an administrator to assign a role.';
+    return;
+  }
+
+  const scope = access.partnerId
+    ? `Partner: ${access.partnerId}`
+    : access.outletId
+      ? `Outlet: ${access.outletId}`
+      : 'No partner/outlet scope assigned';
+
+  message.textContent = `${describeShopEazyRole(access.role)} · ${scope}`;
 }
 
 function startDashboard() {
