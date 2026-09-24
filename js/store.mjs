@@ -1683,9 +1683,25 @@ export async function advanceShopEazyFulfillmentGroup({
         : String(entry.data.status || 'UNALLOCATED').trim().toUpperCase()
     );
 
-    const overallStatus = shopEazyDeriveOverallFulfillmentStatus(
+    let overallStatus = shopEazyDeriveOverallFulfillmentStatus(
       statusForOrder.map(status => ({ status }))
     );
+
+    // A partially approved order with unresolved remainder cannot become
+    // customer-complete merely because its currently approved groups are
+    // delivered. The remainder must first be resolved through the partial
+    // resolution workflow.
+    const unresolvedRemainder = Number(
+      order.fulfillmentSummary?.unallocatedQuantity || 0
+    );
+    if (
+      overallStatus === 'DELIVERED' &&
+      String(order.approvalStatus || '').trim().toUpperCase() === 'PARTIAL' &&
+      Number.isInteger(unresolvedRemainder) &&
+      unresolvedRemainder > 0
+    ) {
+      overallStatus = 'FULFILLING';
+    }
 
     tx.update(groupRef, {
       items: nextItems,
