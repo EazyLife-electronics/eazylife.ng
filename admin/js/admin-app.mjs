@@ -60,6 +60,7 @@ onAuthStateChanged(auth, async (user) => {
     document.getElementById('dashboard').classList.remove('hidden');
     const access = await initializeShopEazyAccess(user);
     if (access?.role === 'ADMIN') {
+      initShopEazyPartners(access);
       startDashboard();
     } else if (['PARTNER_MANAGER'].includes(access?.role)) {
       showShopEazyRoleShell(access);
