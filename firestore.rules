@@ -167,6 +167,12 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin() || isPartnerManager();
     }
 
+    match /shopEazyStaff/{uid} {
+      // Role assignments are sensitive authorization metadata. Only the
+      // ShopEazy administrator can create, change, or read them.
+      allow read, create, update, delete: if isAdmin();
+    }
+
     match /shopEazyAudit/{auditId} {
       allow read: if isAdmin() || isPartnerManager();
       allow create: if isAdmin();
