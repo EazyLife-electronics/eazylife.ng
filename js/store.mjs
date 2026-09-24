@@ -1792,3 +1792,202 @@ export async function getShopEazyFulfillmentSummary(orderId) {
     totalFulfilledQuantity: groups.reduce((sum, group) => sum + group.fulfilledQuantity, 0)
   };
 }
+
+
+/* ---------------- SHOP-EAZY: CANCELLATION & RETURNS ---------------- */
+
+/**
+ * Cancel before approval. No ShopEazy inventory is touched because customer
+ * submission never reserves stock.
+ */
+export async function cancelShopEazyOrderBeforeApproval({
+  orderId, actorUid, reason = null, customerNote = null, internalNote = null
+} = {}) {
+  const id = cleanRequiredString(orderId, 'Order ID');
+  const actor = cleanRequiredString(actorUid, 'Actor UID');
+  const orderRef = doc(db, 'orders', id);
+
+  return runTransaction(db, async tx => {
+    const snap = await tx.get(orderRef);
+    if (!snap.exists()) throw new Error('Order does not exist.');
+
+    const order = snap.data();
+    const status = String(order.status || '').trim().toUpperCase();
+    const approval = String(order.approvalStatus || '').trim().toUpperCase();
+
+    if (order.inventoryApplied === true || ['APPROVED', 'PARTIAL'].includes(approval)) {
+      throw new Error('Inventory has already been committed. Use approved-order cancellation or the return workflow.');
+    }
+    if (['CANCELLED', 'RETURNED'].includes(status)) {
+      throw new Error('Order is already ' + status + '.');
+    }
+    if (['APPROVED', 'FULFILLING', 'OUT_FOR_DELIVERY', 'DELIVERED'].includes(status)) {
+      throw new Error('Pre-approval cancellation is no longer valid for this order.');
+    }
+
+    tx.update(orderRef, {
+      status: 'CANCELLED',
+      cancelReason: reason,
+      cancelCustomerNote: customerNote,
+      cancelInternalNote: internalNote,
+      cancelledAt: serverTimestamp(),
+      cancelledBy: actor,
+      updatedAt: serverTimestamp()
+    });
+
+    const auditRef = doc(collection(db, 'shopEazyAudit'));
+    tx.set(auditRef, {
+      action: 'ORDER_CANCELLED_BEFORE_APPROVAL',
+      orderId: id,
+      actorUid: actor,
+      reason: reason ?? null,
+      createdAt: serverTimestamp()
+    });
+
+    return { orderId: id, status: 'CANCELLED', inventoryChanged: false };
+  });
+}
+
+/**
+ * Cancel after approval but before physical fulfillment. Restores all
+ * still-approved quantities to their original outlets atomically.
+ */
+export async function cancelShopEazyApprovedOrder({
+  orderId, actorUid, reason = null, customerNote = null, internalNote = null
+} = {}) {
+  const id = cleanRequiredString(orderId, 'Order ID');
+  const actor = cleanRequiredString(actorUid, 'Actor UID');
+  const orderRef = doc(db, 'orders', id);
+
+  return runTransaction(db, async tx => {
+    const orderSnap = await tx.get(orderRef);
+    if (!orderSnap.exists()) throw new Error('Order does not exist.');
+
+    const order = orderSnap.data();
+    const status = String(order.status || '').trim().toUpperCase();
+
+    if (['CANCELLED', 'RETURNED'].includes(status)) {
+      throw new Error('Order is already ' + status + '.');
+    }
+    if (order.inventoryApplied !== true || order.inventoryReturned === true) {
+      throw new Error('This order has no committed inventory available for cancellation reversal.');
+    }
+
+    const groupsSnap = await tx.get(collection(db, 'orders', id, 'fulfillmentGroups'));
+    if (!groupsSnap.docs.length) throw new Error('Order has no fulfillment groups.');
+
+    const changes = [];
+
+    for (const groupDoc of groupsSnap.docs) {
+      const group = groupDoc.data();
+      const groupStatus = String(group.status || 'UNALLOCATED').trim().toUpperCase();
+
+      if (['PICKING', 'READY', 'DISPATCHED', 'DELIVERED', 'CANCELLED', 'RETURNED'].includes(groupStatus)) {
+        throw new Error(
+          'Cannot cancel because fulfillment group ' + groupDoc.id +
+          ' has entered ' + groupStatus + '. Use the return workflow.'
+        );
+      }
+
+      for (const item of (Array.isArray(group.items) ? group.items : [])) {
+        const approved = validateNonNegativeInteger(item.quantityApproved || 0, 'Approved quantity');
+        const fulfilled = validateNonNegativeInteger(item.quantityFulfilled || 0, 'Fulfilled quantity');
+
+        if (fulfilled > 0) {
+          throw new Error('An order with fulfilled quantity must use the return workflow.');
+        }
+        if (!approved) continue;
+
+        const outletId = cleanRequiredString(group.outletId, 'Fulfillment outlet ID');
+        const variantId = cleanRequiredString(item.variantId, 'Variant ID');
+
+        changes.push({
+          groupDoc,
+          item,
+          outletId,
+          variantId,
+          quantity: approved,
+          inventoryRef: doc(db, 'outletInventory', shopEazyInventoryId(outletId, variantId))
+        });
+      }
+    }
+
+    // Read all affected inventory before writing any inventory document.
+    const checked = [];
+    for (const change of changes) {
+      const inventorySnap = await tx.get(change.inventoryRef);
+      if (!inventorySnap.exists()) {
+        throw new Error('Inventory record does not exist for outlet ' + change.outletId + '.');
+      }
+      const inventory = inventorySnap.data();
+      const current = validateNonNegativeInteger(inventory.quantityOnHand, 'quantityOnHand');
+      checked.push({ ...change, inventory, current });
+    }
+
+    for (const change of checked) {
+      const next = change.current + change.quantity;
+      tx.update(change.inventoryRef, {
+        quantityOnHand: next,
+        updatedAt: serverTimestamp()
+      });
+
+      const movementRef = doc(collection(db, 'inventoryMovements'));
+      tx.set(movementRef, {
+        productId: change.item.productId,
+        variantId: change.variantId,
+        sku: change.item.sku || '',
+        outletId: change.outletId,
+        partnerId: change.groupDoc.data().partnerId || change.inventory.partnerId || null,
+        movementType: 'return',
+        quantityChange: change.quantity,
+        previousQuantity: change.current,
+        newQuantity: next,
+        referenceType: 'orderCancellation',
+        referenceId: id,
+        fulfillmentGroupId: change.groupDoc.id,
+        actorUid: actor,
+        reason: reason || 'Approved order cancelled before fulfillment',
+        createdAt: serverTimestamp()
+      });
+    }
+
+    for (const groupDoc of groupsSnap.docs) {
+      const items = Array.isArray(groupDoc.data().items) ? groupDoc.data().items : [];
+      tx.update(groupDoc.ref, {
+        items: items.map(item => ({ ...item, quantityApproved: 0, quantityFulfilled: 0 })),
+        status: 'CANCELLED',
+        cancellationReason: reason ?? null,
+        updatedAt: serverTimestamp()
+      });
+    }
+
+    tx.update(orderRef, {
+      status: 'CANCELLED',
+      approvalStatus: 'REJECTED',
+      inventoryReturned: true,
+      inventoryReturnedAt: serverTimestamp(),
+      cancelledAt: serverTimestamp(),
+      cancelledBy: actor,
+      cancelReason: reason,
+      cancelCustomerNote: customerNote,
+      cancelInternalNote: internalNote,
+      updatedAt: serverTimestamp()
+    });
+
+    const auditRef = doc(collection(db, 'shopEazyAudit'));
+    tx.set(auditRef, {
+      action: 'APPROVED_ORDER_CANCELLED_BEFORE_FULFILLMENT',
+      orderId: id,
+      actorUid: actor,
+      restoredQuantity: checked.reduce((sum, item) => sum + item.quantity, 0),
+      reason: reason ?? null,
+      createdAt: serverTimestamp()
+    });
+
+    return {
+      orderId: id,
+      status: 'CANCELLED',
+      restoredQuantity: checked.reduce((sum, item) => sum + item.quantity, 0)
+    };
+  });
+}
