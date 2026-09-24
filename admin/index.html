@@ -52,6 +52,7 @@
     </header>
     <div class="max-w-4xl mx-auto p-4">
         <div class="flex gap-2 mb-6 overflow-x-auto no-scrollbar">
+            <button data-tab="partners" id="partnersTabBtn" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Partners & Outlets</button>
             <button data-tab="products" class="tab-btn tab-active px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Products</button>
             <button data-tab="inventory" id="inventoryTabBtn" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Inventory</button>
             <button data-tab="reports" id="reportsTabBtn" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Reports</button>
@@ -62,6 +63,7 @@
             <button data-tab="delivery" id="deliveryTabBtn" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Delivery</button>
             <button data-tab="settings" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Settings</button>
         </div>
+        <div id="panel-partners" class="tab-panel hidden"><div id="partnersContent"></div></div>
         <div id="panel-products" class="tab-panel">
             <div class="bg-white p-6 rounded-[24px] shadow-sm mb-6">
                 <h2 id="formTitle" class="font-black text-lg mb-4">Add Product</h2>
