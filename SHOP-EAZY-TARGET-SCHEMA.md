@@ -520,22 +520,302 @@ No destructive migration should occur until the separation between EazyLife and 
 - No unnecessary outlet-specific cost accounting at launch.
 - No complete frontend redesign before the data layer is validated.
 
-## 18. Implementation sequence
+## 18. Exact order / approval / fulfillment state architecture
+
+ShopEazy will keep three related but separate state concepts. This avoids forcing one status field to represent customer approval, operational fulfillment, and the overall order lifecycle at the same time.
+
+### 18.1 Overall order status
+
+Recommended values:
+
+- `NEW` — customer submitted the order; no stock has been deducted.
+- `PROCESSING` — admin is reviewing and allocating the order.
+- `APPROVED` — the approved quantities have been atomically committed/deducted.
+- `FULFILLING` — one or more fulfillment groups are being prepared.
+- `OUT_FOR_DELIVERY` — applicable delivery groups have been dispatched.
+- `DELIVERED` — all required fulfillment has been delivered.
+- `CANCELLED` — the order, or the remaining unfulfilled portion, was cancelled.
+- `RETURN_REQUESTED` — a delivered/dispatched item has entered the return process.
+- `RETURNED` — the relevant return process is complete.
+
+The overall status is derived/managed from the order and fulfillment-group state. It must not be used as the sole source of truth for outlet operations.
+
+### 18.2 Approval status
+
+Recommended values:
+
+- `NOT_REVIEWED`
+- `UNDER_REVIEW`
+- `READY`
+- `PARTIAL`
+- `APPROVED`
+- `REJECTED`
+
+Meaning:
+
+- `NOT_REVIEWED`: order has been received but admin has not started review.
+- `UNDER_REVIEW`: allocation/review is in progress.
+- `READY`: allocation is prepared and can be submitted for approval.
+- `PARTIAL`: only part of the requested quantity can currently be approved.
+- `APPROVED`: all quantities intended for approval have been committed successfully.
+- `REJECTED`: the order or remaining unapproved portion is rejected.
+
+A partial order may therefore be approved while retaining explicit unallocated quantity and a customer-resolution path.
+
+### 18.3 Fulfillment-group status
+
+Each `orders/{orderId}/fulfillmentGroups/{groupId}` has its own lifecycle:
+
+- `UNALLOCATED`
+- `ALLOCATED`
+- `APPROVED`
+- `PICKING`
+- `READY`
+- `DISPATCHED`
+- `DELIVERED`
+- `CANCELLED`
+- `RETURNED`
+
+A fulfillment group represents an outlet-specific operational unit. Multiple groups can progress independently within one customer order.
+
+### 18.4 Customer-facing status
+
+The customer interface should intentionally expose fewer states:
+
+- **Order received — checking availability**
+- **Confirmed**
+- **Preparing**
+- **On the way**
+- **Delivered**
+
+For a partial order, show the confirmed quantity explicitly, for example:
+
+> 4 of 5 units confirmed. We’re arranging the remaining 1.
+
+Internal approval and fulfillment states remain available to authorized staff.
+
+## 19. State transitions
+
+### 19.1 Customer submission
+
+`NEW + NOT_REVIEWED`
+
+Actions:
+- create order,
+- preserve requested quantities,
+- do not deduct stock,
+- do not reserve stock.
+
+### 19.2 Admin starts review
+
+`NEW → PROCESSING`
+
+Approval:
+`NOT_REVIEWED → UNDER_REVIEW`
+
+No inventory mutation occurs merely by opening/reviewing an order.
+
+### 19.3 Allocation
+
+Admin creates or updates fulfillment groups and allocates quantities to outlets.
+
+Rules:
+- allocation must reference valid product/variant/outlet records,
+- allocation cannot exceed ordered quantity,
+- approved quantity cannot exceed allocated quantity,
+- unallocated quantity must remain explicit,
+- allocation edits before approval do not deduct stock.
+
+Fulfillment groups normally move:
+`UNALLOCATED → ALLOCATED`
+
+### 19.4 Ready for approval
+
+If the intended approval allocation is complete enough for the selected resolution path:
+
+`UNDER_REVIEW → READY`
+
+For a fully allocatable order, total approved quantity will equal total ordered quantity.
+
+For a partial order, approved quantity may be lower than ordered quantity, but the unallocated quantity and resolution path must be explicit.
+
+### 19.5 Approve Order — one atomic transaction
+
+The admin still sees one overall **Approve Order** action.
+
+The transaction must:
+
+1. Read the order and its approval/allocation data.
+2. Verify the order is still eligible for approval.
+3. Read every affected `outletInventory` record inside the transaction.
+4. Verify each approved quantity is available.
+5. Verify allocation/approval totals against ordered quantities.
+6. Deduct each approved outlet quantity.
+7. Create the corresponding inventory movement records.
+8. Mark the relevant fulfillment groups `APPROVED`.
+9. Update the order approval/inventory fields.
+10. Record `approvedAt` and `approvedBy`.
+
+If any required inventory check fails, the entire transaction fails and **no outlet stock is deducted**.
+
+This protects against concurrent approvals consuming the same stock.
+
+### 19.6 Full approval
+
+For a fully supplied order:
+
+`approvalStatus: APPROVED`
+
+and:
+
+`status: APPROVED`
+
+The order then progresses into fulfillment as groups begin operational work.
+
+### 19.7 Partial approval
+
+For a partially supplied order:
+
+`approvalStatus: PARTIAL`
+
+Approved quantities are committed immediately.
+
+Unallocated quantity remains explicitly recorded.
+
+The remaining quantity must follow a defined resolution path, such as:
+- wait for replenishment,
+- customer accepts the partial order,
+- substitution,
+- cancellation/rejection of the remaining quantity.
+
+The requested quantity must never be silently rewritten downward.
+
+### 19.8 Fulfillment progression
+
+Once approved, each group may progress independently:
+
+`APPROVED → PICKING → READY → DISPATCHED → DELIVERED`
+
+The overall order can move to:
+- `FULFILLING` when fulfillment work starts,
+- `OUT_FOR_DELIVERY` when relevant groups are dispatched,
+- `DELIVERED` only when the required customer fulfillment is complete.
+
+### 19.9 Controlled reassignment
+
+An approved allocation may be moved between outlets only while the affected quantity has not entered fulfillment/delivery.
+
+Allowed window:
+
+`APPROVED` group state, before `PICKING` / `DISPATCHED`.
+
+Reassignment transaction must:
+1. verify the source approved quantity,
+2. verify destination outlet eligibility,
+3. verify destination stock,
+4. deduct destination stock,
+5. restore source stock,
+6. update fulfillment-group allocations,
+7. write inventory movements,
+8. write an audit event with actor, time, source, destination, quantity, and reason.
+
+The transaction must preserve total approved quantity and prevent double-counting.
+
+If fulfillment has already begun, use the exception/return/cancellation workflow rather than silently reassigning the allocation.
+
+### 19.10 Cancellation
+
+Before approval:
+- canceling the order requires no inventory reversal because no stock was committed.
+
+After approval but before physical fulfillment:
+- approved stock that is cancelled must be returned to the appropriate original outlet through a documented inventory return/correction event.
+
+After dispatch:
+- do not model a customer refusal/physical return simply as a pre-fulfillment cancellation.
+- use the return/refusal workflow and identify the physical return location/disposition.
+
+### 19.11 Returns
+
+Return lifecycle:
+
+`RETURN_REQUESTED → RETURN_RECEIVED → INSPECTED → RESTOCKED / DAMAGED`
+
+A return must identify:
+- original order,
+- order item,
+- fulfillment group,
+- physical outlet,
+- quantity,
+- inspection/disposition.
+
+Only sellable returned stock is added back to sellable outlet inventory.
+
+## 20. Transaction and concurrency requirements
+
+Approval and reassignment are inventory-critical operations and must use Firestore transactions.
+
+### Approval transaction invariants
+
+At commit time:
+
+- every approved quantity has a valid outlet inventory record,
+- every approved quantity is greater than or equal to zero,
+- approved quantity does not exceed allocated quantity,
+- allocated quantity does not exceed ordered quantity,
+- the inventory record has enough `quantityOnHand`,
+- the order has not already been inventory-applied,
+- the order is still in an approval-eligible state.
+
+The transaction must update all affected inventory and order state together.
+
+### Reassignment invariants
+
+At commit time:
+
+- source allocation contains enough approved quantity to move,
+- destination outlet is active and fulfillment-enabled,
+- destination inventory has enough stock,
+- total approved quantity remains unchanged,
+- no fulfillment has begun for the moved quantity,
+- audit information is present.
+
+The source stock restoration and destination stock deduction must occur atomically with the allocation update.
+
+### Idempotency
+
+Approval must be safe against accidental repeated clicks/retries.
+
+The implementation should use the order's inventory state plus transaction checks so an already-applied approval cannot deduct the same stock twice.
+
+### Auditability
+
+Inventory-changing operations should record:
+- actor UID,
+- timestamp,
+- order/fulfillment reference,
+- outlet,
+- quantity before/after,
+- reason where applicable.
+
+Reassignment should additionally record source and destination outlets.
+
+## 21. Implementation sequence
 
 The controlled implementation sequence is now:
 
 1. Finalize/verify this target schema.
-2. Define the exact order/approval state machine.
-3. Define the Firestore transaction shapes for approval and reassignment.
+2. Lock the exact order/approval/fulfillment state machine defined above.
+3. Define the concrete Firestore transaction shapes for approval and reassignment.
 4. Introduce ShopEazy partner/outlet records without disturbing existing EazyLife data.
 5. Introduce outlet inventory alongside legacy `stockQty`.
 6. Add outlet-aware fulfillment groups.
 7. Implement admin allocation and approval transactionally.
-8. Add controlled partial-fulfillment handling.
+8. Add controlled partial-fulfillment handling and customer-resolution paths.
 9. Add controlled reassignment with audit history.
 10. Introduce the rich product media system.
 11. Expand product information fields.
 12. Add role-based access incrementally.
-13. Validate with test orders and reconciliation before enabling production behavior.
+13. Validate with test orders, concurrent-approval tests, reassignment tests, and reconciliation before enabling production behavior.
 
 This document is a blueprint only. No Firestore collections or production data are changed by updating it.
