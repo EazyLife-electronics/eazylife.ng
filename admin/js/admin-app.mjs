@@ -13,7 +13,6 @@ import {
 } from '../../js/store.mjs';
 
 import { initTabs, initImagePicker } from './admin-shared.mjs';
-import { getShopEazyAccess, describeShopEazyRole } from './shopeazy-access.mjs';
 import { initProducts, renderProducts } from './admin-products.mjs';
 import { initHeroes, renderHeroes, setProductsForHeroLinks } from './admin-heroes.mjs';
 import { initReviews, renderReviews } from './admin-reviews.mjs';
@@ -53,17 +52,10 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
 
 document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
 
-onAuthStateChanged(auth, async (user) => {
+onAuthStateChanged(auth, (user) => {
   if (user) {
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('dashboard').classList.remove('hidden');
-    const access = await getShopEazyAccess(user);
-    window.shopEazyAccess = access;
-    const badge = document.getElementById('shopEazyAccessBadge');
-    if (badge) {
-      badge.textContent = access.role ? 'ShopEazy · ' + describeShopEazyRole(access.role) : 'ShopEazy · Unassigned';
-      badge.classList.remove('hidden');
-    }
     startDashboard();
   } else {
     document.getElementById('dashboard').classList.add('hidden');
