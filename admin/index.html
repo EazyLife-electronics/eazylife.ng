@@ -30,29 +30,12 @@
     </div>
 </div>
 <div id="dashboard" class="hidden">
-<div id="shopEazyAccessPanel" class="hidden max-w-4xl mx-auto mt-8 px-4">
-    <div class="bg-white rounded-[24px] shadow-sm border border-gray-100 p-6">
-        <div class="flex items-start gap-4">
-            <div class="w-11 h-11 rounded-2xl bg-gray-100 flex items-center justify-center text-gray-600">
-                <i class="fa-solid fa-shield-halved"></i>
-            </div>
-            <div>
-                <h2 class="font-black text-lg">ShopEazy Operations</h2>
-                <p id="shopEazyAccessMessage" class="text-sm text-gray-500 mt-1"></p>
-                <p class="text-xs text-gray-400 mt-3">Your role has been identified. Role-specific partner, outlet, inventory, order approval and fulfillment tools will appear here as each operational module is connected.</p>
-            </div>
-        </div>
-    </div>
-</div>
-
     <header class="bg-white border-b sticky top-0 z-40 p-4 shadow-sm flex justify-between items-center">
-        <div id="shopEazyAccessBadge" class="hidden mr-auto ml-4 text-xs font-bold px-3 py-1 rounded-full bg-gray-100 text-gray-600"></div>
         <h1 class="font-syne font-extrabold text-lg">EazyLife <span class="text-[#00B09B]">Admin</span></h1>
         <button id="logoutBtn" class="text-gray-400 text-xs font-bold hover:text-gray-700"><i class="fas fa-sign-out-alt"></i> Log out</button>
     </header>
     <div class="max-w-4xl mx-auto p-4">
         <div class="flex gap-2 mb-6 overflow-x-auto no-scrollbar">
-            <button data-tab="partners" id="partnersTabBtn" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Partners & Outlets</button>
             <button data-tab="products" class="tab-btn tab-active px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Products</button>
             <button data-tab="inventory" id="inventoryTabBtn" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Inventory</button>
             <button data-tab="reports" id="reportsTabBtn" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Reports</button>
@@ -60,11 +43,9 @@
             <button data-tab="reviews" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Reviews</button>
             <button data-tab="requests" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Requests</button>
             <button data-tab="orders" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Orders</button>
-            <button data-tab="shopeazy-orders" id="shopEazyOrdersTabBtn" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">ShopEazy Orders</button>
             <button data-tab="delivery" id="deliveryTabBtn" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Delivery</button>
             <button data-tab="settings" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Settings</button>
         </div>
-        <div id="panel-partners" class="tab-panel hidden"><div id="partnersContent"></div></div>
         <div id="panel-products" class="tab-panel">
             <div class="bg-white p-6 rounded-[24px] shadow-sm mb-6">
                 <h2 id="formTitle" class="font-black text-lg mb-4">Add Product</h2>
@@ -89,19 +70,17 @@
         <div id="panel-reviews" class="tab-panel hidden"><div class="bg-white p-6 rounded-[24px] shadow-sm mb-6"><h2 class="font-black text-lg mb-1">Add Review</h2><p class="text-xs text-gray-400 mb-4">Paste in a review you received by email (Formspree). New reviews are unapproved until you toggle them live.</p><form id="reviewAddForm" class="space-y-3"><input id="rvName" placeholder="Customer name" required class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"><input id="rvTitle" placeholder="Title" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"><select id="rvStars" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"><option value="5">★★★★★ (5)</option><option value="4">★★★★☆ (4)</option><option value="3">★★★☆☆ (3)</option><option value="2">★★☆☆☆ (2)</option><option value="1">★☆☆☆☆ (1)</option></select><textarea id="rvText" placeholder="Review text" required rows="3" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"></textarea><label class="flex items-center gap-2 text-xs text-gray-500 font-bold px-1"><input type="checkbox" id="rvApproved" checked> Publish immediately (approved)</label><button type="submit" class="bg-gray-900 text-white w-full py-3 rounded-xl font-bold text-sm">Save Review</button></form></div><div id="reviewList" class="grid gap-3"></div></div>
         <div id="panel-requests" class="tab-panel hidden"><p class="text-xs text-gray-400 mb-4 px-1">"Can't find what you want" and budget-based sourcing requests from the shop. Move each through New → Contacted → Fulfilled.</p><div id="requestList" class="grid gap-3"></div></div>
         <div id="panel-orders" class="tab-panel hidden"><div id="orderList" class="grid gap-3"></div></div>
-        <div id="panel-shopeazy-orders" class="tab-panel hidden"><div id="shopEazyOrdersContent"></div></div>
         <div id="panel-delivery" class="tab-panel hidden"><div id="deliveryContent"></div></div>
         <div id="panel-settings" class="tab-panel hidden"><div id="settingsContent"></div></div>
     </div>
 </div>
 <div id="imagePickerModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] flex items-end md:items-center justify-center"><div class="bg-white w-full max-w-lg rounded-t-[28px] md:rounded-[24px] shadow-2xl p-5 max-h-[85vh] flex flex-col"><div class="flex justify-between items-center mb-3"><h3 class="font-black text-base text-gray-800">Choose an Image</h3><button onclick="closeImagePicker()" class="text-gray-400 text-2xl p-1">&times;</button></div><p id="pickerHint" class="text-xs text-gray-400 mb-3"></p><div id="pickerGrid" class="grid grid-cols-3 gap-2 overflow-y-auto pr-1" style="flex:1;"><p class="col-span-3 text-center text-gray-400 text-sm py-10">Loading images...</p></div></div></div>
 <script type="module" src="js/settings-ui.mjs"></script>
-<script type="module" src="js/admin-boot.mjs?v=auth-test-20260925"></script>
+<script type="module" src="js/admin-app.mjs"></script>
 <script type="module" src="js/purchases.mjs"></script>
 <script type="module" src="js/order-delivery-bridge.mjs"></script>
 <script type="module">
 import { initInventory } from "./js/inventory.mjs";
-import { initShopEazyInventory } from "./js/shopeazy-inventory.mjs";
 import { initInventoryReports } from "./js/inventory-reports.mjs";
 import { initDelivery } from "./js/delivery.mjs";
 let stopInventory=null;
@@ -111,7 +90,7 @@ const inventoryBtn=document.getElementById("inventoryTabBtn");
 const reportsBtn=document.getElementById("reportsTabBtn");
 const deliveryBtn=document.getElementById("deliveryTabBtn");
 function showPanel(tab){document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("tab-active"));document.querySelector(`[data-tab="${tab}"]`).classList.add("tab-active");document.querySelectorAll(".tab-panel").forEach(p=>p.classList.add("hidden"));document.getElementById(`panel-${tab}`).classList.remove("hidden");}
-inventoryBtn.addEventListener("click",()=>{showPanel("inventory");if(stopReports){stopReports();stopReports=null;}if(["ADMIN","PARTNER_MANAGER"].includes(window.shopEazyAccess?.role)){initShopEazyInventory(window.shopEazyAccess);}else if(!stopInventory)stopInventory=initInventory();});
+inventoryBtn.addEventListener("click",()=>{showPanel("inventory");if(stopReports){stopReports();stopReports=null;}if(!stopInventory)stopInventory=initInventory();});
 reportsBtn.addEventListener("click",()=>{showPanel("reports");if(stopInventory){stopInventory();stopInventory=null;}if(!stopReports)stopReports=initInventoryReports();});
 deliveryBtn.addEventListener("click",()=>{showPanel("delivery");if(!stopDelivery)stopDelivery=initDelivery();});
 </script>
