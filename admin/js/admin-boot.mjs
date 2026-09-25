@@ -1,6 +1,6 @@
-// Admin bootstrap.
-// Keep the login screen independent from the full dashboard module so a
-// dashboard import/cache problem cannot make the login page disappear.
+// Temporary authentication diagnostic bootstrap.
+// This version intentionally stops after Firebase Authentication so we can
+// verify Auth independently from Firestore permissions and ShopEazy access.
 import { initFirebase } from '../../js/firebase.mjs';
 import {
   onAuthStateChanged,
@@ -18,6 +18,7 @@ const errorEl = document.getElementById('loginError');
 loginBtn?.addEventListener('click', async () => {
   const email = document.getElementById('loginEmail')?.value.trim();
   const password = document.getElementById('loginPassword')?.value;
+
   if (!email || !password) {
     errorEl.textContent = 'Enter your email and password.';
     errorEl.classList.remove('hidden');
@@ -27,11 +28,12 @@ loginBtn?.addEventListener('click', async () => {
   errorEl.classList.add('hidden');
   loginBtn.disabled = true;
   loginBtn.textContent = 'Logging in...';
+
   try {
     await signInWithEmailAndPassword(auth, email, password);
   } catch (error) {
-    console.error('Admin login failed:', error);
-    errorEl.textContent = 'Login failed — check email and password.';
+    console.error('Firebase Authentication failed:', error);
+    errorEl.textContent = 'Firebase login failed — check the email/password.';
     errorEl.classList.remove('hidden');
   } finally {
     loginBtn.disabled = false;
@@ -41,33 +43,20 @@ loginBtn?.addEventListener('click', async () => {
 
 logoutBtn?.addEventListener('click', () => signOut(auth));
 
-let dashboardStarted = false;
-onAuthStateChanged(auth, async (user) => {
+onAuthStateChanged(auth, (user) => {
   if (!user) {
-    dashboardStarted = false;
     dashboard?.classList.add('hidden');
     loginScreen?.classList.remove('hidden');
     return;
   }
 
+  // TEMPORARY: deliberately do not load Firestore, ShopEazy access checks,
+  // or the full admin dashboard. This confirms Firebase Auth by itself.
   loginScreen?.classList.add('hidden');
   dashboard?.classList.remove('hidden');
-
-  if (dashboardStarted) return;
-  dashboardStarted = true;
-
-  try {
-    // Cache-bust the dashboard module so GitHack cannot keep serving an old
-    // failed response for the same module URL.
-    await import('./admin-app.mjs?v=shopeazy-1790299553562');
-  } catch (error) {
-    console.error('Admin dashboard failed to start:', error);
-    dashboardStarted = false;
-    if (errorEl) {
-      errorEl.textContent = 'Dashboard could not start: ' + (error?.message || String(error));
-      errorEl.classList.remove('hidden');
-    }
-    loginScreen?.classList.remove('hidden');
-    dashboard?.classList.add('hidden');
+  const badge = document.getElementById('shopEazyAccessBadge');
+  if (badge) {
+    badge.textContent = 'Firebase Auth OK · ' + (user.email || 'authenticated user');
+    badge.classList.remove('hidden');
   }
 });
