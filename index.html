@@ -767,7 +767,11 @@
         // Keep the homepage snackable — a full row on desktop (4-col grid), two tidy rows
         // on mobile (2-col grid), rather than the longer scroll the full catalog invites.
         const PREVIEW_COUNT = 4;
-        const publicProducts = products.filter(p => !/phone|mobile/i.test(String(p.category || '')) && !/\bphone\b/i.test(String(p.name || '')));
+        const publicProducts = products.filter(p => !/phone|mobile/i.test(String(p.category || '') + ' ' + String(p.name || '')));
+        if (!publicProducts.length) {
+          grid.innerHTML = '<div class="shop-preview-empty">Developer workstations and electronics listings are being updated. Contact us for current availability.</div>';
+          return;
+        }
         const preview = publicProducts.slice(0, PREVIEW_COUNT);
         grid.innerHTML = preview.map(p => {
           const range = productPriceRange(p);
