@@ -10,7 +10,7 @@ export async function loadSettingsForm() {
   document.getElementById('s_tagline').value = settings.tagline || '';
   document.getElementById('s_about').value = Number(settings.aboutTextVersion || 0) >= 2
     ? (settings.aboutText || '')
-    : 'Eazylife Robotics and Electronics Solutions helps people, schools and businesses turn ideas into working systems through practical engineering, accessible components and hands-on learning.';
+    : 'At Eazylife Robotics and Electronics Solutions, we work with individuals, schools and businesses on practical engineering projects, electronics and hands-on learning.';
   document.getElementById('s_referralMode').checked = settings.referralMode !== false; // defaults to true
   document.getElementById('s_deliveryFee').value = settings.deliveryFeePerItem ?? 750;
   document.getElementById('s_deliveryDiscount').value = settings.deliveryDiscountPercent ?? 10;
