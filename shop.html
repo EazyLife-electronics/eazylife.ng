@@ -419,8 +419,8 @@
                 <select id="reqCategory" class="w-full bg-gray-50 dark:bg-[#1c2925] dark:text-gray-100 border border-gray-200 dark:border-[#2a3835] p-3 rounded-xl text-sm outline-none">
                     <option value="">What kind of item? (optional)</option>
                     <option value="Laptop">Laptop</option>
-                    <option value="Phone">Phone</option>
                     <option value="Component">Electronic Component</option>
+                    <option value="Project">Prototype / Engineering Project</option>
                     <option value="Other">Other</option>
                 </select>
                 <input id="reqBudget" type="number" placeholder="Your Budget (₦, optional)" class="w-full bg-gray-50 dark:bg-[#1c2925] dark:text-gray-100 border border-gray-200 dark:border-[#2a3835] p-3 rounded-xl text-sm outline-none">
@@ -491,7 +491,9 @@
     async function init() {
         try {
             const [prods, settings] = await Promise.all([getProducts(), getSettings()]);
-            products = prods;
+            // Phone sales have been discontinued. Keep legacy records in Firestore for
+            // historical orders/admin reference, but exclude phone listings from the public shop.
+            products = prods.filter(p => !/phone|mobile/i.test(String(p.category || '') + ' ' + String(p.name || '')));
             if (settings.whatsapp) whatsappNumber = settings.whatsapp;
             if (settings.deliveryFeePerItem != null) deliveryFeePerItem = settings.deliveryFeePerItem;
             if (settings.deliveryDiscountPercent != null) deliveryDiscountRate = settings.deliveryDiscountPercent / 100;
