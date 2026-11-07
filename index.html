@@ -801,12 +801,17 @@
       }
     }
 
-    // The public-facing philosophy and service descriptions are maintained in this page.
-    // Legacy aboutText/referralMode settings remain in Firestore for compatibility, but
-    // no longer overwrite the current positioning with older retail/referral copy.
+    // Version the editable About copy so an older saved retail description does not
+    // overwrite the current engineering positioning. Admin edits remain fully supported.
     async function loadAboutText() {
-      document.getElementById('aboutText').textContent =
-        'Eazylife Robotics and Electronics Solutions helps people, schools and businesses turn ideas into working systems through practical engineering, accessible components and hands-on learning.';
+      try {
+        const settings = await getSettings();
+        if (settings.aboutText && Number(settings.aboutTextVersion || 0) >= 2) {
+          document.getElementById('aboutText').textContent = settings.aboutText;
+        }
+      } catch (err) {
+        console.error('Settings failed to load, using current About copy:', err);
+      }
     }
 
     loadReviews();
