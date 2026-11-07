@@ -137,6 +137,8 @@ export function renderHeroes(heroes) {
 // Called whenever the product list changes, since the hero form's "link to
 // category" / "link to product" dropdowns are built from it.
 export function setProductsForHeroLinks(products) {
-  allProducts = products;
+  // Keep legacy phone records available in admin, but do not offer discontinued
+  // phone categories/products as destinations for public homepage promotions.
+  allProducts = products.filter(p => !/phone|mobile/i.test(String(p.category || '') + ' ' + String(p.name || '')));
   refreshHeroLinkOptions();
 }
