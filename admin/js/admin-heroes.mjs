@@ -28,7 +28,12 @@ function updateHeroLinkTypeVisibility() {
   const type = hLinkTypeEl.value;
   hLinkValueCategoryEl.classList.toggle('hidden', type !== 'category');
   hLinkValueProductEl.classList.toggle('hidden', type !== 'product');
-  hLinkValueUrlEl.classList.toggle('hidden', type !== 'url');
+  hLinkValueUrlEl.classList.toggle('hidden', !['url', 'section', 'whatsapp'].includes(type));
+  hLinkValueUrlEl.placeholder = type === 'whatsapp'
+    ? 'WhatsApp message to prefill (e.g. I want to discuss a project)'
+    : type === 'section'
+      ? 'Page URL or section anchor (e.g. #services or projects.html)'
+      : 'https://...';
 }
 
 function getHeroLinkValue() {
@@ -57,7 +62,7 @@ function editHero(id) {
   hLinkTypeEl.value = h.linkType || 'category';
   updateHeroLinkTypeVisibility();
   if (h.linkType === 'product') hLinkValueProductEl.value = h.linkValue || '';
-  else if (h.linkType === 'url') hLinkValueUrlEl.value = h.linkValue || '';
+  else if (['url', 'section', 'whatsapp'].includes(h.linkType)) hLinkValueUrlEl.value = h.linkValue || '';
   else hLinkValueCategoryEl.value = h.linkValue || '';
   document.getElementById('hOrder').value = h.order ?? 0;
   document.getElementById('heroFormTitle').textContent = 'Editing: ' + h.title;
