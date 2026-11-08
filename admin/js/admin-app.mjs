@@ -18,7 +18,7 @@ import { initHeroes, renderHeroes, setProductsForHeroLinks } from './admin-heroe
 import { initReviews, renderReviews } from './admin-reviews.mjs';
 import { renderRequestList } from './admin-requests.mjs';
 import { renderOrderList } from './admin-orders.mjs';
-import { initProjects, renderProjects, checkDueProjectPublications } from './admin-projects.mjs';
+import { initProjects, renderProjects, checkDueProjectPublications, setProjectKitProducts } from './admin-projects.mjs';
 import { initSettings, loadSettingsForm } from './admin-settings.mjs';
 
 const { auth } = initFirebase();
@@ -78,7 +78,7 @@ onAuthStateChanged(auth, (user) => {
 
 function startDashboard() {
   unsubProducts = watchProducts((products) => {
-    renderProducts(products);
+    renderProducts(products);\n    setProjectKitProducts(products);
     // The hero form's "link to category"/"link to product" dropdowns are
     // built from the product list, so heroes needs to hear about it too.
     setProductsForHeroLinks(products);
