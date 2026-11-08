@@ -28,7 +28,10 @@ function editProject(id) {
   $('projectCover').value = p.coverImage || '';
   $('projectImages').value = Array.isArray(p.images) ? p.images.join('\n') : '';
   $('projectVideo').value = p.videoUrl || '';
-  $('projectStatus').value = p.status === 'published' ? 'published' : 'draft';
+  const savedPublishDate = p.publishAt?.toDate ? p.publishAt.toDate() : new Date(p.publishAt || 0);
+  const isFutureSchedule = p.status === 'published' && savedPublishDate > new Date();
+  $('projectStatus').value = p.status === 'published' ? (isFutureSchedule ? 'scheduled' : 'published') : 'draft';
+  $('projectScheduleWrap').classList.toggle('hidden', !isFutureSchedule);
   $('projectPublishAt').value = p.publishAt?.toDate ? new Date(p.publishAt.toDate().getTime() - new Date().getTimezoneOffset()*60000).toISOString().slice(0,16) : (p.publishAt instanceof Date ? new Date(p.publishAt.getTime() - new Date().getTimezoneOffset()*60000).toISOString().slice(0,16) : '');
   $('projectFormTitle').textContent = 'Edit: ' + p.title;
   $('projectSaveBtn').textContent = 'Update Project';
@@ -47,8 +50,10 @@ function render() {
   $('projectList').innerHTML = projects.map(p => {
     const state = projectState(p);
     const colour = state === 'Published' ? 'text-green-700 bg-green-50' : state === 'Scheduled' ? 'text-amber-700 bg-amber-50' : 'text-gray-600 bg-gray-100';
+    const rawImage = p.coverImage || '../assets/pictures/placeholder.svg';
+    const previewImage = /^https?:\\/\\//i.test(rawImage) || rawImage.startsWith('../') ? rawImage : '../' + rawImage;
     return `<article class="bg-white p-4 rounded-2xl border border-gray-100 flex gap-3 items-start shadow-sm">
-      <img src="${escapeHtml(p.coverImage || '../assets/pictures/placeholder.svg')}" class="w-20 h-20 rounded-xl object-cover bg-gray-100" alt="">
+      <img src="${escapeHtml(previewImage)}" class="w-20 h-20 rounded-xl object-cover bg-gray-100" alt="">
       <div class="flex-1 min-w-0"><div class="flex flex-wrap gap-2 items-center mb-1"><h3 class="font-bold text-sm">${escapeHtml(p.title)}</h3><span class="text-[10px] px-2 py-1 rounded-full font-bold ${colour}">${state}</span></div>
       <p class="text-xs text-gray-500">${escapeHtml(p.category || 'Engineering project')}</p><p class="text-xs text-gray-600 mt-1 line-clamp-2">${escapeHtml(p.summary || '')}</p>
       <div class="flex flex-wrap gap-2 mt-3">
