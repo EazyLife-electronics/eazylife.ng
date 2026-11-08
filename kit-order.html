@@ -54,7 +54,7 @@ function render(){
  $('title').textContent=project.title+' Kit';
  const linked=(project.kitComponents||[]).filter(x=>x.productId&&x.variantId);
  lines=linked.map((x,i)=>{
-  const p=products.find(z=>z.id===x.productId), v=(p?.variants||[]).find(z=>z.id===x.variantId);
+  const p=products.find(z=>z.id===x.productId), variants=p?.variants||[], v=variants.find(z=>z.id===x.variantId) || (x.variant ? variants.find((z,i)=>variantLabel(z,i)===x.variant) : null);
   return {...x,key:i,product:p,variantData:v,checked:x.required!==false,quantity:Math.max(1,Number(x.quantity)||1)};
  }).filter(x=>x.product&&x.variantData);
  $('count').textContent=lines.length+' listed component'+(lines.length===1?'':'s');
