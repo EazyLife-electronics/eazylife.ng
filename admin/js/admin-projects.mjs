@@ -51,7 +51,7 @@ function render() {
     const state = projectState(p);
     const colour = state === 'Published' ? 'text-green-700 bg-green-50' : state === 'Scheduled' ? 'text-amber-700 bg-amber-50' : 'text-gray-600 bg-gray-100';
     const rawImage = p.coverImage || '../assets/pictures/placeholder.svg';
-    const previewImage = /^https?:\\/\\//i.test(rawImage) || rawImage.startsWith('../') ? rawImage : '../' + rawImage;
+    const previewImage = /^https?:\/\//i.test(rawImage) || rawImage.startsWith('../') ? rawImage : '../' + rawImage;
     return `<article class="bg-white p-4 rounded-2xl border border-gray-100 flex gap-3 items-start shadow-sm">
       <img src="${escapeHtml(previewImage)}" class="w-20 h-20 rounded-xl object-cover bg-gray-100" alt="">
       <div class="flex-1 min-w-0"><div class="flex flex-wrap gap-2 items-center mb-1"><h3 class="font-bold text-sm">${escapeHtml(p.title)}</h3><span class="text-[10px] px-2 py-1 rounded-full font-bold ${colour}">${state}</span></div>
