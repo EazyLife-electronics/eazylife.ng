@@ -36,6 +36,16 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    match /projects/{projectId} {
+      // Admins can manage every project. Public visitors can only read
+      // projects that are published and whose publication time has arrived.
+      allow read: if isAdmin()
+                  || (resource.data.status == 'published'
+                      && resource.data.publishAt is timestamp
+                      && resource.data.publishAt <= request.time);
+      allow write: if isAdmin();
+    }
+
     match /reviews/{reviewId} {
       allow read: if true;
       allow create: if request.resource.data.keys().hasAll(['name', 'text'])
