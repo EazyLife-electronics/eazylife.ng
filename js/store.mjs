@@ -320,11 +320,9 @@ export function watchProjects(callback) {
   });
 }
 export async function getPublishedProjects() {
-  const q = query(
-    collection(db, 'projects'),
-    where('status', '==', 'published'),
-    where('publishAt', '<=', Timestamp.now())
-  );
+  // Scheduled projects stay private until an authenticated admin session
+  // promotes them to status "published".
+  const q = query(collection(db, 'projects'), where('status', '==', 'published'));
   const snap = await getDocs(q);
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
