@@ -67,6 +67,40 @@ function render() {
   document.querySelectorAll('[data-punpublish]').forEach(b => b.addEventListener('click', async () => updateProject(b.dataset.punpublish, { status: 'draft' })));
   document.querySelectorAll('[data-ppublish]').forEach(b => b.addEventListener('click', async () => updateProject(b.dataset.ppublish, { status: 'published', publishAt: new Date() })));
 }
+async function createStarterDrafts() {
+  if (projects.length) return alert('Starter drafts are only available when the project list is empty.');
+  if (!confirm('Create three editable draft entries based on the projects you shared? They will not appear on the public website until you publish them.')) return;
+  const starters = [
+    {
+      title: 'Robotic Drawing Machine',
+      category: 'Robotics & Mechanical Design',
+      summary: 'A servo-driven drawing mechanism built to explore coordinated movement and automated pen control.',
+      description: 'This prototype uses linked mechanical arms and servo actuation to move a pen across paper. The build explores how mechanical geometry and controlled movement can be combined to produce a drawing.',
+      materials: [], process: 'A mechanical linkage and servo arrangement was assembled and tested with a pen on paper.', outcome: 'The prototype produced a portrait-style drawing on paper.',
+      coverImage: '', images: [], videoUrl: ''
+    },
+    {
+      title: 'Ultrasonic Robot Vehicle',
+      category: 'Robotics & Embedded Systems',
+      summary: 'A small mobile robot prototype combining custom electronics and ultrasonic sensing.',
+      description: 'The vehicle brings together a wheeled chassis, ultrasonic sensor modules, microcontroller boards and hand-assembled electronics. A recorded test shows the vehicle moving.',
+      materials: [], process: 'The electronic modules were assembled on prototyping boards and fitted to a mobile chassis for testing.', outcome: 'A moving robot vehicle prototype was demonstrated.',
+      coverImage: '', images: [], videoUrl: ''
+    },
+    {
+      title: 'Servo-Driven Robotic Arm',
+      category: 'Robotics & Mechanical Design',
+      summary: 'A linkage-based robotic arm prototype using servo actuators to explore controlled mechanical movement.',
+      description: 'This build explores a multi-link mechanical structure and servo actuation. The frame and linkages provide a practical platform for studying movement, alignment and mechanical design.',
+      materials: [], process: 'The arm structure was assembled from linked sections with servo actuation at key joints.', outcome: 'A physical robotic arm prototype was assembled for further development.',
+      coverImage: '', images: [], videoUrl: ''
+    }
+  ];
+  try {
+    for (const item of starters) await addProject({ ...item, status: 'draft', publishAt: new Date('2999-01-01T00:00:00Z'), createdAt: new Date(), updatedAt: new Date() });
+    alert('Three starter drafts created. Add the project photos and video links, review the descriptions, then publish when ready.');
+  } catch (err) { alert('Could not create starter drafts: ' + err.message); }
+}
 export function initProjects() {
   $('projectStatus').addEventListener('change', () => {
     $('projectScheduleWrap').classList.toggle('hidden', $('projectStatus').value !== 'scheduled');
@@ -105,6 +139,7 @@ export function initProjects() {
     } catch (err) { alert('Could not save project: ' + err.message); }
   });
   $('projectResetBtn').addEventListener('click', resetForm);
+  $('projectStarterBtn').addEventListener('click', createStarterDrafts);
   resetForm();
 }
 export function renderProjects(items) { projects = items || []; render(); }
