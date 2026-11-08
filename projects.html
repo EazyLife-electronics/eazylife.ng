@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#00B09B">
+  <title>Engineering Project Gallery | EazyLife</title>
+  <meta name="description" content="Explore practical robotics, electronics, embedded systems and prototyping projects by EazyLife Robotics and Electronics Solutions.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root{--teal:#00B09B;--teal-dark:#008a78;--dark:#1a2e2b;--text:#2d3748;--muted:#64748b;--border:#e2e8f0}
+    *{box-sizing:border-box}body{margin:0;font-family:'DM Sans',Arial,sans-serif;color:var(--text);line-height:1.6;background:#fff}
+    h1,h2,h3{font-family:Poppins,Arial,sans-serif;color:var(--dark);line-height:1.25}
+    a{color:inherit;text-decoration:none}.container{max-width:1100px;margin:auto;padding:0 20px}
+    .nav{border-bottom:1px solid var(--border);padding:14px 0}.nav-inner{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{font-family:Poppins,sans-serif;font-weight:800;font-size:1.1rem}.brand span{color:var(--teal)}
+    .btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:11px 18px;font-weight:700;font-size:.88rem;background:#fff;border:1px solid var(--border)}
+    .btn-primary{background:linear-gradient(135deg,#00B09B,#8DC63F);color:#fff;border:0}
+    header{padding:42px 0 24px;background:linear-gradient(180deg,#e0f7f5,#fff)}
+    .eyebrow{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;font-weight:800;color:var(--teal-dark)}
+    header h1{font-size:clamp(1.8rem,5vw,2.7rem);margin:8px 0}
+    header p{max-width:650px;color:var(--muted);margin:0}
+    .gallery{padding:28px 0 64px}.grid{display:grid;grid-template-columns:1fr;gap:18px}
+    .card{border:1px solid var(--border);border-radius:18px;overflow:hidden;box-shadow:0 3px 14px #00000008;background:#fff}
+    .card img{width:100%;height:230px;object-fit:cover;background:#f4f6f6;display:block}
+    .body{padding:18px}.category{font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;font-weight:800;color:var(--teal-dark)}
+    .body h2{font-size:1.08rem;margin:5px 0 8px}.body p{font-size:.88rem;color:var(--muted);margin:0 0 12px}
+    .empty{padding:30px;text-align:center;border:1px dashed var(--border);border-radius:16px;color:var(--muted);grid-column:1/-1}
+    .detail{max-width:850px;margin:0 auto}.detail h1{font-size:clamp(1.7rem,5vw,2.4rem);margin:8px 0}
+    .detail-copy{color:var(--muted);white-space:pre-line}.detail-cover{width:100%;max-height:480px;object-fit:cover;border-radius:18px;margin:22px 0}
+    .detail-images{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:20px 0}
+    .detail-images img{width:100%;height:180px;object-fit:cover;border-radius:12px;background:#f4f6f6}
+    .detail-block{margin:22px 0}.detail-block h2{font-size:1.1rem}.materials{display:flex;flex-wrap:wrap;gap:8px}
+    .chip{background:#e0f7f5;color:#006f63;border-radius:999px;padding:6px 11px;font-size:.8rem;font-weight:700}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+    footer{padding:24px 0;border-top:1px solid var(--border);color:var(--muted);font-size:.82rem}
+    @media(min-width:700px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.card img{height:200px}.detail-images{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  </style>
+</head>
+<body>
+  <nav class="nav"><div class="container nav-inner">
+    <a class="brand" href="index.html">Eazy<span>Life</span></a>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn" href="index.html#projects">Home</a><a class="btn" href="shop.html">Shop</a></div>
+  </div></nav>
+  <header id="pageHeader"><div class="container">
+    <div class="eyebrow">Proof of work</div><h1>Engineering Project Gallery</h1>
+    <p>Explore practical builds, experiments and engineering work from EazyLife. Select a project to see its story, images and available build details.</p>
+  </div></header>
+  <main class="gallery"><div class="container" id="content"><p class="empty">Loading projects...</p></div></main>
+  <footer><div class="container">EazyLife Robotics &amp; Electronics Solutions · Ibadan, Nigeria · <a href="https://wa.me/2347051548082">Contact us</a></div></footer>
+  <script type="module">
+    import { getPublishedProjects } from './js/store.mjs';
+    const content = document.getElementById('content');
+    const params = new URLSearchParams(location.search);
+    const selectedId = params.get('id');
+    const esc = value => String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+    const safeUrl = value => {
+      const raw = String(value || '').trim();
+      if (!raw) return '';
+      if (/^(https?:\/\/|\.\.\/|\/|assets\/)/i.test(raw)) return raw;
+      return '';
+    };
+    function projectCard(p) {
+      const image = safeUrl(p.coverImage) || safeUrl(Array.isArray(p.images) ? p.images[0] : '') || 'assets/pictures/placeholder.svg';
+      return `<article class="card">
+        <a href="projects.html?id=${encodeURIComponent(p.id)}"><img src="${esc(image)}" alt="${esc(p.title || 'EazyLife project')}" loading="lazy"></a>
+        <div class="body"><span class="category">${esc(p.category || 'Engineering project')}</span>
+          <h2><a href="projects.html?id=${encodeURIComponent(p.id)}">${esc(p.title || 'Engineering project')}</a></h2>
+          <p>${esc(p.summary || '')}</p><a class="btn" href="projects.html?id=${encodeURIComponent(p.id)}">View project <i class="fas fa-arrow-right"></i></a>
+        </div></article>`;
+    }
+    function renderDetail(p) {
+      document.title = (p.title || 'Project') + ' | EazyLife';
+      document.getElementById('pageHeader').style.display = 'none';
+      const cover = safeUrl(p.coverImage) || safeUrl(Array.isArray(p.images) ? p.images[0] : '');
+      const images = (Array.isArray(p.images) ? p.images : []).map(safeUrl).filter(Boolean);
+      const uniqueImages = [...new Set([cover, ...images].filter(Boolean))];
+      const materials = Array.isArray(p.materials) ? p.materials : [];
+      const video = String(p.videoUrl || '').trim();
+      content.innerHTML = `<article class="detail">
+        <a class="btn" href="projects.html"><i class="fas fa-arrow-left"></i> All projects</a>
+        <div class="eyebrow" style="margin-top:22px">${esc(p.category || 'Engineering project')}</div>
+        <h1>${esc(p.title || 'Engineering project')}</h1>
+        <p class="detail-copy">${esc(p.summary || '')}</p>
+        ${cover ? `<img class="detail-cover" src="${esc(cover)}" alt="${esc(p.title || 'Project cover')}">` : ''}
+        ${p.description ? `<div class="detail-block"><h2>About this project</h2><p class="detail-copy">${esc(p.description)}</p></div>` : ''}
+        ${uniqueImages.length > 1 ? `<div class="detail-images">${uniqueImages.map(src => `<a href="${esc(src)}" target="_blank" rel="noopener"><img src="${esc(src)}" alt="Project image" loading="lazy"></a>`).join('')}</div>` : ''}
+        ${materials.length ? `<div class="detail-block"><h2>Materials and components</h2><div class="materials">${materials.map(m => `<span class="chip">${esc(m)}</span>`).join('')}</div></div>` : ''}
+        ${p.process ? `<div class="detail-block"><h2>Build process</h2><p class="detail-copy">${esc(p.process)}</p></div>` : ''}
+        ${p.outcome ? `<div class="detail-block"><h2>Outcome</h2><p class="detail-copy">${esc(p.outcome)}</p></div>` : ''}
+        ${video && /^https?:\/\//i.test(video) ? `<div class="actions"><a class="btn btn-primary" href="${esc(video)}" target="_blank" rel="noopener"><i class="fas fa-play"></i> Watch project video</a></div>` : ''}
+        <div class="actions"><a class="btn btn-primary" href="https://wa.me/2347051548082?text=${encodeURIComponent('Hello EazyLife, I would like to enquire about the project: ' + (p.title || ''))}">Discuss a similar project</a><a class="btn" href="projects.html">Back to gallery</a></div>
+      </article>`;
+    }
+    try {
+      const projects = await getPublishedProjects();
+      if (selectedId) {
+        const project = projects.find(p => p.id === selectedId);
+        if (!project) content.innerHTML = '<p class="empty">This project is unavailable or is no longer published. <a href="projects.html">Return to the gallery.</a></p>';
+        else renderDetail(project);
+      } else {
+        content.innerHTML = projects.length ? '<div class="grid">' + projects.map(projectCard).join('') + '</div>' : '<p class="empty">The project gallery is being prepared. Please check back soon.</p>';
+      }
+    } catch (error) {
+      console.error('Could not load projects:', error);
+      content.innerHTML = '<p class="empty">We could not load the project gallery right now. Please refresh or try again later.</p>';
+    }
+  </script>
+</body>
+</html>
