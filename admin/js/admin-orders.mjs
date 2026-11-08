@@ -71,11 +71,11 @@ export function renderOrderList(orders) {
           <div>
             <p class="font-bold text-sm text-gray-800">${escapeHtml(o.customerName || 'Unknown')}</p>
             <p class="text-xs text-gray-400">${escapeHtml(o.phone || '')} · ${created}</p>
-            <p class="text-[10px] font-mono text-teal-600 font-bold mt-0.5">${escapeHtml(o.trackingCode || o.id)}</p>
+            <p class="text-[10px] font-mono text-teal-600 font-bold mt-0.5">${escapeHtml(o.trackingCode || o.id)}</p>\n            ${o.orderType === 'project_kit' ? `<span class="inline-block mt-1 text-[9px] font-black uppercase tracking-wide bg-teal-50 text-teal-700 px-2 py-1 rounded-full">Project kit</span>` : ''}
           </div>
           <span class="text-[10px] font-bold uppercase px-2 py-1 rounded-full ${STATUS_COLORS[o.status] || 'bg-gray-100 text-gray-500'}">${escapeHtml(o.status || 'new')}</span>
         </div>
-        <p class="text-xs text-gray-600 mb-1">${itemsHtml}</p>
+        ${o.orderType === 'project_kit' ? `<p class="text-xs font-bold text-teal-700 mb-1">Kit: ${escapeHtml(o.projectTitle || 'Engineering project')}</p><p class="text-[10px] text-amber-700 bg-amber-50 rounded-lg p-2 mb-2">Catalogue-priced kit request. Check component availability and delivery before confirming. No stock is reserved on submission.</p>` : ''}\n        <p class="text-xs text-gray-600 mb-1">${itemsHtml}</p>
         <p class="text-xs text-gray-400 mb-3">${escapeHtml(o.address || '')}</p>
         ${isCancelled ? `
           <div class="bg-red-50 border border-red-100 rounded-lg p-2.5 mb-3">
