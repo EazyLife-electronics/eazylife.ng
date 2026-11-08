@@ -37,12 +37,9 @@ service cloud.firestore {
     }
 
     match /projects/{projectId} {
-      // Admins can manage every project. Public visitors can only read
-      // projects that are published and whose publication time has arrived.
-      allow read: if isAdmin()
-                  || (resource.data.status == 'published'
-                      && resource.data.publishAt is timestamp
-                      && resource.data.publishAt <= request.time);
+      // Scheduled projects remain private. An authenticated admin session
+      // promotes due projects to "published"; public visitors can then read them.
+      allow read: if isAdmin() || resource.data.status == 'published';
       allow write: if isAdmin();
     }
 
