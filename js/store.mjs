@@ -69,12 +69,22 @@ function variantLabelForOrder(v, index) {
   return bits.length ? bits.join(' / ') : `Variant ${index + 1}`;
 }
 
-async function resolveOrderItems(items) {
+async function resolveOrderItems(items, { enforceCatalogPrice = false } = {}) {
   const productsSnap = await getDocs(collection(db, 'products'));
   const products = new Map(productsSnap.docs.map(d => [d.id, { id: d.id, ...d.data() }]));
 
   return (items || []).map(item => {
-    if (!item?.productId || item.variantId) return item;
+    if (!item?.productId) return item;
+
+    if (item.variantId) {
+      if (!enforceCatalogPrice) return item;
+      const product = products.get(item.productId);
+      const variant = (Array.isArray(product?.variants) ? product.variants : []).find(v => v.id === item.variantId);
+      if (!product || !variant) throw new Error(`A selected project kit item is no longer available in the catalogue. Please refresh the kit page.`);
+      const currentPrice = Number(variant.promoPrice > 0 ? variant.promoPrice : variant.price || 0);
+      if (Number(item.price) !== currentPrice) throw new Error(`The catalogue price for ${product.name} has changed. Please refresh the kit page and review the updated total.`);
+      return { ...item, name: product.name || item.name, variant: variantLabelForOrder(variant, (product.variants || []).indexOf(variant)), price: currentPrice, sku: variant.sku || '' };
+    }
 
     const product = products.get(item.productId);
     const variants = Array.isArray(product?.variants) ? product.variants : [];
@@ -97,7 +107,7 @@ async function resolveOrderItems(items) {
 
 export async function placeOrder(order) {
   const trackingCode = generateTrackingCode();
-  const items = await resolveOrderItems(order.items || []);
+  const items = await resolveOrderItems(order.items || [], { enforceCatalogPrice: order.orderType === 'project_kit' });
   await setDoc(doc(db, 'orders', trackingCode), {
     ...order,
     items,
