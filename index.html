@@ -494,7 +494,7 @@
     <div class="container">
       <div class="section-label">Customer Reviews</div>
       <h2 class="section-title">What People Are Saying</h2>
-      <p class="section-sub" style="margin-bottom:28px;">Real feedback from real customers in Ibadan.</p>
+      <p class="section-sub" style="margin-bottom:28px;">Shared experiences from customers, learners and project partners.</p>
       <div class="testimonials-grid" id="reviewsGrid">
         <div style="text-align:center;padding:40px;color:var(--text-light);font-size:0.9rem;grid-column:1/-1;">Loading reviews...</div>
       </div>
@@ -724,8 +724,8 @@
           return;
         }
         const featured = reviews.filter(r => r.featured === true);
-        const pool = featured.length ? featured : reviews;
-        const selected = [...pool].sort((a,b) => String(b.updatedAt || b.createdAt || '').localeCompare(String(a.updatedAt || a.createdAt || ''))).slice(0,3);
+        const others = reviews.filter(r => r.featured !== true);
+        const selected = [...featured, ...others].slice(0,3);
         grid.innerHTML = selected.map(r => {
           const stars = Math.max(0, Math.min(5, Number(r.stars) || 0));
           const summary = r.summary || r.text || '';
