@@ -65,7 +65,8 @@
     @media(min-width:700px){.gallery-tools{grid-template-columns:minmax(0,1fr) 240px}.detail-images{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
     @media(min-width:700px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.card img{height:200px}.detail-images{grid-template-columns:repeat(3,minmax(0,1fr))}}
-      .kit-section{border:1px solid var(--border);border-radius:16px;padding:18px;background:#f8fbfa}.kit-lines{display:grid;gap:10px;margin:14px 0}.kit-line{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px;background:#fff;border:1px solid var(--border);border-radius:12px}.kit-line strong{display:block;font-size:.92rem}.kit-line small{display:block;color:var(--muted);font-size:.76rem;margin-top:4px}.kit-line-side{text-align:right;display:grid;gap:3px;font-size:.82rem}.kit-line-side a{color:var(--teal);font-weight:700;font-size:.78rem}.kit-stock{font-size:.68rem;font-weight:700}.kit-stock.available{color:#16804a}.kit-stock.unavailable{color:#a36b12}.kit-order-btn{margin:4px 0 12px}.kit-manual{padding:12px;background:#fff;border-radius:12px;font-size:.82rem}.kit-manual ul{padding-left:20px;margin:8px 0}.kit-manual p{color:var(--muted);margin:6px 0 0}@media(max-width:520px){.kit-line{align-items:flex-start}.kit-line-side{min-width:112px}}\n</style>
+      .kit-section{border:1px solid var(--border);border-radius:16px;padding:18px;background:#f8fbfa}.kit-lines{display:grid;gap:10px;margin:14px 0}.kit-line{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px;background:#fff;border:1px solid var(--border);border-radius:12px}.kit-line strong{display:block;font-size:.92rem}.kit-line small{display:block;color:var(--muted);font-size:.76rem;margin-top:4px}.kit-line-side{text-align:right;display:grid;gap:3px;font-size:.82rem}.kit-line-side a{color:var(--teal);font-weight:700;font-size:.78rem}.kit-stock{font-size:.68rem;font-weight:700}.kit-stock.available{color:#16804a}.kit-stock.unavailable{color:#a36b12}.kit-order-btn{margin:4px 0 12px}.kit-manual{padding:12px;background:#fff;border-radius:12px;font-size:.82rem}.kit-manual ul{padding-left:20px;margin:8px 0}.kit-manual p{color:var(--muted);margin:6px 0 0}@media(max-width:520px){.kit-line{align-items:flex-start}.kit-line-side{min-width:112px}}
+</style>
 </head>
 <body>
   <nav class="nav"><div class="container nav-inner">
@@ -207,7 +208,8 @@
           galleryImages.map((src,i) => '<button class="detail-image-button" type="button" data-project-image="' + esc(src) + '" aria-label="View project photo ' + (i+1) + '"><img src="' + esc(src) + '" alt="' + esc(p.title || 'Project') + ' photo ' + (i+1) + '" loading="lazy"></button>').join('') +
         '</div></div>' : '') +
         (videoMarkup(p.videoUrl) ? '<div class="detail-block"><h2>Project video</h2>' + videoMarkup(p.videoUrl) + '</div>' : '') +
-        (materials.length ? '<div class="detail-block"><h2>Materials and components</h2><div class="materials">' + materials.map(m => '<span class="chip">' + esc(m) + '</span>').join('') + '</div></div>' : '') +\n        renderKitSection(p, products) +
+        (materials.length ? '<div class="detail-block"><h2>Materials and components</h2><div class="materials">' + materials.map(m => '<span class="chip">' + esc(m) + '</span>').join('') + '</div></div>' : '') + 
+        renderKitSection(p, products) +
         (p.process ? '<div class="detail-block"><h2>Build process</h2><p class="detail-copy">' + esc(p.process) + '</p></div>' : '') +
         (p.outcome ? '<div class="detail-block"><h2>Outcome</h2><p class="detail-copy">' + esc(p.outcome) + '</p></div>' : '') +
         '<div class="actions"><a class="btn btn-primary" href="https://wa.me/2347051548082?text=' + encodeURIComponent('Hello EazyLife, I would like to enquire about the project: ' + (p.title || '')) + '">Discuss a similar project</a><a class="btn" href="projects.html">Back to gallery</a></div>' +
