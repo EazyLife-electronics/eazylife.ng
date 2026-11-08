@@ -178,7 +178,8 @@
       const byId = new Map(products.map(x => [x.id, x]));
       const line = x => {
         const product = byId.get(x.productId);
-        const variants = product?.variants || [];\n        const variant = variants.find(v => v.id === x.variantId) || (x.variant ? variants.find((v,i) => { const bits=[v?.processor,v?.ram,v?.rom,v?.color].filter(Boolean); return (bits.length?bits.join(' / '):'Variant '+(i+1)) === x.variant; }) : null);
+        const variants = product?.variants || [];
+        const variant = variants.find(v => v.id === x.variantId) || (x.variant ? variants.find((v,i) => { const bits=[v?.processor,v?.ram,v?.rom,v?.color].filter(Boolean); return (bits.length?bits.join(' / '):'Variant '+(i+1)) === x.variant; }) : null);
         const label = product?.name || x.productName || x.name || 'Store component';
         const price = variant ? Number(variant.promoPrice > 0 ? variant.promoPrice : variant.price || 0) : null;
         const available = !!product && product.inStock !== false && !!variant && variant.inStock !== false;
