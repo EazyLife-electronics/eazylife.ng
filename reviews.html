@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Customer Reviews & Project Stories | EazyLife</title>
+  <meta name="description" content="Read customer experiences and project stories from EazyLife Robotics & Electronics Solutions in Ibadan, Nigeria.">
+  <link rel="canonical" href="https://eazylife.ng/reviews.html">
+  <link rel="icon" type="image/png" href="assets/pictures/icon_dark.png">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root{--teal:#00B09B;--teal-dark:#008a78;--lime:#8DC63F;--dark:#1a2e2b;--text:#2d3748;--muted:#64748b;--border:#e2e8f0;--surface:#fff;--soft:#f7faf9}
+    *{box-sizing:border-box}body{margin:0;background:#fff;color:var(--text);font-family:'DM Sans',Arial,sans-serif;line-height:1.6}h1,h2,h3{font-family:Poppins,Arial,sans-serif;color:var(--dark);line-height:1.25}a{color:inherit;text-decoration:none}.wrap{max-width:1080px;margin:auto;padding:0 20px}
+    header{border-bottom:1px solid var(--border);background:#fff}.nav{min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:14px}.brand{font-family:Poppins,sans-serif;font-weight:800;font-size:1.1rem}.brand span{color:var(--teal)}.back{font-size:.85rem;font-weight:700;color:var(--teal-dark)}
+    main{padding:42px 0 64px}.eyebrow{font-size:.72rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--teal-dark)}h1{font-size:clamp(1.8rem,5vw,2.7rem);margin:8px 0}.intro{max-width:650px;color:var(--muted);margin:0 0 26px}
+    .tools{display:grid;grid-template-columns:1fr;gap:10px;margin:22px 0 24px}.tools input,.tools select{width:100%;padding:13px 14px;border:1px solid var(--border);border-radius:12px;background:white;font:inherit}.grid{display:grid;grid-template-columns:1fr;gap:16px}.card{border:1px solid var(--border);border-radius:18px;padding:18px;background:var(--surface);box-shadow:0 3px 14px #132b2408}.card img{width:100%;height:190px;object-fit:cover;border-radius:12px;margin-bottom:14px;background:var(--soft)}.stars{color:#f59e0b;letter-spacing:1px}.meta{font-size:.8rem;color:var(--muted);margin:5px 0 10px}.summary{font-size:.92rem;white-space:pre-line}.more{display:inline-block;color:var(--teal-dark);font-size:.84rem;font-weight:800;margin-top:12px}.empty{padding:34px;text-align:center;border:1px dashed var(--border);border-radius:16px;color:var(--muted);grid-column:1/-1}
+    .detail{max-width:850px;margin:auto}.quote{font-size:1.12rem;line-height:1.85;white-space:pre-line;border-left:4px solid var(--teal);padding:8px 0 8px 20px;margin:24px 0}.detail-photos{display:grid;grid-template-columns:1fr;gap:12px;margin:22px 0}.detail-photos img{width:100%;max-height:460px;object-fit:contain;background:var(--soft);border-radius:14px}.project{background:var(--soft);border:1px solid var(--border);border-radius:16px;padding:20px;margin:26px 0}.project h2{font-size:1.2rem;margin:0 0 12px}.project p{white-space:pre-line}.project-label{font-size:.72rem;font-weight:800;text-transform:uppercase;color:var(--teal-dark);margin:14px 0 3px}.notice{font-size:.78rem;color:var(--muted);margin-top:18px}.hidden{display:none!important}
+    @media(min-width:650px){.tools{grid-template-columns:2fr 1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.detail-photos{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(min-width:900px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  </style>
+</head>
+<body>
+<header><div class="wrap nav"><a class="brand" href="index.html">Eazy<span>Life</span></a><a class="back" href="index.html"><i class="fas fa-arrow-left"></i> Back to website</a></div></header>
+<main class="wrap">
+  <section id="archiveView">
+    <div class="eyebrow">Customer experiences</div><h1>Reviews & Project Stories</h1>
+    <p class="intro">Read feedback shared by people who have experienced EazyLife's services, learning sessions and engineering work. Some reviews include project photographs and additional context.</p>
+    <div class="tools"><input id="reviewSearch" type="search" placeholder="Search reviews, people, projects or keywords..." aria-label="Search reviews"><select id="reviewCategory" aria-label="Filter reviews by category"><option value="">All categories</option></select></div>
+    <div id="reviewArchive" class="grid"><div class="empty">Loading reviews...</div></div>
+  </section>
+  <section id="detailView" class="detail hidden"></section>
+</main>
+<script type="module">
+  import { getApprovedReviews } from './js/store.mjs';
+  const archive=document.getElementById('reviewArchive');
+  const search=document.getElementById('reviewSearch');
+  const category=document.getElementById('reviewCategory');
+  const archiveView=document.getElementById('archiveView');
+  const detailView=document.getElementById('detailView');
+  let reviews=[];
+  const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  const safeUrl=v=>{const s=String(v||'').trim();if(!s)return '';if(/^(https?:\/\/|\/|\.\.\/|assets\/)/i.test(s)&&!/^javascript:/i.test(s))return s;return '';};
+  const stars=r=>{const n=Math.max(0,Math.min(5,Number(r.stars)||0));return '★'.repeat(n)+'☆'.repeat(5-n)};
+  const textOf=r=>[r.name,r.title,r.text,r.summary,(r.categories||[]).join(' '),r.project?.title,r.project?.description,r.project?.materials?.join(' '),r.project?.process,r.project?.outcome].join(' ').toLowerCase();
+  function card(r){
+    const image=safeUrl(r.coverImage||(r.images||[])[0]);
+    const summary=r.summary||r.text||'';
+    return `<article class="card">${image?`<a href="reviews.html?id=${encodeURIComponent(r.id)}"><img src="${esc(image)}" alt="Project photograph associated with the review by ${esc(r.name)}" loading="lazy"></a>`:''}
+      <div class="stars" aria-label="${Number(r.stars)||0} out of 5 stars">${stars(r)}</div><h2 style="font-size:1.02rem;margin:9px 0 0">${esc(r.name||'Customer')}</h2>
+      <div class="meta">${esc(r.title||'')}${r.categories?.length?' · '+esc(r.categories.join(', ')):''}</div><p class="summary">${esc(summary.length>260?summary.slice(0,257).trim()+'…':summary)}</p>
+      <a class="more" href="reviews.html?id=${encodeURIComponent(r.id)}">Read full review <i class="fas fa-arrow-right"></i></a></article>`;
+  }
+  function render(){
+    const term=search.value.trim().toLowerCase(), cat=category.value;
+    const list=reviews.filter(r=>(!cat||(r.categories||[]).includes(cat))&&(!term||textOf(r).includes(term)));
+    archive.innerHTML=list.length?list.map(card).join(''):'<div class="empty">No reviews match that search. Try another word or category.</div>';
+  }
+  function projectBlock(p){
+    if(!p||!Object.values(p).some(v=>Array.isArray(v)?v.length:Boolean(v)))return '';
+    return `<section class="project"><div class="eyebrow">Project context</div><h2>${esc(p.title||'Project details')}</h2>
+      ${p.description?`<p>${esc(p.description)}</p>`:''}
+      ${p.materials?.length?`<div class="project-label">Materials & components</div><p>${esc(p.materials.join(', '))}</p>`:''}
+      ${p.process?`<div class="project-label">Process</div><p>${esc(p.process)}</p>`:''}
+      ${p.outcome?`<div class="project-label">Outcome</div><p>${esc(p.outcome)}</p>`:''}</section>`;
+  }
+  function showDetail(r){
+    archiveView.classList.add('hidden');detailView.classList.remove('hidden');
+    const photos=[r.coverImage,...(Array.isArray(r.images)?r.images:[])].map(safeUrl).filter(Boolean);
+    detailView.innerHTML=`<a class="back" href="reviews.html"><i class="fas fa-arrow-left"></i> All reviews</a>
+      <div class="eyebrow" style="margin-top:28px">Customer review</div><h1>${esc(r.name||'Customer experience')}</h1>
+      <div class="meta">${esc(r.title||'')}${r.categories?.length?' · '+esc(r.categories.join(', ')):''}</div>
+      <div class="stars">${stars(r)}</div><blockquote class="quote">“${esc(r.text||'')}”</blockquote>
+      ${projectBlock(r.project)}
+      ${photos.length?`<h2 style="font-size:1.2rem;margin-top:28px">Associated project photographs</h2><div class="detail-photos">${photos.map((src,i)=>`<img src="${esc(src)}" alt="Project photograph ${i+1} associated with this review" loading="lazy">`).join('')}</div><p class="notice">Photographs are shared by EazyLife as supporting project context. They are not presented as identity verification.</p>`:''}
+      <p class="notice">Review text is displayed as submitted. Any project summary or additional context is provided by EazyLife.</p>
+      <a class="more" href="index.html#testimonials">Share your experience <i class="fas fa-arrow-right"></i></a>`;
+  }
+  try{
+    reviews=await getApprovedReviews();
+    const cats=[...new Set(reviews.flatMap(r=>Array.isArray(r.categories)?r.categories:[]))].sort((a,b)=>a.localeCompare(b));
+    cats.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;category.appendChild(o)});
+    const id=new URLSearchParams(location.search).get('id');
+    if(id){const selected=reviews.find(r=>r.id===id);if(selected)showDetail(selected);else{archive.innerHTML='<div class="empty">This review is not available. It may have been unpublished or removed.</div>'}}
+    else render();
+    search.addEventListener('input',render);category.addEventListener('change',render);
+  }catch(err){console.error(err);archive.innerHTML='<div class="empty">Reviews could not be loaded right now. Please try again later.</div>'}
+</script>
+</body>
+</html>

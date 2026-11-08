@@ -349,8 +349,10 @@ export async function deleteProject(id) {
 /* ---------------- REVIEWS ---------------- */
 
 export async function getApprovedReviews() {
-  const snap = await getDocs(collection(db, 'reviews'));
-  return snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(r => r.approved === true);
+  // Public pages request only approved records. Pending submissions remain private.
+  const approvedQuery = query(collection(db, 'reviews'), where('approved', '==', true));
+  const snap = await getDocs(approvedQuery);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
 export function watchReviews(callback) {

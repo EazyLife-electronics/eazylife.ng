@@ -494,10 +494,12 @@
     <div class="container">
       <div class="section-label">Customer Reviews</div>
       <h2 class="section-title">What People Are Saying</h2>
-      <p class="section-sub" style="margin-bottom:28px;">Real feedback from real customers in Ibadan.</p>
+      <p class="section-sub" style="margin-bottom:28px;">Shared experiences from customers, learners and project partners.</p>
       <div class="testimonials-grid" id="reviewsGrid">
         <div style="text-align:center;padding:40px;color:var(--text-light);font-size:0.9rem;grid-column:1/-1;">Loading reviews...</div>
       </div>
+
+      <p style="margin:-12px 0 28px;"><a class="service-link" href="reviews.html">Explore all customer reviews <i class="fas fa-arrow-right"></i></a></p>
 
       <div class="review-form-wrap">
         <h3>Share Your Experience</h3>
@@ -712,7 +714,7 @@
     }
     loadProjects();
 
-    // ── REVIEWS ──
+    // ── REVIEWS: keep the homepage concise, with a maximum of three stories ──
     async function loadReviews() {
       const grid = document.getElementById('reviewsGrid');
       try {
@@ -721,13 +723,21 @@
           grid.innerHTML = `<div style="text-align:center;padding:30px;color:var(--text-light);font-size:0.88rem;grid-column:1/-1;">No reviews yet. Be the first to share your experience below.</div>`;
           return;
         }
-        grid.innerHTML = reviews.map(r => `
-          <div class="review-card">
-            <div class="stars">${'★'.repeat(Math.max(0, Math.min(5, r.stars || 0)))}${'☆'.repeat(5 - Math.max(0, Math.min(5, r.stars || 0)))}</div>
-            <p class="text">"${escapeHtml(r.text)}"</p>
+        const featured = reviews.filter(r => r.featured === true);
+        const others = reviews.filter(r => r.featured !== true);
+        const selected = [...featured, ...others].slice(0,3);
+        grid.innerHTML = selected.map(r => {
+          const stars = Math.max(0, Math.min(5, Number(r.stars) || 0));
+          const summary = r.summary || r.text || '';
+          const image = r.coverImage || (Array.isArray(r.images) ? r.images[0] : '');
+          return `<article class="review-card">
+            ${image ? `<a href="reviews.html?id=${encodeURIComponent(r.id)}"><img src="${escapeHtml(image)}" alt="Project photograph associated with review by ${escapeHtml(r.name)}" loading="lazy" style="width:100%;height:170px;object-fit:cover;border-radius:12px;margin-bottom:14px;"></a>` : ''}
+            <div class="stars">${'★'.repeat(stars)}${'☆'.repeat(5-stars)}</div>
+            <p class="text">"${escapeHtml(summary.length > 210 ? summary.slice(0,207).trim() + '…' : summary)}"</p>
             <div class="who">${escapeHtml(r.name)}<span>${escapeHtml(r.title || '')}</span></div>
-          </div>
-        `).join('');
+            <a class="service-link" href="reviews.html?id=${encodeURIComponent(r.id)}" style="display:inline-flex;margin-top:12px;">Read full review <i class="fas fa-arrow-right"></i></a>
+          </article>`;
+        }).join('');
       } catch (err) {
         grid.innerHTML = `<div style="text-align:center;padding:30px;color:var(--text-light);font-size:0.85rem;grid-column:1/-1;">Couldn't load reviews right now.</div>`;
         console.error(err);
