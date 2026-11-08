@@ -28,7 +28,8 @@ function addKitRow(data = {}) {
     const p=kitProducts.find(x=>x.id===productSelect.value);
     manual.classList.toggle('hidden',!!p);
     const variants=Array.isArray(p?.variants)?p.variants:[];
-    const oldVariant = variants.find(v=>v.id===data.variantId) || (data.variant ? variants.find((v,i)=>kitVariantLabel(v,i)===data.variant) : null);\n    variantSelect.innerHTML=variants.map((v,i)=>`<option value="${escapeHtml(v.id||'')}" ${(v.id===oldVariant?.id)?'selected':''}>${escapeHtml(kitVariantLabel(v,i))} · ₦${Number(v.promoPrice>0?v.promoPrice:v.price||0).toLocaleString()}${v.inStock===false?' · Currently unavailable':''}</option>`).join('');
+    const oldVariant = variants.find(v=>v.id===data.variantId) || (data.variant ? variants.find((v,i)=>kitVariantLabel(v,i)===data.variant) : null);
+    variantSelect.innerHTML=variants.map((v,i)=>`<option value="${escapeHtml(v.id||'')}" ${(v.id===oldVariant?.id)?'selected':''}>${escapeHtml(kitVariantLabel(v,i))} · ₦${Number(v.promoPrice>0?v.promoPrice:v.price||0).toLocaleString()}${v.inStock===false?' · Currently unavailable':''}</option>`).join('');
     variantSelect.classList.toggle('hidden',!p || !variants.length);
     if(p && !variants.length) variantSelect.innerHTML='<option value="">No variants configured</option>';
   };
