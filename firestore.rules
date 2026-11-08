@@ -46,9 +46,12 @@ service cloud.firestore {
     match /reviews/{reviewId} {
       // Public visitors can read approved reviews only. Admins can manage all submissions.
       allow read: if isAdmin() || resource.data.approved == true;
-      allow create: if request.resource.data.keys().hasAll(['name', 'text'])
+      allow create: if isAdmin() || (
+                    request.resource.data.keys().hasAll(['name', 'text', 'approved'])
                     && request.resource.data.name is string
-                    && request.resource.data.text is string;
+                    && request.resource.data.text is string
+                    && request.resource.data.approved == false
+                    );
       allow update, delete: if isAdmin();
     }
 
