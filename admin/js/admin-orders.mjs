@@ -59,7 +59,7 @@ function orderMessageTemplate(order) {
 // Passed directly as the watchOrders() callback.
 export function renderOrderList(orders) {
   document.getElementById('orderList').innerHTML = orders.map(o => {
-    const itemsHtml = (o.items || []).map(i => `${escapeHtml(i.name)} × ${Number(i.quantity) || 0}`).join(', ');
+    const itemsHtml = (o.items || []).map(i => `${escapeHtml(i.name)} × ${Number(i.quantity) || 0}${Number.isFinite(Number(i.price)) ? ` · ₦${(Number(i.price) * (Number(i.quantity) || 0)).toLocaleString()}` : ''}`).join(', ');
     const isCancelled = o.status === 'cancelled';
     const canCancel = !isCancelled && o.status !== 'delivered';
     const nextStatus = isCancelled ? null : STATUS_FLOW[STATUS_FLOW.indexOf(o.status) + 1];
