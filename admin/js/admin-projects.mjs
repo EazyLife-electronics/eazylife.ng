@@ -3,6 +3,7 @@ import { addProject, updateProject, deleteProject } from '../../js/store.mjs';
 import { escapeHtml } from './admin-shared.mjs';
 
 let projects = [];
+const publishingDue = new Set();
 const $ = id => document.getElementById(id);
 const form = $('projectForm');
 
@@ -29,8 +30,8 @@ function editProject(id) {
   $('projectImages').value = Array.isArray(p.images) ? p.images.join('\n') : '';
   $('projectVideo').value = p.videoUrl || '';
   const savedPublishDate = p.publishAt?.toDate ? p.publishAt.toDate() : new Date(p.publishAt || 0);
-  const isFutureSchedule = p.status === 'published' && savedPublishDate > new Date();
-  $('projectStatus').value = p.status === 'published' ? (isFutureSchedule ? 'scheduled' : 'published') : 'draft';
+  const isFutureSchedule = p.status === 'scheduled';
+  $('projectStatus').value = p.status === 'published' ? 'published' : (isFutureSchedule ? 'scheduled' : 'draft');
   $('projectScheduleWrap').classList.toggle('hidden', !isFutureSchedule);
   $('projectPublishAt').value = p.publishAt?.toDate ? new Date(p.publishAt.toDate().getTime() - new Date().getTimezoneOffset()*60000).toISOString().slice(0,16) : (p.publishAt instanceof Date ? new Date(p.publishAt.getTime() - new Date().getTimezoneOffset()*60000).toISOString().slice(0,16) : '');
   $('projectFormTitle').textContent = 'Edit: ' + p.title;
@@ -42,9 +43,32 @@ async function removeProject(id) {
   await deleteProject(id);
 }
 function projectState(p) {
-  if (p.status !== 'published') return 'Draft / Unpublished';
-  const date = p.publishAt?.toDate ? p.publishAt.toDate() : new Date(p.publishAt || 0);
-  return date > new Date() ? 'Scheduled' : 'Published';
+  if (p.status === 'scheduled') return 'Scheduled';
+  if (p.status === 'published') return 'Published';
+  return 'Draft / Unpublished';
+}
+
+// Runs in the authenticated admin dashboard only. Due scheduled projects are
+// promoted using the admin's existing Firestore write permission.
+async function publishDueProjects() {
+  const now = Date.now();
+  const due = projects.filter(p => {
+    if (p.status !== 'scheduled' || publishingDue.has(p.id)) return false;
+    const date = p.publishAt?.toDate ? p.publishAt.toDate() : new Date(p.publishAt || 0);
+    return Number.isFinite(date.getTime()) && date.getTime() <= now;
+  });
+  for (const p of due) {
+    publishingDue.add(p.id);
+    try {
+      await updateProject(p.id, { status: 'published', publishedAt: new Date() });
+    } catch (err) {
+      console.error('Could not auto-publish scheduled project:', p.id, err);
+      const notice = $('projectPublishNotice');
+      if (notice) notice.textContent = 'A scheduled project is due but could not be published. Please check your connection and permissions.';
+    } finally {
+      publishingDue.delete(p.id);
+    }
+  }
 }
 function render() {
   $('projectList').innerHTML = projects.map(p => {
@@ -125,7 +149,7 @@ export function initProjects() {
       coverImage: $('projectCover').value.trim(),
       images: $('projectImages').value.split('\n').map(x => x.trim()).filter(Boolean),
       videoUrl: $('projectVideo').value.trim(),
-      status: statusChoice === 'draft' ? 'draft' : 'published',
+      status: statusChoice,
       publishAt: statusChoice === 'draft' ? new Date('2999-01-01T00:00:00Z') : publishAt,
       updatedAt: new Date()
     };
@@ -142,4 +166,8 @@ export function initProjects() {
   $('projectStarterBtn').addEventListener('click', createStarterDrafts);
   resetForm();
 }
-export function renderProjects(items) { projects = items || []; render(); }
+export function renderProjects(items) {
+  projects = items || [];
+  render();
+  publishDueProjects();
+}
