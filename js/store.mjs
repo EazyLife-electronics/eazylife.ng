@@ -5,7 +5,7 @@
 import { initFirebase } from './firebase.mjs';
 import {
   collection, doc, getDocs, getDoc, addDoc, setDoc, updateDoc, deleteDoc,
-  onSnapshot, query, orderBy, serverTimestamp, runTransaction
+  onSnapshot, query, orderBy, where, Timestamp, serverTimestamp, runTransaction
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const { db } = initFirebase();
@@ -308,6 +308,34 @@ export async function updateHero(id, updates) {
 
 export async function deleteHero(id) {
   return deleteDoc(doc(db, 'heroes', id));
+}
+
+
+/* ---------------- ENGINEERING PROJECTS ---------------- */
+// Admin watches all records. Public reads are restricted by Firestore rules
+// to published records whose publishAt timestamp has arrived.
+export function watchProjects(callback) {
+  return onSnapshot(collection(db, 'projects'), snap => {
+    callback(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+  });
+}
+export async function getPublishedProjects() {
+  const q = query(
+    collection(db, 'projects'),
+    where('status', '==', 'published'),
+    where('publishAt', '<=', Timestamp.now())
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+export async function addProject(project) {
+  return addDoc(collection(db, 'projects'), project);
+}
+export async function updateProject(id, updates) {
+  return updateDoc(doc(db, 'projects', id), updates);
+}
+export async function deleteProject(id) {
+  return deleteDoc(doc(db, 'projects', id));
 }
 
 /* ---------------- REVIEWS ---------------- */
