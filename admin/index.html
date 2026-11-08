@@ -83,6 +83,11 @@
               <input id="projectCover" placeholder="Cover image URL or repository image path" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm">
               <textarea id="projectImages" rows="2" placeholder="Additional image URLs or paths, one per line" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm"></textarea>
               <input id="projectVideo" placeholder="Optional video URL (YouTube or hosted video)" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm">
+              <section class="rounded-xl border border-teal-100 bg-teal-50/50 p-3 space-y-3">
+                <div><h3 class="font-black text-sm text-gray-800">Project Components & Kit</h3><p class="text-[11px] text-gray-500">Link components to products in your store. Unlinked items can be listed as extra requirements but won't enter the kit order.</p></div>
+                <div id="projectKitRows" class="space-y-2"></div>
+                <button type="button" id="projectKitAddBtn" class="w-full bg-white border border-teal-200 text-teal-700 py-2.5 rounded-lg text-xs font-bold">+ Add component</button>
+              </section>
               <select id="projectStatus" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm"><option value="draft">Save as draft</option><option value="published">Publish now</option><option value="scheduled">Schedule publication</option></select>
               <div id="projectScheduleWrap" class="hidden"><label class="block text-xs font-bold text-gray-500 mb-1">Publish date and time</label><input id="projectPublishAt" type="datetime-local" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm"></div>
               <div class="flex gap-2"><button id="projectSaveBtn" type="submit" class="flex-1 bg-gray-900 text-white py-3 rounded-xl font-bold text-sm">Save Project</button><button id="projectResetBtn" type="button" class="bg-gray-100 text-gray-500 px-4 rounded-xl font-bold text-sm">Reset</button></div>
