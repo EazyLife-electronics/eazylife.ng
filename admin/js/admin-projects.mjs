@@ -208,6 +208,8 @@ export function initProjects() {
       publishAt = new Date($('projectPublishAt').value);
       if (Number.isNaN(publishAt.getTime()) || publishAt <= new Date()) return alert('Choose a future publication date and time.');
     }
+    const kitComponents = collectKitComponents();
+    if (kitComponents.some(item => item.productId && !item.variantId)) return alert('Choose a valid store variant for each linked product, or remove the product link and enter it as a manual component.');
     const project = {
       title: $('projectTitle').value.trim(),
       category: $('projectCategory').value.trim(),
@@ -219,7 +221,7 @@ export function initProjects() {
       coverImage: $('projectCover').value.trim(),
       images: $('projectImages').value.split('\n').map(x => x.trim()).filter(Boolean),
       videoUrl: $('projectVideo').value.trim(),
-      kitComponents: collectKitComponents(),
+      kitComponents,
       status: statusChoice,
       publishAt: statusChoice === 'draft' ? new Date('2999-01-01T00:00:00Z') : publishAt,
       updatedAt: new Date()
