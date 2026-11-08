@@ -78,7 +78,8 @@ onAuthStateChanged(auth, (user) => {
 
 function startDashboard() {
   unsubProducts = watchProducts((products) => {
-    renderProducts(products);\n    setProjectKitProducts(products);
+    renderProducts(products);
+    setProjectKitProducts(products);
     // The hero form's "link to category"/"link to product" dropdowns are
     // built from the product list, so heroes needs to hear about it too.
     setProductsForHeroLinks(products);
