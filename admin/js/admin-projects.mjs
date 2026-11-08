@@ -232,7 +232,8 @@ export function initProjects() {
     } catch (err) { alert('Could not save project: ' + err.message); }
   });
   $('projectResetBtn').addEventListener('click', resetForm);
-  $('projectStarterBtn').addEventListener('click', createStarterDrafts);\n  $('projectKitAddBtn')?.addEventListener('click', () => addKitRow());
+  $('projectStarterBtn').addEventListener('click', createStarterDrafts);
+  $('projectKitAddBtn')?.addEventListener('click', () => addKitRow());
   resetForm();
 }
 export function renderProjects(items) {
