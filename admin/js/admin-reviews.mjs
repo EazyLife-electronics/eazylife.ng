@@ -40,7 +40,7 @@ function resetForm() {
   byId('rvEditId').value = '';
   byId('rvSaveBtn').textContent = 'Save Review';
   byId('rvCancelEdit').classList.add('hidden');
-  byId('rvApproved').checked = true;
+  byId('rvApproved').checked = false;
 }
 
 function editReview(id) {
