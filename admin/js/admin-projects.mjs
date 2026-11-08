@@ -52,19 +52,30 @@ function projectState(p) {
 // promoted using the admin's existing Firestore write permission.
 async function publishDueProjects() {
   const now = Date.now();
-  const due = projects.filter(p => {
-    if (p.status !== 'scheduled' || publishingDue.has(p.id)) return false;
+  const tasks = projects.filter(p => {
+    if (publishingDue.has(p.id)) return false;
     const date = p.publishAt?.toDate ? p.publishAt.toDate() : new Date(p.publishAt || 0);
-    return Number.isFinite(date.getTime()) && date.getTime() <= now;
+    if (!Number.isFinite(date.getTime())) return false;
+    // Migrate older scheduled entries, which were stored as "published" with
+    // a future publishAt, into the new private "scheduled" state.
+    if (p.status === 'published' && date.getTime() > now) return true;
+    // Publish a scheduled entry once its due time has arrived.
+    if (p.status === 'scheduled' && date.getTime() <= now) return true;
+    return false;
   });
-  for (const p of due) {
+  for (const p of tasks) {
     publishingDue.add(p.id);
+    const date = p.publishAt?.toDate ? p.publishAt.toDate() : new Date(p.publishAt || 0);
+    const nextStatus = date.getTime() > now ? 'scheduled' : 'published';
     try {
-      await updateProject(p.id, { status: 'published', publishedAt: new Date() });
+      await updateProject(p.id, {
+        status: nextStatus,
+        ...(nextStatus === 'published' ? { publishedAt: new Date() } : {})
+      });
     } catch (err) {
-      console.error('Could not auto-publish scheduled project:', p.id, err);
+      console.error('Could not update scheduled project:', p.id, err);
       const notice = $('projectPublishNotice');
-      if (notice) notice.textContent = 'A scheduled project is due but could not be published. Please check your connection and permissions.';
+      if (notice) notice.textContent = 'A scheduled project could not be updated. Please check your connection and permissions.';
     } finally {
       publishingDue.delete(p.id);
     }
