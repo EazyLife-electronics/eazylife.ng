@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#00B09B">
+  <title>Engineering Project Gallery | EazyLife</title>
+  <meta name="description" content="Explore practical robotics, electronics, embedded systems and prototyping projects by EazyLife Robotics and Electronics Solutions.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root{--teal:#00B09B;--teal-dark:#008a78;--dark:#1a2e2b;--text:#2d3748;--muted:#64748b;--border:#e2e8f0}
+    *{box-sizing:border-box}body{margin:0;font-family:'DM Sans',Arial,sans-serif;color:var(--text);line-height:1.6;background:#fff}
+    h1,h2,h3{font-family:Poppins,Arial,sans-serif;color:var(--dark);line-height:1.25}
+    a{color:inherit;text-decoration:none}.container{max-width:1100px;margin:auto;padding:0 20px}
+    .nav{border-bottom:1px solid var(--border);padding:14px 0}.nav-inner{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{font-family:Poppins,sans-serif;font-weight:800;font-size:1.1rem}.brand span{color:var(--teal)}
+    .btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:11px 18px;font-weight:700;font-size:.88rem;background:#fff;border:1px solid var(--border)}
+    .btn-primary{background:linear-gradient(135deg,#00B09B,#8DC63F);color:#fff;border:0}
+    header{padding:42px 0 24px;background:linear-gradient(180deg,#e0f7f5,#fff)}
+    .eyebrow{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;font-weight:800;color:var(--teal-dark)}
+    header h1{font-size:clamp(1.8rem,5vw,2.7rem);margin:8px 0}
+    header p{max-width:650px;color:var(--muted);margin:0}
+    .gallery{padding:28px 0 64px}.grid{display:grid;grid-template-columns:1fr;gap:18px}
+    .card{border:1px solid var(--border);border-radius:18px;overflow:hidden;box-shadow:0 3px 14px #00000008;background:#fff}
+    .card img{width:100%;height:230px;object-fit:cover;background:#f4f6f6;display:block}
+    .body{padding:18px}.category{font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;font-weight:800;color:var(--teal-dark)}
+    .body h2{font-size:1.08rem;margin:5px 0 8px}.body p{font-size:.88rem;color:var(--muted);margin:0 0 12px}
+    .empty{padding:30px;text-align:center;border:1px dashed var(--border);border-radius:16px;color:var(--muted);grid-column:1/-1}
+    .detail{max-width:850px;margin:0 auto}.detail h1{font-size:clamp(1.7rem,5vw,2.4rem);margin:8px 0}
+    .detail-copy{color:var(--muted);white-space:pre-line}.detail-cover{width:100%;max-height:480px;object-fit:cover;border-radius:18px;margin:22px 0}
+    .detail-images{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:20px 0}
+    .detail-images img{width:100%;height:180px;object-fit:cover;border-radius:12px;background:#f4f6f6}
+    .detail-block{margin:22px 0}.detail-block h2{font-size:1.1rem}.materials{display:flex;flex-wrap:wrap;gap:8px}
+    .chip{background:#e0f7f5;color:#006f63;border-radius:999px;padding:6px 11px;font-size:.8rem;font-weight:700}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+    footer{padding:24px 0;border-top:1px solid var(--border);color:var(--muted);font-size:.82rem}
+
+    /* Gallery discovery and project presentation */
+    .gallery-tools{display:grid;grid-template-columns:1fr;gap:10px;margin:0 0 20px}
+    .search-wrap{position:relative}.search-wrap i{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--muted)}
+    .gallery-search,.category-filter{width:100%;min-height:48px;border:1px solid var(--border);border-radius:12px;padding:12px 14px;background:#fff;color:var(--text);font:inherit}
+    .gallery-search{padding-left:42px}.gallery-meta{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 16px;color:var(--muted);font-size:.84rem}
+    .card{transition:transform .2s ease,box-shadow .2s ease}.card:hover{transform:translateY(-3px);box-shadow:0 12px 28px #173d3514}
+    .card-media{position:relative;display:block;overflow:hidden;background:#f4f6f6}.card img{transition:transform .35s ease}.card:hover .card-media img{transform:scale(1.035)}
+    .card-media img{width:100%;height:230px;object-fit:cover;display:block}
+    .media-badge{position:absolute;right:12px;bottom:12px;background:#102a26d9;color:#fff;padding:6px 10px;border-radius:999px;font-size:.72rem;font-weight:700}
+    .card .body{display:flex;flex-direction:column;align-items:flex-start}.card .body p{flex:1}
+    .card .body .btn{margin-top:4px}
+    .detail-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .detail-cover{cursor:zoom-in;display:block}
+    .detail-images{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .detail-image-button{border:0;padding:0;background:#f4f6f6;border-radius:12px;overflow:hidden;cursor:zoom-in;display:block}
+    .detail-images img{width:100%;height:190px;object-fit:cover;display:block;transition:transform .25s ease}
+    .detail-image-button:hover img{transform:scale(1.04)}
+    .gallery-video{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:#102a26;margin:18px 0}
+    .gallery-video iframe,.gallery-video video{width:100%;height:100%;border:0;display:block}
+    .lightbox{position:fixed;inset:0;z-index:9999;background:#071512ed;display:none;align-items:center;justify-content:center;padding:18px}
+    .lightbox.open{display:flex}.lightbox img{max-width:100%;max-height:88vh;object-fit:contain;border-radius:8px}
+    .lightbox-close{position:absolute;right:16px;top:14px;width:44px;height:44px;border:1px solid #ffffff55;border-radius:50%;background:#ffffff18;color:#fff;font-size:1.5rem;cursor:pointer}
+    .lightbox-caption{position:absolute;left:16px;right:16px;bottom:12px;text-align:center;color:#fff;font-size:.85rem}
+    .no-results{padding:30px;text-align:center;border:1px dashed var(--border);border-radius:16px;color:var(--muted);grid-column:1/-1}
+    @media(min-width:700px){.gallery-tools{grid-template-columns:minmax(0,1fr) 240px}.detail-images{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+    @media(min-width:700px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.card img{height:200px}.detail-images{grid-template-columns:repeat(3,minmax(0,1fr))}}
+      .kit-section{border:1px solid var(--border);border-radius:16px;padding:18px;background:#f8fbfa}.kit-lines{display:grid;gap:10px;margin:14px 0}.kit-line{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px;background:#fff;border:1px solid var(--border);border-radius:12px}.kit-line strong{display:block;font-size:.92rem}.kit-line small{display:block;color:var(--muted);font-size:.76rem;margin-top:4px}.kit-line-side{text-align:right;display:grid;gap:3px;font-size:.82rem}.kit-line-side a{color:var(--teal);font-weight:700;font-size:.78rem}.kit-stock{font-size:.68rem;font-weight:700}.kit-stock.available{color:#16804a}.kit-stock.unavailable{color:#a36b12}.kit-order-btn{margin:4px 0 12px}.kit-manual{padding:12px;background:#fff;border-radius:12px;font-size:.82rem}.kit-manual ul{padding-left:20px;margin:8px 0}.kit-manual p{color:var(--muted);margin:6px 0 0}@media(max-width:520px){.kit-line{align-items:flex-start}.kit-line-side{min-width:112px}}
+</style>
+</head>
+<body>
+  <nav class="nav"><div class="container nav-inner">
+    <a class="brand" href="index.html">Eazy<span>Life</span></a>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn" href="index.html#projects">Home</a><a class="btn" href="shop.html">Shop</a></div>
+  </div></nav>
+  <header id="pageHeader"><div class="container">
+    <div class="eyebrow">Proof of work</div><h1>Engineering Project Gallery</h1>
+    <p>Explore practical builds, experiments and engineering work from EazyLife. Select a project to see its story, images and available build details.</p>
+  </div></header>
+  <main class="gallery"><div class="container" id="content"><p class="empty">Loading projects...</p></div></main>
+  <footer><div class="container">EazyLife Robotics &amp; Electronics Solutions · Ibadan, Nigeria · <a href="https://wa.me/2347051548082">Contact us</a></div></footer>
+  <script type="module">
+    import { getPublishedProjects, getProducts } from './js/store.mjs';
+    const content = document.getElementById('content');
+    const params = new URLSearchParams(location.search);
+    const selectedId = params.get('id');
+    const esc = value => String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+    const safeUrl = value => {
+      const raw = String(value || '').trim();
+      if (!raw) return '';
+      if (/^(https?:\/\/|\.\.\/|\/|assets\/)/i.test(raw)) return raw;
+      return '';
+    };
+    function projectCard(p) {
+      const image = safeUrl(p.coverImage) || safeUrl(Array.isArray(p.images) ? p.images[0] : '') || 'assets/pictures/placeholder.svg';
+      const imageCount = [...new Set([p.coverImage, ...(Array.isArray(p.images) ? p.images : [])].map(safeUrl).filter(Boolean))].length;
+      const hasVideo = /^https?:\/\//i.test(String(p.videoUrl || '').trim());
+      const link = 'projects.html?id=' + encodeURIComponent(p.id);
+      return '<article class="card">' +
+        '<a class="card-media" href="' + link + '"><img src="' + esc(image) + '" alt="' + esc(p.title || 'EazyLife project') + '" loading="lazy">' +
+        (imageCount > 1 ? '<span class="media-badge"><i class="fas fa-images"></i> ' + imageCount + ' photos</span>' : (hasVideo ? '<span class="media-badge"><i class="fas fa-play"></i> Video available</span>' : '')) +
+        '</a><div class="body"><span class="category">' + esc(p.category || 'Engineering project') + '</span>' +
+        '<h2><a href="' + link + '">' + esc(p.title || 'Engineering project') + '</a></h2>' +
+        '<p>' + esc(p.summary || '') + '</p><a class="btn" href="' + link + '">Explore project <i class="fas fa-arrow-right"></i></a></div></article>';
+    }
+
+    function renderGallery(projects) {
+      const categories = [...new Set(projects.map(p => String(p.category || '').trim()).filter(Boolean))].sort((a,b) => a.localeCompare(b));
+      content.innerHTML =
+        '<div class="gallery-tools">' +
+          '<label class="search-wrap"><i class="fas fa-search"></i><input id="projectSearch" class="gallery-search" type="search" placeholder="Search projects, topics or skills..." aria-label="Search projects"></label>' +
+          '<select id="categoryFilter" class="category-filter" aria-label="Filter projects by category"><option value="">All categories</option>' +
+            categories.map(c => '<option value="' + esc(c) + '">' + esc(c) + '</option>').join('') +
+          '</select></div>' +
+        '<div class="gallery-meta"><span id="projectCount"></span><span>Choose a project to explore how it was built.</span></div>' +
+        '<div class="grid" id="projectGrid"></div>';
+
+      const search = document.getElementById('projectSearch');
+      const filter = document.getElementById('categoryFilter');
+      const grid = document.getElementById('projectGrid');
+      const count = document.getElementById('projectCount');
+      const applyFilters = () => {
+        const term = search.value.trim().toLowerCase();
+        const category = filter.value;
+        const visible = projects.filter(p => {
+          const text = [p.title,p.category,p.summary,p.description,p.process,p.outcome,...(Array.isArray(p.materials)?p.materials:[])].join(' ').toLowerCase();
+          return (!term || text.includes(term)) && (!category || String(p.category || '') === category);
+        });
+        count.textContent = visible.length + (visible.length === 1 ? ' project' : ' projects');
+        grid.innerHTML = visible.length ? visible.map(projectCard).join('') :
+          '<div class="no-results"><i class="fas fa-search"></i><h3>No matching projects</h3><p>Try another search phrase or choose a different category.</p></div>';
+      };
+      search.addEventListener('input', applyFilters);
+      filter.addEventListener('change', applyFilters);
+      applyFilters();
+    }
+
+    function videoMarkup(value) {
+      const raw = String(value || '').trim();
+      if (!/^https?:\/\//i.test(raw)) return '';
+      let embed = '';
+      let match = raw.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/i);
+      if (match) embed = 'https://www.youtube-nocookie.com/embed/' + match[1];
+      if (!embed) {
+        match = raw.match(/vimeo\.com\/(?:video\/)?([0-9]+)/i);
+        if (match) embed = 'https://player.vimeo.com/video/' + match[1];
+      }
+      if (embed) return '<div class="gallery-video"><iframe src="' + esc(embed) + '" title="Project video" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>';
+      if (/\.mp4(?:[?#].*)?$/i.test(raw)) return '<div class="gallery-video"><video controls playsinline preload="metadata"><source src="' + esc(raw) + '" type="video/mp4">Your browser does not support video playback.</video></div>';
+      return '<div class="actions"><a class="btn btn-primary" href="' + esc(raw) + '" target="_blank" rel="noopener"><i class="fas fa-play"></i> Watch project video</a></div>';
+    }
+
+    function openLightbox(src, caption) {
+      let box = document.getElementById('projectLightbox');
+      if (!box) {
+        box = document.createElement('div');
+        box.id = 'projectLightbox';
+        box.className = 'lightbox';
+        box.setAttribute('role','dialog');
+        box.setAttribute('aria-modal','true');
+        box.setAttribute('aria-label','Project image viewer');
+        box.innerHTML = '<button class="lightbox-close" type="button" aria-label="Close image">&times;</button><img alt=""><div class="lightbox-caption"></div>';
+        document.body.appendChild(box);
+        box.addEventListener('click', event => { if (event.target === box || event.target.closest('.lightbox-close')) box.classList.remove('open'); });
+        document.addEventListener('keydown', event => { if (event.key === 'Escape') box.classList.remove('open'); });
+      }
+      box.querySelector('img').src = src;
+      box.querySelector('img').alt = caption || 'Project image';
+      box.querySelector('.lightbox-caption').textContent = caption || '';
+      box.classList.add('open');
+    }
+
+    function renderKitSection(p, products) {
+      const rows = Array.isArray(p.kitComponents) ? p.kitComponents : [];
+      if (!rows.length) return '';
+      const linked = rows.filter(x => x.productId && x.variantId);
+      const manual = rows.filter(x => !x.productId || !x.variantId);
+      const byId = new Map(products.map(x => [x.id, x]));
+      const line = x => {
+        const product = byId.get(x.productId);
+        const variants = product?.variants || [];
+        const variant = variants.find(v => v.id === x.variantId) || (x.variant ? variants.find((v,i) => { const bits=[v?.processor,v?.ram,v?.rom,v?.color].filter(Boolean); return (bits.length?bits.join(' / '):'Variant '+(i+1)) === x.variant; }) : null);
+        const label = product?.name || x.productName || x.name || 'Store component';
+        const price = variant ? Number(variant.promoPrice > 0 ? variant.promoPrice : variant.price || 0) : null;
+        const available = !!product && product.inStock !== false && !!variant && variant.inStock !== false;
+        const url = 'shop.html?product=' + encodeURIComponent(x.productId);
+        return '<div class="kit-line"><div><strong>' + esc(label) + '</strong><small>' + esc(x.variant || '') + ' · Qty ' + Number(x.quantity || 1) + (x.required === false ? ' · Optional' : ' · Required') + '</small></div><div class="kit-line-side">' + (price != null ? '<b>₦' + price.toLocaleString() + '</b>' : '<b>Price unavailable</b>') + '<span class="kit-stock ' + (available ? 'available' : 'unavailable') + '">' + (available ? 'Listed in store' : 'Availability to be confirmed') + '</span><a href="' + url + '">View item</a></div></div>';
+      };
+      return '<section class="detail-block kit-section"><h2>Components for this project</h2><p class="detail-copy">Explore the components individually or request a kit. Store-linked components are included in the kit order at current catalogue prices. Availability is confirmed by EazyLife after submission.</p>' +
+        (linked.length ? '<div class="kit-lines">' + linked.map(line).join('') + '</div><a class="btn btn-primary kit-order-btn" href="kit-order.html?project=' + encodeURIComponent(p.id) + '">Order project kit <i class="fas fa-arrow-right"></i></a>' : '<p class="empty">No store-linked components have been added to this project yet.</p>') +
+        (manual.length ? '<div class="kit-manual"><strong>Additional materials not listed in the store</strong><ul>' + manual.map(x => '<li>' + esc(x.name) + ' · Qty ' + Number(x.quantity || 1) + (x.required === false ? ' · Optional' : '') + '</li>').join('') + '</ul><p>These items are not included in the online kit order. Contact us if you need help sourcing them.</p></div>' : '') + '</section>';
+    }
+
+    function renderDetail(p, products) {
+      document.title = (p.title || 'Project') + ' | EazyLife';
+      document.getElementById('pageHeader').style.display = 'none';
+      const cover = safeUrl(p.coverImage) || safeUrl(Array.isArray(p.images) ? p.images[0] : '');
+      const images = (Array.isArray(p.images) ? p.images : []).map(safeUrl).filter(Boolean);
+      const uniqueImages = [...new Set([cover, ...images].filter(Boolean))];
+      const galleryImages = uniqueImages.filter(src => src !== cover);
+      const materials = Array.isArray(p.materials) ? p.materials : [];
+      content.innerHTML = '<article class="detail">' +
+        '<div class="detail-top"><a class="btn" href="projects.html"><i class="fas fa-arrow-left"></i> All projects</a><span class="category">' + esc(p.category || 'Engineering project') + '</span></div>' +
+        '<h1>' + esc(p.title || 'Engineering project') + '</h1>' +
+        '<p class="detail-copy">' + esc(p.summary || '') + '</p>' +
+        (cover ? '<img class="detail-cover" data-project-image="' + esc(cover) + '" src="' + esc(cover) + '" alt="' + esc(p.title || 'Project cover') + '">' : '') +
+        (p.description ? '<div class="detail-block"><h2>About this project</h2><p class="detail-copy">' + esc(p.description) + '</p></div>' : '') +
+        (galleryImages.length ? '<div class="detail-block"><h2>Project photos</h2><p class="detail-copy">Select any image to view it larger.</p><div class="detail-images">' +
+          galleryImages.map((src,i) => '<button class="detail-image-button" type="button" data-project-image="' + esc(src) + '" aria-label="View project photo ' + (i+1) + '"><img src="' + esc(src) + '" alt="' + esc(p.title || 'Project') + ' photo ' + (i+1) + '" loading="lazy"></button>').join('') +
+        '</div></div>' : '') +
+        (videoMarkup(p.videoUrl) ? '<div class="detail-block"><h2>Project video</h2>' + videoMarkup(p.videoUrl) + '</div>' : '') +
+        (materials.length ? '<div class="detail-block"><h2>Materials and components</h2><div class="materials">' + materials.map(m => '<span class="chip">' + esc(m) + '</span>').join('') + '</div></div>' : '') + 
+        renderKitSection(p, products) +
+        (p.process ? '<div class="detail-block"><h2>Build process</h2><p class="detail-copy">' + esc(p.process) + '</p></div>' : '') +
+        (p.outcome ? '<div class="detail-block"><h2>Outcome</h2><p class="detail-copy">' + esc(p.outcome) + '</p></div>' : '') +
+        '<div class="actions"><a class="btn btn-primary" href="https://wa.me/2347051548082?text=' + encodeURIComponent('Hello EazyLife, I would like to enquire about the project: ' + (p.title || '')) + '">Discuss a similar project</a><a class="btn" href="projects.html">Back to gallery</a></div>' +
+      '</article>';
+      content.querySelectorAll('[data-project-image]').forEach(el => {
+        el.addEventListener('click', () => openLightbox(el.dataset.projectImage, p.title || 'Project image'));
+      });
+    }
+
+    try {
+      const [projects, products] = await Promise.all([getPublishedProjects(), getProducts()]);
+      if (selectedId) {
+        const project = projects.find(p => p.id === selectedId);
+        if (!project) content.innerHTML = '<p class="empty">This project is unavailable or is no longer published. <a href="projects.html">Return to the gallery.</a></p>';
+        else renderDetail(project, products);
+      } else {
+        if (projects.length) renderGallery(projects);
+        else content.innerHTML = '<p class="empty">The project gallery is being prepared. Please check back soon.</p>';
+      }
+    } catch (error) {
+      console.error('Could not load projects:', error);
+      content.innerHTML = '<p class="empty">We could not load the project gallery right now. Please refresh or try again later.</p>';
+    }
+  </script>
+</body>
+</html>

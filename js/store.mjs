@@ -5,7 +5,7 @@
 import { initFirebase } from './firebase.mjs';
 import {
   collection, doc, getDocs, getDoc, addDoc, setDoc, updateDoc, deleteDoc,
-  onSnapshot, query, orderBy, serverTimestamp, runTransaction
+  onSnapshot, query, orderBy, where, Timestamp, serverTimestamp, runTransaction
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const { db } = initFirebase();
@@ -69,12 +69,22 @@ function variantLabelForOrder(v, index) {
   return bits.length ? bits.join(' / ') : `Variant ${index + 1}`;
 }
 
-async function resolveOrderItems(items) {
+async function resolveOrderItems(items, { enforceCatalogPrice = false } = {}) {
   const productsSnap = await getDocs(collection(db, 'products'));
   const products = new Map(productsSnap.docs.map(d => [d.id, { id: d.id, ...d.data() }]));
 
   return (items || []).map(item => {
-    if (!item?.productId || item.variantId) return item;
+    if (!item?.productId) return item;
+
+    if (item.variantId) {
+      if (!enforceCatalogPrice) return item;
+      const product = products.get(item.productId);
+      const variant = (Array.isArray(product?.variants) ? product.variants : []).find(v => v.id === item.variantId);
+      if (!product || !variant) throw new Error(`A selected project kit item is no longer available in the catalogue. Please refresh the kit page.`);
+      const currentPrice = Number(variant.promoPrice > 0 ? variant.promoPrice : variant.price || 0);
+      if (Number(item.price) !== currentPrice) throw new Error(`The catalogue price for ${product.name} has changed. Please refresh the kit page and review the updated total.`);
+      return { ...item, name: product.name || item.name, variant: variantLabelForOrder(variant, (product.variants || []).indexOf(variant)), price: currentPrice, sku: variant.sku || '' };
+    }
 
     const product = products.get(item.productId);
     const variants = Array.isArray(product?.variants) ? product.variants : [];
@@ -97,7 +107,7 @@ async function resolveOrderItems(items) {
 
 export async function placeOrder(order) {
   const trackingCode = generateTrackingCode();
-  const items = await resolveOrderItems(order.items || []);
+  const items = await resolveOrderItems(order.items || [], { enforceCatalogPrice: order.orderType === 'project_kit' });
   await setDoc(doc(db, 'orders', trackingCode), {
     ...order,
     items,
@@ -308,6 +318,32 @@ export async function updateHero(id, updates) {
 
 export async function deleteHero(id) {
   return deleteDoc(doc(db, 'heroes', id));
+}
+
+
+/* ---------------- ENGINEERING PROJECTS ---------------- */
+// Admin watches all records. Public reads are restricted by Firestore rules
+// to published records whose publishAt timestamp has arrived.
+export function watchProjects(callback) {
+  return onSnapshot(collection(db, 'projects'), snap => {
+    callback(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+  });
+}
+export async function getPublishedProjects() {
+  // Scheduled projects stay private until an authenticated admin session
+  // promotes them to status "published".
+  const q = query(collection(db, 'projects'), where('status', '==', 'published'));
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+export async function addProject(project) {
+  return addDoc(collection(db, 'projects'), project);
+}
+export async function updateProject(id, updates) {
+  return updateDoc(doc(db, 'projects', id), updates);
+}
+export async function deleteProject(id) {
+  return deleteDoc(doc(db, 'projects', id));
 }
 
 /* ---------------- REVIEWS ---------------- */

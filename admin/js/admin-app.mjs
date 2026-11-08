@@ -9,7 +9,7 @@ import {
   onAuthStateChanged, signInWithEmailAndPassword, signOut
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
-  watchProducts, watchHeroes, watchReviews, watchRequests, watchOrders
+  watchProducts, watchHeroes, watchReviews, watchRequests, watchOrders, watchProjects
 } from '../../js/store.mjs';
 
 import { initTabs, initImagePicker } from './admin-shared.mjs';
@@ -18,6 +18,7 @@ import { initHeroes, renderHeroes, setProductsForHeroLinks } from './admin-heroe
 import { initReviews, renderReviews } from './admin-reviews.mjs';
 import { renderRequestList } from './admin-requests.mjs';
 import { renderOrderList } from './admin-orders.mjs';
+import { initProjects, renderProjects, checkDueProjectPublications, setProjectKitProducts } from './admin-projects.mjs';
 import { initSettings, loadSettingsForm } from './admin-settings.mjs';
 
 const { auth } = initFirebase();
@@ -27,6 +28,7 @@ initImagePicker();
 initProducts();
 initHeroes();
 initReviews();
+initProjects();
 initSettings();
 
 let unsubProducts = null;
@@ -34,6 +36,8 @@ let unsubHeroes = null;
 let unsubReviews = null;
 let unsubRequests = null;
 let unsubOrders = null;
+let unsubProjects = null;
+let projectPublishTimer = null;
 
 /* ---------------- AUTH ---------------- */
 
@@ -57,6 +61,8 @@ onAuthStateChanged(auth, (user) => {
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('dashboard').classList.remove('hidden');
     startDashboard();
+    if (projectPublishTimer) clearInterval(projectPublishTimer);
+    projectPublishTimer = setInterval(checkDueProjectPublications, 60000);
   } else {
     document.getElementById('dashboard').classList.add('hidden');
     document.getElementById('loginScreen').classList.remove('hidden');
@@ -65,12 +71,15 @@ onAuthStateChanged(auth, (user) => {
     if (unsubReviews) unsubReviews();
     if (unsubRequests) unsubRequests();
     if (unsubOrders) unsubOrders();
+    if (unsubProjects) unsubProjects();
+    if (projectPublishTimer) { clearInterval(projectPublishTimer); projectPublishTimer = null; }
   }
 });
 
 function startDashboard() {
   unsubProducts = watchProducts((products) => {
     renderProducts(products);
+    setProjectKitProducts(products);
     // The hero form's "link to category"/"link to product" dropdowns are
     // built from the product list, so heroes needs to hear about it too.
     setProductsForHeroLinks(products);
@@ -79,5 +88,6 @@ function startDashboard() {
   unsubReviews = watchReviews(renderReviews);
   unsubRequests = watchRequests(renderRequestList);
   unsubOrders = watchOrders(renderOrderList);
+  unsubProjects = watchProjects(renderProjects);
   loadSettingsForm();
 }

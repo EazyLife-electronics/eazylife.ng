@@ -22,14 +22,15 @@ if (typeof document !== 'undefined' &&
             <input id="s_tagline" placeholder="Short tagline shown around the shop" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
           </div>
           <div>
-            <label class="block text-[10px] font-black uppercase text-gray-400 mb-1">About text</label>
-            <textarea id="s_about" rows="4" placeholder="Short description about EazyLife" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]"></textarea>
+            <label class="block text-[10px] font-black uppercase text-gray-400 mb-1">About / Philosophy Text</label>
+            <textarea id="s_about" rows="4" placeholder="Describe Eazylife engineering, services and values" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]"></textarea>
           </div>
           <label class="flex items-center gap-2 text-xs font-bold text-gray-600 px-1">
             <input type="checkbox" id="s_referralMode">
-            Enable referral mode
+            Legacy referral mode (retained for compatibility)
           </label>
-          <div class="grid grid-cols-2 gap-3">
+          <p class="text-[10px] text-gray-400 -mt-2 px-1">This older setting is retained for existing records and no longer changes the current homepage service descriptions.</p>
+          <div class="grid grid-cols-2 gap-3>
             <div>
               <label class="block text-[10px] font-black uppercase text-gray-400 mb-1">Delivery fee / item (₦)</label>
               <input id="s_deliveryFee" type="number" min="0" step="1" placeholder="750" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">

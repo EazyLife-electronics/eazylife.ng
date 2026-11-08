@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Order Project Kit | EazyLife</title>
+<link rel="icon" type="image/png" href="assets/pictures/icon_dark.png">
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root{--teal:#00B09B;--dark:#1a2e2b}body{font-family:'DM Sans',sans-serif;background:#f7faf9;color:#1a2e2b}h1,h2{font-family:Poppins,sans-serif}.btn{background:#102a26;color:white;border-radius:14px;padding:14px 18px;font-weight:800}.btn:disabled{opacity:.55}.field{width:100%;padding:13px;border:1px solid #dce6e2;border-radius:12px;background:white}.kit-item{border:1px solid #e3ebe7;border-radius:14px;background:white;padding:14px}.muted{color:#71817b}.pill{font-size:11px;font-weight:800;border-radius:999px;padding:5px 9px}.in{background:#e8f7ef;color:#16804a}.out{background:#fff4df;color:#98600b}
+</style>
+</head>
+<body class="min-h-screen">
+<header class="bg-white border-b border-gray-100 sticky top-0 z-20"><div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between"><a href="index.html"><img src="assets/pictures/logo_black_transparent.png" alt="EazyLife" class="h-9"></a><a href="projects.html" class="text-sm font-bold text-teal-700">Back to projects</a></div></header>
+<main class="max-w-3xl mx-auto px-4 py-7">
+<div id="loading" class="text-center py-20 muted"><i class="fas fa-circle-notch fa-spin text-2xl"></i><p class="mt-3">Preparing your project kit...</p></div>
+<div id="page" class="hidden">
+<div class="mb-6"><p class="text-xs uppercase tracking-wider font-bold text-teal-700">EazyLife project kit</p><h1 id="title" class="text-2xl md:text-3xl font-extrabold mt-2"></h1><p class="muted text-sm mt-2">Choose the store-listed components you need. Prices use the current catalogue. Stock and fulfilment are confirmed by EazyLife after you submit.</p></div>
+<section class="bg-white rounded-2xl border border-gray-100 p-4 md:p-5 mb-5">
+<div class="flex justify-between items-center gap-3 mb-3"><h2 class="text-lg">Components</h2><span id="count" class="text-xs muted"></span></div>
+<div id="items" class="space-y-3"></div>
+<p id="noItems" class="hidden text-sm muted py-5">This project does not currently have any store-linked components available for online kit ordering.</p>
+</section>
+<section class="bg-white rounded-2xl border border-gray-100 p-4 md:p-5 mb-5">
+<h2 class="text-lg mb-3">Your order</h2>
+<div class="flex justify-between text-sm"><span class="muted">Selected components</span><strong id="subtotal">₦0</strong></div>
+<p class="text-xs muted mt-2">Delivery charges, if applicable, are confirmed separately before fulfilment. Submitting this request does not reserve stock or confirm delivery.</p>
+</section>
+<section class="bg-white rounded-2xl border border-gray-100 p-4 md:p-5">
+<h2 class="text-lg mb-1">Contact and delivery details</h2><p class="text-xs muted mb-4">We'll use these details to contact you about availability and fulfilment.</p>
+<div class="space-y-3"><input id="customerName" class="field" autocomplete="name" placeholder="Full name" required><input id="phone" class="field" autocomplete="tel" inputmode="tel" placeholder="Phone / WhatsApp number" required><textarea id="address" class="field" rows="3" autocomplete="street-address" placeholder="Delivery address / area" required></textarea></div>
+<label class="flex items-start gap-2 text-xs muted mt-4"><input id="terms" type="checkbox" class="mt-0.5"><span>I understand that stock and fulfilment will be confirmed by EazyLife after submission. Catalogue prices shown above apply to the selected listed components.</span></label>
+<button id="submit" class="btn w-full mt-5" type="button"><i class="fas fa-paper-plane mr-2"></i>Submit kit order</button>
+<p id="error" class="hidden text-sm text-red-600 mt-3" role="alert"></p>
+</section>
+</div>
+<div id="success" class="hidden bg-white rounded-2xl border border-gray-100 p-6 text-center mt-10">
+<div class="text-4xl text-teal-600"><i class="fas fa-circle-check"></i></div><h1 class="text-2xl mt-3">Kit request received!</h1><p class="muted text-sm mt-2">Thank you. EazyLife will review component availability and contact you before confirming fulfilment.</p>
+<p class="text-xs uppercase font-bold muted mt-6">Tracking code</p><p id="tracking" class="text-2xl font-black tracking-widest text-teal-700 mt-1"></p><a id="track" class="btn inline-block mt-4" href="track.html">Track this request</a>
+<a id="whatsapp" target="_blank" rel="noopener" class="block mt-4 text-sm font-bold text-green-700"><i class="fab fa-whatsapp mr-1"></i>Send order details on WhatsApp (optional)</a>
+</div>
+</main>
+<script type="module">
+import { getProducts, getPublishedProjects, placeOrder, getSettings } from './js/store.mjs';
+const params=new URLSearchParams(location.search), projectId=params.get('project');
+let project=null,products=[],settings={},lines=[];
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+function variantLabel(v,i){const a=[v?.processor,v?.ram,v?.rom,v?.color].filter(Boolean);return a.length?a.join(' / '):'Variant '+(i+1)}
+function unitPrice(v){return Number(v?.promoPrice>0?v.promoPrice:v?.price||0)}
+function selected(){return lines.filter(x=>x.checked)}
+function render(){
+ $('title').textContent=project.title+' Kit';
+ const linked=(project.kitComponents||[]).filter(x=>x.productId&&x.variantId);
+ lines=linked.map((x,i)=>{
+  const p=products.find(z=>z.id===x.productId), variants=p?.variants||[], v=variants.find(z=>z.id===x.variantId) || (x.variant ? variants.find((z,i)=>variantLabel(z,i)===x.variant) : null);
+  return {...x,key:i,product:p,variantData:v,checked:x.required!==false,quantity:Math.max(1,Number(x.quantity)||1)};
+ }).filter(x=>x.product&&x.variantData);
+ $('count').textContent=lines.length+' listed component'+(lines.length===1?'':'s');
+ $('noItems').classList.toggle('hidden',lines.length>0);
+ $('items').innerHTML=lines.map(x=>{
+  const price=unitPrice(x.variantData), available=x.product.inStock!==false&&x.variantData.inStock!==false;
+  const vIndex=x.product.variants.findIndex(v=>v.id===x.variantData.id);
+  return '<article class="kit-item"><div class="flex items-start gap-3"><input data-check="'+x.key+'" type="checkbox" class="mt-1 w-4 h-4 accent-teal-600" '+(x.checked?'checked':'')+'><div class="min-w-0 flex-1"><div class="font-bold text-sm">'+esc(x.product.name)+'</div><p class="text-xs muted mt-1">'+esc(variantLabel(x.variantData,vIndex))+' · '+(x.required===false?'Optional':'Required')+'</p><div class="flex flex-wrap items-center gap-2 mt-2"><span class="pill '+(available?'in':'out')+'">'+(available?'Listed as in stock':'Availability to be confirmed')+'</span><a class="text-xs font-bold text-teal-700" href="shop.html?product='+encodeURIComponent(x.product.id)+'">View store item</a></div></div><div class="text-right shrink-0"><strong class="text-sm">₦'+price.toLocaleString()+'</strong><div class="text-[10px] muted">per unit</div><div class="flex items-center gap-2 justify-end mt-2"><button type="button" data-qty="'+x.key+'" data-delta="-1" class="w-7 h-7 rounded-lg bg-gray-100 font-bold">−</button><span class="text-sm font-bold w-4 text-center">'+x.quantity+'</span><button type="button" data-qty="'+x.key+'" data-delta="1" class="w-7 h-7 rounded-lg bg-gray-100 font-bold">+</button></div></div></div></article>';
+ }).join('');
+ $('items').querySelectorAll('[data-check]').forEach(el=>el.addEventListener('change',()=>{lines.find(x=>x.key===Number(el.dataset.check)).checked=el.checked;updateTotal()}));
+ $('items').querySelectorAll('[data-qty]').forEach(el=>el.addEventListener('click',()=>{const x=lines.find(z=>z.key===Number(el.dataset.qty));x.quantity=Math.max(1,x.quantity+Number(el.dataset.delta));render()}));
+ updateTotal();
+}
+function updateTotal(){const sum=selected().reduce((n,x)=>n+unitPrice(x.variantData)*x.quantity,0);$('subtotal').textContent='₦'+sum.toLocaleString();$('submit').disabled=!selected().length}
+async function init(){
+ try{
+  const [ps,allProjects,site]=await Promise.all([getProducts(),getPublishedProjects(),getSettings()]);
+  products=ps;settings=site;project=allProjects.find(x=>x.id===projectId);
+  if(!project)throw new Error('This project is not available for kit ordering. Please return to the project gallery.');
+  render();$('loading').classList.add('hidden');$('page').classList.remove('hidden');
+ }catch(e){$('loading').innerHTML='<p class="text-red-600">'+esc(e.message||'Could not load this project kit.')+'</p><a class="text-teal-700 font-bold" href="projects.html">Return to projects</a>'}
+}
+$('submit').addEventListener('click',async()=>{
+ const name=$('customerName').value.trim(),phone=$('phone').value.trim(),address=$('address').value.trim(),items=selected();
+ if(!name||!phone||!address)return showError('Please enter your name, phone number and delivery address.');
+ if(!$('terms').checked)return showError('Please confirm that you understand the availability and fulfilment terms.');
+ if(!items.length)return showError('Select at least one component.');
+ const btn=$('submit');btn.disabled=true;btn.textContent='Submitting...';$('error').classList.add('hidden');
+ const orderItems=items.map(x=>({productId:x.product.id,variantId:x.variantData.id,sku:x.variantData.sku||'',name:x.product.name,variant:variantLabel(x.variantData,x.product.variants.findIndex(v=>v.id===x.variantData.id)),price:unitPrice(x.variantData),quantity:x.quantity,required:x.required!==false}));
+ const subtotal=orderItems.reduce((n,x)=>n+x.price*x.quantity,0);
+ try{
+  const code=await placeOrder({orderType:'project_kit',projectId:project.id,projectTitle:project.title,pricingMode:'fixed_catalogue',items:orderItems,customerName:name,phone,address,subtotal,deliveryFee:0,total:subtotal,fulfilmentNote:'Stock and fulfilment require admin confirmation. Delivery charge may be confirmed separately.',inventoryApplied:false});
+  try{const saved=JSON.parse(localStorage.getItem('eazylife_my_orders'))||[];if(!saved.includes(code))saved.unshift(code);localStorage.setItem('eazylife_my_orders',JSON.stringify(saved.slice(0,50)))}catch(_){}
+  $('page').classList.add('hidden');$('success').classList.remove('hidden');$('tracking').textContent=code;$('track').href='track.html?code='+encodeURIComponent(code);
+  const linesText=orderItems.map(x=>'• '+x.name+' ('+x.variant+') × '+x.quantity+' = ₦'+(x.price*x.quantity).toLocaleString()).join('\n');
+  const message='Hello EazyLife, I submitted project kit request '+code+' for '+project.title+'.\n\n'+linesText+'\n\nCatalogue subtotal: ₦'+subtotal.toLocaleString()+'\nName: '+name+'\nPhone: '+phone+'\nAddress: '+address+'\nPlease confirm availability and delivery.';
+  $('whatsapp').href='https://wa.me/'+String(settings.whatsapp||'2347051548082').replace(/\D/g,'')+'?text='+encodeURIComponent(message);
+ }catch(e){showError(e.message||'Could not submit your kit request. Please try again.');btn.disabled=false;btn.innerHTML='<i class="fas fa-paper-plane mr-2"></i>Submit kit order'}
+});
+function showError(message){$('error').textContent=message;$('error').classList.remove('hidden')}
+init();
+</script>
+</body></html>

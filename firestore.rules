@@ -36,6 +36,13 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    match /projects/{projectId} {
+      // Scheduled projects remain private. An authenticated admin session
+      // promotes due projects to "published"; public visitors can then read them.
+      allow read: if isAdmin() || resource.data.status == 'published';
+      allow write: if isAdmin();
+    }
+
     match /reviews/{reviewId} {
       allow read: if true;
       allow create: if request.resource.data.keys().hasAll(['name', 'text'])
