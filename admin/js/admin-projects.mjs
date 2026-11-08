@@ -3,6 +3,63 @@ import { addProject, updateProject, deleteProject } from '../../js/store.mjs';
 import { escapeHtml } from './admin-shared.mjs';
 
 let projects = [];
+let kitProducts = [];
+let kitRowCounter = 0;
+
+function kitVariantLabel(v, index) {
+  const parts = [v?.processor, v?.ram, v?.rom, v?.color].filter(Boolean);
+  return parts.length ? parts.join(' / ') : `Variant ${index + 1}`;
+}
+function addKitRow(data = {}) {
+  const host = $('projectKitRows');
+  if (!host) return;
+  const id = ++kitRowCounter;
+  const productOptions = ['<option value="">Not linked to store / manual item</option>', ...kitProducts.map(p => `<option value="${escapeHtml(p.id)}" ${p.id === data.productId ? 'selected' : ''}>${escapeHtml(p.name || 'Unnamed product')}</option>`)].join('');
+  const row = document.createElement('div');
+  row.className = 'bg-white border border-gray-100 rounded-xl p-3 space-y-2';
+  row.dataset.kitRow = String(id);
+  row.innerHTML = `<select data-kit-product class="w-full p-2.5 bg-gray-50 rounded-lg border border-gray-200 text-xs">${productOptions}</select>
+    <input data-kit-manual value="${escapeHtml(data.name || '')}" placeholder="Manual component name (if not linked)" class="w-full p-2.5 bg-gray-50 rounded-lg border border-gray-200 text-xs ${data.productId ? 'hidden' : ''}">
+    <select data-kit-variant class="w-full p-2.5 bg-gray-50 rounded-lg border border-gray-200 text-xs"></select>
+    <div class="flex items-center gap-2"><input data-kit-qty type="number" min="1" step="1" value="${Math.max(1,Number(data.quantity)||1)}" class="w-20 p-2 bg-gray-50 rounded-lg border border-gray-200 text-xs" aria-label="Quantity"><label class="flex items-center gap-1 text-[11px] text-gray-600"><input data-kit-required type="checkbox" ${data.required !== false ? 'checked' : ''}> Required</label><button type="button" data-kit-remove class="ml-auto text-red-500 text-[11px] font-bold">Remove</button></div>`;
+  host.appendChild(row);
+  const productSelect=row.querySelector('[data-kit-product]'), variantSelect=row.querySelector('[data-kit-variant]'), manual=row.querySelector('[data-kit-manual]');
+  const refreshVariants=()=>{
+    const p=kitProducts.find(x=>x.id===productSelect.value);
+    manual.classList.toggle('hidden',!!p);
+    const variants=Array.isArray(p?.variants)?p.variants:[];
+    variantSelect.innerHTML=variants.map((v,i)=>`<option value="${escapeHtml(v.id||'')}" ${v.id===data.variantId?'selected':''}>${escapeHtml(kitVariantLabel(v,i))} · ₦${Number(v.promoPrice>0?v.promoPrice:v.price||0).toLocaleString()}${v.inStock===false?' · Currently unavailable':''}</option>`).join('');
+    variantSelect.classList.toggle('hidden',!p || !variants.length);
+    if(p && !variants.length) variantSelect.innerHTML='<option value="">No variants configured</option>';
+  };
+  productSelect.addEventListener('change',()=>{data.variantId=null;refreshVariants();});
+  row.querySelector('[data-kit-remove]').addEventListener('click',()=>row.remove());
+  refreshVariants();
+}
+function collectKitComponents() {
+  return [...document.querySelectorAll('#projectKitRows [data-kit-row]')].map(row=>{
+    const productId=row.querySelector('[data-kit-product]').value;
+    const product=kitProducts.find(p=>p.id===productId);
+    const variantId=row.querySelector('[data-kit-variant]').value || null;
+    const variant=(product?.variants||[]).find(v=>v.id===variantId);
+    return {
+      productId: product?.id || null,
+      productName: product?.name || null,
+      variantId: variant?.id || null,
+      variant: variant ? kitVariantLabel(variant,(product.variants||[]).indexOf(variant)) : '',
+      name: product ? product.name : row.querySelector('[data-kit-manual]').value.trim(),
+      quantity: Math.max(1,parseInt(row.querySelector('[data-kit-qty]').value,10)||1),
+      required: row.querySelector('[data-kit-required]').checked
+    };
+  }).filter(x=>x.name);
+}
+function renderKitComponents(items=[]) {
+  const host=$('projectKitRows'); if(!host) return;
+  host.innerHTML=''; kitRowCounter=0;
+  (items||[]).forEach(addKitRow);
+}
+export function setProjectKitProducts(items) { kitProducts=items||[]; }
+
 const publishingDue = new Set();
 const $ = id => document.getElementById(id);
 const form = $('projectForm');
@@ -28,7 +85,7 @@ function editProject(id) {
   $('projectOutcome').value = p.outcome || '';
   $('projectCover').value = p.coverImage || '';
   $('projectImages').value = Array.isArray(p.images) ? p.images.join('\n') : '';
-  $('projectVideo').value = p.videoUrl || '';
+  $('projectVideo').value = p.videoUrl || '';\n  renderKitComponents(p.kitComponents || []);
   const savedPublishDate = p.publishAt?.toDate ? p.publishAt.toDate() : new Date(p.publishAt || 0);
   const isFutureSchedule = p.status === 'scheduled';
   $('projectStatus').value = p.status === 'published' ? 'published' : (isFutureSchedule ? 'scheduled' : 'draft');
@@ -159,7 +216,7 @@ export function initProjects() {
       outcome: $('projectOutcome').value.trim(),
       coverImage: $('projectCover').value.trim(),
       images: $('projectImages').value.split('\n').map(x => x.trim()).filter(Boolean),
-      videoUrl: $('projectVideo').value.trim(),
+      videoUrl: $('projectVideo').value.trim(),\n      kitComponents: collectKitComponents(),
       status: statusChoice,
       publishAt: statusChoice === 'draft' ? new Date('2999-01-01T00:00:00Z') : publishAt,
       updatedAt: new Date()
@@ -174,7 +231,7 @@ export function initProjects() {
     } catch (err) { alert('Could not save project: ' + err.message); }
   });
   $('projectResetBtn').addEventListener('click', resetForm);
-  $('projectStarterBtn').addEventListener('click', createStarterDrafts);
+  $('projectStarterBtn').addEventListener('click', createStarterDrafts);\n  $('projectKitAddBtn')?.addEventListener('click', () => addKitRow());
   resetForm();
 }
 export function renderProjects(items) {
