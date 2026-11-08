@@ -346,6 +346,7 @@
           <i class="fas fa-shopping-basket"></i>
           <span id="navCartCount" style="background:var(--teal); color:#fff; border-radius:999px; padding:1px 7px; font-size:0.68rem; font-weight:800;">0</span>
         </a>
+        <a href="#projects" class="btn btn-outline"><i class="fas fa-diagram-project"></i> Projects</a>
         <a href="shop.html" class="btn btn-outline"><i class="fas fa-shopping-basket"></i> Shop</a>
         <a href="track.html" class="btn btn-outline" title="Track Order"><i class="fas fa-truck-fast"></i></a>
         <a href="https://wa.me/2347051548082" target="_blank" class="btn btn-wa"><i class="fab fa-whatsapp"></i></a>
@@ -377,6 +378,21 @@
     </div>
     <div class="hero-carousel-viewport">
       <div class="hero-carousel-track" id="heroCarousel"></div>
+    </div>
+  </section>
+
+  <!-- ENGINEERING PROJECTS / PROOF OF WORK -->
+  <section id="projects" aria-label="Engineering projects">
+    <div class="container">
+      <div class="section-label">Built by EazyLife</div>
+      <h2 class="section-title">Engineering Projects & Practical Builds</h2>
+      <p class="section-sub" style="margin-bottom:28px;">A few examples of our practical engineering work. Explore the full gallery for project stories, build details and more.</p>
+      <div id="projectsGrid" class="project-gallery-grid">
+        <p class="shop-preview-loading">Loading engineering projects...</p>
+      </div>
+      <div style="text-align:center;margin-top:24px;">
+        <a href="projects.html" class="btn btn-primary">Explore the Full Project Gallery <i class="fas fa-arrow-right"></i></a>
+      </div>
     </div>
   </section>
 
@@ -445,18 +461,6 @@
     </div>
   </section>
 
-
-  <!-- ENGINEERING PROJECTS / PROOF OF WORK -->
-  <section id="projects" aria-label="Engineering projects">
-    <div class="container">
-      <div class="section-label">Built by EazyLife</div>
-      <h2 class="section-title">Engineering Projects & Practical Builds</h2>
-      <p class="section-sub" style="margin-bottom:28px;">A look at ideas we have explored, systems we have built and practical engineering work in progress.</p>
-      <div id="projectsGrid" class="project-gallery-grid">
-        <p class="shop-preview-loading">Loading engineering projects...</p>
-      </div>
-    </div>
-  </section>
 
   <!-- TRUST / ABOUT (dynamic aboutText from settings, falls back to static copy) -->
   <section aria-label="About EazyLife">
@@ -676,20 +680,28 @@
       return String(value ?? '').replace(/[&<>'"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[c]));
     }
 
-    // ── ENGINEERING PROJECT GALLERY ──
+    // ── HOMEPAGE PROJECT PREVIEW: three varied published projects ──
     async function loadProjects() {
       const grid = document.getElementById('projectsGrid');
       try {
         const projects = await getPublishedProjects();
-        grid.innerHTML = projects.length ? projects.map(p => {
+        const shuffled = [...projects];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        const featured = shuffled.slice(0, 3);
+        grid.innerHTML = featured.length ? featured.map(p => {
           const image = p.coverImage || (Array.isArray(p.images) ? p.images[0] : '') || 'assets/pictures/placeholder.svg';
           return `<article class="project-gallery-card">
-            <img src="${escapeHtml(image)}" alt="${escapeHtml(p.title || 'EazyLife engineering project')}" loading="lazy">
+            <a href="projects.html?id=${encodeURIComponent(p.id)}" aria-label="View ${escapeHtml(p.title || 'engineering project')} details">
+              <img src="${escapeHtml(image)}" alt="${escapeHtml(p.title || 'EazyLife engineering project')}" loading="lazy">
+            </a>
             <div class="project-card-body">
               <span class="project-category">${escapeHtml(p.category || 'Engineering project')}</span>
-              <h3>${escapeHtml(p.title || 'Engineering project')}</h3>
+              <h3><a href="projects.html?id=${encodeURIComponent(p.id)}">${escapeHtml(p.title || 'Engineering project')}</a></h3>
               <p>${escapeHtml(p.summary || '')}</p>
-              ${p.outcome ? `<p style="margin-top:10px;"><strong>Outcome:</strong> ${escapeHtml(p.outcome)}</p>` : ''}
+              <a class="service-link" href="projects.html?id=${encodeURIComponent(p.id)}" style="display:inline-flex;margin-top:12px;">View project details <i class="fas fa-arrow-right"></i></a>
             </div>
           </article>`;
         }).join('') : '<p class="project-gallery-empty">Our project gallery is being prepared. Check back soon to see practical builds and engineering work from EazyLife.</p>';
