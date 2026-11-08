@@ -85,7 +85,8 @@ function editProject(id) {
   $('projectOutcome').value = p.outcome || '';
   $('projectCover').value = p.coverImage || '';
   $('projectImages').value = Array.isArray(p.images) ? p.images.join('\n') : '';
-  $('projectVideo').value = p.videoUrl || '';\n  renderKitComponents(p.kitComponents || []);
+  $('projectVideo').value = p.videoUrl || '';
+  renderKitComponents(p.kitComponents || []);
   const savedPublishDate = p.publishAt?.toDate ? p.publishAt.toDate() : new Date(p.publishAt || 0);
   const isFutureSchedule = p.status === 'scheduled';
   $('projectStatus').value = p.status === 'published' ? 'published' : (isFutureSchedule ? 'scheduled' : 'draft');
