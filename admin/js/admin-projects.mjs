@@ -217,7 +217,8 @@ export function initProjects() {
       outcome: $('projectOutcome').value.trim(),
       coverImage: $('projectCover').value.trim(),
       images: $('projectImages').value.split('\n').map(x => x.trim()).filter(Boolean),
-      videoUrl: $('projectVideo').value.trim(),\n      kitComponents: collectKitComponents(),
+      videoUrl: $('projectVideo').value.trim(),
+      kitComponents: collectKitComponents(),
       status: statusChoice,
       publishAt: statusChoice === 'draft' ? new Date('2999-01-01T00:00:00Z') : publishAt,
       updatedAt: new Date()
