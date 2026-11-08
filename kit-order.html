@@ -71,7 +71,7 @@ function render(){
 function updateTotal(){const sum=selected().reduce((n,x)=>n+unitPrice(x.variantData)*x.quantity,0);$('subtotal').textContent='₦'+sum.toLocaleString();$('submit').disabled=!selected().length}
 async function init(){
  try{
-  const [ps,prods,allProjects,site]=await Promise.all([getProducts(),getProducts(),getPublishedProjects(),getSettings()]);
+  const [ps,allProjects,site]=await Promise.all([getProducts(),getPublishedProjects(),getSettings()]);
   products=ps;settings=site;project=allProjects.find(x=>x.id===projectId);
   if(!project)throw new Error('This project is not available for kit ordering. Please return to the project gallery.');
   render();$('loading').classList.add('hidden');$('page').classList.remove('hidden');
