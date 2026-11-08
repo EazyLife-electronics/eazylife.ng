@@ -9,7 +9,7 @@ import {
   onAuthStateChanged, signInWithEmailAndPassword, signOut
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
-  watchProducts, watchHeroes, watchReviews, watchRequests, watchOrders
+  watchProducts, watchHeroes, watchReviews, watchRequests, watchOrders, watchProjects
 } from '../../js/store.mjs';
 
 import { initTabs, initImagePicker } from './admin-shared.mjs';
@@ -18,6 +18,7 @@ import { initHeroes, renderHeroes, setProductsForHeroLinks } from './admin-heroe
 import { initReviews, renderReviews } from './admin-reviews.mjs';
 import { renderRequestList } from './admin-requests.mjs';
 import { renderOrderList } from './admin-orders.mjs';
+import { initProjects, renderProjects } from './admin-projects.mjs';
 import { initSettings, loadSettingsForm } from './admin-settings.mjs';
 
 const { auth } = initFirebase();
@@ -27,6 +28,7 @@ initImagePicker();
 initProducts();
 initHeroes();
 initReviews();
+initProjects();
 initSettings();
 
 let unsubProducts = null;
@@ -34,6 +36,7 @@ let unsubHeroes = null;
 let unsubReviews = null;
 let unsubRequests = null;
 let unsubOrders = null;
+let unsubProjects = null;
 
 /* ---------------- AUTH ---------------- */
 
@@ -65,6 +68,7 @@ onAuthStateChanged(auth, (user) => {
     if (unsubReviews) unsubReviews();
     if (unsubRequests) unsubRequests();
     if (unsubOrders) unsubOrders();
+    if (unsubProjects) unsubProjects();
   }
 });
 
@@ -79,5 +83,6 @@ function startDashboard() {
   unsubReviews = watchReviews(renderReviews);
   unsubRequests = watchRequests(renderRequestList);
   unsubOrders = watchOrders(renderOrderList);
+  unsubProjects = watchProjects(renderProjects);
   loadSettingsForm();
 }
