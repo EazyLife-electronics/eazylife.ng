@@ -171,3 +171,7 @@ export function renderProjects(items) {
   render();
   publishDueProjects();
 }
+
+export function checkDueProjectPublications() {
+  publishDueProjects();
+}
