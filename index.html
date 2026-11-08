@@ -207,7 +207,18 @@
     .product-card .bulk-hint { font-size: 0.66rem; font-weight: 800; color: var(--teal); margin-top: 4px; display: flex; align-items: center; gap: 4px; }
     .shop-preview-loading, .shop-preview-empty { text-align: center; color: var(--text-light); font-size: 0.88rem; padding: 30px; grid-column: 1 / -1; }
 
-    /* SERVICES STRIP */
+
+    /* ENGINEERING PROJECT GALLERY */
+    .project-gallery-grid { display:grid; grid-template-columns:1fr; gap:16px; }
+    .project-gallery-card { background:#fff; border:1px solid var(--border); border-radius:18px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,.04); }
+    .project-gallery-card img { width:100%; height:210px; object-fit:cover; background:#f4f6f6; }
+    .project-gallery-card .project-card-body { padding:18px; }
+    .project-gallery-card .project-category { color:var(--teal-dark); font-size:.68rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+    .project-gallery-card h3 { color:var(--dark); font-size:1rem; margin:5px 0 8px; }
+    .project-gallery-card p { color:var(--text-light); font-size:.84rem; }
+    .project-gallery-empty { grid-column:1/-1; padding:28px; text-align:center; color:var(--text-light); background:#fafbfc; border:1px dashed var(--border); border-radius:16px; }
+    @media(min-width:720px) { .project-gallery-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+\n    /* SERVICES STRIP */
     .services-strip { display: grid; grid-template-columns: 1fr; gap: 14px; }
     .service-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; position: relative; }
     .service-icon { width: 46px; height: 46px; border-radius: 12px; background: var(--teal-light); color: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 1.15rem; margin-bottom: 14px; }
@@ -434,6 +445,19 @@
     </div>
   </section>
 
+
+  <!-- ENGINEERING PROJECTS / PROOF OF WORK -->
+  <section id="projects" aria-label="Engineering projects">
+    <div class="container">
+      <div class="section-label">Built by EazyLife</div>
+      <h2 class="section-title">Engineering Projects & Practical Builds</h2>
+      <p class="section-sub" style="margin-bottom:28px;">A look at ideas we have explored, systems we have built and practical engineering work in progress.</p>
+      <div id="projectsGrid" class="project-gallery-grid">
+        <p class="shop-preview-loading">Loading engineering projects...</p>
+      </div>
+    </div>
+  </section>
+
   <!-- TRUST / ABOUT (dynamic aboutText from settings, falls back to static copy) -->
   <section aria-label="About EazyLife">
     <div class="trust-section">
@@ -643,7 +667,7 @@
   </script>
 
   <script type="module">
-    import { getApprovedReviews, getHeroes, getProducts, getSettings } from './js/store.mjs';
+    import { getApprovedReviews, getHeroes, getProducts, getSettings, getPublishedProjects } from './js/store.mjs';
 
     // Escapes text before it's inserted via innerHTML. Reviews are public-write
     // (anyone can submit one, pending your approval) so r.name/r.text/r.title
@@ -651,6 +675,30 @@
     function escapeHtml(value) {
       return String(value ?? '').replace(/[&<>'"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[c]));
     }
+
+    // ── ENGINEERING PROJECT GALLERY ──
+    async function loadProjects() {
+      const grid = document.getElementById('projectsGrid');
+      try {
+        const projects = await getPublishedProjects();
+        grid.innerHTML = projects.length ? projects.map(p => {
+          const image = p.coverImage || (Array.isArray(p.images) ? p.images[0] : '') || 'assets/pictures/placeholder.svg';
+          return `<article class="project-gallery-card">
+            <img src="${escapeHtml(image)}" alt="${escapeHtml(p.title || 'EazyLife engineering project')}" loading="lazy">
+            <div class="project-card-body">
+              <span class="project-category">${escapeHtml(p.category || 'Engineering project')}</span>
+              <h3>${escapeHtml(p.title || 'Engineering project')}</h3>
+              <p>${escapeHtml(p.summary || '')}</p>
+              ${p.outcome ? `<p style="margin-top:10px;"><strong>Outcome:</strong> ${escapeHtml(p.outcome)}</p>` : ''}
+            </div>
+          </article>`;
+        }).join('') : '<p class="project-gallery-empty">Our project gallery is being prepared. Check back soon to see practical builds and engineering work from EazyLife.</p>';
+      } catch (err) {
+        console.error('Could not load engineering projects:', err);
+        grid.innerHTML = '<p class="project-gallery-empty">Engineering projects will be available here soon.</p>';
+      }
+    }
+    loadProjects();
 
     // ── REVIEWS ──
     async function loadReviews() {
