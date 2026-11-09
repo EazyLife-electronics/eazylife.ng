@@ -229,15 +229,16 @@ function applyPickerSelection(urls) {
     target.value = combined.join('\n');
   } else {
     target.value = (urls || [pickerSelected.values().next().value])[0] || '';
-    updateProjectCoverPreview();
+    updateTargetPreview(pickerTarget);
   }
   target.dispatchEvent(new Event('input', { bubbles: true }));
   closeMediaPicker();
 }
 
-function updateProjectCoverPreview() {
-  const input = $('projectCover');
-  const preview = $('projectCoverPreview');
+function updateTargetPreview(targetId) {
+  const input = $(targetId);
+  const previewId = targetId === 'projectCover' ? 'projectCoverPreview' : `${targetId}_preview`;
+  const preview = $(previewId);
   if (!input || !preview) return;
   const value = input.value.trim();
   if (!value) {
@@ -327,21 +328,22 @@ function openMediaPicker(targetId, multiple = false) {
   pickerMultiple = multiple;
   pickerSelected = new Set();
   const modal = ensureMediaPicker();
-  $('mediaPickerHint').textContent = multiple ? 'Tap images to select several, then add them to the gallery.' : 'Choose one image for the project cover.';
+  $('mediaPickerHint').textContent = multiple ? 'Tap images to select several, then add them to the gallery.' : 'Choose one image for this image field.';
   $('mediaPickerApply').classList.toggle('hidden', !multiple);
   $('mediaPickerApply').disabled = true;
   $('mediaPickerApply').textContent = 'Add selected images';
-  $('mediaPickerFolder').value = '/eazylife/projects';
+  $('mediaPickerFolder').value = targetId.startsWith('v') ? '/eazylife/products' : '/eazylife/projects';
   modal.classList.remove('hidden');
   loadPickerFolder();
 }
 
-document.querySelectorAll('[data-media-pick]').forEach(button => {
-  button.addEventListener('click', () => openMediaPicker(button.dataset.mediaPick, button.dataset.mediaMultiple === 'true'));
+document.addEventListener('click', event => {
+  const button = event.target.closest('[data-media-pick]');
+  if (button) openMediaPicker(button.dataset.mediaPick, button.dataset.mediaMultiple === 'true');
 });
-$('projectCover')?.addEventListener('input', updateProjectCoverPreview);
-$('projectResetBtn')?.addEventListener('click', () => setTimeout(updateProjectCoverPreview, 0));
-$('projectForm')?.addEventListener('reset', () => setTimeout(updateProjectCoverPreview, 0));
+$('projectCover')?.addEventListener('input', () => updateTargetPreview('projectCover'));
+$('projectResetBtn')?.addEventListener('click', () => setTimeout(() => updateTargetPreview('projectCover'), 0));
+$('projectForm')?.addEventListener('reset', () => setTimeout(() => updateTargetPreview('projectCover'), 0));
 
 $('mediaUploadBtn')?.addEventListener('click', uploadSelectedImage);
 $('mediaRefreshBtn')?.addEventListener('click', loadMedia);
