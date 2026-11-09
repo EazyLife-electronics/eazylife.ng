@@ -19,9 +19,11 @@
     @media(min-width:650px){.tools{grid-template-columns:2fr 1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.detail-photos{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(min-width:900px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
   </style>
+<script>(function(){var t=null;try{t=localStorage.getItem('eazylife-theme')}catch(e){}t=t||(matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);document.documentElement.classList.toggle('dark',t==='dark')})();</script>
+<link rel="stylesheet" href="assets/css/site-theme.css">
 </head>
 <body>
-<header><div class="wrap nav"><a class="brand" href="index.html">Eazy<span>Life</span></a><a class="back" href="index.html"><i class="fas fa-arrow-left"></i> Back to website</a></div></header>
+<header><div class="wrap nav"><a class="brand" href="index.html"><img data-theme-logo data-theme-logo-light="assets/pictures/logo_black_transparent.png" data-theme-logo-dark="assets/pictures/logo_white_transparent.png" src="assets/pictures/logo_black_transparent.png" alt="EazyLife" style="height:34px;width:auto;display:block"></a><a class="back" href="index.html"><i class="fas fa-arrow-left"></i> Back to website</a></div></header>
 <main class="wrap">
   <section id="archiveView">
     <div class="eyebrow">Customer experiences</div><h1>Reviews & Project Stories</h1>
@@ -86,5 +88,6 @@
     search.addEventListener('input',render);category.addEventListener('change',render);
   }catch(err){console.error(err);archive.innerHTML='<div class="empty">Reviews could not be loaded right now. Please try again later.</div>'}
 </script>
+<script src="js/site-theme.js"></script>
 </body>
 </html>
