@@ -14,11 +14,15 @@
   var saved=null;try{saved=localStorage.getItem('eazylife-theme')}catch(e){}
   setTheme(saved||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'),false);
   function addToggle(){
-    if(document.querySelector('.el-theme-toggle'))return;
-    var btn=document.createElement('button');btn.type='button';btn.className='el-theme-toggle';btn.innerHTML='<i class="fas fa-moon" aria-hidden="true"></i>';btn.addEventListener('click',function(){setTheme(root.getAttribute('data-theme')==='dark'?'light':'dark',true)});
-    var host=document.querySelector('.nav-actions, nav .nav-inner, header .nav-inner, header .nav, header .flex.items-center.justify-between, header .max-w-xl > div, header');
-    if(host){host.appendChild(btn);if(getComputedStyle(host).display==='flex'){host.style.gap=host.style.gap||'12px';}}
-    else{btn.style.position='fixed';btn.style.top='12px';btn.style.right='12px';btn.style.zIndex='10000';document.body.appendChild(btn);}
+    var buttons=document.querySelectorAll('.el-theme-toggle');
+    if(!buttons.length){
+      var btn=document.createElement('button');btn.type='button';btn.className='el-theme-toggle';btn.innerHTML='<i class="fas fa-moon" aria-hidden="true"></i>';
+      var host=document.querySelector('.nav-actions, nav .nav-inner, header .nav-inner, header .nav, header .flex.items-center.justify-between, header .max-w-xl > div, header');
+      if(host){host.appendChild(btn);if(getComputedStyle(host).display==='flex'){host.style.gap=host.style.gap||'12px';}}
+      else{btn.style.position='fixed';btn.style.top='12px';btn.style.right='12px';btn.style.zIndex='10000';document.body.appendChild(btn);}
+      buttons=document.querySelectorAll('.el-theme-toggle');
+    }
+    buttons.forEach(function(btn){if(btn.getAttribute('data-theme-bound')==='1')return;btn.setAttribute('data-theme-bound','1');btn.addEventListener('click',function(){setTheme(root.getAttribute('data-theme')==='dark'?'light':'dark',true)});});
     setTheme(root.getAttribute('data-theme')||'light',false);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addToggle);else addToggle();
