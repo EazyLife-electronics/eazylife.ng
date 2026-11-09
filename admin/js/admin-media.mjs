@@ -174,6 +174,175 @@ async function uploadSelectedImage() {
   }
 }
 
+
+/* ---------------- IMAGE PICKER FOR CONTENT EDITORS ---------------- */
+let pickerElement = null;
+let pickerTarget = null;
+let pickerMultiple = false;
+let pickerAssets = [];
+let pickerSelected = new Set();
+
+function ensureMediaPicker() {
+  if (pickerElement) return pickerElement;
+  pickerElement = document.createElement('div');
+  pickerElement.className = 'hidden fixed inset-0 z-[250] bg-black/60 backdrop-blur-sm p-3 flex items-end sm:items-center justify-center';
+  pickerElement.innerHTML = `
+    <section class="bg-white w-full max-w-2xl rounded-t-2xl sm:rounded-2xl p-4 max-h-[88vh] flex flex-col">
+      <div class="flex items-center justify-between gap-3 mb-3">
+        <div><h3 class="font-black text-base text-gray-800">Choose from ImageKit</h3><p id="mediaPickerHint" class="text-[11px] text-gray-500">Select an image</p></div>
+        <button type="button" id="mediaPickerClose" class="text-gray-500 text-2xl px-2" aria-label="Close">&times;</button>
+      </div>
+      <select id="mediaPickerFolder" class="w-full p-3 mb-3 rounded-lg border border-gray-200 bg-gray-50 text-sm">
+        <option value="/eazylife/projects">Projects</option>
+        <option value="/eazylife/products">Products</option>
+        <option value="/eazylife/reviews">Reviews</option>
+        <option value="/eazylife/website">Website</option>
+        <option value="/eazylife/general">General</option>
+      </select>
+      <div id="mediaPickerGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-3 overflow-y-auto min-h-0" style="flex:1"></div>
+      <div class="flex gap-2 pt-3">
+        <button type="button" id="mediaPickerCancel" class="flex-1 py-3 rounded-lg bg-gray-100 text-gray-700 text-sm font-bold">Cancel</button>
+        <button type="button" id="mediaPickerApply" class="flex-1 py-3 rounded-lg bg-gray-900 text-white text-sm font-bold hidden">Add selected images</button>
+      </div>
+    </section>`;
+  document.body.appendChild(pickerElement);
+  const close = () => pickerElement.classList.add('hidden');
+  pickerElement.querySelector('#mediaPickerClose').addEventListener('click', close);
+  pickerElement.querySelector('#mediaPickerCancel').addEventListener('click', close);
+  pickerElement.addEventListener('click', event => { if (event.target === pickerElement) close(); });
+  pickerElement.querySelector('#mediaPickerFolder').addEventListener('change', loadPickerFolder);
+  pickerElement.querySelector('#mediaPickerApply').addEventListener('click', applyPickerSelection);
+  return pickerElement;
+}
+
+function closeMediaPicker() {
+  if (pickerElement) pickerElement.classList.add('hidden');
+}
+
+function applyPickerSelection(urls) {
+  const target = $(pickerTarget);
+  if (!target) return closeMediaPicker();
+  if (pickerMultiple) {
+    const existing = target.value.split('\\n').map(value => value.trim()).filter(Boolean);
+    const combined = [...existing];
+    (urls || [...pickerSelected]).forEach(url => { if (url && !combined.includes(url)) combined.push(url); });
+    target.value = combined.join('\\n');
+  } else {
+    target.value = (urls || [pickerSelected.values().next().value])[0] || '';
+    updateProjectCoverPreview();
+  }
+  target.dispatchEvent(new Event('input', { bubbles: true }));
+  closeMediaPicker();
+}
+
+function updateProjectCoverPreview() {
+  const input = $('projectCover');
+  const preview = $('projectCoverPreview');
+  if (!input || !preview) return;
+  const value = input.value.trim();
+  if (!value) {
+    preview.classList.add('hidden');
+    preview.removeAttribute('src');
+    return;
+  }
+  preview.src = /^https?:\\/\\//i.test(value) || value.startsWith('../') ? value : '../' + value;
+  preview.classList.remove('hidden');
+}
+
+async function loadPickerFolder() {
+  const grid = $('mediaPickerGrid');
+  const folder = $('mediaPickerFolder').value;
+  grid.replaceChildren();
+  const loading = document.createElement('p');
+  loading.className = 'col-span-full text-center text-sm text-gray-500 py-8';
+  loading.textContent = 'Loading images…';
+  grid.appendChild(loading);
+  try {
+    const idToken = await getIdToken();
+    const response = await fetch(`${WORKER_URL}/files?path=${encodeURIComponent(folder)}`, {
+      headers: { Authorization: `Bearer ${idToken}` }
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.error || `Could not load images (${response.status}).`);
+    pickerAssets = normalizeAssets(payload).filter(item => item.type !== 'folder' && (item.fileType === 'image' || !item.fileType) && (item.url || item.thumbnail));
+    grid.replaceChildren();
+    if (!pickerAssets.length) {
+      const empty = document.createElement('p');
+      empty.className = 'col-span-full text-center text-sm text-gray-500 py-8';
+      empty.textContent = 'No images found in this folder.';
+      grid.appendChild(empty);
+      return;
+    }
+    pickerAssets.forEach((asset, index) => {
+      const url = asset.url || asset.thumbnail;
+      const name = asset.name || asset.filePath?.split('/').pop() || 'Image';
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'text-left border rounded-xl overflow-hidden bg-white';
+      card.setAttribute('aria-label', `Select ${name}`);
+      const img = document.createElement('img');
+      img.src = asset.thumbnail || url;
+      img.alt = name;
+      img.loading = 'lazy';
+      img.className = 'w-full aspect-square object-cover bg-gray-50';
+      const label = document.createElement('span');
+      label.className = 'block p-2 text-[10px] font-bold text-gray-700 truncate';
+      label.textContent = name;
+      card.append(img, label);
+      const refreshSelected = () => {
+        const chosen = pickerSelected.has(url);
+        card.classList.toggle('border-teal-500', chosen);
+        card.classList.toggle('ring-2', chosen);
+        card.classList.toggle('ring-teal-300', chosen);
+      };
+      card.addEventListener('click', () => {
+        if (pickerMultiple) {
+          if (pickerSelected.has(url)) pickerSelected.delete(url);
+          else pickerSelected.add(url);
+          refreshSelected();
+          $('mediaPickerApply').textContent = `Add selected images (${pickerSelected.size})`;
+          $('mediaPickerApply').disabled = pickerSelected.size === 0;
+        } else {
+          applyPickerSelection([url]);
+        }
+      });
+      refreshSelected();
+      grid.appendChild(card);
+    });
+  } catch (error) {
+    grid.replaceChildren();
+    const message = document.createElement('p');
+    message.className = 'col-span-full text-center text-sm text-red-600 py-8';
+    message.textContent = error.message || 'Could not load images.';
+    grid.appendChild(message);
+  }
+}
+
+function openMediaPicker(targetId, multiple = false) {
+  if (!currentUser) {
+    alert('Please log in as an administrator first.');
+    return;
+  }
+  pickerTarget = targetId;
+  pickerMultiple = multiple;
+  pickerSelected = new Set();
+  const modal = ensureMediaPicker();
+  $('mediaPickerHint').textContent = multiple ? 'Tap images to select several, then add them to the gallery.' : 'Choose one image for the project cover.';
+  $('mediaPickerApply').classList.toggle('hidden', !multiple);
+  $('mediaPickerApply').disabled = true;
+  $('mediaPickerApply').textContent = 'Add selected images';
+  $('mediaPickerFolder').value = '/eazylife/projects';
+  modal.classList.remove('hidden');
+  loadPickerFolder();
+}
+
+document.querySelectorAll('[data-media-pick]').forEach(button => {
+  button.addEventListener('click', () => openMediaPicker(button.dataset.mediaPick, button.dataset.mediaMultiple === 'true'));
+});
+$('projectCover')?.addEventListener('input', updateProjectCoverPreview);
+$('projectResetBtn')?.addEventListener('click', () => setTimeout(updateProjectCoverPreview, 0));
+$('projectForm')?.addEventListener('reset', () => setTimeout(updateProjectCoverPreview, 0));
+
 $('mediaUploadBtn')?.addEventListener('click', uploadSelectedImage);
 $('mediaRefreshBtn')?.addEventListener('click', loadMedia);
 $('mediaFolder')?.addEventListener('change', loadMedia);
