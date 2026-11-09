@@ -23,6 +23,40 @@ import { initSettings, loadSettingsForm } from './admin-settings.mjs';
 
 const { auth } = initFirebase();
 
+const MEDIA_WORKER_URL = 'https://eazylife-media.damzyeazy.workers.dev';
+
+async function checkMediaService(user) {
+  const statusEl = document.getElementById('mediaServiceStatus');
+  if (!statusEl) return;
+
+  statusEl.textContent = 'Checking media service…';
+  statusEl.className = 'text-[10px] px-2 py-1 rounded-full bg-gray-100 text-gray-500';
+
+  try {
+    const idToken = await user.getIdToken();
+    const response = await fetch(`${MEDIA_WORKER_URL}/auth`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${idToken}` }
+    });
+
+    if (!response.ok) {
+      throw new Error(response.status === 401 ? 'Admin verification failed' : `Worker returned ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (!data.token || !data.signature || !data.expire || !data.publicKey) {
+      throw new Error('Worker returned incomplete upload credentials');
+    }
+
+    statusEl.textContent = 'Media service connected';
+    statusEl.className = 'text-[10px] px-2 py-1 rounded-full bg-green-50 text-green-700';
+  } catch (error) {
+    console.error('EazyLife media service check failed:', error);
+    statusEl.textContent = 'Media service unavailable';
+    statusEl.className = 'text-[10px] px-2 py-1 rounded-full bg-red-50 text-red-700';
+  }
+}
+
 initTabs();
 initImagePicker();
 initProducts();
@@ -58,6 +92,7 @@ document.getElementById('logoutBtn').addEventListener('click', () => signOut(aut
 
 onAuthStateChanged(auth, (user) => {
   if (user) {
+    checkMediaService(user);
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('dashboard').classList.remove('hidden');
     startDashboard();
