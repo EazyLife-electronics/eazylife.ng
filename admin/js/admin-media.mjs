@@ -264,7 +264,7 @@ async function runBulkMediaAction(action) {
     setStatus("mediaLibraryStatus", "Select at least one image first.", "error");
     return;
   }
-  const destinationPath = $("mediaDestinationFolder").value;
+  const destinationPath = $("mediaDestinationFolder").value.replace(/\/+$/, "") + "/";
   if (action === "delete") {
     if (!confirm("Permanently delete " + selected.length + " selected image(s)? Website content using them will lose those images. This cannot be undone.")) return;
   } else {
@@ -293,8 +293,9 @@ async function runBulkMediaAction(action) {
     setStatus("mediaLibraryStatus", done + " image(s) " + (action === "delete" ? "deleted" : action === "move" ? "moved" : "copied") + " successfully.", "success");
     await loadMedia();
   } catch (error) {
-    setStatus("mediaLibraryStatus", done + " of " + selected.length + " completed. " + error.message, "error");
+    const message = done + " of " + selected.length + " completed. " + (error.message || "The media operation failed.");
     await loadMedia();
+    setStatus("mediaLibraryStatus", message, "error");
   }
 }
 
