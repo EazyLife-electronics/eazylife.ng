@@ -67,6 +67,18 @@
     @media(min-width:700px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.card img{height:200px}.detail-images{grid-template-columns:repeat(3,minmax(0,1fr))}}
       .kit-section{border:1px solid var(--border);border-radius:16px;padding:18px;background:#f8fbfa}.kit-lines{display:grid;gap:10px;margin:14px 0}.kit-line{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px;background:#fff;border:1px solid var(--border);border-radius:12px}.kit-line strong{display:block;font-size:.92rem}.kit-line small{display:block;color:var(--muted);font-size:.76rem;margin-top:4px}.kit-line-side{text-align:right;display:grid;gap:3px;font-size:.82rem}.kit-line-side a{color:var(--teal);font-weight:700;font-size:.78rem}.kit-stock{font-size:.68rem;font-weight:700}.kit-stock.available{color:#16804a}.kit-stock.unavailable{color:#a36b12}.kit-order-btn{margin:4px 0 12px}.kit-manual{padding:12px;background:#fff;border-radius:12px;font-size:.82rem}.kit-manual ul{padding-left:20px;margin:8px 0}.kit-manual p{color:var(--muted);margin:6px 0 0}@media(max-width:520px){.kit-line{align-items:flex-start}.kit-line-side{min-width:112px}}
 
+    /* Project component cards must remain readable in dark mode. */
+    :root[data-theme="dark"] .kit-section{background:#142522;border-color:#30413d;color:#edf5f2}
+    :root[data-theme="dark"] .kit-section h2,
+    :root[data-theme="dark"] .kit-section strong,
+    :root[data-theme="dark"] .kit-section b,
+    :root[data-theme="dark"] .kit-section li{color:#edf5f2}
+    :root[data-theme="dark"] .kit-section .kit-line,
+    :root[data-theme="dark"] .kit-section .kit-manual{background:#1b302c;border-color:#354944;color:#edf5f2}
+    :root[data-theme="dark"] .kit-section .kit-line small,
+    :root[data-theme="dark"] .kit-section .kit-manual p{color:#a8bbb5}
+    :root[data-theme="dark"] .kit-section .kit-line-side a{color:#36cbb5}
+    :root[data-theme="dark"] .kit-section .kit-order-btn{background:linear-gradient(135deg,#00B09B,#8DC63F);color:#fff;border:0}
     /* Keep the project page navigation on one horizontal bar, like the homepage. */
     .nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);padding:10px 0}
     .nav-inner{display:flex;flex-wrap:nowrap;align-items:center;justify-content:space-between;gap:8px;min-width:0}
