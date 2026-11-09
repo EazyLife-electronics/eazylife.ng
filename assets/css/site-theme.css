@@ -17,6 +17,8 @@ body{transition:background-color .18s ease,color .18s ease}
 :root[data-theme="dark"] input::placeholder,:root[data-theme="dark"] textarea::placeholder{color:#8b9a94}
 :root[data-theme="dark"] .border,:root[data-theme="dark"] [class*="border-gray-"]{border-color:var(--el-border)!important}
 :root[data-theme="dark"] .project,:root[data-theme="dark"] .kit-section,:root[data-theme="dark"] .kit-manual,:root[data-theme="dark"] .empty{background:var(--el-soft)!important;border-color:var(--el-border)!important;color:var(--el-text)}
-:root[data-theme="dark"] .btn:not(.btn-primary),:root[data-theme="dark"] .back{color:var(--el-text)}
+:root[data-theme="dark"] .btn:not(.btn-primary),:root[data-theme="dark"] .back{color:var(--el-text);background:var(--el-surface);border-color:var(--el-border)}
+:root[data-theme="dark"] .nav-actions a{color:var(--el-text);background:var(--el-surface);border-color:var(--el-border)}
+:root[data-theme="dark"] .nav-actions .btn-primary{background:linear-gradient(135deg,#00B09B,#8DC63F);color:#fff;border-color:transparent}
 :root[data-theme="dark"] .el-theme-toggle{background:#182420;color:#eef2f0;border-color:#2a3835}
 @media(prefers-reduced-motion:reduce){body{transition:none}}
