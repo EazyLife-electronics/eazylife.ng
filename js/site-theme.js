@@ -19,6 +19,7 @@
     var host=document.querySelector('nav .nav-inner, header .nav-inner, header .nav, header .flex.items-center.justify-between, header .max-w-xl > div, header');
     if(host){host.appendChild(btn);if(getComputedStyle(host).display==='flex'){host.style.gap=host.style.gap||'12px';}}
     else{btn.style.position='fixed';btn.style.top='12px';btn.style.right='12px';btn.style.zIndex='10000';document.body.appendChild(btn);}
+    setTheme(root.getAttribute('data-theme')||'light',false);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addToggle);else addToggle();
   if(window.matchMedia){var mq=window.matchMedia('(prefers-color-scheme: dark)');if(mq.addEventListener)mq.addEventListener('change',function(e){var has=false;try{has=!!localStorage.getItem('eazylife-theme')}catch(_){}if(!has)setTheme(e.matches?'dark':'light',false)});}
