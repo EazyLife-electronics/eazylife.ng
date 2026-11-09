@@ -16,7 +16,7 @@
   function addToggle(){
     if(document.querySelector('.el-theme-toggle'))return;
     var btn=document.createElement('button');btn.type='button';btn.className='el-theme-toggle';btn.innerHTML='<i class="fas fa-moon" aria-hidden="true"></i>';btn.addEventListener('click',function(){setTheme(root.getAttribute('data-theme')==='dark'?'light':'dark',true)});
-    var host=document.querySelector('nav .nav-inner, header .nav-inner, header .nav, header .flex.items-center.justify-between, header .max-w-xl > div, header');
+    var host=document.querySelector('.nav-actions, nav .nav-inner, header .nav-inner, header .nav, header .flex.items-center.justify-between, header .max-w-xl > div, header');
     if(host){host.appendChild(btn);if(getComputedStyle(host).display==='flex'){host.style.gap=host.style.gap||'12px';}}
     else{btn.style.position='fixed';btn.style.top='12px';btn.style.right='12px';btn.style.zIndex='10000';document.body.appendChild(btn);}
     setTheme(root.getAttribute('data-theme')||'light',false);
