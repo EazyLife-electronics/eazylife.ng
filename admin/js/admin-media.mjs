@@ -43,6 +43,7 @@ async function getUploadAuth() {
 
 function normalizeAssets(payload) {
   if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.images)) return payload.images;
   if (Array.isArray(payload?.files)) return payload.files;
   if (Array.isArray(payload?.results)) return payload.results;
   if (Array.isArray(payload?.items)) return payload.items;
