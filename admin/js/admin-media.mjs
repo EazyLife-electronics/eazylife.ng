@@ -377,6 +377,7 @@ async function uploadSelectedImage() {
 
     $('mediaFileInput').value = '';
     setStatus('mediaUploadStatus', `Uploaded successfully: ${result.name || file.name}`, 'success');
+    if ($('mediaBrowseFolder')) $('mediaBrowseFolder').value = 'all';
     await loadMedia();
   } catch (error) {
     console.error('ImageKit upload failed:', error);
