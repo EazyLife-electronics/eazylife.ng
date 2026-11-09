@@ -333,7 +333,7 @@ function openMediaPicker(targetId, multiple = false) {
   $('mediaPickerApply').classList.toggle('hidden', !multiple);
   $('mediaPickerApply').disabled = true;
   $('mediaPickerApply').textContent = 'Add selected images';
-  $('mediaPickerFolder').value = targetId.startsWith('v') ? '/eazylife/products' : '/eazylife/projects';
+  $('mediaPickerFolder').value = targetId.startsWith('v') ? '/eazylife/products' : targetId.startsWith('rv') ? '/eazylife/reviews' : '/eazylife/projects';
   modal.classList.remove('hidden');
   loadPickerFolder();
 }
