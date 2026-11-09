@@ -264,7 +264,8 @@ async function runBulkMediaAction(action) {
     setStatus("mediaLibraryStatus", "Select at least one image first.", "error");
     return;
   }
-  const destinationPath = $("mediaDestinationFolder").value.replace(/\/+$/, "") + "/";
+  const destinationFolder = $("mediaDestinationFolder").value.replace(/\/+$/, "");
+  const destinationPath = destinationFolder + "/";
   if (action === "delete") {
     if (!confirm("Permanently delete " + selected.length + " selected image(s)? Website content using them will lose those images. This cannot be undone.")) return;
   } else {
@@ -272,13 +273,13 @@ async function runBulkMediaAction(action) {
       setStatus("mediaLibraryStatus", "Some selected images are missing file paths. Refresh and try again.", "error");
       return;
     }
-    if (action === "move" && selected.some(x => x.filePath.startsWith(destinationPath + "/"))) {
+    if (action === "move" && selected.some(x => x.filePath.startsWith(destinationPath))) {
       setStatus("mediaLibraryStatus", "The destination is the same as a selected image's current folder. Choose another folder.", "error");
       return;
     }
     const warning = action === "move"
       ? "Moving changes image URLs and can break website content that uses them. Continue?"
-      : "Copy " + selected.length + " image(s) to " + (MEDIA_FOLDERS.find(x => x.value === destinationPath)?.label || destinationPath) + "? Originals remain unchanged.";
+      : "Copy " + selected.length + " image(s) to " + (MEDIA_FOLDERS.find(x => x.value === destinationFolder)?.label || destinationFolder) + "? Originals remain unchanged.";
     if (!confirm(warning)) return;
   }
   let done = 0;
