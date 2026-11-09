@@ -43,6 +43,7 @@
             <button data-tab="reports" id="reportsTabBtn" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Reports</button>
             <button data-tab="projects" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Projects</button>
             <button data-tab="heroes" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Heroes</button>
+            <button data-tab="media" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Media</button>
             <button data-tab="reviews" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Reviews</button>
             <button data-tab="requests" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Requests</button>
             <button data-tab="orders" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Orders</button>
@@ -98,6 +99,37 @@
           <div class="flex flex-wrap justify-between items-center gap-2 mb-3"><p class="text-xs text-gray-500">Manage drafts, published projects and scheduled posts. Due posts publish automatically while an admin is logged in.</p><button type="button" id="projectStarterBtn" class="bg-teal-50 text-teal-700 px-4 py-2 rounded-lg text-xs font-bold">Create 3 starter drafts</button></div><p id="projectPublishNotice" class="text-xs text-amber-700 mb-3" role="status" aria-live="polite"></p><div id="projectList" class="grid gap-3"></div>
         </div>
         <div id="panel-heroes" class="tab-panel hidden"><div class="bg-white p-6 rounded-[24px] shadow-sm mb-6"><h2 id="heroFormTitle" class="font-black text-lg mb-1">Add Hero Slide</h2><p class="text-xs text-gray-400 mb-4">These show as a carousel on the homepage. Each slide links straight into the shop.</p><form id="heroForm" class="space-y-3"><input type="hidden" id="heroEditId"><input id="hTitle" placeholder="Title (e.g. HP EliteBook Deals)" required class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"><input id="hSubtitle" placeholder="Subtitle (short, one line)" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"><div><div class="flex gap-2"><input id="hImage" placeholder="Image URL (or browse below)" class="flex-1 p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"><button type="button" onclick="openImagePicker('heroes','hImage')" class="bg-gray-100 text-gray-700 px-4 rounded-xl font-bold text-xs whitespace-nowrap">Browse</button></div><img id="hImagePreview" class="hidden mt-2 h-16 rounded-lg object-cover border border-gray-200"></div><input id="hCtaText" placeholder="Button text (e.g. Shop Laptops)" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"><div class="grid grid-cols-2 gap-3"><select id="hLinkType" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"><option value="category">Links to Category</option><option value="product">Links to Product</option><option value="url">Custom URL</option><option value="section">Website Page / Section</option><option value="whatsapp">WhatsApp Chat</option></select><input id="hOrder" type="number" placeholder="Order (0 = first)" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"></div><div id="hLinkValueWrap"><select id="hLinkValueCategory" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"></select><select id="hLinkValueProduct" class="hidden w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"></select><input id="hLinkValueUrl" placeholder="https://..." class="hidden w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"><p class="text-[10px] text-gray-400 mt-1 px-1">Choose a product/category, enter a page URL or section anchor (for example #services), or write the WhatsApp message to prefill.</p></div><div class="flex gap-2 pt-1"><button type="submit" class="flex-1 bg-gray-900 text-white py-3 rounded-xl font-bold text-sm">Save Hero</button><button type="button" id="heroResetBtn" class="bg-gray-100 text-gray-500 px-4 rounded-xl font-bold text-sm">Reset</button></div></form></div><div id="heroList" class="grid gap-3"></div></div>
+        <div id="panel-media" class="tab-panel hidden">
+          <div class="bg-white p-5 rounded-[24px] shadow-sm mb-5">
+            <h2 class="font-black text-lg mb-1">EazyLife Media Library</h2>
+            <p class="text-xs text-gray-500 mb-4">Upload and browse public website images. Customer receipts and private documents must not be stored here.</p>
+            <div class="grid gap-3">
+              <label class="text-xs font-bold text-gray-600">Destination folder
+                <select id="mediaFolder" class="mt-1 w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm">
+                  <option value="/eazylife/products">Products</option>
+                  <option value="/eazylife/projects">Projects</option>
+                  <option value="/eazylife/reviews">Reviews</option>
+                  <option value="/eazylife/website">Website</option>
+                  <option value="/eazylife/general">General</option>
+                </select>
+              </label>
+              <label class="text-xs font-bold text-gray-600">Choose an image
+                <input id="mediaFileInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" class="mt-1 block w-full text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-teal-50 file:px-4 file:py-2 file:text-xs file:font-bold file:text-teal-700">
+              </label>
+              <p class="text-[10px] text-gray-400">Images only. Maximum 25 MB per image on the current free-plan upload limit.</p>
+              <button id="mediaUploadBtn" type="button" class="bg-gray-900 text-white py-3 rounded-xl text-sm font-bold">Upload image</button>
+              <p id="mediaUploadStatus" class="text-xs text-gray-500" role="status" aria-live="polite">Choose a folder and image to begin.</p>
+            </div>
+          </div>
+          <div class="bg-white p-5 rounded-[24px] shadow-sm">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+              <div><h3 class="font-black text-base">Browse images</h3><p id="mediaFolderLabel" class="text-[11px] text-gray-400">Products</p></div>
+              <button id="mediaRefreshBtn" type="button" class="border border-gray-200 px-3 py-2 rounded-lg text-xs font-bold text-gray-600">Refresh</button>
+            </div>
+            <p id="mediaLibraryStatus" class="text-xs text-gray-500 mb-3" role="status" aria-live="polite">Open this tab to load your images.</p>
+            <div id="mediaGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
+          </div>
+        </div>
         <div id="panel-reviews" class="tab-panel hidden"><div class="bg-white p-6 rounded-[24px] shadow-sm mb-6"><h2 class="font-black text-lg mb-1">Add Review</h2><p class="text-xs text-gray-400 mb-4">Paste in a review you received by email (Formspree). New reviews are unapproved until you toggle them live.</p><form id="reviewAddForm" class="space-y-3"><input id="rvName" placeholder="Customer name" required class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"><input id="rvTitle" placeholder="Title" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"><select id="rvStars" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"><option value="5">★★★★★ (5)</option><option value="4">★★★★☆ (4)</option><option value="3">★★★☆☆ (3)</option><option value="2">★★☆☆☆ (2)</option><option value="1">★☆☆☆☆ (1)</option></select><textarea id="rvText" placeholder="Original review text (keep the reviewer’s words unchanged)" required rows="3" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm outline-none"></textarea>
 <div class="border-t pt-4 mt-2 space-y-3"><p class="text-xs font-black uppercase text-gray-500">Review story presentation (admin only)</p>
 <input id="rvSummary" placeholder="Short summary for homepage and archive (optional)" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-sm">
@@ -126,6 +158,7 @@
 <div id="imagePickerModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] flex items-end md:items-center justify-center"><div class="bg-white w-full max-w-lg rounded-t-[28px] md:rounded-[24px] shadow-2xl p-5 max-h-[85vh] flex flex-col"><div class="flex justify-between items-center mb-3"><h3 class="font-black text-base text-gray-800">Choose an Image</h3><button onclick="closeImagePicker()" class="text-gray-400 text-2xl p-1">&times;</button></div><p id="pickerHint" class="text-xs text-gray-400 mb-3"></p><div id="pickerGrid" class="grid grid-cols-3 gap-2 overflow-y-auto pr-1" style="flex:1;"><p class="col-span-3 text-center text-gray-400 text-sm py-10">Loading images...</p></div></div></div>
 <script type="module" src="js/settings-ui.mjs"></script>
 <script type="module" src="js/admin-app.mjs"></script>
+<script type="module" src="js/admin-media.mjs"></script>
 <script type="module" src="js/purchases.mjs"></script>
 <script type="module" src="js/order-delivery-bridge.mjs"></script>
 <script type="module">
