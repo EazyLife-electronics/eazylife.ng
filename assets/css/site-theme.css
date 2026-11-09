@@ -7,7 +7,7 @@ body{transition:background-color .18s ease,color .18s ease}
 .el-theme-toggle:focus-visible{outline:3px solid #00B09B66;outline-offset:2px}
 .el-theme-toggle:hover{border-color:var(--el-teal)}
 :root[data-theme="dark"] body{background:var(--el-bg)!important;color:var(--el-text)}
-:root[data-theme="dark"] header,:root[data-theme="dark"] nav{background-color:var(--el-surface)!important;border-color:var(--el-border)!important;color:var(--el-text)}
+:root[data-theme="dark"] header,:root[data-theme="dark"] nav{background-image:none!important;background-color:var(--el-surface)!important;border-color:var(--el-border)!important;color:var(--el-text)}
 :root[data-theme="dark"] main,:root[data-theme="dark"] footer{color:var(--el-text)}
 :root[data-theme="dark"] .bg-white,:root[data-theme="dark"] .bg-gray-50,:root[data-theme="dark"] .bg-gray-100,:root[data-theme="dark"] .section,:root[data-theme="dark"] .card,:root[data-theme="dark"] .kit-item{background-color:var(--el-surface)!important;border-color:var(--el-border)!important;color:var(--el-text)}
 :root[data-theme="dark"] .bg-gray-200{background-color:#263530!important}
