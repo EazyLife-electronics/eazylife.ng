@@ -48,7 +48,16 @@ async function checkMediaService(user) {
       throw new Error('Worker returned incomplete upload credentials');
     }
 
-    statusEl.textContent = 'Media service connected';
+    const filesResponse = await fetch(`${MEDIA_WORKER_URL}/files?path=${encodeURIComponent('/eazylife/projects')}`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${idToken}` }
+    });
+    if (!filesResponse.ok) {
+      throw new Error(filesResponse.status === 401 ? 'Admin verification failed while listing media' : `Media listing returned ${filesResponse.status}`);
+    }
+    await filesResponse.json();
+
+    statusEl.textContent = 'Media service connected · library access OK';
     statusEl.className = 'text-[10px] px-2 py-1 rounded-full bg-green-50 text-green-700';
   } catch (error) {
     console.error('EazyLife media service check failed:', error);
