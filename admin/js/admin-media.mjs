@@ -238,7 +238,7 @@ function applyPickerSelection(urls) {
 function updateTargetPreview(targetId) {
   const input = $(targetId);
   const variantMatch = targetId.match(/^(v\d+)_image$/);
-  const previewId = targetId === 'projectCover' ? 'projectCoverPreview' : variantMatch ? `${variantMatch[1]}_preview` : `${targetId}_preview`;
+  const previewId = targetId === 'projectCover' ? 'projectCoverPreview' : targetId === 'hImage' ? 'hImagePreview' : variantMatch ? `${variantMatch[1]}_preview` : `${targetId}_preview`;
   const preview = $(previewId);
   if (!input || !preview) return;
   const value = input.value.trim();
@@ -320,7 +320,7 @@ async function loadPickerFolder() {
   }
 }
 
-function openMediaPicker(targetId, multiple = false) {
+function openMediaPicker(targetId, multiple = false, folderOverride = '') {
   if (!currentUser) {
     alert('Please log in as an administrator first.');
     return;
@@ -333,19 +333,21 @@ function openMediaPicker(targetId, multiple = false) {
   $('mediaPickerApply').classList.toggle('hidden', !multiple);
   $('mediaPickerApply').disabled = true;
   $('mediaPickerApply').textContent = 'Add selected images';
-  $('mediaPickerFolder').value = targetId.startsWith('v') ? '/eazylife/products' : targetId.startsWith('rv') ? '/eazylife/reviews' : '/eazylife/projects';
+  $('mediaPickerFolder').value = folderOverride || (targetId.startsWith('v') ? '/eazylife/products' : targetId.startsWith('rv') ? '/eazylife/reviews' : '/eazylife/projects');
   modal.classList.remove('hidden');
   loadPickerFolder();
 }
 
 document.addEventListener('click', event => {
   const button = event.target.closest('[data-media-pick]');
-  if (button) openMediaPicker(button.dataset.mediaPick, button.dataset.mediaMultiple === 'true');
+  if (button) openMediaPicker(button.dataset.mediaPick, button.dataset.mediaMultiple === 'true', button.dataset.mediaFolder || '');
 });
 $('projectCover')?.addEventListener('input', () => updateTargetPreview('projectCover'));
 $('projectResetBtn')?.addEventListener('click', () => setTimeout(() => updateTargetPreview('projectCover'), 0));
 $('projectForm')?.addEventListener('reset', () => setTimeout(() => updateTargetPreview('projectCover'), 0));
 $('rvCoverImage')?.addEventListener('input', () => updateTargetPreview('rvCoverImage'));
+$('hImage')?.addEventListener('input', () => updateTargetPreview('hImage'));
+$('heroForm')?.addEventListener('reset', () => setTimeout(() => updateTargetPreview('hImage'), 0));
 $('reviewAddForm')?.addEventListener('reset', () => setTimeout(() => updateTargetPreview('rvCoverImage'), 0));
 
 $('mediaUploadBtn')?.addEventListener('click', uploadSelectedImage);
