@@ -66,14 +66,27 @@
 
     @media(min-width:700px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.card img{height:200px}.detail-images{grid-template-columns:repeat(3,minmax(0,1fr))}}
       .kit-section{border:1px solid var(--border);border-radius:16px;padding:18px;background:#f8fbfa}.kit-lines{display:grid;gap:10px;margin:14px 0}.kit-line{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px;background:#fff;border:1px solid var(--border);border-radius:12px}.kit-line strong{display:block;font-size:.92rem}.kit-line small{display:block;color:var(--muted);font-size:.76rem;margin-top:4px}.kit-line-side{text-align:right;display:grid;gap:3px;font-size:.82rem}.kit-line-side a{color:var(--teal);font-weight:700;font-size:.78rem}.kit-stock{font-size:.68rem;font-weight:700}.kit-stock.available{color:#16804a}.kit-stock.unavailable{color:#a36b12}.kit-order-btn{margin:4px 0 12px}.kit-manual{padding:12px;background:#fff;border-radius:12px;font-size:.82rem}.kit-manual ul{padding-left:20px;margin:8px 0}.kit-manual p{color:var(--muted);margin:6px 0 0}@media(max-width:520px){.kit-line{align-items:flex-start}.kit-line-side{min-width:112px}}
-</style>
+
+    /* Keep the project page navigation on one horizontal bar, like the homepage. */
+    .nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);padding:10px 0}
+    .nav-inner{display:flex;flex-wrap:nowrap;align-items:center;justify-content:space-between;gap:8px;min-width:0}
+    .nav .brand{display:flex;align-items:center;flex:0 0 auto;min-width:0}
+    .nav .brand img{display:block;height:42px!important;width:auto;max-width:92px;object-fit:contain}
+    .nav .nav-actions{display:flex;flex:1 1 auto;flex-wrap:nowrap;align-items:center;justify-content:flex-end;gap:7px;min-width:0;white-space:nowrap;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+    .nav .nav-actions::-webkit-scrollbar{display:none}
+    .nav .nav-actions>*{flex:0 0 auto;white-space:nowrap}
+    .nav .nav-actions .el-theme-toggle{width:38px;height:38px;flex-basis:38px;padding:0}
+    .nav .nav-actions .btn{padding:10px 13px;font-size:.78rem}
+    .nav .nav-actions .btn-wa{background:#16c765;color:#fff;border-color:#16c765}
+    @media(max-width:520px){.nav .container{padding-left:12px;padding-right:12px}.nav .brand img{height:40px!important;max-width:82px}.nav .nav-actions{justify-content:flex-start;gap:6px}.nav .nav-actions .btn{padding:9px 11px;font-size:.74rem}}
+  </style>
 <script>(function(){var t=null;try{t=localStorage.getItem('eazylife-theme')}catch(e){}t=t||(matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);document.documentElement.classList.toggle('dark',t==='dark')})();</script>
 <link rel="stylesheet" href="assets/css/site-theme.css">
 </head>
 <body>
   <nav class="nav"><div class="container nav-inner">
     <a class="brand" href="index.html"><img data-theme-logo data-theme-logo-light="assets/pictures/logo_black_transparent.png" data-theme-logo-dark="assets/pictures/logo_white_transparent.png" src="assets/pictures/logo_black_transparent.png" alt="EazyLife" style="height:34px;width:auto;display:block"></a>
-    <div class="nav-actions"><button class="el-theme-toggle" type="button" aria-label="Toggle colour theme"><i class="fas fa-moon"></i></button><a class="btn" href="shop.html#cart" aria-label="Shopping basket"><i class="fas fa-shopping-basket"></i></a><a class="btn" href="index.html#projects"><i class="fas fa-diagram-project"></i> Projects</a><a class="btn" href="shop.html"><i class="fas fa-shopping-basket"></i> Shop</a><a class="btn" href="track.html" title="Track Order"><i class="fas fa-truck-fast"></i></a><a class="btn btn-wa" href="https://wa.me/2347051548082" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a></div>
+    <div class="nav-actions"><button class="el-theme-toggle" type="button" aria-label="Toggle colour theme"><i class="fas fa-moon"></i></button><a class="btn" href="shop.html#cart" aria-label="Shopping basket"><i class="fas fa-shopping-basket"></i></a><a class="btn" href="reviews.html"><i class="fas fa-star"></i> Reviews</a><a class="btn" href="shop.html"><i class="fas fa-shopping-basket"></i> Shop</a><a class="btn" href="track.html" title="Track Order"><i class="fas fa-truck-fast"></i></a><a class="btn btn-wa" href="https://wa.me/2347051548082" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a></div>
   </div></nav>
   <header id="pageHeader"><div class="container">
     <div class="eyebrow">Proof of work</div><h1>Engineering Project Gallery</h1>
