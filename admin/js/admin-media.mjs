@@ -84,12 +84,9 @@ function ensureMediaManagementUI() {
       '</select><button id="mediaSelectAllBtn" type="button" class="px-3 py-2.5 rounded-lg border border-gray-200 text-xs font-bold">Select all</button><span id="mediaSelectionCount" class="text-xs text-gray-500">0 selected</span>' +
     '</div>' +
     '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3 space-y-2">' +
-      '<p class="text-[11px] font-bold text-gray-600">Actions for selected images</p>' +
-      '<div class="grid grid-cols-1 sm:grid-cols-3 gap-2"><select id="mediaDestinationFolder" class="w-full min-w-0 p-2.5 rounded-lg border border-gray-200 bg-white text-xs">' + folderOptions + '</select>' +
-      '<button id="mediaCopySelectedBtn" type="button" class="rounded-lg bg-teal-50 text-teal-800 py-2.5 text-xs font-bold">Copy to folder</button>' +
-      '<button id="mediaMoveSelectedBtn" type="button" class="rounded-lg bg-amber-50 text-amber-800 py-2.5 text-xs font-bold">Move to folder</button></div>' +
+      '<p class="text-[11px] font-bold text-gray-600">Bulk action</p>' +
       '<button id="mediaDeleteSelectedBtn" type="button" class="w-full rounded-lg bg-red-50 text-red-700 py-2.5 text-xs font-bold">Delete selected images</button>' +
-      '<p class="text-[10px] text-gray-500">Copy is safest for images already used on the website. Moving or renaming changes image URLs. Deleting is permanent.</p>' +
+      '<p class="text-[10px] text-gray-500">Deleting is permanent and removes the image from any website content using its URL.</p>' +
     '</div>';
   $("mediaGrid").parentElement.insertBefore(toolbar, $("mediaGrid"));
   $("mediaSearchInput").addEventListener("input", renderMediaGrid);
@@ -101,9 +98,7 @@ function ensureMediaManagementUI() {
     visible.forEach(x => all ? selectedMediaIds.delete(x.fileId) : selectedMediaIds.add(x.fileId));
     renderMediaGrid();
   });
-  $("mediaCopySelectedBtn").addEventListener("click", () => runBulkMediaAction("copy"));
-  $("mediaMoveSelectedBtn").addEventListener("click", () => runBulkMediaAction("move"));
-  $("mediaDeleteSelectedBtn").addEventListener("click", () => runBulkMediaAction("delete"));
+  $("mediaDeleteSelectedBtn").addEventListener("click", runBulkDelete);
 }
 
 function getVisibleMedia() {
@@ -258,43 +253,38 @@ async function deleteMediaAsset(asset) {
   }
 }
 
-async function runBulkMediaAction(action) {
+async function runBulkDelete() {
   const selected = mediaAssets.filter(x => selectedMediaIds.has(x.fileId));
+
   if (!selected.length) {
     setStatus("mediaLibraryStatus", "Select at least one image first.", "error");
     return;
   }
-  const destinationFolder = $("mediaDestinationFolder").value.replace(/\/+$/, "");
-  const destinationPath = destinationFolder + "/";
-  if (action === "delete") {
-    if (!confirm("Permanently delete " + selected.length + " selected image(s)? Website content using them will lose those images. This cannot be undone.")) return;
-  } else {
-    if (selected.some(x => !x.filePath)) {
-      setStatus("mediaLibraryStatus", "Some selected images are missing file paths. Refresh and try again.", "error");
-      return;
-    }
-    if (action === "move" && selected.some(x => x.filePath.startsWith(destinationPath))) {
-      setStatus("mediaLibraryStatus", "The destination is the same as a selected image's current folder. Choose another folder.", "error");
-      return;
-    }
-    const warning = action === "move"
-      ? "Moving changes image URLs and can break website content that uses them. Continue?"
-      : "Copy " + selected.length + " image(s) to " + (MEDIA_FOLDERS.find(x => x.value === destinationFolder)?.label || destinationFolder) + "? Originals remain unchanged.";
-    if (!confirm(warning)) return;
+
+  if (selected.some(x => !x.fileId)) {
+    setStatus("mediaLibraryStatus", "Some selected images are missing file IDs. Refresh and try again.", "error");
+    return;
   }
+
+  if (!confirm("Permanently delete " + selected.length + " selected image(s)? Website content using them will lose those images. This cannot be undone.")) {
+    return;
+  }
+
   let done = 0;
+
   try {
     for (const asset of selected) {
-      setStatus("mediaLibraryStatus", (action === "delete" ? "Deleting " : action === "move" ? "Moving " : "Copying ") + (done + 1) + " of " + selected.length + "…");
-      if (action === "delete") await requestMediaAction("delete", { fileId: asset.fileId });
-      else await requestMediaAction(action, { sourceFilePath: asset.filePath, destinationPath });
+      setStatus("mediaLibraryStatus", "Deleting " + (done + 1) + " of " + selected.length + "…");
+      await requestMediaAction("delete", { fileId: asset.fileId });
       done++;
     }
+
     selectedMediaIds.clear();
-    setStatus("mediaLibraryStatus", done + " image(s) " + (action === "delete" ? "deleted" : action === "move" ? "moved" : "copied") + " successfully.", "success");
     await loadMedia();
+    setStatus("mediaLibraryStatus", done + " image(s) deleted successfully.", "success");
   } catch (error) {
-    const message = done + " of " + selected.length + " completed. " + (error.message || "The media operation failed.");
+    const message = done + " of " + selected.length + " deleted. " +
+      (error.message || "The delete operation failed.");
     await loadMedia();
     setStatus("mediaLibraryStatus", message, "error");
   }
