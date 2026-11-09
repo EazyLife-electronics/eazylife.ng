@@ -50,79 +50,292 @@ function normalizeAssets(payload) {
   return [];
 }
 
+const MEDIA_FOLDERS = [
+  { value: "/eazylife/products", label: "Products" },
+  { value: "/eazylife/projects", label: "Projects" },
+  { value: "/eazylife/reviews", label: "Reviews" },
+  { value: "/eazylife/website", label: "Website" },
+  { value: "/eazylife/general", label: "General" }
+];
+let mediaAssets = [];
+let selectedMediaIds = new Set();
+let mediaToolbarReady = false;
+
+function mediaSize(bytes) {
+  const n = Number(bytes) || 0;
+  return n ? (n < 1048576 ? (n / 1024).toFixed(1) + " KB" : (n / 1048576).toFixed(1) + " MB") : "";
+}
+
+function ensureMediaManagementUI() {
+  if (mediaToolbarReady || !$("mediaGrid")) return;
+  mediaToolbarReady = true;
+  const toolbar = document.createElement("div");
+  toolbar.id = "mediaManagementToolbar";
+  toolbar.className = "space-y-3 mb-4";
+  const folderOptions = MEDIA_FOLDERS.map(x => '<option value="' + x.value + '">' + x.label + '</option>').join("");
+  toolbar.innerHTML =
+    '<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">' +
+      '<input id="mediaSearchInput" type="search" placeholder="Search filenames..." class="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-sm">' +
+      '<select id="mediaBrowseFolder" class="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-sm"><option value="all">All media folders</option>' + folderOptions + '</select>' +
+    '</div>' +
+    '<div class="flex flex-wrap items-center gap-2">' +
+      '<select id="mediaSortSelect" class="flex-1 min-w-[145px] p-2.5 rounded-lg border border-gray-200 bg-white text-xs">' +
+        '<option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="name-asc">Name A–Z</option><option value="name-desc">Name Z–A</option><option value="size-desc">Largest first</option><option value="size-asc">Smallest first</option>' +
+      '</select><button id="mediaSelectAllBtn" type="button" class="px-3 py-2.5 rounded-lg border border-gray-200 text-xs font-bold">Select all</button><span id="mediaSelectionCount" class="text-xs text-gray-500">0 selected</span>' +
+    '</div>' +
+    '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3 space-y-2">' +
+      '<p class="text-[11px] font-bold text-gray-600">Actions for selected images</p>' +
+      '<div class="grid grid-cols-1 sm:grid-cols-3 gap-2"><select id="mediaDestinationFolder" class="w-full min-w-0 p-2.5 rounded-lg border border-gray-200 bg-white text-xs">' + folderOptions + '</select>' +
+      '<button id="mediaCopySelectedBtn" type="button" class="rounded-lg bg-teal-50 text-teal-800 py-2.5 text-xs font-bold">Copy to folder</button>' +
+      '<button id="mediaMoveSelectedBtn" type="button" class="rounded-lg bg-amber-50 text-amber-800 py-2.5 text-xs font-bold">Move to folder</button></div>' +
+      '<button id="mediaDeleteSelectedBtn" type="button" class="w-full rounded-lg bg-red-50 text-red-700 py-2.5 text-xs font-bold">Delete selected images</button>' +
+      '<p class="text-[10px] text-gray-500">Copy is safest for images already used on the website. Moving or renaming changes image URLs. Deleting is permanent.</p>' +
+    '</div>';
+  $("mediaGrid").parentElement.insertBefore(toolbar, $("mediaGrid"));
+  $("mediaSearchInput").addEventListener("input", renderMediaGrid);
+  $("mediaBrowseFolder").addEventListener("change", loadMedia);
+  $("mediaSortSelect").addEventListener("change", renderMediaGrid);
+  $("mediaSelectAllBtn").addEventListener("click", () => {
+    const visible = getVisibleMedia();
+    const all = visible.length && visible.every(x => selectedMediaIds.has(x.fileId));
+    visible.forEach(x => all ? selectedMediaIds.delete(x.fileId) : selectedMediaIds.add(x.fileId));
+    renderMediaGrid();
+  });
+  $("mediaCopySelectedBtn").addEventListener("click", () => runBulkMediaAction("copy"));
+  $("mediaMoveSelectedBtn").addEventListener("click", () => runBulkMediaAction("move"));
+  $("mediaDeleteSelectedBtn").addEventListener("click", () => runBulkMediaAction("delete"));
+}
+
+function getVisibleMedia() {
+  const query = ($("mediaSearchInput")?.value || "").trim().toLowerCase();
+  const folder = $("mediaBrowseFolder")?.value || "all";
+  const list = mediaAssets.filter(x => {
+    const name = x.name || x.filePath?.split("/").pop() || "";
+    return (!query || name.toLowerCase().includes(query)) && (folder === "all" || x.filePath?.startsWith(folder + "/"));
+  });
+  const sort = $("mediaSortSelect")?.value || "newest";
+  list.sort((a, b) => {
+    if (sort === "name-asc") return (a.name || "").localeCompare(b.name || "");
+    if (sort === "name-desc") return (b.name || "").localeCompare(a.name || "");
+    if (sort === "size-desc") return (Number(b.size) || 0) - (Number(a.size) || 0);
+    if (sort === "size-asc") return (Number(a.size) || 0) - (Number(b.size) || 0);
+    const da = new Date(a.createdAt || 0).getTime() || 0;
+    const db = new Date(b.createdAt || 0).getTime() || 0;
+    return sort === "oldest" ? da - db : db - da;
+  });
+  return list;
+}
+
 function createMediaCard(asset) {
-  const url = asset.url || asset.thumbnail || '';
-  const name = asset.name || asset.filePath?.split('/').pop() || 'Image';
-  if (!url || asset.type === 'folder') return null;
-
-  const card = document.createElement('article');
-  card.className = 'border border-gray-100 rounded-xl overflow-hidden bg-white';
-
-  const image = document.createElement('img');
+  const url = asset.url || asset.thumbnail || "";
+  const name = asset.name || asset.filePath?.split("/").pop() || "Image";
+  if (!url || asset.type === "folder") return null;
+  const card = document.createElement("article");
+  card.className = "border border-gray-100 rounded-xl overflow-hidden bg-white";
+  const image = document.createElement("img");
   image.src = asset.thumbnail || url;
   image.alt = name;
-  image.loading = 'lazy';
-  image.className = 'w-full aspect-square object-cover bg-gray-50';
+  image.loading = "lazy";
+  image.className = "w-full aspect-square object-cover bg-gray-50";
+  image.title = "Open full image";
+  image.style.cursor = "zoom-in";
+  image.addEventListener("click", () => window.open(url, "_blank", "noopener"));
   card.appendChild(image);
-
-  const body = document.createElement('div');
-  body.className = 'p-2';
-  const title = document.createElement('p');
-  title.className = 'text-[11px] font-bold text-gray-700 truncate';
+  const body = document.createElement("div");
+  body.className = "p-2 space-y-2";
+  const label = document.createElement("label");
+  label.className = "flex items-center gap-2 text-[10px] font-bold text-gray-600";
+  const check = document.createElement("input");
+  check.type = "checkbox";
+  check.checked = selectedMediaIds.has(asset.fileId);
+  check.disabled = !asset.fileId;
+  check.addEventListener("change", () => {
+    if (check.checked) selectedMediaIds.add(asset.fileId);
+    else selectedMediaIds.delete(asset.fileId);
+    updateMediaSelectionCount();
+  });
+  label.append(check, document.createTextNode("Select"));
+  body.appendChild(label);
+  const title = document.createElement("p");
+  title.className = "text-[11px] font-bold text-gray-700 break-words";
   title.textContent = name;
   body.appendChild(title);
-
-  const copy = document.createElement('button');
-  copy.type = 'button';
-  copy.textContent = 'Copy image URL';
-  copy.className = 'mt-2 w-full border border-gray-200 rounded-lg py-2 text-[10px] font-bold text-gray-600';
-  copy.addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText(url);
-      copy.textContent = 'Copied!';
-    } catch {
-      copy.textContent = 'Copy unavailable';
-    }
+  const folder = MEDIA_FOLDERS.find(x => asset.filePath?.startsWith(x.value + "/"));
+  const meta = document.createElement("p");
+  meta.className = "text-[10px] text-gray-400";
+  meta.textContent = [folder?.label || asset.filePath || "", mediaSize(asset.size)].filter(Boolean).join(" · ");
+  body.appendChild(meta);
+  const copy = document.createElement("button");
+  copy.type = "button";
+  copy.textContent = "Copy URL";
+  copy.className = "w-full border border-gray-200 rounded-lg py-2 text-[10px] font-bold text-gray-600";
+  copy.addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(url); copy.textContent = "Copied!"; }
+    catch { copy.textContent = "Copy unavailable"; }
   });
   body.appendChild(copy);
+  const actions = document.createElement("div");
+  actions.className = "grid grid-cols-2 gap-2";
+  const rename = document.createElement("button");
+  rename.type = "button";
+  rename.textContent = "Rename";
+  rename.className = "rounded-lg bg-gray-100 py-2 text-[10px] font-bold text-gray-700";
+  rename.disabled = !asset.filePath;
+  rename.addEventListener("click", () => renameMediaAsset(asset));
+  const remove = document.createElement("button");
+  remove.type = "button";
+  remove.textContent = "Delete";
+  remove.className = "rounded-lg bg-red-50 py-2 text-[10px] font-bold text-red-700";
+  remove.disabled = !asset.fileId;
+  remove.addEventListener("click", () => deleteMediaAsset(asset));
+  actions.append(rename, remove);
+  body.appendChild(actions);
   card.appendChild(body);
   return card;
 }
 
-async function loadMedia() {
-  if (!currentUser) {
-    setStatus('mediaLibraryStatus', 'Log in as an administrator to browse media.', 'error');
-    return;
+function updateMediaSelectionCount() {
+  if ($("mediaSelectionCount")) $("mediaSelectionCount").textContent = selectedMediaIds.size + " selected";
+}
+
+function renderMediaGrid() {
+  const grid = $("mediaGrid");
+  if (!grid) return;
+  const visible = getVisibleMedia();
+  const cards = visible.map(createMediaCard).filter(Boolean);
+  grid.replaceChildren(...cards);
+  if (!cards.length) {
+    const empty = document.createElement("p");
+    empty.className = "col-span-full text-center text-sm text-gray-500 py-8";
+    empty.textContent = mediaAssets.length ? "No images match your search or folder filter." : "No images found in the selected folders.";
+    grid.appendChild(empty);
   }
+  if ($("mediaSelectAllBtn")) $("mediaSelectAllBtn").textContent = visible.length && visible.every(x => selectedMediaIds.has(x.fileId)) ? "Clear selection" : "Select all";
+  updateMediaSelectionCount();
+  const folder = $("mediaBrowseFolder")?.value || "all";
+  const label = folder === "all" ? "All media folders" : (MEDIA_FOLDERS.find(x => x.value === folder)?.label || folder);
+  $("mediaFolderLabel").textContent = label + " · " + cards.length + " shown";
+}
 
-  const folder = $('mediaFolder').value;
-  const folderName = $('mediaFolder').selectedOptions[0]?.textContent || folder;
-  $('mediaFolderLabel').textContent = folderName;
-  $('mediaGrid').replaceChildren();
-  setStatus('mediaLibraryStatus', 'Loading images…');
+async function requestMediaAction(action, payload) {
+  const token = await getIdToken();
+  const response = await fetch(WORKER_URL + "/manage", {
+    method: "POST",
+    headers: { Authorization: "Bearer " + token, "Content-Type": "application/json" },
+    body: JSON.stringify({ action, ...payload })
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok || !result.success) throw new Error(result.error || "Media " + action + " failed (" + response.status + ").");
+  return result;
+}
 
+async function renameMediaAsset(asset) {
+  const oldName = asset.name || asset.filePath.split("/").pop();
+  const newName = prompt("Enter the new filename, including its extension:", oldName);
+  if (newName === null || !newName.trim() || newName.trim() === oldName) return;
+  if (!confirm("Renaming changes this image URL. Website content using the old URL may stop displaying. Continue?")) return;
   try {
-    const idToken = await getIdToken();
-    const response = await fetch(`${WORKER_URL}/files?path=${encodeURIComponent(folder)}`, {
-      headers: { Authorization: `Bearer ${idToken}` }
-    });
-    const payload = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(payload.error || `Could not load folder (${response.status}).`);
-
-    const assets = normalizeAssets(payload).filter(item => item.type !== 'folder' && (item.fileType === 'image' || !item.fileType));
-    const cards = assets.map(createMediaCard).filter(Boolean);
-    if (!cards.length) {
-      setStatus('mediaLibraryStatus', 'No images found in this folder yet.');
-      return;
-    }
-    $('mediaGrid').replaceChildren(...cards);
-    setStatus('mediaLibraryStatus', `${cards.length} image(s) loaded.`, 'success');
+    setStatus("mediaLibraryStatus", "Renaming " + oldName + "…");
+    await requestMediaAction("rename", { filePath: asset.filePath, newFileName: newName.trim() });
+    selectedMediaIds.delete(asset.fileId);
+    setStatus("mediaLibraryStatus", "Image renamed successfully.", "success");
+    await loadMedia();
   } catch (error) {
-    console.error('Media library loading failed:', error);
-    setStatus('mediaLibraryStatus', error.message || 'Could not load this folder.', 'error');
+    setStatus("mediaLibraryStatus", error.message || "Could not rename image.", "error");
   }
 }
 
+async function deleteMediaAsset(asset) {
+  if (!confirm('Permanently delete "' + (asset.name || "this image") + '"? Website content using it will lose the image. This cannot be undone.')) return;
+  try {
+    setStatus("mediaLibraryStatus", "Deleting image…");
+    await requestMediaAction("delete", { fileId: asset.fileId });
+    selectedMediaIds.delete(asset.fileId);
+    setStatus("mediaLibraryStatus", "Image deleted.", "success");
+    await loadMedia();
+  } catch (error) {
+    setStatus("mediaLibraryStatus", error.message || "Could not delete image.", "error");
+  }
+}
+
+async function runBulkMediaAction(action) {
+  const selected = mediaAssets.filter(x => selectedMediaIds.has(x.fileId));
+  if (!selected.length) {
+    setStatus("mediaLibraryStatus", "Select at least one image first.", "error");
+    return;
+  }
+  const destinationPath = $("mediaDestinationFolder").value;
+  if (action === "delete") {
+    if (!confirm("Permanently delete " + selected.length + " selected image(s)? Website content using them will lose those images. This cannot be undone.")) return;
+  } else {
+    if (selected.some(x => !x.filePath)) {
+      setStatus("mediaLibraryStatus", "Some selected images are missing file paths. Refresh and try again.", "error");
+      return;
+    }
+    if (action === "move" && selected.some(x => x.filePath.startsWith(destinationPath + "/"))) {
+      setStatus("mediaLibraryStatus", "The destination is the same as a selected image's current folder. Choose another folder.", "error");
+      return;
+    }
+    const warning = action === "move"
+      ? "Moving changes image URLs and can break website content that uses them. Continue?"
+      : "Copy " + selected.length + " image(s) to " + (MEDIA_FOLDERS.find(x => x.value === destinationPath)?.label || destinationPath) + "? Originals remain unchanged.";
+    if (!confirm(warning)) return;
+  }
+  let done = 0;
+  try {
+    for (const asset of selected) {
+      setStatus("mediaLibraryStatus", (action === "delete" ? "Deleting " : action === "move" ? "Moving " : "Copying ") + (done + 1) + " of " + selected.length + "…");
+      if (action === "delete") await requestMediaAction("delete", { fileId: asset.fileId });
+      else await requestMediaAction(action, { sourceFilePath: asset.filePath, destinationPath });
+      done++;
+    }
+    selectedMediaIds.clear();
+    setStatus("mediaLibraryStatus", done + " image(s) " + (action === "delete" ? "deleted" : action === "move" ? "moved" : "copied") + " successfully.", "success");
+    await loadMedia();
+  } catch (error) {
+    setStatus("mediaLibraryStatus", done + " of " + selected.length + " completed. " + error.message, "error");
+    await loadMedia();
+  }
+}
+
+async function loadMedia() {
+  if (!currentUser) {
+    setStatus("mediaLibraryStatus", "Log in as an administrator to browse media.", "error");
+    return;
+  }
+  ensureMediaManagementUI();
+  $("mediaGrid").replaceChildren();
+  setStatus("mediaLibraryStatus", "Loading media library…");
+  try {
+    const token = await getIdToken();
+    const selectedFolder = $("mediaBrowseFolder")?.value || "all";
+    const folders = selectedFolder === "all" ? MEDIA_FOLDERS : MEDIA_FOLDERS.filter(x => x.value === selectedFolder);
+    const results = await Promise.all(folders.map(async folder => {
+      const found = [];
+      let skip = 0;
+      while (true) {
+        const response = await fetch(WORKER_URL + "/files?path=" + encodeURIComponent(folder.value) + "&limit=100&skip=" + skip, {
+          headers: { Authorization: "Bearer " + token }
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.error || "Could not load " + folder.label + " (" + response.status + ").");
+        const batch = normalizeAssets(payload).filter(x => x.type !== "folder" && (x.fileType === "image" || !x.fileType));
+        found.push(...batch);
+        if (batch.length < 100) break;
+        skip += batch.length;
+      }
+      return found;
+    }));
+    mediaAssets = results.flat();
+    const valid = new Set(mediaAssets.map(x => x.fileId).filter(Boolean));
+    selectedMediaIds = new Set([...selectedMediaIds].filter(id => valid.has(id)));
+    renderMediaGrid();
+    setStatus("mediaLibraryStatus", mediaAssets.length + " image(s) loaded from " + (folders.length === 1 ? folders[0].label : "all media folders") + ".", "success");
+  } catch (error) {
+    console.error("Media library loading failed:", error);
+    setStatus("mediaLibraryStatus", error.message || "Could not load the media library.", "error");
+  }
+}
 async function uploadSelectedImage() {
   const file = $('mediaFileInput').files?.[0];
   if (!file) {
