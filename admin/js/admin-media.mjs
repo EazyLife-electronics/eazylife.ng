@@ -237,7 +237,8 @@ function applyPickerSelection(urls) {
 
 function updateTargetPreview(targetId) {
   const input = $(targetId);
-  const previewId = targetId === 'projectCover' ? 'projectCoverPreview' : `${targetId}_preview`;
+  const variantMatch = targetId.match(/^(v\d+)_image$/);
+  const previewId = targetId === 'projectCover' ? 'projectCoverPreview' : variantMatch ? `${variantMatch[1]}_preview` : `${targetId}_preview`;
   const preview = $(previewId);
   if (!input || !preview) return;
   const value = input.value.trim();
