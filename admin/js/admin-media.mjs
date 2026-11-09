@@ -345,6 +345,8 @@ document.addEventListener('click', event => {
 $('projectCover')?.addEventListener('input', () => updateTargetPreview('projectCover'));
 $('projectResetBtn')?.addEventListener('click', () => setTimeout(() => updateTargetPreview('projectCover'), 0));
 $('projectForm')?.addEventListener('reset', () => setTimeout(() => updateTargetPreview('projectCover'), 0));
+$('rvCoverImage')?.addEventListener('input', () => updateTargetPreview('rvCoverImage'));
+$('reviewAddForm')?.addEventListener('reset', () => setTimeout(() => updateTargetPreview('rvCoverImage'), 0));
 
 $('mediaUploadBtn')?.addEventListener('click', uploadSelectedImage);
 $('mediaRefreshBtn')?.addEventListener('click', loadMedia);
