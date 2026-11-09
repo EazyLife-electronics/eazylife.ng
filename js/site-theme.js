@@ -6,7 +6,7 @@
     root.classList.toggle('dark',theme==='dark');
     if(save){try{localStorage.setItem('eazylife-theme',theme)}catch(e){}}
     document.querySelectorAll('[data-theme-logo]').forEach(function(img){
-      img.src=theme==='dark'?'assets/pictures/logo_white_transparent.png':'assets/pictures/logo_black_transparent.png';
+      img.src=theme==='dark'?(img.getAttribute('data-theme-logo-dark')||'assets/pictures/logo_white_transparent.png'):(img.getAttribute('data-theme-logo-light')||'assets/pictures/logo_black_transparent.png');
     });
     document.querySelectorAll('.el-theme-toggle i').forEach(function(icon){icon.className=theme==='dark'?'fas fa-sun':'fas fa-moon'});
     document.querySelectorAll('.el-theme-toggle').forEach(function(btn){btn.setAttribute('aria-label',theme==='dark'?'Switch to light mode':'Switch to dark mode');btn.title=theme==='dark'?'Switch to light mode':'Switch to dark mode'});
