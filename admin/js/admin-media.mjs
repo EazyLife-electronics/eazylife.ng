@@ -211,7 +211,7 @@ function ensureMediaPicker() {
   pickerElement.querySelector('#mediaPickerCancel').addEventListener('click', close);
   pickerElement.addEventListener('click', event => { if (event.target === pickerElement) close(); });
   pickerElement.querySelector('#mediaPickerFolder').addEventListener('change', loadPickerFolder);
-  pickerElement.querySelector('#mediaPickerApply').addEventListener('click', applyPickerSelection);
+  pickerElement.querySelector('#mediaPickerApply').addEventListener('click', () => applyPickerSelection());
   return pickerElement;
 }
 
@@ -223,10 +223,10 @@ function applyPickerSelection(urls) {
   const target = $(pickerTarget);
   if (!target) return closeMediaPicker();
   if (pickerMultiple) {
-    const existing = target.value.split('\\n').map(value => value.trim()).filter(Boolean);
+    const existing = target.value.split('\n').map(value => value.trim()).filter(Boolean);
     const combined = [...existing];
     (urls || [...pickerSelected]).forEach(url => { if (url && !combined.includes(url)) combined.push(url); });
-    target.value = combined.join('\\n');
+    target.value = combined.join('\n');
   } else {
     target.value = (urls || [pickerSelected.values().next().value])[0] || '';
     updateProjectCoverPreview();
@@ -245,7 +245,7 @@ function updateProjectCoverPreview() {
     preview.removeAttribute('src');
     return;
   }
-  preview.src = /^https?:\\/\\//i.test(value) || value.startsWith('../') ? value : '../' + value;
+  preview.src = /^https?:\/\//i.test(value) || value.startsWith('../') ? value : '../' + value;
   preview.classList.remove('hidden');
 }
 
