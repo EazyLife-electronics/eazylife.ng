@@ -31,6 +31,8 @@
       min-height: 58px;
     }
   </style>
+<script>(function(){var t=null;try{t=localStorage.getItem('eazylife-theme')}catch(e){}t=t||(matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);document.documentElement.classList.toggle('dark',t==='dark')})();</script>
+<link rel="stylesheet" href="assets/css/site-theme.css">
 </head>
 
 <body class="bg-gray-100 text-gray-800 font-sans">
@@ -41,14 +43,9 @@
 
       <div class="flex items-center justify-between">
 
-        <div>
-          <h1 class="text-xl font-extrabold text-blue-900">
-            🇳🇬 Reseller Price Finder
-          </h1>
-
-          <p class="text-xs text-gray-500 mt-1">
-            EazyLife.ng Retailer Tool
-          </p>
+        <div class="flex items-center gap-3 min-w-0">
+          <img src="assets/pictures/logo_black_transparent.png" alt="EazyLife" style="width:112px;height:auto;object-fit:contain">
+          <div><h1 class="text-base font-extrabold text-gray-900">Reseller Price Finder</h1><p class="text-xs text-gray-500 mt-1">Retailer Tool</p></div>
         </div>
 
         <div class="text-right">
@@ -56,7 +53,7 @@
             Compare
           </div>
 
-          <div class="font-bold text-blue-700">
+          <div class="font-bold text-[#008a78]">
             Jumia + Jiji
           </div>
         </div>
@@ -89,13 +86,13 @@
           type="text"
           placeholder="e.g. iPhone 12 128GB"
           autocomplete="off"
-          class="flex-1 min-w-0 px-4 py-3 rounded-xl border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="flex-1 min-w-0 px-4 py-3 rounded-xl border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-[#00B09B]"
         >
 
         <button
           id="searchButton"
           type="button"
-          class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 rounded-xl"
+          class="bg-[#00B09B] hover:bg-[#008a78] text-white font-bold px-5 rounded-xl"
         >
           Search
         </button>
@@ -1049,5 +1046,6 @@
 
   </script>
 
+<script src="js/site-theme.js"></script>
 </body>
 </html>
