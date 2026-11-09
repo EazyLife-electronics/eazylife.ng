@@ -17,11 +17,13 @@
         .bg-eazylife { background: linear-gradient(135deg, #00B09B, #8DC63F); }
         .tab-active { background: #111827 !important; color: white !important; }
     </style>
+<script>(function(){var t=null;try{t=localStorage.getItem('eazylife-theme')}catch(e){}t=t||(matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);document.documentElement.classList.toggle('dark',t==='dark')})();</script>
+<link rel="stylesheet" href="../assets/css/site-theme.css">
 </head>
 <body class="bg-gray-50 min-h-screen">
 <div id="loginScreen" class="min-h-screen flex items-center justify-center p-6">
     <div class="bg-white w-full max-w-sm rounded-[24px] shadow-xl p-8">
-        <h1 class="font-syne font-extrabold text-2xl text-center mb-1">EazyLife</h1>
+        <img data-theme-logo data-theme-logo-light="../assets/pictures/logo_black_transparent.png" data-theme-logo-dark="../assets/pictures/logo_white_transparent.png" src="../assets/pictures/logo_black_transparent.png" alt="EazyLife" style="height:42px;width:auto;display:block;margin:0 auto 12px">
         <p class="text-center text-gray-400 text-sm mb-6">Admin Dashboard</p>
         <input id="loginEmail" type="email" placeholder="Admin email" class="w-full p-3 mb-3 rounded-xl bg-gray-50 border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
         <input id="loginPassword" type="password" placeholder="Password" class="w-full p-3 mb-4 rounded-xl bg-gray-50 border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
@@ -31,7 +33,7 @@
 </div>
 <div id="dashboard" class="hidden">
     <header class="bg-white border-b sticky top-0 z-40 p-4 shadow-sm flex justify-between items-center">
-        <h1 class="font-syne font-extrabold text-lg">EazyLife <span class="text-[#00B09B]">Admin</span></h1>
+        <div class="flex items-center gap-3"><img data-theme-logo data-theme-logo-light="../assets/pictures/logo_black_transparent.png" data-theme-logo-dark="../assets/pictures/logo_white_transparent.png" src="../assets/pictures/logo_black_transparent.png" alt="EazyLife" style="height:30px;width:auto"><h1 class="font-syne font-extrabold text-lg"><span class="text-[#00B09B]">Admin</span></h1></div>
         <button id="logoutBtn" class="text-gray-400 text-xs font-bold hover:text-gray-700"><i class="fas fa-sign-out-alt"></i> Log out</button>
     </header>
     <div class="max-w-4xl mx-auto p-4">
@@ -141,5 +143,6 @@ inventoryBtn.addEventListener("click",()=>{showPanel("inventory");if(stopReports
 reportsBtn.addEventListener("click",()=>{showPanel("reports");if(stopInventory){stopInventory();stopInventory=null;}if(!stopReports)stopReports=initInventoryReports();});
 deliveryBtn.addEventListener("click",()=>{showPanel("delivery");if(!stopDelivery)stopDelivery=initDelivery();});
 </script>
+<script src="../js/site-theme.js"></script>
 </body>
 </html>
