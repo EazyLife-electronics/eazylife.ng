@@ -85,6 +85,7 @@ function editProject(id) {
   $('projectProcess').value = p.process || '';
   $('projectOutcome').value = p.outcome || '';
   $('projectCover').value = p.coverImage || '';
+  $('projectCover').dispatchEvent(new Event('input', { bubbles: true }));
   $('projectImages').value = Array.isArray(p.images) ? p.images.join('\n') : '';
   $('projectVideo').value = p.videoUrl || '';
   renderKitComponents(p.kitComponents || []);

@@ -58,6 +58,7 @@ function editHero(id) {
   document.getElementById('hTitle').value = h.title || '';
   document.getElementById('hSubtitle').value = h.subtitle || '';
   document.getElementById('hImage').value = h.image || '';
+  document.getElementById('hImage').dispatchEvent(new Event('input', { bubbles: true }));
   document.getElementById('hCtaText').value = h.ctaText || '';
   hLinkTypeEl.value = h.linkType || 'category';
   updateHeroLinkTypeVisibility();

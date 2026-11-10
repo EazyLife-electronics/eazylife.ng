@@ -55,6 +55,7 @@ function editReview(id) {
   byId('rvSummary').value = r.summary || '';
   byId('rvCategory').value = (r.categories || []).join(', ');
   byId('rvCoverImage').value = r.coverImage || '';
+  byId('rvCoverImage').dispatchEvent(new Event('input', { bubbles: true }));
   byId('rvImages').value = (r.images || []).join('\n');
   byId('rvFeatured').checked = r.featured === true;
   byId('rvApproved').checked = r.approved === true;
