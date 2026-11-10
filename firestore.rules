@@ -86,6 +86,16 @@ service cloud.firestore {
       allow read, create, update, delete: if isAdmin();
     }
 
+    // Quotations are private admin records, deliberately isolated from orders and inventory.
+    match /quotations/{quotationId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
+    // Reusable quotation-only catalogue; never linked to product stock.
+    match /quotationCatalogue/{itemId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
     match /deliveries/{deliveryId} {
       // Public `get` only (never `list`): the tracking page fetches one
       // specific delivery by ID, which it can only learn from the order's
