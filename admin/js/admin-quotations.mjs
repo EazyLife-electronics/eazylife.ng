@@ -186,7 +186,7 @@ function addSelectedProduct(){
 }
 function addLine(item={}) {
   const id = ++lineCounter;
-  const row=document.createElement('div'); row.className='q-line bg-white border rounded-xl p-3 grid gap-2'; row.dataset.lineId=id; row.dataset.productId=item.productId||''; row.dataset.variantId=item.variantId||''; row.dataset.source=item.source||'manual';
+  const row=document.createElement('div'); row.className='q-line bg-white border rounded-xl p-3 grid gap-2'; row.dataset.lineId=id; row.dataset.productId=item.productId||''; row.dataset.variantId=item.variantId||''; row.dataset.source=item.source||'manual'; row.dataset.catalogueId=item.catalogueId||'';
   row.innerHTML=`<div class="flex justify-between items-center"><strong class="text-xs text-gray-500">Item ${id}</strong><button type="button" class="q-remove text-red-500 text-xs font-bold">Remove</button></div>
   <input data-field="name" required placeholder="Item / component name" value="${safe(item.name)}" class="p-2 border rounded-lg text-sm">
   <textarea data-field="description" rows="1" placeholder="Description (optional)" class="p-2 border rounded-lg text-xs">${safe(item.description)}</textarea>
@@ -199,7 +199,7 @@ function addLine(item={}) {
 function readLines() {
   return [...document.querySelectorAll('.q-line')].map(row => {
     const get = key => row.querySelector('[data-field="'+key+'"]').value;
-    return {name:get('name').trim(),description:get('description').trim(),image:get('image').trim(),quantity:Math.max(1,Number(get('quantity'))||1),unitPrice:Math.max(0,Number(get('unitPrice'))||0),productId:row.dataset.productId||'',variantId:row.dataset.variantId||'',source:row.dataset.source||'manual'};
+    return {name:get('name').trim(),description:get('description').trim(),image:get('image').trim(),quantity:Math.max(1,Number(get('quantity'))||1),unitPrice:Math.max(0,Number(get('unitPrice'))||0),productId:row.dataset.productId||'',variantId:row.dataset.variantId||'',source:row.dataset.source||'manual',catalogueId:row.dataset.catalogueId||''};
   }).filter(x=>x.name);
 }
 function calculate() {
