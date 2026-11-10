@@ -132,6 +132,7 @@ async function loadAll() {
   ]);
   quotations = q.docs.map(d => ({id:d.id,...d.data()}));
   catalogue = c.docs.map(d => ({id:d.id,...d.data()}));
+  reconcileConvertedItems();
   renderHistory();
   renderCatalogList();
 }
@@ -350,10 +351,7 @@ async function exportQuotation(q, mode) {
  setTimeout(()=>URL.revokeObjectURL(url),10*60*1000);
 }
 
-// Receive the same live product records already loaded by the admin dashboard.
-export function setQuotationProducts(items) {
-  products = Array.isArray(items) ? items : [];
-  renderProductPicker();
+function reconcileConvertedItems() {
   const liveIds = new Set(products.map(p => p.id));
   const stale = catalogue.filter(item => item.convertedProductId && !liveIds.has(item.convertedProductId));
   for (const item of stale) {
@@ -361,5 +359,11 @@ export function setQuotationProducts(items) {
     updateDoc(doc(db,CATALOG,item.id),{convertedProductId:deleteField(),updatedAt:serverTimestamp()})
       .then(() => renderCatalogList()).catch(showError);
   }
+}
+// Receive the same live product records already loaded by the admin dashboard.
+export function setQuotationProducts(items) {
+  products = Array.isArray(items) ? items : [];
+  renderProductPicker();
+  reconcileConvertedItems();
   renderCatalogList();
 }
