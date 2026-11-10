@@ -1,7 +1,7 @@
 // EazyLife Quotation Manager — independent from orders and inventory.
 import { initFirebase } from '../../js/firebase.mjs';
 import {
-  collection, addDoc, updateDoc, deleteDoc, doc, getDocs, query, orderBy, serverTimestamp
+  collection, addDoc, updateDoc, doc, getDocs, query, orderBy, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const { db } = initFirebase();
@@ -121,7 +121,7 @@ function addSelectedProduct(){
  const p=products.find(x=>x.id===document.getElementById('qProductSelect').value);if(!p)return alert('Choose a product first.');
  const i=Number(document.getElementById('qVariantSelect').value),v=(p.variants||[])[i];if(!v)return alert('Choose a product variant.');
  const price=Number(v.promoPrice)>0?Number(v.promoPrice):Number(v.price)||0;
- addLine({name:p.name||'Product',description:[p.brand,p.category,variantLabel(v,i),p.desc].filter(Boolean).join(' · '),quantity:1,unitPrice:price,image:v.image||'',productId:p.id,variantId:v.id||'',source:'product'});
+ addLine({name:p.name||'Product',description:[p.brand,p.category,variantLabel(v,i),p.desc].filter(Boolean).join(' · '),quantity:1,unitPrice:price,image:v.image?( /^https?:\\/\\//i.test(v.image) ? v.image : new URL(v.image, location.href).href ):'',productId:p.id,variantId:v.id||'',source:'product'});
 }
 function addLine(item={}) {
   const id = ++lineCounter;
@@ -129,7 +129,7 @@ function addLine(item={}) {
   row.innerHTML=`<div class="flex justify-between items-center"><strong class="text-xs text-gray-500">Item ${id}</strong><button type="button" class="q-remove text-red-500 text-xs font-bold">Remove</button></div>
   <input data-field="name" required placeholder="Item / component name" value="${safe(item.name)}" class="p-2 border rounded-lg text-sm">
   <textarea data-field="description" rows="1" placeholder="Description (optional)" class="p-2 border rounded-lg text-xs">${safe(item.description)}</textarea>
-  <input data-field="image" type="url" placeholder="Image URL (optional)" value="${safe(item.image)}" class="p-2 border rounded-lg text-xs">
+  <input data-field="image" type="text" placeholder="Image URL (optional)" value="${safe(item.image)}" class="p-2 border rounded-lg text-xs">
   <div class="grid grid-cols-3 gap-2"><input data-field="quantity" type="number" min="1" step="1" value="${Math.max(1,Number(item.quantity)||1)}" class="p-2 border rounded-lg text-xs"><input data-field="unitPrice" type="number" min="0" step="0.01" value="${Number(item.unitPrice)||0}" class="p-2 border rounded-lg text-xs"><div class="flex items-center justify-end text-xs font-black q-line-total">${money((Number(item.quantity)||1)*(Number(item.unitPrice)||0))}</div></div>`;
   row.querySelector('.q-remove').addEventListener('click',()=>{row.remove();calculate();});
   row.addEventListener('input',calculate);
@@ -184,7 +184,7 @@ async function saveQuotation(e) {
       const ref=await addDoc(collection(db,QUOTES),{...data,quotationNumber:'EL-'+Date.now().toString().slice(-8),createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
       editingId=ref.id;
     }
-    document.getElementById('qMessage').textContent='Quotation saved. Catalogue and inventory were not changed.';
+    document.getElementById('qMessage').textContent='Quotation saved. Product catalogue and inventory were not changed.';
     await loadAll();
   } finally { button.disabled=false; button.textContent='Save quotation'; }
 }
@@ -216,7 +216,7 @@ function quotationMarkup(q) {
   const rows=(q.items||[]).map(x=>`<tr><td>${x.image?'<img src="'+safe(x.image)+'" style="width:54px;height:54px;object-fit:cover;border-radius:8px;margin-bottom:5px">':''}<strong>${safe(x.name)}</strong><div style="color:#64748b;font-size:12px">${safe(x.description||'')}</div></td><td style="text-align:center">${x.quantity}</td><td style="text-align:right">${money(x.unitPrice)}</td><td style="text-align:right;font-weight:700">${money(x.quantity*x.unitPrice)}</td></tr>`).join('');
   return `<article class="quotation-paper" style="font-family:Arial,sans-serif;background:#fff;color:#17202a;padding:34px;max-width:850px;margin:0 auto;border:1px solid #e5e7eb">
     <header style="display:flex;justify-content:space-between;align-items:center;gap:20px;border-bottom:4px solid #00B09B;padding-bottom:18px;margin-bottom:24px">
-      <div><img src="../assets/pictures/logo_black_transparent.png" alt="EazyLife" style="max-width:210px;max-height:75px;object-fit:contain"><p style="font-size:12px;color:#64748b;margin:8px 0 0">Robotics and Electronics Solutions</p><a href="https://eazylife.ng" style="color:#008f80;font-weight:bold;font-size:13px">https://eazylife.ng</a></div>
+      <div><img src="${safe(new URL("../assets/pictures/logo_black_transparent.png", location.href).href)}" alt="EazyLife" style="max-width:210px;max-height:75px;object-fit:contain"><p style="font-size:12px;color:#64748b;margin:8px 0 0">Robotics and Electronics Solutions</p><a href="https://eazylife.ng" style="color:#008f80;font-weight:bold;font-size:13px">https://eazylife.ng</a></div>
       <div style="text-align:right"><h1 style="font-size:25px;margin:0;color:#008f80">QUOTATION</h1><p style="font-size:12px;margin:8px 0 3px"><b>No:</b> ${safe(q.quotationNumber||'Draft')}</p><p style="font-size:12px;margin:3px 0"><b>Issued:</b> ${safe(q.issueDate||'')}</p><p style="font-size:12px;margin:3px 0"><b>Valid:</b> ${q.expiryDate?'Until '+safe(q.expiryDate):'No expiry'}</p></div>
     </header>
     <section style="background:#f3faf8;border-radius:10px;padding:14px;margin-bottom:20px"><p style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin:0 0 5px">Prepared for</p><strong style="font-size:16px">${safe(q.customerName)}</strong><p style="font-size:12px;margin:4px 0;color:#475569">${safe(q.phone||'')}${q.email?' · '+safe(q.email):''}</p></section>
