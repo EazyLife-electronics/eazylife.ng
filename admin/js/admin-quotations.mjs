@@ -17,6 +17,7 @@ let quotations = [];
 let editingId = null;
 let lineCounter = 0;
 let pendingShareFile = null;
+let preparedJpgShare = null;
 let viewingQuotation = null;
 
 const nav = document.querySelector('.tab-btn')?.parentElement;
@@ -104,7 +105,7 @@ if (nav && dashboard && !document.getElementById('quotationTabBtn')) {
   document.getElementById('qEditViewed').addEventListener('click',()=>{if(viewingQuotation){const q=viewingQuotation;hideQuotationView();loadQuotation(q);}});
   document.querySelector('[data-view-save-jpg]').addEventListener('click',()=>exportQuotation('save','jpg').catch(showError));
   document.querySelector('[data-view-save-pdf]').addEventListener('click',()=>exportQuotation('save','pdf').catch(showError));
-  document.querySelector('[data-view-share-jpg]').addEventListener('click',()=>exportQuotation('share','jpg').catch(showError));
+  document.querySelector('[data-view-share-jpg]').addEventListener('click',sharePreparedQuotationJpg);
   document.querySelector('[data-view-share-pdf]').addEventListener('click',()=>exportQuotation('share','pdf').catch(showError));
   document.getElementById('qProductSelect').addEventListener('change', renderVariantOptions);
   document.getElementById('qAddProduct').addEventListener('click', addSelectedProduct);
@@ -282,13 +283,20 @@ function showQuotationView(q){
  document.querySelectorAll('#panel-quotations > .grid > section').forEach(el=>el.classList.add('hidden'));
  document.getElementById('qViewSection').classList.remove('hidden');
  document.getElementById('qPreview').innerHTML=quotationMarkup(q);
- document.getElementById('qViewMessage').textContent='';
+ document.getElementById('qViewMessage').textContent='Preparing JPG for sharing…';
+ const shareButton=document.querySelector('[data-view-share-jpg]');
+ shareButton.disabled=true; shareButton.textContent='Preparing JPG…';
  document.getElementById('qViewSection').scrollIntoView({behavior:'smooth',block:'start'});
+ prepareQuotationJpgShare(q).catch(error=>{
+  console.error('JPG share preparation:',error);
+  shareButton.disabled=true; shareButton.textContent='JPG unavailable';
+  document.getElementById('qViewMessage').textContent='JPG sharing could not be prepared. Save JPG is still available.';
+ });
 }
 function hideQuotationView(){
  document.getElementById('qViewSection').classList.add('hidden');
  document.querySelectorAll('#panel-quotations > .grid > section').forEach(el=>el.classList.remove('hidden'));
- viewingQuotation=null;
+ viewingQuotation=null; preparedJpgShare=null;
 }
 function loadQuotation(q) {
   editingId=q.id; document.getElementById('qCustomer').value=q.customerName||''; document.getElementById('qPhone').value=q.phone||'';
@@ -339,6 +347,35 @@ async function makeCanvasImagesSafe(root){
    img.style.display='none';
   }
  }
+}
+async function prepareQuotationJpgShare(q) {
+ preparedJpgShare=null;
+ const canvas=await captureQuotationCanvas();
+ const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',0.95));
+ if(!blob)throw new Error('Could not create JPG image.');
+ const file=new File([blob],quotationFilename(q)+'.jpg',{type:'image/jpeg'});
+ preparedJpgShare={quotationId:q.id,file,blob};
+ const button=document.querySelector('[data-view-share-jpg]');
+ if(button&&viewingQuotation?.id===q.id){button.disabled=false;button.textContent='Share JPG';document.getElementById('qViewMessage').textContent='JPG ready to share.';}
+}
+function sharePreparedQuotationJpg() {
+ const msg=document.getElementById('qViewMessage');
+ const prepared=preparedJpgShare;
+ if(!prepared||prepared.quotationId!==viewingQuotation?.id){msg.textContent='JPG is still preparing. Please try again in a moment.';return;}
+ if(!navigator.share||!navigator.canShare||!navigator.canShare({files:[prepared.file]})){
+  const url=URL.createObjectURL(prepared.blob),a=document.createElement('a');
+  a.href=url;a.download=prepared.file.name;a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);
+  msg.textContent='File sharing is unavailable in this browser, so the JPG was downloaded instead.';
+  return;
+ }
+ try {
+  // Invoke share synchronously inside the button's click event, before any await.
+  const shareRequest=navigator.share({files:[prepared.file],title:'EazyLife Quotation'});
+  msg.textContent='Opening share panel…';
+  shareRequest.then(()=>{msg.textContent='JPG shared.';}).catch(error=>{
+   if(error.name!=='AbortError')msg.textContent='Could not share JPG: '+(error.message||error);
+  });
+ } catch(error) { msg.textContent='Could not share JPG: '+(error.message||error); }
 }
 function quotationFilename(q) {
  const num=String(q.quotationNumber||'quotation').replace(/[^A-Za-z0-9-]/g,'')||'quotation';
