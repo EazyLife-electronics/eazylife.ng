@@ -2,7 +2,7 @@
 import { initFirebase } from '../../js/firebase.mjs';
 import { addProduct } from '../../js/store.mjs';
 import {
-  collection, addDoc, updateDoc, doc, getDocs, query, orderBy, serverTimestamp
+  collection, addDoc, updateDoc, doc, getDocs, query, orderBy, serverTimestamp, deleteField
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const { db } = initFirebase();
@@ -16,6 +16,7 @@ let catalogue = [];
 let quotations = [];
 let editingId = null;
 let lineCounter = 0;
+let pendingShareFile = null;
 
 const nav = document.querySelector('.tab-btn')?.parentElement;
 const dashboard = document.getElementById('dashboard');
@@ -306,40 +307,59 @@ async function makeCanvasImagesSafe(root){
   }
  }
 }
-async function exportQuotation(q, mode) {
- let printWindow=null;
- if(mode==='pdf'){printWindow=window.open('','_blank');if(!printWindow)throw new Error('Allow pop-ups to print or save the PDF.');}
- const wrap=document.createElement('div');wrap.style.cssText='position:fixed;left:-10000px;top:0;width:900px;background:white;z-index:-1';
+function showExportAction(message, actionLabel, action) {
+ const host=document.getElementById('qMessage');
+ host.textContent=message+' ';
+ const button=document.createElement('button');
+ button.type='button';button.className='ml-1 underline font-bold';button.textContent=actionLabel;
+ button.addEventListener('click',action);
+ host.append(button);
+}
+async function canvasBlobForQuotation(q){
+ const wrap=document.createElement('div');
+ wrap.style.cssText='position:fixed;left:0;top:0;width:900px;background:white;z-index:99999;opacity:0.01;pointer-events:none';
  wrap.innerHTML=quotationMarkup(q);document.body.append(wrap);
  try{
-  if(mode==='pdf'){
-   const imgs=[...wrap.querySelectorAll('img')];await Promise.all(imgs.map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;})));
-   printWindow.onload=()=>{printWindow.focus();printWindow.print();};
-   printWindow.document.write('<!doctype html><html><head><title>'+safe(q.quotationNumber||'EazyLife Quotation')+'</title><style>@page{size:A4;margin:12mm}body{margin:0}.quotation-paper{border:0!important;max-width:none!important;padding:0!important}tr{break-inside:avoid}a{color:#008f80}</style></head><body>'+wrap.innerHTML+'</body></html>');
-   printWindow.document.close();return;
-  }
   await makeCanvasImagesSafe(wrap);
   if(!window.html2canvas)await new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';script.onload=resolve;script.onerror=()=>reject(new Error('Image export library could not load.'));document.head.append(script);});
-  const canvas=await window.html2canvas(wrap.firstElementChild,{scale:2,backgroundColor:'#ffffff',useCORS:true,allowTaint:false});
-  const blob=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('Could not create quotation image.')),'image/png'));
-  const file=new File([blob],(q.quotationNumber||'EazyLife-Quotation')+'.png',{type:'image/png'});
-  if(mode==='share'){
-   if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){
-    try{await navigator.share({files:[file],title:'EazyLife quotation',text:'Quotation '+(q.quotationNumber||'')+' · https://eazylife.ng'});}
-    catch(error){if(error.name!=='AbortError')throw error;}
-   }else{
-    const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download=file.name;link.click();setTimeout(()=>URL.revokeObjectURL(url),30000);
-    document.getElementById('qMessage').textContent='Image downloaded. Your browser does not support direct file sharing here.';
-   }
-  }else{
-   const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download=file.name;link.click();setTimeout(()=>URL.revokeObjectURL(url),30000);
-  }
+  const canvas=await window.html2canvas(wrap.firstElementChild,{scale:2,backgroundColor:'#ffffff',useCORS:true,allowTaint:false,logging:false});
+  return await new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('Could not create quotation image.')),'image/png'));
  }finally{wrap.remove();}
 }
-
+async function exportQuotation(q, mode) {
+ if(mode==='pdf'){
+  const printWindow=window.open('','_blank');if(!printWindow)throw new Error('Allow pop-ups to print or save the PDF.');
+  const html=quotationMarkup(q);
+  printWindow.document.write('<!doctype html><html><head><title>'+safe(q.quotationNumber||'EazyLife Quotation')+'</title><style>@page{size:A4;margin:12mm}body{margin:0}.quotation-paper{border:0!important;max-width:none!important;padding:0!important}tr{break-inside:avoid}a{color:#008f80}</style></head><body>'+html+'</body></html>');
+  printWindow.document.close();printWindow.onload=()=>{printWindow.focus();printWindow.print();};return;
+ }
+ const blob=await canvasBlobForQuotation(q);
+ const filename=(q.quotationNumber||'EazyLife-Quotation')+'.png';
+ const url=URL.createObjectURL(blob);
+ if(mode==='share'){
+  pendingShareFile=new File([blob],filename,{type:'image/png'});
+  showExportAction('Quotation image is ready.','Tap to share',async()=>{
+   const file=pendingShareFile;if(!file)return;
+   if(!navigator.share){showExportAction('File sharing is not supported by this browser.','Open image',()=>window.open(url,'_blank'));return;}
+   try{await navigator.share({files:[file],title:'EazyLife quotation',text:'Quotation '+(q.quotationNumber||'')+' · https://eazylife.ng'});document.getElementById('qMessage').textContent='Share sheet opened.';}
+   catch(error){if(error.name!=='AbortError')showError(error);}
+  });
+ }else{
+  showExportAction('Quotation image is ready.','Open image / Save image',()=>{const win=window.open(url,'_blank');if(!win){const a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener';a.textContent='Open quotation image';document.getElementById('qMessage').append(a);}});
+ }
+ setTimeout(()=>URL.revokeObjectURL(url),10*60*1000);
+}
 
 // Receive the same live product records already loaded by the admin dashboard.
 export function setQuotationProducts(items) {
   products = Array.isArray(items) ? items : [];
   renderProductPicker();
+  const liveIds = new Set(products.map(p => p.id));
+  const stale = catalogue.filter(item => item.convertedProductId && !liveIds.has(item.convertedProductId));
+  for (const item of stale) {
+    delete item.convertedProductId;
+    updateDoc(doc(db,CATALOG,item.id),{convertedProductId:deleteField(),updatedAt:serverTimestamp()})
+      .then(() => renderCatalogList()).catch(showError);
+  }
+  renderCatalogList();
 }
