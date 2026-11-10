@@ -84,6 +84,7 @@ function editProject(id) {
   $('projectMaterials').value = Array.isArray(p.materials) ? p.materials.join(', ') : '';
   $('projectProcess').value = p.process || '';
   $('projectOutcome').value = p.outcome || '';
+  $('projectServiceLinks').value = (Array.isArray(p.serviceLinks) ? p.serviceLinks : []).map(x => `${x.label || ''} | ${x.url || ''}`).join('\n');
   $('projectCover').value = p.coverImage || '';
   $('projectCover').dispatchEvent(new Event('input', { bubbles: true }));
   $('projectImages').value = Array.isArray(p.images) ? p.images.join('\n') : '';
@@ -219,6 +220,7 @@ export function initProjects() {
       materials: $('projectMaterials').value.split(',').map(x => x.trim()).filter(Boolean),
       process: $('projectProcess').value.trim(),
       outcome: $('projectOutcome').value.trim(),
+      serviceLinks: $('projectServiceLinks').value.split('\n').map(line => { const [label, ...urlParts] = line.split('|'); return { label: label.trim(), url: urlParts.join('|').trim() }; }).filter(x => x.label && /^https:\/\//i.test(x.url)),
       coverImage: $('projectCover').value.trim(),
       images: $('projectImages').value.split('\n').map(x => x.trim()).filter(Boolean),
       videoUrl: $('projectVideo').value.trim(),
