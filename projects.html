@@ -62,6 +62,8 @@
     .lightbox-close{position:absolute;right:16px;top:14px;width:44px;height:44px;border:1px solid #ffffff55;border-radius:50%;background:#ffffff18;color:#fff;font-size:1.5rem;cursor:pointer}
     .lightbox-caption{position:absolute;left:16px;right:16px;bottom:12px;text-align:center;color:#fff;font-size:.85rem}
     .no-results{padding:30px;text-align:center;border:1px dashed var(--border);border-radius:16px;color:var(--muted);grid-column:1/-1}
+    .service-links-block{background:linear-gradient(135deg,#e8faf6,#f4fbe9);border:1px solid #cceee4;border-radius:18px;padding:20px}.service-link-list{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}.service-link-list .btn{font-size:.82rem}.service-links-block h2{color:#173c35}
+    :root[data-theme="dark"] .service-links-block{background:#142b26;border-color:#31574d}:root[data-theme="dark"] .service-links-block h2{color:#edf8f3}
     @media(min-width:700px){.gallery-tools{grid-template-columns:minmax(0,1fr) 240px}.detail-images{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
     @media(min-width:700px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.card img{height:200px}.detail-images{grid-template-columns:repeat(3,minmax(0,1fr))}}
@@ -240,6 +242,7 @@
         renderKitSection(p, products) +
         (p.process ? '<div class="detail-block"><h2>Build process</h2><p class="detail-copy">' + esc(p.process) + '</p></div>' : '') +
         (p.outcome ? '<div class="detail-block"><h2>Outcome</h2><p class="detail-copy">' + esc(p.outcome) + '</p></div>' : '') +
+        (Array.isArray(p.serviceLinks) && p.serviceLinks.some(x => x && x.label && /^https:\/\//i.test(String(x.url || ''))) ? '<section class="detail-block service-links-block"><h2>Explore related EazyLife services</h2><p class="detail-copy">Need something similar or support with another part of your build? Explore the relevant services.</p><div class="service-link-list">' + p.serviceLinks.filter(x => x && x.label && /^https:\/\//i.test(String(x.url || ''))).map(x => '<a class="btn btn-primary" href="' + esc(x.url) + '" target="_blank" rel="noopener">' + esc(x.label) + ' <i class="fas fa-arrow-up-right-from-square"></i></a>').join('') + '</div></section>' : '') +
         '<div class="actions"><a class="btn btn-primary" href="https://wa.me/2347051548082?text=' + encodeURIComponent('Hello EazyLife, I would like to enquire about the project: ' + (p.title || '')) + '">Discuss a similar project</a><a class="btn" href="projects.html">Back to gallery</a></div>' +
       '</article>';
       content.querySelectorAll('[data-project-image]').forEach(el => {
