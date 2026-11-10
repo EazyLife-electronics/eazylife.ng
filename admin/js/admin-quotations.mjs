@@ -129,7 +129,7 @@ if (nav && dashboard && !document.getElementById('quotationTabBtn')) {
 
 function showError(error) {
   console.error('Quotation Manager:', error);
-  const msg = document.getElementById('qMessage');
+  const msg = viewingQuotation ? document.getElementById('qViewMessage') : document.getElementById('qMessage');
   if (msg) msg.textContent = 'Could not complete that action: ' + (error?.message || error);
   else alert('Quotation Manager error: ' + (error?.message || error));
 }
@@ -309,8 +309,8 @@ function renderHistory() {
 function quotationMarkup(q) {
   const rows=(q.items||[]).map(x=>`<tr><td>${x.image?'<img src="'+safe(x.image)+'" style="width:54px;height:54px;object-fit:cover;border-radius:8px;margin-bottom:5px">':''}<strong>${safe(x.name)}</strong><div style="color:#64748b;font-size:12px">${safe(x.description||'')}</div></td><td style="text-align:center">${x.quantity}</td><td style="text-align:right">${money(x.unitPrice)}</td><td style="text-align:right;font-weight:700">${money(x.quantity*x.unitPrice)}</td></tr>`).join('');
   return `<article class="quotation-paper" style="font-family:Arial,sans-serif;background:#fff;color:#17202a;padding:clamp(16px,4vw,34px);width:100%;max-width:850px;margin:0 auto;border:1px solid #e5e7eb;box-sizing:border-box">
-    <header style="display:flex;justify-content:space-between;align-items:center;gap:20px;border-bottom:4px solid #00B09B;padding-bottom:18px;margin-bottom:24px">
-      <div><img src="${safe(new URL("../assets/pictures/logo_black_transparent.png", location.href).href)}" alt="EazyLife" style="max-width:210px;max-height:75px;object-fit:contain"><p style="font-size:12px;color:#64748b;margin:8px 0 0">Robotics and Electronics Solutions</p><a href="https://eazylife.ng" style="color:#008f80;font-weight:bold;font-size:13px">https://eazylife.ng</a></div>
+    <header style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;border-bottom:4px solid #00B09B;padding-bottom:18px;margin-bottom:24px">
+      <div><img src="${safe(new URL("../assets/pictures/logo_black_transparent.png", location.href).href)}" alt="EazyLife" style="max-width:min(210px,42vw);max-height:75px;object-fit:contain"><p style="font-size:12px;color:#64748b;margin:8px 0 0">Robotics and Electronics Solutions</p><a href="https://eazylife.ng" style="color:#008f80;font-weight:bold;font-size:13px">https://eazylife.ng</a></div>
       <div style="text-align:right"><h1 style="font-size:25px;margin:0;color:#008f80">QUOTATION</h1><p style="font-size:12px;margin:8px 0 3px"><b>No:</b> ${safe(q.quotationNumber||'Draft')}</p><p style="font-size:12px;margin:3px 0"><b>Issued:</b> ${safe(q.issueDate||'')}</p><p style="font-size:12px;margin:3px 0"><b>Valid:</b> ${q.expiryDate?'Until '+safe(q.expiryDate):'No expiry'}</p></div>
     </header>
     <section style="background:#f3faf8;border-radius:10px;padding:14px;margin-bottom:20px"><p style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin:0 0 5px">Prepared for</p><strong style="font-size:16px">${safe(q.customerName)}</strong><p style="font-size:12px;margin:4px 0;color:#475569">${safe(q.phone||'')}${q.email?' · '+safe(q.email):''}</p></section>
@@ -358,7 +358,7 @@ async function exportQuotation(action, format) {
  if(!q)throw new Error('Please open a saved quotation in View first.');
  const fname=quotationFilename(q);
  try {
-  const msg=document.getElementById('qMessage');
+  const msg=document.getElementById('qViewMessage');
   msg.textContent=(action==='save'?'Saving ':'Preparing to share ')+format.toUpperCase()+'…';
   await new Promise(resolve=>setTimeout(resolve,80));
   const canvas=await captureQuotationCanvas();
