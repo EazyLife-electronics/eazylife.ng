@@ -251,3 +251,10 @@ async function exportQuotation(q, mode) {
   }
   wrap.remove();
 }
+
+
+// Receive the same live product records already loaded by the admin dashboard.
+export function setQuotationProducts(items) {
+  products = Array.isArray(items) ? items : [];
+  renderProductPicker();
+}
