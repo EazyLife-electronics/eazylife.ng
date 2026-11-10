@@ -307,10 +307,10 @@ function renderHistory() {
   host.querySelectorAll('[data-q-duplicate]').forEach(b=>b.addEventListener('click',()=>{const q=quotations.find(x=>x.id===b.dataset.qDuplicate);if(q){hideQuotationView();loadQuotation(q);editingId=null;document.getElementById('qMessage').textContent='Duplicate ready — save to create a new quotation.';}}));
 }
 function quotationMarkup(q) {
-  const rows=(q.items||[]).map(x=>`<tr><td>${x.image?'<img src="'+safe(x.image)+'" style="width:54px;height:54px;object-fit:cover;border-radius:8px;margin-bottom:5px">':''}<strong>${safe(x.name)}</strong><div style="color:#64748b;font-size:12px">${safe(x.description||'')}</div></td><td style="text-align:center">${x.quantity}</td><td style="text-align:right">${money(x.unitPrice)}</td><td style="text-align:right;font-weight:700">${money(x.quantity*x.unitPrice)}</td></tr>`).join('');
+  const rows=(q.items||[]).map(x=>`<tr><td>${x.image?'<img crossorigin="anonymous" src="'+safe(x.image)+'" style="width:54px;height:54px;object-fit:cover;border-radius:8px;margin-bottom:5px">':''}<strong>${safe(x.name)}</strong><div style="color:#64748b;font-size:12px">${safe(x.description||'')}</div></td><td style="text-align:center">${x.quantity}</td><td style="text-align:right">${money(x.unitPrice)}</td><td style="text-align:right;font-weight:700">${money(x.quantity*x.unitPrice)}</td></tr>`).join('');
   return `<article class="quotation-paper" style="font-family:Arial,sans-serif;background:#fff;color:#17202a;padding:clamp(16px,4vw,34px);width:100%;max-width:850px;margin:0 auto;border:1px solid #e5e7eb;box-sizing:border-box">
     <header style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;border-bottom:4px solid #00B09B;padding-bottom:18px;margin-bottom:24px">
-      <div><img src="${safe(new URL("../assets/pictures/logo_black_transparent.png", location.href).href)}" alt="EazyLife" style="max-width:min(210px,42vw);max-height:75px;object-fit:contain"><p style="font-size:12px;color:#64748b;margin:8px 0 0">Robotics and Electronics Solutions</p><a href="https://eazylife.ng" style="color:#008f80;font-weight:bold;font-size:13px">https://eazylife.ng</a></div>
+      <div><img src="${safe("https://eazylife.ng/assets/pictures/logo_black_transparent.png")}" alt="EazyLife" style="max-width:min(210px,42vw);max-height:75px;object-fit:contain"><p style="font-size:12px;color:#64748b;margin:8px 0 0">Robotics and Electronics Solutions</p><a href="https://eazylife.ng" style="color:#008f80;font-weight:bold;font-size:13px">https://eazylife.ng</a></div>
       <div style="text-align:right"><h1 style="font-size:25px;margin:0;color:#008f80">QUOTATION</h1><p style="font-size:12px;margin:8px 0 3px"><b>No:</b> ${safe(q.quotationNumber||'Draft')}</p><p style="font-size:12px;margin:3px 0"><b>Issued:</b> ${safe(q.issueDate||'')}</p><p style="font-size:12px;margin:3px 0"><b>Valid:</b> ${q.expiryDate?'Until '+safe(q.expiryDate):'No expiry'}</p></div>
     </header>
     <section style="background:#f3faf8;border-radius:10px;padding:14px;margin-bottom:20px"><p style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin:0 0 5px">Prepared for</p><strong style="font-size:16px">${safe(q.customerName)}</strong><p style="font-size:12px;margin:4px 0;color:#475569">${safe(q.phone||'')}${q.email?' · '+safe(q.email):''}</p></section>
@@ -323,15 +323,17 @@ function quotationMarkup(q) {
 async function makeCanvasImagesSafe(root){
  const imgs=[...root.querySelectorAll('img')];
  for(const img of imgs){
-  const src=img.src;
+  const src=img.getAttribute('src');
   if(!src)continue;
   try{
-   if(new URL(src).origin===location.origin){await img.decode().catch(()=>{});continue;}
-   const response=await fetch(src,{mode:'cors',credentials:'omit'});
-   if(!response.ok)throw new Error('Image unavailable');
+   img.crossOrigin='anonymous';
+   const response=await fetch(src,{mode:'cors',credentials:'omit',cache:'force-cache'});
+   if(!response.ok)throw new Error('Image unavailable: '+response.status);
    const blob=await response.blob();
+   if(!blob.type.startsWith('image/'))throw new Error('Not an image');
    const dataUrl=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(blob);});
-   img.src=dataUrl;await img.decode();
+   img.src=dataUrl;
+   await img.decode();
   }catch(_){
    img.removeAttribute('src');
    img.style.display='none';
