@@ -17,6 +17,7 @@ let quotations = [];
 let editingId = null;
 let lineCounter = 0;
 let pendingShareFile = null;
+let viewingQuotation = null;
 
 const nav = document.querySelector('.tab-btn')?.parentElement;
 const dashboard = document.getElementById('dashboard');
@@ -75,6 +76,19 @@ if (nav && dashboard && !document.getElementById('quotationTabBtn')) {
         </form>
         <p id="qMessage" class="text-xs text-teal-700 mt-2" role="status"></p>
       </section>
+      <section id="qViewSection" class="hidden bg-[#f0fdf9] rounded-2xl p-3 sm:p-5">
+        <div class="flex flex-wrap gap-2 mb-4">
+          <button type="button" id="qBackHistory" class="rounded-xl border bg-white px-4 py-3 text-sm font-bold">← Quotations</button>
+          <button type="button" id="qEditViewed" class="rounded-xl border bg-white px-4 py-3 text-sm font-bold">Edit</button>
+          <span class="flex-1"></span>
+          <button type="button" data-view-save-jpg class="rounded-xl bg-teal-700 text-white px-3 py-3 text-xs font-bold">Save JPG</button>
+          <button type="button" data-view-save-pdf class="rounded-xl bg-teal-800 text-white px-3 py-3 text-xs font-bold">Save PDF</button>
+          <button type="button" data-view-share-jpg class="rounded-xl bg-gray-900 text-white px-3 py-3 text-xs font-bold">Share JPG</button>
+          <button type="button" data-view-share-pdf class="rounded-xl bg-gray-700 text-white px-3 py-3 text-xs font-bold">Share PDF</button>
+        </div>
+        <p id="qViewMessage" class="text-xs text-teal-800 mb-3" role="status"></p>
+        <div id="qPreview" class="bg-white rounded-2xl overflow-hidden shadow-lg"></div>
+      </section>
       <section class="bg-white p-5 rounded-2xl shadow-sm"><h2 class="font-black text-lg mb-3">Saved quotations</h2><div id="qHistory" class="grid gap-2"></div></section>
     </div>
   `;
@@ -86,6 +100,12 @@ if (nav && dashboard && !document.getElementById('quotationTabBtn')) {
     panel.classList.remove('hidden');
     loadAll().catch(showError);
   });
+  document.getElementById('qBackHistory').addEventListener('click',hideQuotationView);
+  document.getElementById('qEditViewed').addEventListener('click',()=>{if(viewingQuotation){const q=viewingQuotation;hideQuotationView();loadQuotation(q);}});
+  document.querySelector('[data-view-save-jpg]').addEventListener('click',()=>exportQuotation('save','jpg').catch(showError));
+  document.querySelector('[data-view-save-pdf]').addEventListener('click',()=>exportQuotation('save','pdf').catch(showError));
+  document.querySelector('[data-view-share-jpg]').addEventListener('click',()=>exportQuotation('share','jpg').catch(showError));
+  document.querySelector('[data-view-share-pdf]').addEventListener('click',()=>exportQuotation('share','pdf').catch(showError));
   document.getElementById('qProductSelect').addEventListener('change', renderVariantOptions);
   document.getElementById('qAddProduct').addEventListener('click', addSelectedProduct);
   document.getElementById('qCatalogSelect').addEventListener('change', renderCatalogList);
@@ -257,6 +277,19 @@ function resetForm() {
   document.getElementById('qValidity').value='14'; document.getElementById('qExpiryWrap').classList.add('hidden'); setExpiryDefault(); calculate();
   document.getElementById('qMessage').textContent='New quotation ready.';
 }
+function showQuotationView(q){
+ viewingQuotation=q;
+ document.querySelectorAll('#panel-quotations > .grid > section').forEach(el=>el.classList.add('hidden'));
+ document.getElementById('qViewSection').classList.remove('hidden');
+ document.getElementById('qPreview').innerHTML=quotationMarkup(q);
+ document.getElementById('qViewMessage').textContent='';
+ document.getElementById('qViewSection').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function hideQuotationView(){
+ document.getElementById('qViewSection').classList.add('hidden');
+ document.querySelectorAll('#panel-quotations > .grid > section').forEach(el=>el.classList.remove('hidden'));
+ viewingQuotation=null;
+}
 function loadQuotation(q) {
   editingId=q.id; document.getElementById('qCustomer').value=q.customerName||''; document.getElementById('qPhone').value=q.phone||'';
   document.getElementById('qEmail').value=q.email||''; document.getElementById('qDate').value=q.issueDate||today();
@@ -269,23 +302,19 @@ function loadQuotation(q) {
 }
 function renderHistory() {
   const host=document.getElementById('qHistory');
-  host.innerHTML=quotations.map(q=>`<div class="border rounded-xl p-3 grid gap-2"><div class="flex justify-between gap-2"><div><p class="font-black text-sm">${safe(q.customerName||'Unnamed customer')}</p><p class="text-[10px] text-gray-500">${safe(q.quotationNumber||q.id)} · ${safe(q.issueDate||'')}</p></div><strong class="text-sm">${money(q.total)}</strong></div><p class="text-[10px] text-gray-500">${q.expiryDate?'Valid until '+safe(q.expiryDate):'No expiry'} · ${(q.items||[]).length} line(s)</p><div class="flex flex-wrap gap-2"><button data-q-edit="${q.id}" class="text-xs font-bold text-teal-700">Open / edit</button><button data-q-duplicate="${q.id}" class="text-xs font-bold text-gray-600">Duplicate</button><button data-q-save-jpg="${q.id}" class="text-xs font-bold text-gray-600">Save JPG</button><button data-q-save-pdf="${q.id}" class="text-xs font-bold text-gray-600">Save PDF</button><button data-q-share-jpg="${q.id}" class="text-xs font-bold text-teal-700">Share JPG</button><button data-q-share-pdf="${q.id}" class="text-xs font-bold text-teal-700">Share PDF</button></div></div>`).join('')||'<p class="text-xs text-gray-400">No quotations saved yet.</p>';
-  host.querySelectorAll('[data-q-edit]').forEach(b=>b.addEventListener('click',()=>{const q=quotations.find(x=>x.id===b.dataset.qEdit);if(q)loadQuotation(q);}));
-  host.querySelectorAll('[data-q-duplicate]').forEach(b=>b.addEventListener('click',()=>{const q=quotations.find(x=>x.id===b.dataset.qDuplicate);if(q){loadQuotation(q);editingId=null;document.getElementById('qMessage').textContent='Duplicate ready — save to create a new quotation.';}}));
-  host.querySelectorAll('[data-q-save-jpg]').forEach(b=>b.addEventListener('click',()=>{const q=quotations.find(x=>x.id===b.dataset.qSaveJpg);if(q)exportQuotation(q,'save','jpg').catch(showError);}));
-  host.querySelectorAll('[data-q-save-pdf]').forEach(b=>b.addEventListener('click',()=>{const q=quotations.find(x=>x.id===b.dataset.qSavePdf);if(q)exportQuotation(q,'save','pdf').catch(showError);}));
-  host.querySelectorAll('[data-q-share-jpg]').forEach(b=>b.addEventListener('click',()=>{const q=quotations.find(x=>x.id===b.dataset.qShareJpg);if(q)exportQuotation(q,'share','jpg').catch(showError);}));
-  host.querySelectorAll('[data-q-share-pdf]').forEach(b=>b.addEventListener('click',()=>{const q=quotations.find(x=>x.id===b.dataset.qSharePdf);if(q)exportQuotation(q,'share','pdf').catch(showError);}));
+  host.innerHTML=quotations.map(q=>`<div class="border rounded-2xl p-4 grid gap-3 bg-white shadow-sm"><div class="flex justify-between gap-3"><div class="min-w-0"><p class="font-extrabold text-sm">${safe(q.customerName||'Unnamed customer')}</p><p class="text-xs text-gray-500 mt-1">${safe(q.quotationNumber||q.id)} · ${safe(q.issueDate||'')}</p></div><strong class="text-sm whitespace-nowrap">${money(q.total)}</strong></div><p class="text-xs text-gray-500">${q.expiryDate?'Valid until '+safe(q.expiryDate):'No expiry'} · ${(q.items||[]).length} item(s)</p><div class="flex gap-2"><button data-q-view="${q.id}" class="flex-1 rounded-xl bg-teal-700 text-white p-3 text-sm font-bold">View quotation</button><button data-q-duplicate="${q.id}" class="rounded-xl border px-4 text-sm font-bold">Duplicate</button></div></div>`).join('')||'<p class="text-xs text-gray-400">No quotations saved yet.</p>';
+  host.querySelectorAll('[data-q-view]').forEach(b=>b.addEventListener('click',()=>{const q=quotations.find(x=>x.id===b.dataset.qView);if(q)showQuotationView(q);}));
+  host.querySelectorAll('[data-q-duplicate]').forEach(b=>b.addEventListener('click',()=>{const q=quotations.find(x=>x.id===b.dataset.qDuplicate);if(q){hideQuotationView();loadQuotation(q);editingId=null;document.getElementById('qMessage').textContent='Duplicate ready — save to create a new quotation.';}}));
 }
 function quotationMarkup(q) {
   const rows=(q.items||[]).map(x=>`<tr><td>${x.image?'<img src="'+safe(x.image)+'" style="width:54px;height:54px;object-fit:cover;border-radius:8px;margin-bottom:5px">':''}<strong>${safe(x.name)}</strong><div style="color:#64748b;font-size:12px">${safe(x.description||'')}</div></td><td style="text-align:center">${x.quantity}</td><td style="text-align:right">${money(x.unitPrice)}</td><td style="text-align:right;font-weight:700">${money(x.quantity*x.unitPrice)}</td></tr>`).join('');
-  return `<article class="quotation-paper" style="font-family:Arial,sans-serif;background:#fff;color:#17202a;padding:34px;max-width:850px;margin:0 auto;border:1px solid #e5e7eb">
+  return `<article class="quotation-paper" style="font-family:Arial,sans-serif;background:#fff;color:#17202a;padding:clamp(16px,4vw,34px);width:100%;max-width:850px;margin:0 auto;border:1px solid #e5e7eb;box-sizing:border-box">
     <header style="display:flex;justify-content:space-between;align-items:center;gap:20px;border-bottom:4px solid #00B09B;padding-bottom:18px;margin-bottom:24px">
       <div><img src="${safe(new URL("../assets/pictures/logo_black_transparent.png", location.href).href)}" alt="EazyLife" style="max-width:210px;max-height:75px;object-fit:contain"><p style="font-size:12px;color:#64748b;margin:8px 0 0">Robotics and Electronics Solutions</p><a href="https://eazylife.ng" style="color:#008f80;font-weight:bold;font-size:13px">https://eazylife.ng</a></div>
       <div style="text-align:right"><h1 style="font-size:25px;margin:0;color:#008f80">QUOTATION</h1><p style="font-size:12px;margin:8px 0 3px"><b>No:</b> ${safe(q.quotationNumber||'Draft')}</p><p style="font-size:12px;margin:3px 0"><b>Issued:</b> ${safe(q.issueDate||'')}</p><p style="font-size:12px;margin:3px 0"><b>Valid:</b> ${q.expiryDate?'Until '+safe(q.expiryDate):'No expiry'}</p></div>
     </header>
     <section style="background:#f3faf8;border-radius:10px;padding:14px;margin-bottom:20px"><p style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin:0 0 5px">Prepared for</p><strong style="font-size:16px">${safe(q.customerName)}</strong><p style="font-size:12px;margin:4px 0;color:#475569">${safe(q.phone||'')}${q.email?' · '+safe(q.email):''}</p></section>
-    <table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:#eff6f5"><th style="text-align:left;padding:11px">Description</th><th style="padding:11px">Qty</th><th style="text-align:right;padding:11px">Unit price</th><th style="text-align:right;padding:11px">Amount</th></tr></thead><tbody>${rows}</tbody></table>
+    <table style="width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed;overflow-wrap:anywhere"><thead><tr style="background:#eff6f5"><th style="text-align:left;padding:8px 5px;width:48%">Description</th><th style="padding:8px 3px;width:10%">Qty</th><th style="text-align:right;padding:8px 4px;width:20%">Unit price</th><th style="text-align:right;padding:8px 4px;width:22%">Amount</th></tr></thead><tbody>${rows}</tbody></table>
     <div style="width:310px;max-width:100%;margin:22px 0 0 auto;font-size:13px"><div style="display:flex;justify-content:space-between;padding:5px 0"><span>Subtotal</span><b>${money(q.subtotal)}</b></div><div style="display:flex;justify-content:space-between;padding:5px 0"><span>Labour / service</span><b>${money(q.labour)}</b></div><div style="display:flex;justify-content:space-between;padding:5px 0"><span>Discount</span><b>−${money(q.discount)}</b></div><div style="display:flex;justify-content:space-between;border-top:2px solid #00B09B;margin-top:8px;padding:12px 0;font-size:19px;color:#008f80"><b>Total</b><b>${money(q.total)}</b></div></div>
     ${q.notes?'<section style="margin-top:22px;padding:14px;background:#f8fafc;border-radius:8px"><b style="font-size:12px">Notes / Terms</b><p style="font-size:12px;white-space:pre-wrap;color:#475569">'+safe(q.notes)+'</p></section>':''}
     <footer style="border-top:1px solid #e5e7eb;margin-top:32px;padding-top:14px;text-align:center;color:#64748b;font-size:11px"><b style="color:#008f80">EazyLife Robotics and Electronics Solutions</b><br>Thank you for the opportunity to serve you · <a href="https://eazylife.ng" style="color:#008f80">eazylife.ng</a></footer>
@@ -313,29 +342,26 @@ function quotationFilename(q) {
  const num=String(q.quotationNumber||'quotation').replace(/[^A-Za-z0-9-]/g,'')||'quotation';
  return 'EazyLife-'+num;
 }
-async function captureQuotationCanvas(q) {
- const wrap=document.createElement('div');
- wrap.style.cssText='position:fixed;left:-10000px;top:0;width:900px;background:white;z-index:-1';
- wrap.innerHTML=quotationMarkup(q);document.body.append(wrap);
- try {
-  await makeCanvasImagesSafe(wrap);
-  const el=wrap.firstElementChild;
-  const imgs=el.querySelectorAll('img');
-  await Promise.all(Array.from(imgs).map(img=>{
-   if(img.complete&&img.naturalWidth>0)return Promise.resolve();
-   return new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;});
-  }));
-  if(!window.html2canvas)throw new Error('Image export library did not load.');
-  return await window.html2canvas(el,{scale:6,useCORS:true,allowTaint:false,backgroundColor:'#ffffff',logging:false,imageTimeout:8000});
- } finally {wrap.remove();}
+async function captureQuotationCanvas() {
+ const el=document.getElementById('qPreview');
+ if(!el||!el.firstElementChild)throw new Error('Open a quotation in View before exporting.');
+ await makeCanvasImagesSafe(el);
+ const imgs=el.querySelectorAll('img');
+ await Promise.all(Array.from(imgs).map(img=>{
+  if(img.complete&&img.naturalWidth>0)return Promise.resolve();
+  return new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;});
+ }));
+ return await window.html2canvas(el.firstElementChild,{scale:6,useCORS:true,allowTaint:false,backgroundColor:'#ffffff',logging:false,imageTimeout:8000});
 }
-async function exportQuotation(q, action, format) {
+async function exportQuotation(action, format) {
+ const q=viewingQuotation;
+ if(!q)throw new Error('Please open a saved quotation in View first.');
  const fname=quotationFilename(q);
  try {
   const msg=document.getElementById('qMessage');
   msg.textContent=(action==='save'?'Saving ':'Preparing to share ')+format.toUpperCase()+'…';
   await new Promise(resolve=>setTimeout(resolve,80));
-  const canvas=await captureQuotationCanvas(q);
+  const canvas=await captureQuotationCanvas();
   if(format==='jpg') {
    const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',0.95));
    if(!blob)throw new Error('Could not create JPG image.');
