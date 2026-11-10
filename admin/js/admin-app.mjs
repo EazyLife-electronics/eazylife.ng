@@ -20,6 +20,7 @@ import { renderRequestList } from './admin-requests.mjs';
 import { renderOrderList } from './admin-orders.mjs';
 import { initProjects, renderProjects, checkDueProjectPublications, setProjectKitProducts } from './admin-projects.mjs';
 import { initSettings, loadSettingsForm } from './admin-settings.mjs';
+import { setQuotationProducts } from './admin-quotations.mjs';
 
 const { auth } = initFirebase();
 
@@ -123,6 +124,7 @@ onAuthStateChanged(auth, (user) => {
 function startDashboard() {
   unsubProducts = watchProducts((products) => {
     renderProducts(products);
+    setQuotationProducts(products);
     setProjectKitProducts(products);
     // The hero form's "link to category"/"link to product" dropdowns are
     // built from the product list, so heroes needs to hear about it too.
