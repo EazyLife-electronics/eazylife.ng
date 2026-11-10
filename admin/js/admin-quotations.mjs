@@ -1,15 +1,18 @@
 // EazyLife Quotation Manager — independent from orders and inventory.
 import { initFirebase } from '../../js/firebase.mjs';
+import { addProduct } from '../../js/store.mjs';
 import {
   collection, addDoc, updateDoc, doc, getDocs, query, orderBy, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const { db } = initFirebase();
 const QUOTES = 'quotations';
+const CATALOG = 'quotationCatalogue';
 const money = n => '₦' + (Number(n) || 0).toLocaleString('en-NG', { maximumFractionDigits: 2 });
 const safe = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const today = () => new Date().toISOString().slice(0,10);
 let products = [];
+let catalogue = [];
 let quotations = [];
 let editingId = null;
 let lineCounter = 0;
@@ -30,12 +33,28 @@ if (nav && dashboard && !document.getElementById('quotationTabBtn')) {
   panel.innerHTML = `
     <div class="grid gap-5">
       <section class="bg-white p-5 rounded-2xl shadow-sm">
-        <h2 class="font-black text-lg mb-1">Choose from Products</h2>
-        <p class="text-xs text-gray-500 mb-4">Select an existing EazyLife product and its variant. Manual items are also supported. Quoting does not change stock.</p>
+        <h2 class="font-black text-lg mb-1">Add quotation items</h2>
+        <p class="text-xs text-gray-500 mb-4">Choose from shop products, reusable quotation items (including off-stock components), or enter something manually. Quoting never changes stock.</p>
+        <h3 class="text-xs font-bold text-gray-600 mb-1">Shop products</h3>
         <select id="qProductSelect" class="w-full p-3 bg-gray-50 rounded-xl border text-sm"><option value="">Loading product list…</option></select>
         <select id="qVariantSelect" class="w-full mt-2 p-3 bg-gray-50 rounded-xl border text-sm" disabled><option value="">Choose product first</option></select>
-        <button type="button" id="qAddProduct" class="w-full mt-2 bg-teal-700 text-white p-3 rounded-xl text-sm font-bold">Add selected product to quotation</button>
+        <button type="button" id="qAddProduct" class="w-full mt-2 bg-teal-700 text-white p-3 rounded-xl text-sm font-bold">Add selected product</button>
         <p id="qProductHint" class="text-[11px] text-gray-500 mt-2"></p>
+        <div class="border-t my-4"></div>
+        <h3 class="text-xs font-bold text-gray-600 mb-1">Reusable quotation items</h3>
+        <select id="qCatalogSelect" class="w-full p-3 bg-gray-50 rounded-xl border text-sm"><option value="">Loading quotation items…</option></select>
+        <button type="button" id="qAddCatalog" class="w-full mt-2 bg-gray-800 text-white p-3 rounded-xl text-sm font-bold">Add saved quotation item</button>
+        <div id="qCatalogList" class="grid gap-2 mt-3"></div>
+        <details class="mt-4 border-t pt-3">
+          <summary class="text-sm font-bold cursor-pointer">Save a reusable quotation item</summary>
+          <form id="qCatalogForm" class="grid gap-2 mt-3">
+            <input id="qcName" required placeholder="Component / service name" class="w-full p-3 bg-gray-50 rounded-xl border text-sm">
+            <textarea id="qcDescription" rows="2" placeholder="Description (optional)" class="w-full p-3 bg-gray-50 rounded-xl border text-sm"></textarea>
+            <div class="grid grid-cols-2 gap-2"><input id="qcBrand" placeholder="Brand (optional)" class="w-full p-3 bg-gray-50 rounded-xl border text-sm"><input id="qcCategory" placeholder="Category (optional)" class="w-full p-3 bg-gray-50 rounded-xl border text-sm"></div>
+            <div class="grid grid-cols-2 gap-2"><input id="qcPrice" type="number" min="0" step="0.01" required placeholder="Unit price (₦)" class="w-full p-3 bg-gray-50 rounded-xl border text-sm"><input id="qcImage" type="text" placeholder="Image URL (optional)" class="w-full p-3 bg-gray-50 rounded-xl border text-sm"></div>
+            <button class="bg-gray-900 text-white p-3 rounded-xl text-sm font-bold">Save to quotation items</button>
+          </form>
+        </details>
       </section>
       <section class="bg-white p-5 rounded-2xl shadow-sm">
         <div class="flex justify-between items-center gap-2 mb-3"><div><h2 class="font-black text-lg">Create quotation</h2><p class="text-xs text-gray-500">Build a proposal for a referred customer.</p></div><button id="qReset" type="button" class="text-xs font-bold bg-gray-100 px-3 py-2 rounded-lg">New</button></div>
@@ -68,6 +87,9 @@ if (nav && dashboard && !document.getElementById('quotationTabBtn')) {
   });
   document.getElementById('qProductSelect').addEventListener('change', renderVariantOptions);
   document.getElementById('qAddProduct').addEventListener('click', addSelectedProduct);
+  document.getElementById('qCatalogSelect').addEventListener('change', renderCatalogList);
+  document.getElementById('qAddCatalog').addEventListener('click', addSelectedCatalogItem);
+  document.getElementById('qCatalogForm').addEventListener('submit', saveCatalogItem);
   document.getElementById('qAddManual').addEventListener('click', () => addLine({ name:'', description:'', quantity:1, unitPrice:0, image:'' }));
   document.getElementById('qReset').addEventListener('click', resetForm);
   document.getElementById('qForm').addEventListener('input', calculate);
@@ -103,9 +125,14 @@ function setExpiryDefault() {
   document.getElementById('qExpiry').value = date.toISOString().slice(0,10);
 }
 async function loadAll() {
-  const q = await getDocs(query(collection(db, QUOTES), orderBy('updatedAt','desc')));
+  const [q,c] = await Promise.all([
+    getDocs(query(collection(db, QUOTES), orderBy('updatedAt','desc'))),
+    getDocs(query(collection(db, CATALOG), orderBy('name')))
+  ]);
   quotations = q.docs.map(d => ({id:d.id,...d.data()}));
+  catalogue = c.docs.map(d => ({id:d.id,...d.data()}));
   renderHistory();
+  renderCatalogList();
 }
 function variantLabel(v,i){return [v.color,v.ram,v.rom,v.processor].filter(Boolean).join(' · ')||'Variant '+(i+1);}
 function renderVariantOptions(){
@@ -113,6 +140,40 @@ function renderVariantOptions(){
  if(!p){sel.innerHTML='<option value="">Choose product first</option>';sel.disabled=true;hint.textContent=products.length?'Select a product to see its variants.':'No products loaded yet.';return;}
  const vs=p.variants||[];sel.innerHTML=vs.map((v,i)=>{const price=Number(v.promoPrice)>0?Number(v.promoPrice):Number(v.price)||0;return '<option value="'+i+'">'+safe(variantLabel(v,i))+' — '+money(price)+(p.inStock===false||v.inStock===false?' · not marked in stock':'')+'</option>';}).join('')||'<option value="">No variants on this product</option>';
  sel.disabled=!vs.length;hint.textContent=[p.brand,p.category,p.inStock===false?'Product not marked in stock':''].filter(Boolean).join(' · ');
+}
+async function saveCatalogItem(e){
+ e.preventDefault();
+ const form=e.currentTarget;
+ const item={name:document.getElementById('qcName').value.trim(),description:document.getElementById('qcDescription').value.trim(),brand:document.getElementById('qcBrand').value.trim(),category:document.getElementById('qcCategory').value.trim(),unitPrice:Math.max(0,Number(document.getElementById('qcPrice').value)||0),image:document.getElementById('qcImage').value.trim(),createdAt:serverTimestamp(),updatedAt:serverTimestamp()};
+ if(!item.name)return alert('Enter an item name.');
+ await addDoc(collection(db,CATALOG),item);
+ form.reset();
+ document.getElementById('qMessage').textContent='Reusable quotation item saved.';
+ await loadAll();
+}
+function renderCatalogList(){
+ const select=document.getElementById('qCatalogSelect'),list=document.getElementById('qCatalogList');
+ if(!select||!list)return;
+ const current=select.value;
+ select.innerHTML='<option value="">Choose a saved quotation item…</option>'+catalogue.map(x=>'<option value="'+safe(x.id)+'">'+safe(x.name)+' — '+money(x.unitPrice)+(x.convertedProductId?' · converted to product':'')+'</option>').join('');
+ if(catalogue.some(x=>x.id===current))select.value=current;
+ list.innerHTML=catalogue.map(x=>'<div class="border rounded-lg p-2 flex items-center gap-2"><div class="min-w-0 flex-1"><p class="text-xs font-bold">'+safe(x.name)+'</p><p class="text-[10px] text-gray-500">'+money(x.unitPrice)+(x.convertedProductId?' · Product created':' · Quotation only')+'</p></div><button type="button" data-q-convert="'+safe(x.id)+'" class="text-[10px] font-bold text-teal-700">'+(x.convertedProductId?'View product ID':'Convert to product')+'</button></div>').join('')||'<p class="text-[10px] text-gray-400">No reusable items saved yet.</p>';
+ list.querySelectorAll('[data-q-convert]').forEach(b=>b.addEventListener('click',()=>convertCatalogItem(b.dataset.qConvert).catch(showError)));
+}
+function addSelectedCatalogItem(){
+ const item=catalogue.find(x=>x.id===document.getElementById('qCatalogSelect').value);
+ if(!item)return alert('Choose a saved quotation item first.');
+ addLine({name:item.name,description:item.description||'',quantity:1,unitPrice:Number(item.unitPrice)||0,image:item.image||'',source:'quotation-catalogue',catalogueId:item.id});
+}
+async function convertCatalogItem(id){
+ const item=catalogue.find(x=>x.id===id);if(!item)return;
+ if(item.convertedProductId){alert('This item has already been converted. Product ID: '+item.convertedProductId);return;}
+ if(!confirm('Create this as a new shop product? It will be created hidden / out of stock so you can review it before making it available.'))return;
+ const product={name:item.name,brand:item.brand||'',category:item.category||'',desc:item.description||'',inStock:false,variants:[{id:'v'+Date.now(),color:'',processor:'',ram:'',rom:'',price:Number(item.unitPrice)||0,promoPrice:0,image:item.image||'',deliveryFee:null,deliveryRoute:'general',bulkSavingsEnabled:false,bulkSavingsMode:'general',bulkSavingsPercent:0,bulkSavingsMinQty:0,inStock:false}],upgrades:[]};
+ const ref=await addProduct(product);
+ await updateDoc(doc(db,CATALOG,id),{convertedProductId:ref.id,updatedAt:serverTimestamp()});
+ document.getElementById('qMessage').textContent='Product created as hidden / out of stock. Review it in Products before publishing.';
+ await loadAll();
 }
 function renderProductPicker(){
  const sel=document.getElementById('qProductSelect'),old=sel.value;sel.innerHTML='<option value="">Choose a product…</option>'+products.map(p=>'<option value="'+safe(p.id)+'">'+safe(p.name||'Unnamed product')+'</option>').join('');if(products.some(p=>p.id===old))sel.value=old;renderVariantOptions();
@@ -206,11 +267,12 @@ function loadQuotation(q) {
 }
 function renderHistory() {
   const host=document.getElementById('qHistory');
-  host.innerHTML=quotations.map(q=>`<div class="border rounded-xl p-3 grid gap-2"><div class="flex justify-between gap-2"><div><p class="font-black text-sm">${safe(q.customerName||'Unnamed customer')}</p><p class="text-[10px] text-gray-500">${safe(q.quotationNumber||q.id)} · ${safe(q.issueDate||'')}</p></div><strong class="text-sm">${money(q.total)}</strong></div><p class="text-[10px] text-gray-500">${q.expiryDate?'Valid until '+safe(q.expiryDate):'No expiry'} · ${(q.items||[]).length} line(s)</p><div class="flex flex-wrap gap-2"><button data-q-edit="${q.id}" class="text-xs font-bold text-teal-700">Open / edit</button><button data-q-duplicate="${q.id}" class="text-xs font-bold text-gray-600">Duplicate</button><button data-q-pdf="${q.id}" class="text-xs font-bold text-gray-600">PDF / Print</button><button data-q-image="${q.id}" class="text-xs font-bold text-gray-600">Save image</button></div></div>`).join('')||'<p class="text-xs text-gray-400">No quotations saved yet.</p>';
+  host.innerHTML=quotations.map(q=>`<div class="border rounded-xl p-3 grid gap-2"><div class="flex justify-between gap-2"><div><p class="font-black text-sm">${safe(q.customerName||'Unnamed customer')}</p><p class="text-[10px] text-gray-500">${safe(q.quotationNumber||q.id)} · ${safe(q.issueDate||'')}</p></div><strong class="text-sm">${money(q.total)}</strong></div><p class="text-[10px] text-gray-500">${q.expiryDate?'Valid until '+safe(q.expiryDate):'No expiry'} · ${(q.items||[]).length} line(s)</p><div class="flex flex-wrap gap-2"><button data-q-edit="${q.id}" class="text-xs font-bold text-teal-700">Open / edit</button><button data-q-duplicate="${q.id}" class="text-xs font-bold text-gray-600">Duplicate</button><button data-q-pdf="${q.id}" class="text-xs font-bold text-gray-600">PDF / Print</button><button data-q-image="${q.id}" class="text-xs font-bold text-gray-600">Save image</button><button data-q-share="${q.id}" class="text-xs font-bold text-teal-700">Share</button></div></div>`).join('')||'<p class="text-xs text-gray-400">No quotations saved yet.</p>';
   host.querySelectorAll('[data-q-edit]').forEach(b=>b.addEventListener('click',()=>{const q=quotations.find(x=>x.id===b.dataset.qEdit);if(q)loadQuotation(q);}));
   host.querySelectorAll('[data-q-duplicate]').forEach(b=>b.addEventListener('click',()=>{const q=quotations.find(x=>x.id===b.dataset.qDuplicate);if(q){loadQuotation(q);editingId=null;document.getElementById('qMessage').textContent='Duplicate ready — save to create a new quotation.';}}));
   host.querySelectorAll('[data-q-pdf]').forEach(b=>b.addEventListener('click',()=>{const q=quotations.find(x=>x.id===b.dataset.qPdf);if(q)exportQuotation(q,'pdf').catch(showError);}));
   host.querySelectorAll('[data-q-image]').forEach(b=>b.addEventListener('click',()=>{const q=quotations.find(x=>x.id===b.dataset.qImage);if(q)exportQuotation(q,'image').catch(showError);}));
+  host.querySelectorAll('[data-q-share]').forEach(b=>b.addEventListener('click',()=>{const q=quotations.find(x=>x.id===b.dataset.qShare);if(q)exportQuotation(q,'share').catch(showError);}));
 }
 function quotationMarkup(q) {
   const rows=(q.items||[]).map(x=>`<tr><td>${x.image?'<img src="'+safe(x.image)+'" style="width:54px;height:54px;object-fit:cover;border-radius:8px;margin-bottom:5px">':''}<strong>${safe(x.name)}</strong><div style="color:#64748b;font-size:12px">${safe(x.description||'')}</div></td><td style="text-align:center">${x.quantity}</td><td style="text-align:right">${money(x.unitPrice)}</td><td style="text-align:right;font-weight:700">${money(x.quantity*x.unitPrice)}</td></tr>`).join('');
@@ -226,30 +288,53 @@ function quotationMarkup(q) {
     <footer style="border-top:1px solid #e5e7eb;margin-top:32px;padding-top:14px;text-align:center;color:#64748b;font-size:11px"><b style="color:#008f80">EazyLife Robotics and Electronics Solutions</b><br>Thank you for the opportunity to serve you · <a href="https://eazylife.ng" style="color:#008f80">eazylife.ng</a></footer>
   </article>`;
 }
+async function makeCanvasImagesSafe(root){
+ const imgs=[...root.querySelectorAll('img')];
+ for(const img of imgs){
+  const src=img.src;
+  if(!src)continue;
+  try{
+   if(new URL(src).origin===location.origin){await img.decode().catch(()=>{});continue;}
+   const response=await fetch(src,{mode:'cors',credentials:'omit'});
+   if(!response.ok)throw new Error('Image unavailable');
+   const blob=await response.blob();
+   const dataUrl=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(blob);});
+   img.src=dataUrl;await img.decode();
+  }catch(_){
+   img.removeAttribute('src');
+   img.style.display='none';
+  }
+ }
+}
 async function exportQuotation(q, mode) {
-  // Open the print tab synchronously inside the click handler so mobile browsers
-  // do not classify it as a blocked, delayed popup.
-  let printWindow = null;
-  if (mode === 'pdf') {
-    printWindow = window.open('', '_blank');
-    if (!printWindow) throw new Error('Allow pop-ups to print or save the PDF.');
+ let printWindow=null;
+ if(mode==='pdf'){printWindow=window.open('','_blank');if(!printWindow)throw new Error('Allow pop-ups to print or save the PDF.');}
+ const wrap=document.createElement('div');wrap.style.cssText='position:fixed;left:-10000px;top:0;width:900px;background:white;z-index:-1';
+ wrap.innerHTML=quotationMarkup(q);document.body.append(wrap);
+ try{
+  if(mode==='pdf'){
+   const imgs=[...wrap.querySelectorAll('img')];await Promise.all(imgs.map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;})));
+   printWindow.onload=()=>{printWindow.focus();printWindow.print();};
+   printWindow.document.write('<!doctype html><html><head><title>'+safe(q.quotationNumber||'EazyLife Quotation')+'</title><style>@page{size:A4;margin:12mm}body{margin:0}.quotation-paper{border:0!important;max-width:none!important;padding:0!important}tr{break-inside:avoid}a{color:#008f80}</style></head><body>'+wrap.innerHTML+'</body></html>');
+   printWindow.document.close();return;
   }
-  const wrap=document.createElement('div'); wrap.style.cssText='position:fixed;left:-10000px;top:0;width:900px;background:white;z-index:-1';
-  wrap.innerHTML=quotationMarkup(q); document.body.append(wrap);
-  const images=[...wrap.querySelectorAll('img')];
-  await Promise.all(images.map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;})));
-  if(mode==='pdf') {
-    printWindow.onload=()=>{printWindow.focus();printWindow.print();};
-    printWindow.document.write('<!doctype html><html><head><title>'+safe(q.quotationNumber||'EazyLife Quotation')+'</title><style>@page{size:A4;margin:12mm}body{margin:0}.quotation-paper{border:0!important;max-width:none!important;padding:0!important}tr{break-inside:avoid}a{color:#008f80}</style></head><body>'+wrap.innerHTML+'</body></html>');
-    printWindow.document.close();
-  } else {
-    if (!window.html2canvas) {
-      await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';s.onload=resolve;s.onerror=()=>reject(new Error('Image export library could not load.'));document.head.append(s);});
-    }
-    const canvas=await window.html2canvas(wrap.firstElementChild,{scale:2,backgroundColor:'#ffffff',useCORS:true});
-    const link=document.createElement('a'); link.download=(q.quotationNumber||'EazyLife-Quotation')+'.png'; link.href=canvas.toDataURL('image/png'); link.click();
+  await makeCanvasImagesSafe(wrap);
+  if(!window.html2canvas)await new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';script.onload=resolve;script.onerror=()=>reject(new Error('Image export library could not load.'));document.head.append(script);});
+  const canvas=await window.html2canvas(wrap.firstElementChild,{scale:2,backgroundColor:'#ffffff',useCORS:true,allowTaint:false});
+  const blob=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('Could not create quotation image.')),'image/png'));
+  const file=new File([blob],(q.quotationNumber||'EazyLife-Quotation')+'.png',{type:'image/png'});
+  if(mode==='share'){
+   if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){
+    try{await navigator.share({files:[file],title:'EazyLife quotation',text:'Quotation '+(q.quotationNumber||'')+' · https://eazylife.ng'});}
+    catch(error){if(error.name!=='AbortError')throw error;}
+   }else{
+    const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download=file.name;link.click();setTimeout(()=>URL.revokeObjectURL(url),30000);
+    document.getElementById('qMessage').textContent='Image downloaded. Your browser does not support direct file sharing here.';
+   }
+  }else{
+   const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download=file.name;link.click();setTimeout(()=>URL.revokeObjectURL(url),30000);
   }
-  wrap.remove();
+ }finally{wrap.remove();}
 }
 
 
