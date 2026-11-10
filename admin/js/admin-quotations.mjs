@@ -121,7 +121,7 @@ function addSelectedProduct(){
  const p=products.find(x=>x.id===document.getElementById('qProductSelect').value);if(!p)return alert('Choose a product first.');
  const i=Number(document.getElementById('qVariantSelect').value),v=(p.variants||[])[i];if(!v)return alert('Choose a product variant.');
  const price=Number(v.promoPrice)>0?Number(v.promoPrice):Number(v.price)||0;
- addLine({name:p.name||'Product',description:[p.brand,p.category,variantLabel(v,i),p.desc].filter(Boolean).join(' · '),quantity:1,unitPrice:price,image:v.image?( /^https?:\\/\\//i.test(v.image) ? v.image : new URL(v.image, location.href).href ):'',productId:p.id,variantId:v.id||'',source:'product'});
+ addLine({name:p.name||'Product',description:[p.brand,p.category,variantLabel(v,i),p.desc].filter(Boolean).join(' · '),quantity:1,unitPrice:price,image:v.image?(v.image.startsWith('http://')||v.image.startsWith('https://')?v.image:new URL(v.image,location.href).href):'',productId:p.id,variantId:v.id||'',source:'product'});
 }
 function addLine(item={}) {
   const id = ++lineCounter;
