@@ -39,15 +39,15 @@
     <div class="max-w-4xl mx-auto p-4">
         <div class="flex gap-2 mb-6 overflow-x-auto no-scrollbar">
             <button data-tab="products" class="tab-btn tab-active px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Products</button>
-            <button data-tab="inventory" id="inventoryTabBtn" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Inventory</button>
-            <button data-tab="reports" id="reportsTabBtn" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Reports</button>
-            <button data-tab="projects" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Projects</button>
-            <button data-tab="heroes" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Heroes</button>
-            <button data-tab="media" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Media</button>
-            <button data-tab="reviews" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Reviews</button>
-            <button data-tab="requests" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Requests</button>
             <button data-tab="orders" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Orders</button>
+            <button data-tab="inventory" id="inventoryTabBtn" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Inventory</button>
             <button data-tab="delivery" id="deliveryTabBtn" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Delivery</button>
+            <button data-tab="reports" id="reportsTabBtn" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Reports</button>
+            <button data-tab="requests" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Requests</button>
+            <button data-tab="projects" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Projects</button>
+            <button data-tab="media" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Media</button>
+            <button data-tab="heroes" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Heroes</button>
+            <button data-tab="reviews" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Reviews</button>
             <button data-tab="settings" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Settings</button>
         </div>
         <div id="panel-products" class="tab-panel">
@@ -158,6 +158,9 @@
 <div id="imagePickerModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] flex items-end md:items-center justify-center"><div class="bg-white w-full max-w-lg rounded-t-[28px] md:rounded-[24px] shadow-2xl p-5 max-h-[85vh] flex flex-col"><div class="flex justify-between items-center mb-3"><h3 class="font-black text-base text-gray-800">Choose an Image</h3><button onclick="closeImagePicker()" class="text-gray-400 text-2xl p-1">&times;</button></div><p id="pickerHint" class="text-xs text-gray-400 mb-3"></p><div id="pickerGrid" class="grid grid-cols-3 gap-2 overflow-y-auto pr-1" style="flex:1;"><p class="col-span-3 text-center text-gray-400 text-sm py-10">Loading images...</p></div></div></div>
 <script type="module" src="js/settings-ui.mjs"></script>
 <script type="module" src="js/admin-app.mjs"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script type="module" src="js/admin-quotations.mjs"></script>
 <script type="module" src="js/admin-media.mjs"></script>
 <script type="module" src="js/purchases.mjs"></script>
 <script type="module" src="js/order-delivery-bridge.mjs"></script>
