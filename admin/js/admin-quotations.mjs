@@ -5,12 +5,11 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const { db } = initFirebase();
-const CATALOG = 'quotationCatalogue';
 const QUOTES = 'quotations';
 const money = n => '₦' + (Number(n) || 0).toLocaleString('en-NG', { maximumFractionDigits: 2 });
 const safe = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const today = () => new Date().toISOString().slice(0,10);
-let catalogue = [];
+let products = [];
 let quotations = [];
 let editingId = null;
 let lineCounter = 0;
@@ -31,15 +30,12 @@ if (nav && dashboard && !document.getElementById('quotationTabBtn')) {
   panel.innerHTML = `
     <div class="grid gap-5">
       <section class="bg-white p-5 rounded-2xl shadow-sm">
-        <h2 class="font-black text-lg mb-1">Quotation Catalogue</h2>
-        <p class="text-xs text-gray-500 mb-4">Reusable quotation items. This catalogue is separate from shop products and inventory.</p>
-        <form id="qCatalogForm" class="grid gap-2">
-          <input id="qcName" required placeholder="Component / service name" class="w-full p-3 bg-gray-50 rounded-xl border text-sm">
-          <textarea id="qcDescription" rows="2" placeholder="Description (optional)" class="w-full p-3 bg-gray-50 rounded-xl border text-sm"></textarea>
-          <div class="grid grid-cols-2 gap-2"><input id="qcPrice" type="number" min="0" step="0.01" required placeholder="Unit price (₦)" class="w-full p-3 bg-gray-50 rounded-xl border text-sm"><input id="qcImage" type="url" placeholder="Image URL (optional)" class="w-full p-3 bg-gray-50 rounded-xl border text-sm"></div>
-          <button class="bg-gray-900 text-white p-3 rounded-xl text-sm font-bold">Add to quotation catalogue</button>
-        </form>
-        <div id="qCatalogList" class="grid gap-2 mt-4"></div>
+        <h2 class="font-black text-lg mb-1">Choose from Products</h2>
+        <p class="text-xs text-gray-500 mb-4">Select an existing EazyLife product and its variant. Manual items are also supported. Quoting does not change stock.</p>
+        <select id="qProductSelect" class="w-full p-3 bg-gray-50 rounded-xl border text-sm"><option value="">Loading product list…</option></select>
+        <select id="qVariantSelect" class="w-full mt-2 p-3 bg-gray-50 rounded-xl border text-sm" disabled><option value="">Choose product first</option></select>
+        <button type="button" id="qAddProduct" class="w-full mt-2 bg-teal-700 text-white p-3 rounded-xl text-sm font-bold">Add selected product to quotation</button>
+        <p id="qProductHint" class="text-[11px] text-gray-500 mt-2"></p>
       </section>
       <section class="bg-white p-5 rounded-2xl shadow-sm">
         <div class="flex justify-between items-center gap-2 mb-3"><div><h2 class="font-black text-lg">Create quotation</h2><p class="text-xs text-gray-500">Build a proposal for a referred customer.</p></div><button id="qReset" type="button" class="text-xs font-bold bg-gray-100 px-3 py-2 rounded-lg">New</button></div>
@@ -49,7 +45,7 @@ if (nav && dashboard && !document.getElementById('quotationTabBtn')) {
           <div class="grid grid-cols-2 gap-2"><label class="text-xs text-gray-500 font-bold">Issue date<input id="qDate" type="date" required class="block w-full mt-1 p-3 bg-gray-50 rounded-xl border text-sm"></label><label class="text-xs text-gray-500 font-bold">Validity<select id="qValidity" class="block w-full mt-1 p-3 bg-gray-50 rounded-xl border text-sm"><option value="7">7 days</option><option value="14" selected>14 days</option><option value="30">30 days</option><option value="custom">Custom date</option><option value="none">No expiry</option></select></label></div>
           <label id="qExpiryWrap" class="hidden text-xs text-gray-500 font-bold">Custom expiry date<input id="qExpiry" type="date" class="block w-full mt-1 p-3 bg-gray-50 rounded-xl border text-sm"></label>
           <div class="rounded-xl bg-gray-50 p-3"><div class="flex justify-between items-center mb-2"><h3 class="font-black text-sm">Quotation items</h3><button type="button" id="qAddManual" class="text-xs bg-white border px-3 py-2 rounded-lg font-bold">+ Manual item</button></div>
-            <div class="flex gap-2 mb-2"><select id="qCatalogSelect" class="flex-1 min-w-0 p-2 rounded-lg border bg-white text-xs"><option value="">Choose catalogue item…</option></select><button type="button" id="qAddCatalog" class="bg-teal-700 text-white px-3 rounded-lg text-xs font-bold">Add</button></div>
+            
             <div id="qLines" class="grid gap-2"></div>
           </div>
           <div class="grid grid-cols-2 gap-2"><label class="text-xs text-gray-500 font-bold">Labour / service charge (₦)<input id="qLabour" type="number" min="0" step="0.01" value="0" class="block w-full mt-1 p-3 bg-gray-50 rounded-xl border text-sm"></label><label class="text-xs text-gray-500 font-bold">Discount (₦)<input id="qDiscount" type="number" min="0" step="0.01" value="0" class="block w-full mt-1 p-3 bg-gray-50 rounded-xl border text-sm"></label></div>
@@ -70,8 +66,8 @@ if (nav && dashboard && !document.getElementById('quotationTabBtn')) {
     panel.classList.remove('hidden');
     loadAll().catch(showError);
   });
-  document.getElementById('qCatalogForm').addEventListener('submit', saveCatalogItem);
-  document.getElementById('qAddCatalog').addEventListener('click', addSelectedCatalogItem);
+  document.getElementById('qProductSelect').addEventListener('change', renderVariantOptions);
+  document.getElementById('qAddProduct').addEventListener('click', addSelectedProduct);
   document.getElementById('qAddManual').addEventListener('click', () => addLine({ name:'', description:'', quantity:1, unitPrice:0, image:'' }));
   document.getElementById('qReset').addEventListener('click', resetForm);
   document.getElementById('qForm').addEventListener('input', calculate);
@@ -107,53 +103,29 @@ function setExpiryDefault() {
   document.getElementById('qExpiry').value = date.toISOString().slice(0,10);
 }
 async function loadAll() {
-  const [c, q] = await Promise.all([
-    getDocs(query(collection(db, CATALOG), orderBy('name'))),
-    getDocs(query(collection(db, QUOTES), orderBy('updatedAt','desc')))
-  ]);
-  catalogue = c.docs.map(d => ({id:d.id,...d.data()}));
+  const q = await getDocs(query(collection(db, QUOTES), orderBy('updatedAt','desc')));
   quotations = q.docs.map(d => ({id:d.id,...d.data()}));
-  renderCatalogue();
   renderHistory();
 }
-function renderCatalogue() {
-  const list = document.getElementById('qCatalogList');
-  const select = document.getElementById('qCatalogSelect');
-  list.innerHTML = catalogue.map(item => `<div class="flex gap-3 items-center border rounded-xl p-2">
-    ${item.image ? `<img src="${safe(item.image)}" class="w-12 h-12 rounded-lg object-cover">` : '<div class="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400"><i class="fas fa-cube"></i></div>'}
-    <div class="flex-1 min-w-0"><p class="font-bold text-xs">${safe(item.name)}</p><p class="text-[10px] text-gray-500">${money(item.unitPrice)}</p></div>
-    <button type="button" data-qcat-edit="${item.id}" class="text-xs text-teal-700 font-bold">Edit</button><button type="button" data-qcat-delete="${item.id}" class="text-xs text-red-500 font-bold">Delete</button></div>`).join('') || '<p class="text-xs text-gray-400">No reusable items yet.</p>';
-  select.innerHTML = '<option value="">Choose catalogue item…</option>' + catalogue.map(x => `<option value="${x.id}">${safe(x.name)} — ${money(x.unitPrice)}</option>`).join('');
-  list.querySelectorAll('[data-qcat-edit]').forEach(b => b.addEventListener('click', () => {
-    const x = catalogue.find(v => v.id === b.dataset.qcatEdit); if (!x) return;
-    document.getElementById('qcName').value=x.name||''; document.getElementById('qcDescription').value=x.description||'';
-    document.getElementById('qcPrice').value=x.unitPrice||0; document.getElementById('qcImage').value=x.image||'';
-    document.getElementById('qCatalogForm').dataset.editId=x.id;
-    document.querySelector('#qCatalogForm button').textContent='Update catalogue item';
-  }));
-  list.querySelectorAll('[data-qcat-delete]').forEach(b => b.addEventListener('click', async () => {
-    if (!confirm('Delete this catalogue item? Existing saved quotations will remain unchanged.')) return;
-    await deleteDoc(doc(db,CATALOG,b.dataset.qcatDelete)); await loadAll();
-  }));
+function variantLabel(v,i){return [v.color,v.ram,v.rom,v.processor].filter(Boolean).join(' · ')||'Variant '+(i+1);}
+function renderVariantOptions(){
+ const p=products.find(x=>x.id===document.getElementById('qProductSelect').value),sel=document.getElementById('qVariantSelect'),hint=document.getElementById('qProductHint');
+ if(!p){sel.innerHTML='<option value="">Choose product first</option>';sel.disabled=true;hint.textContent=products.length?'Select a product to see its variants.':'No products loaded yet.';return;}
+ const vs=p.variants||[];sel.innerHTML=vs.map((v,i)=>{const price=Number(v.promoPrice)>0?Number(v.promoPrice):Number(v.price)||0;return '<option value="'+i+'">'+safe(variantLabel(v,i))+' — '+money(price)+(p.inStock===false||v.inStock===false?' · not marked in stock':'')+'</option>';}).join('')||'<option value="">No variants on this product</option>';
+ sel.disabled=!vs.length;hint.textContent=[p.brand,p.category,p.inStock===false?'Product not marked in stock':''].filter(Boolean).join(' · ');
 }
-async function saveCatalogItem(e) {
-  e.preventDefault();
-  const id = e.currentTarget.dataset.editId;
-  const data = { name:document.getElementById('qcName').value.trim(), description:document.getElementById('qcDescription').value.trim(), unitPrice:Number(document.getElementById('qcPrice').value), image:document.getElementById('qcImage').value.trim(), updatedAt:serverTimestamp() };
-  if (!data.name || data.unitPrice < 0 || !Number.isFinite(data.unitPrice)) return;
-  if (id) await updateDoc(doc(db,CATALOG,id),data); else await addDoc(collection(db,CATALOG),{...data,createdAt:serverTimestamp()});
-  e.currentTarget.reset(); delete e.currentTarget.dataset.editId; e.currentTarget.querySelector('button').textContent='Add to quotation catalogue';
-  await loadAll();
+function renderProductPicker(){
+ const sel=document.getElementById('qProductSelect'),old=sel.value;sel.innerHTML='<option value="">Choose a product…</option>'+products.map(p=>'<option value="'+safe(p.id)+'">'+safe(p.name||'Unnamed product')+'</option>').join('');if(products.some(p=>p.id===old))sel.value=old;renderVariantOptions();
 }
-function addSelectedCatalogItem() {
-  const id = document.getElementById('qCatalogSelect').value;
-  const item = catalogue.find(x=>x.id===id);
-  if (!item) return;
-  addLine({name:item.name,description:item.description||'',quantity:1,unitPrice:Number(item.unitPrice)||0,image:item.image||'',catalogueId:item.id});
+function addSelectedProduct(){
+ const p=products.find(x=>x.id===document.getElementById('qProductSelect').value);if(!p)return alert('Choose a product first.');
+ const i=Number(document.getElementById('qVariantSelect').value),v=(p.variants||[])[i];if(!v)return alert('Choose a product variant.');
+ const price=Number(v.promoPrice)>0?Number(v.promoPrice):Number(v.price)||0;
+ addLine({name:p.name||'Product',description:[p.brand,p.category,variantLabel(v,i),p.desc].filter(Boolean).join(' · '),quantity:1,unitPrice:price,image:v.image||'',productId:p.id,variantId:v.id||'',source:'product'});
 }
 function addLine(item={}) {
   const id = ++lineCounter;
-  const row=document.createElement('div'); row.className='q-line bg-white border rounded-xl p-3 grid gap-2'; row.dataset.lineId=id;
+  const row=document.createElement('div'); row.className='q-line bg-white border rounded-xl p-3 grid gap-2'; row.dataset.lineId=id; row.dataset.productId=item.productId||''; row.dataset.variantId=item.variantId||''; row.dataset.source=item.source||'manual';
   row.innerHTML=`<div class="flex justify-between items-center"><strong class="text-xs text-gray-500">Item ${id}</strong><button type="button" class="q-remove text-red-500 text-xs font-bold">Remove</button></div>
   <input data-field="name" required placeholder="Item / component name" value="${safe(item.name)}" class="p-2 border rounded-lg text-sm">
   <textarea data-field="description" rows="1" placeholder="Description (optional)" class="p-2 border rounded-lg text-xs">${safe(item.description)}</textarea>
@@ -166,7 +138,7 @@ function addLine(item={}) {
 function readLines() {
   return [...document.querySelectorAll('.q-line')].map(row => {
     const get = key => row.querySelector('[data-field="'+key+'"]').value;
-    return {name:get('name').trim(),description:get('description').trim(),image:get('image').trim(),quantity:Math.max(1,Number(get('quantity'))||1),unitPrice:Math.max(0,Number(get('unitPrice'))||0)};
+    return {name:get('name').trim(),description:get('description').trim(),image:get('image').trim(),quantity:Math.max(1,Number(get('quantity'))||1),unitPrice:Math.max(0,Number(get('unitPrice'))||0),productId:row.dataset.productId||'',variantId:row.dataset.variantId||'',source:row.dataset.source||'manual'};
   }).filter(x=>x.name);
 }
 function calculate() {
