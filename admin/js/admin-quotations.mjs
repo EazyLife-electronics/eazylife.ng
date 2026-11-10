@@ -255,14 +255,21 @@ function quotationMarkup(q) {
   </article>`;
 }
 async function exportQuotation(q, mode) {
+  // Open the print tab synchronously inside the click handler so mobile browsers
+  // do not classify it as a blocked, delayed popup.
+  let printWindow = null;
+  if (mode === 'pdf') {
+    printWindow = window.open('', '_blank');
+    if (!printWindow) throw new Error('Allow pop-ups to print or save the PDF.');
+  }
   const wrap=document.createElement('div'); wrap.style.cssText='position:fixed;left:-10000px;top:0;width:900px;background:white;z-index:-1';
   wrap.innerHTML=quotationMarkup(q); document.body.append(wrap);
   const images=[...wrap.querySelectorAll('img')];
   await Promise.all(images.map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;})));
   if(mode==='pdf') {
-    const w=window.open('','_blank'); if(!w) throw new Error('Allow pop-ups to print or save the PDF.');
-    w.document.write('<!doctype html><html><head><title>'+safe(q.quotationNumber||'EazyLife Quotation')+'</title><style>@page{size:A4;margin:12mm}body{margin:0}.quotation-paper{border:0!important;max-width:none!important;padding:0!important}tr{break-inside:avoid}a{color:#008f80}</style></head><body>'+wrap.innerHTML+'</body></html>');
-    w.document.close(); w.onload=()=>{w.focus();w.print();};
+    printWindow.onload=()=>{printWindow.focus();printWindow.print();};
+    printWindow.document.write('<!doctype html><html><head><title>'+safe(q.quotationNumber||'EazyLife Quotation')+'</title><style>@page{size:A4;margin:12mm}body{margin:0}.quotation-paper{border:0!important;max-width:none!important;padding:0!important}tr{break-inside:avoid}a{color:#008f80}</style></head><body>'+wrap.innerHTML+'</body></html>');
+    printWindow.document.close();
   } else {
     if (!window.html2canvas) {
       await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';s.onload=resolve;s.onerror=()=>reject(new Error('Image export library could not load.'));document.head.append(s);});
