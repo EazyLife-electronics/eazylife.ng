@@ -318,7 +318,7 @@ function showExportAction(message, actionLabel, action) {
 }
 async function canvasBlobForQuotation(q){
  const wrap=document.createElement('div');
- wrap.style.cssText='position:fixed;left:0;top:0;width:900px;background:white;z-index:99999;opacity:0.01;pointer-events:none';
+ wrap.style.cssText='position:fixed;left:-10000px;top:0;width:900px;background:white;z-index:99999;opacity:1;pointer-events:none';
  wrap.innerHTML=quotationMarkup(q);document.body.append(wrap);
  try{
   await makeCanvasImagesSafe(wrap);
