@@ -269,12 +269,13 @@ function loadQuotation(q) {
 }
 function renderHistory() {
   const host=document.getElementById('qHistory');
-  host.innerHTML=quotations.map(q=>`<div class="border rounded-xl p-3 grid gap-2"><div class="flex justify-between gap-2"><div><p class="font-black text-sm">${safe(q.customerName||'Unnamed customer')}</p><p class="text-[10px] text-gray-500">${safe(q.quotationNumber||q.id)} · ${safe(q.issueDate||'')}</p></div><strong class="text-sm">${money(q.total)}</strong></div><p class="text-[10px] text-gray-500">${q.expiryDate?'Valid until '+safe(q.expiryDate):'No expiry'} · ${(q.items||[]).length} line(s)</p><div class="flex flex-wrap gap-2"><button data-q-edit="${q.id}" class="text-xs font-bold text-teal-700">Open / edit</button><button data-q-duplicate="${q.id}" class="text-xs font-bold text-gray-600">Duplicate</button><button data-q-pdf="${q.id}" class="text-xs font-bold text-gray-600">PDF / Print</button><button data-q-image="${q.id}" class="text-xs font-bold text-gray-600">Save image</button><button data-q-share="${q.id}" class="text-xs font-bold text-teal-700">Share</button></div></div>`).join('')||'<p class="text-xs text-gray-400">No quotations saved yet.</p>';
+  host.innerHTML=quotations.map(q=>`<div class="border rounded-xl p-3 grid gap-2"><div class="flex justify-between gap-2"><div><p class="font-black text-sm">${safe(q.customerName||'Unnamed customer')}</p><p class="text-[10px] text-gray-500">${safe(q.quotationNumber||q.id)} · ${safe(q.issueDate||'')}</p></div><strong class="text-sm">${money(q.total)}</strong></div><p class="text-[10px] text-gray-500">${q.expiryDate?'Valid until '+safe(q.expiryDate):'No expiry'} · ${(q.items||[]).length} line(s)</p><div class="flex flex-wrap gap-2"><button data-q-edit="${q.id}" class="text-xs font-bold text-teal-700">Open / edit</button><button data-q-duplicate="${q.id}" class="text-xs font-bold text-gray-600">Duplicate</button><button data-q-save-jpg="${q.id}" class="text-xs font-bold text-gray-600">Save JPG</button><button data-q-save-pdf="${q.id}" class="text-xs font-bold text-gray-600">Save PDF</button><button data-q-share-jpg="${q.id}" class="text-xs font-bold text-teal-700">Share JPG</button><button data-q-share-pdf="${q.id}" class="text-xs font-bold text-teal-700">Share PDF</button></div></div>`).join('')||'<p class="text-xs text-gray-400">No quotations saved yet.</p>';
   host.querySelectorAll('[data-q-edit]').forEach(b=>b.addEventListener('click',()=>{const q=quotations.find(x=>x.id===b.dataset.qEdit);if(q)loadQuotation(q);}));
   host.querySelectorAll('[data-q-duplicate]').forEach(b=>b.addEventListener('click',()=>{const q=quotations.find(x=>x.id===b.dataset.qDuplicate);if(q){loadQuotation(q);editingId=null;document.getElementById('qMessage').textContent='Duplicate ready — save to create a new quotation.';}}));
-  host.querySelectorAll('[data-q-pdf]').forEach(b=>b.addEventListener('click',()=>{const q=quotations.find(x=>x.id===b.dataset.qPdf);if(q)exportQuotation(q,'pdf').catch(showError);}));
-  host.querySelectorAll('[data-q-image]').forEach(b=>b.addEventListener('click',()=>{const q=quotations.find(x=>x.id===b.dataset.qImage);if(q)exportQuotation(q,'image').catch(showError);}));
-  host.querySelectorAll('[data-q-share]').forEach(b=>b.addEventListener('click',()=>{const q=quotations.find(x=>x.id===b.dataset.qShare);if(q)exportQuotation(q,'share').catch(showError);}));
+  host.querySelectorAll('[data-q-save-jpg]').forEach(b=>b.addEventListener('click',()=>{const q=quotations.find(x=>x.id===b.dataset.qSaveJpg);if(q)exportQuotation(q,'save','jpg').catch(showError);}));
+  host.querySelectorAll('[data-q-save-pdf]').forEach(b=>b.addEventListener('click',()=>{const q=quotations.find(x=>x.id===b.dataset.qSavePdf);if(q)exportQuotation(q,'save','pdf').catch(showError);}));
+  host.querySelectorAll('[data-q-share-jpg]').forEach(b=>b.addEventListener('click',()=>{const q=quotations.find(x=>x.id===b.dataset.qShareJpg);if(q)exportQuotation(q,'share','jpg').catch(showError);}));
+  host.querySelectorAll('[data-q-share-pdf]').forEach(b=>b.addEventListener('click',()=>{const q=quotations.find(x=>x.id===b.dataset.qSharePdf);if(q)exportQuotation(q,'share','pdf').catch(showError);}));
 }
 function quotationMarkup(q) {
   const rows=(q.items||[]).map(x=>`<tr><td>${x.image?'<img src="'+safe(x.image)+'" style="width:54px;height:54px;object-fit:cover;border-radius:8px;margin-bottom:5px">':''}<strong>${safe(x.name)}</strong><div style="color:#64748b;font-size:12px">${safe(x.description||'')}</div></td><td style="text-align:center">${x.quantity}</td><td style="text-align:right">${money(x.unitPrice)}</td><td style="text-align:right;font-weight:700">${money(x.quantity*x.unitPrice)}</td></tr>`).join('');
@@ -308,47 +309,69 @@ async function makeCanvasImagesSafe(root){
   }
  }
 }
-function showExportAction(message, actionLabel, action) {
- const host=document.getElementById('qMessage');
- host.textContent=message+' ';
- const button=document.createElement('button');
- button.type='button';button.className='ml-1 underline font-bold';button.textContent=actionLabel;
- button.addEventListener('click',action);
- host.append(button);
+function quotationFilename(q) {
+ const num=String(q.quotationNumber||'quotation').replace(/[^A-Za-z0-9-]/g,'')||'quotation';
+ return 'EazyLife-'+num;
 }
-async function canvasBlobForQuotation(q){
+async function captureQuotationCanvas(q) {
  const wrap=document.createElement('div');
- wrap.style.cssText='position:fixed;left:-10000px;top:0;width:900px;background:white;z-index:99999;opacity:1;pointer-events:none';
+ wrap.style.cssText='position:fixed;left:-10000px;top:0;width:900px;background:white;z-index:-1';
  wrap.innerHTML=quotationMarkup(q);document.body.append(wrap);
- try{
+ try {
   await makeCanvasImagesSafe(wrap);
-  if(!window.html2canvas)await new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';script.onload=resolve;script.onerror=()=>reject(new Error('Image export library could not load.'));document.head.append(script);});
-  const canvas=await window.html2canvas(wrap.firstElementChild,{scale:2,backgroundColor:'#ffffff',useCORS:true,allowTaint:false,logging:false});
-  return await new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('Could not create quotation image.')),'image/png'));
- }finally{wrap.remove();}
+  const el=wrap.firstElementChild;
+  const imgs=el.querySelectorAll('img');
+  await Promise.all(Array.from(imgs).map(img=>{
+   if(img.complete&&img.naturalWidth>0)return Promise.resolve();
+   return new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;});
+  }));
+  if(!window.html2canvas)throw new Error('Image export library did not load.');
+  return await window.html2canvas(el,{scale:6,useCORS:true,allowTaint:false,backgroundColor:'#ffffff',logging:false,imageTimeout:8000});
+ } finally {wrap.remove();}
 }
-async function exportQuotation(q, mode) {
- if(mode==='pdf'){
-  const printWindow=window.open('','_blank');if(!printWindow)throw new Error('Allow pop-ups to print or save the PDF.');
-  const html=quotationMarkup(q);
-  printWindow.document.write('<!doctype html><html><head><title>'+safe(q.quotationNumber||'EazyLife Quotation')+'</title><style>@page{size:A4;margin:12mm}body{margin:0}.quotation-paper{border:0!important;max-width:none!important;padding:0!important}tr{break-inside:avoid}a{color:#008f80}</style></head><body>'+html+'</body></html>');
-  printWindow.document.close();printWindow.onload=()=>{printWindow.focus();printWindow.print();};return;
+async function exportQuotation(q, action, format) {
+ const fname=quotationFilename(q);
+ try {
+  const msg=document.getElementById('qMessage');
+  msg.textContent=(action==='save'?'Saving ':'Preparing to share ')+format.toUpperCase()+'…';
+  await new Promise(resolve=>setTimeout(resolve,80));
+  const canvas=await captureQuotationCanvas(q);
+  if(format==='jpg') {
+   const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',0.95));
+   if(!blob)throw new Error('Could not create JPG image.');
+   if(action==='save') {
+    const url=URL.createObjectURL(blob),a=document.createElement('a');
+    a.href=url;a.download=fname+'.jpg';a.click();setTimeout(()=>URL.revokeObjectURL(url),5000);
+   } else {
+    const file=new File([blob],fname+'.jpg',{type:'image/jpeg'});
+    if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})) {
+     msg.textContent='Opening share panel…';
+     await navigator.share({files:[file],title:'EazyLife Quotation'});
+    } else {
+     const url=URL.createObjectURL(blob);window.open(url,'_blank');setTimeout(()=>URL.revokeObjectURL(url),10000);
+     msg.textContent='Sharing files is unavailable here. The JPG has been opened instead.';
+    }
+   }
+  } else {
+   if(!window.jspdf?.jsPDF)throw new Error('PDF library did not load.');
+   const {jsPDF}=window.jspdf,imgW=canvas.width,imgH=canvas.height,pxPerMm=imgW/210,pdfH=imgH/pxPerMm;
+   const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:[210,pdfH]});
+   pdf.addImage(canvas.toDataURL('image/jpeg',0.95),'JPEG',0,0,210,pdfH);
+   if(action==='save')pdf.save(fname+'.pdf');
+   else {
+    const blob=pdf.output('blob'),file=new File([blob],fname+'.pdf',{type:'application/pdf'});
+    if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})) {
+     msg.textContent='Opening share panel…';
+     await navigator.share({files:[file],title:'EazyLife Quotation'});
+    } else {
+     pdf.save(fname+'.pdf');msg.textContent='PDF sharing is unavailable here, so the PDF was downloaded instead.';
+    }
+   }
+  }
+  if(!msg.textContent.includes('unavailable'))msg.textContent='Export completed.';
+ } catch(error) {
+  if(error.name!=='AbortError')throw error;
  }
- const blob=await canvasBlobForQuotation(q);
- const filename=(q.quotationNumber||'EazyLife-Quotation')+'.png';
- const url=URL.createObjectURL(blob);
- if(mode==='share'){
-  pendingShareFile=new File([blob],filename,{type:'image/png'});
-  showExportAction('Quotation image is ready.','Tap to share',async()=>{
-   const file=pendingShareFile;if(!file)return;
-   if(!navigator.share){showExportAction('File sharing is not supported by this browser.','Open image',()=>window.open(url,'_blank'));return;}
-   try{await navigator.share({files:[file],title:'EazyLife quotation',text:'Quotation '+(q.quotationNumber||'')+' · https://eazylife.ng'});document.getElementById('qMessage').textContent='Share sheet opened.';}
-   catch(error){if(error.name!=='AbortError')showError(error);}
-  });
- }else{
-  showExportAction('Quotation image is ready.','Open image / Save image',()=>{const win=window.open(url,'_blank');if(!win){const a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener';a.textContent='Open quotation image';document.getElementById('qMessage').append(a);}});
- }
- setTimeout(()=>URL.revokeObjectURL(url),10*60*1000);
 }
 
 function reconcileConvertedItems() {
