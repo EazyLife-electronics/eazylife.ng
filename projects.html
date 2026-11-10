@@ -59,8 +59,11 @@
     .gallery-video iframe,.gallery-video video{width:100%;height:100%;border:0;display:block}
     .lightbox{position:fixed;inset:0;z-index:9999;background:#071512ed;display:none;align-items:center;justify-content:center;padding:18px}
     .lightbox.open{display:flex}.lightbox img{max-width:100%;max-height:88vh;object-fit:contain;border-radius:8px}
-    .lightbox-close{position:absolute;right:16px;top:14px;width:44px;height:44px;border:1px solid #ffffff55;border-radius:50%;background:#ffffff18;color:#fff;font-size:1.5rem;cursor:pointer}
-    .lightbox-caption{position:absolute;left:16px;right:16px;bottom:12px;text-align:center;color:#fff;font-size:.85rem}
+    .lightbox-close{position:absolute;right:16px;top:14px;width:44px;height:44px;border:1px solid #ffffff55;border-radius:50%;background:#ffffff18;color:#fff;font-size:1.5rem;cursor:pointer;z-index:2}
+    .lightbox-nav{position:absolute;top:50%;transform:translateY(-50%);width:46px;height:58px;border:1px solid #ffffff55;border-radius:14px;background:#ffffff18;color:#fff;font-size:2.2rem;line-height:1;cursor:pointer;z-index:2}
+    .lightbox-nav:disabled{opacity:.25;cursor:default}.lightbox-prev{left:12px}.lightbox-next{right:12px}
+    .lightbox-caption{position:absolute;left:60px;right:60px;bottom:12px;text-align:center;color:#fff;font-size:.85rem}
+    @media(max-width:520px){.lightbox{padding:12px}.lightbox-nav{width:38px;height:48px;font-size:1.8rem}.lightbox-prev{left:8px}.lightbox-next{right:8px}.lightbox-caption{left:48px;right:48px;font-size:.75rem}}
     .no-results{padding:30px;text-align:center;border:1px dashed var(--border);border-radius:16px;color:var(--muted);grid-column:1/-1}
     .service-links-block{background:linear-gradient(135deg,#e8faf6,#f4fbe9);border:1px solid #cceee4;border-radius:18px;padding:20px}.service-link-list{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}.service-link-list .btn{font-size:.82rem}.service-links-block h2{color:#173c35}
     :root[data-theme="dark"] .service-links-block{background:#142b26;border-color:#31574d}:root[data-theme="dark"] .service-links-block h2{color:#edf8f3}
@@ -179,7 +182,22 @@
       return '<div class="actions"><a class="btn btn-primary" href="' + esc(raw) + '" target="_blank" rel="noopener"><i class="fas fa-play"></i> Watch project video</a></div>';
     }
 
-    function openLightbox(src, caption) {
+    let lightboxImages = [];
+    let lightboxIndex = 0;
+    let lightboxCaption = '';
+
+    function updateLightbox() {
+      const box = document.getElementById('projectLightbox');
+      if (!box || !lightboxImages.length) return;
+      const src = lightboxImages[lightboxIndex];
+      box.querySelector('img').src = src;
+      box.querySelector('img').alt = lightboxCaption || 'Project image';
+      box.querySelector('.lightbox-caption').textContent = lightboxCaption + (lightboxImages.length > 1 ? ' · ' + (lightboxIndex + 1) + ' of ' + lightboxImages.length : '');
+      box.querySelector('.lightbox-prev').disabled = lightboxImages.length < 2;
+      box.querySelector('.lightbox-next').disabled = lightboxImages.length < 2;
+    }
+
+    function openLightbox(src, caption, images = [src]) {
       let box = document.getElementById('projectLightbox');
       if (!box) {
         box = document.createElement('div');
@@ -188,14 +206,24 @@
         box.setAttribute('role','dialog');
         box.setAttribute('aria-modal','true');
         box.setAttribute('aria-label','Project image viewer');
-        box.innerHTML = '<button class="lightbox-close" type="button" aria-label="Close image">&times;</button><img alt=""><div class="lightbox-caption"></div>';
+        box.innerHTML = '<button class="lightbox-close" type="button" aria-label="Close image">&times;</button><button class="lightbox-nav lightbox-prev" type="button" aria-label="Previous image">&#8249;</button><img alt=""><button class="lightbox-nav lightbox-next" type="button" aria-label="Next image">&#8250;</button><div class="lightbox-caption"></div>';
         document.body.appendChild(box);
-        box.addEventListener('click', event => { if (event.target === box || event.target.closest('.lightbox-close')) box.classList.remove('open'); });
-        document.addEventListener('keydown', event => { if (event.key === 'Escape') box.classList.remove('open'); });
+        box.addEventListener('click', event => {
+          if (event.target === box || event.target.closest('.lightbox-close')) box.classList.remove('open');
+          if (event.target.closest('.lightbox-prev')) { lightboxIndex = (lightboxIndex - 1 + lightboxImages.length) % lightboxImages.length; updateLightbox(); }
+          if (event.target.closest('.lightbox-next')) { lightboxIndex = (lightboxIndex + 1) % lightboxImages.length; updateLightbox(); }
+        });
+        document.addEventListener('keydown', event => {
+          if (event.key === 'Escape') box.classList.remove('open');
+          if (!box.classList.contains('open')) return;
+          if (event.key === 'ArrowLeft' && lightboxImages.length > 1) { lightboxIndex = (lightboxIndex - 1 + lightboxImages.length) % lightboxImages.length; updateLightbox(); }
+          if (event.key === 'ArrowRight' && lightboxImages.length > 1) { lightboxIndex = (lightboxIndex + 1) % lightboxImages.length; updateLightbox(); }
+        });
       }
-      box.querySelector('img').src = src;
-      box.querySelector('img').alt = caption || 'Project image';
-      box.querySelector('.lightbox-caption').textContent = caption || '';
+      lightboxImages = [...new Set((images || [src]).filter(Boolean))];
+      lightboxIndex = Math.max(0, lightboxImages.indexOf(src));
+      lightboxCaption = caption || '';
+      updateLightbox();
       box.classList.add('open');
     }
 
@@ -246,7 +274,7 @@
         '<div class="actions"><a class="btn btn-primary" href="https://wa.me/2347051548082?text=' + encodeURIComponent('Hello EazyLife, I would like to enquire about the project: ' + (p.title || '')) + '">Discuss a similar project</a><a class="btn" href="projects.html">Back to gallery</a></div>' +
       '</article>';
       content.querySelectorAll('[data-project-image]').forEach(el => {
-        el.addEventListener('click', () => openLightbox(el.dataset.projectImage, p.title || 'Project image'));
+        el.addEventListener('click', () => openLightbox(el.dataset.projectImage, p.title || 'Project image', uniqueImages));
       });
     }
 
