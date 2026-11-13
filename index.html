@@ -336,6 +336,15 @@
     :root[data-theme="dark"] footer.site-footer { border-top-color: var(--dm-border); color: var(--dm-text-light); }
     .theme-toggle { width: 38px; height: 38px; border-radius: 999px; border: 1.5px solid var(--border); background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.95rem; color: var(--dark); }
     :root[data-theme="dark"] .theme-toggle { background: var(--dm-surface); border-color: var(--dm-border); color: var(--dm-text); }
+    /* STEM LAB FEATURE — isolated homepage invitation */
+    .stem-teaser { padding: 34px 0; background: linear-gradient(120deg, #e8faf5, #f2f9e4); border-top: 1px solid #dcefe5; border-bottom: 1px solid #dcefe5; }
+    .stem-teaser-inner { display:flex; align-items:center; justify-content:space-between; gap:24px; }
+    .stem-teaser-inner h2 { font-family:'Poppins',sans-serif; color:var(--dark); font-size:clamp(1.25rem,2.4vw,1.8rem); line-height:1.25; margin:5px 0 8px; }
+    .stem-teaser-inner p { color:var(--text-light); font-size:.88rem; max-width:650px; margin:0; }
+    :root[data-theme="dark"] .stem-teaser { background:linear-gradient(120deg,#142d27,#1c2d20); border-color:var(--dm-border); }
+    :root[data-theme="dark"] .stem-teaser-inner h2 { color:var(--dm-text); }
+    :root[data-theme="dark"] .stem-teaser-inner p { color:var(--dm-text-light); }
+    @media(max-width:650px){.stem-teaser-inner{align-items:flex-start;flex-direction:column}.stem-teaser-inner .btn{width:100%}}
   </style>
 </head>
 <body>
@@ -351,6 +360,7 @@
           <span id="navCartCount" style="background:var(--teal); color:#fff; border-radius:999px; padding:1px 7px; font-size:0.68rem; font-weight:800;">0</span>
         </a>
         <a href="#projects" class="btn btn-outline"><i class="fas fa-diagram-project"></i> Projects</a>
+        <a href="stem-lab.html" class="btn btn-outline"><i class="fas fa-flask"></i> STEM Lab</a>
         <a href="shop.html" class="btn btn-outline"><i class="fas fa-shopping-basket"></i> Shop</a>
         <a href="track.html" class="btn btn-outline" title="Track Order"><i class="fas fa-truck-fast"></i></a>
         <a href="https://wa.me/2347051548082" target="_blank" class="btn btn-wa"><i class="fab fa-whatsapp"></i></a>
@@ -396,6 +406,20 @@
       </div>
       <div style="text-align:center;margin-top:24px;">
         <a href="projects.html" class="btn btn-primary">Explore the Full Project Gallery <i class="fas fa-arrow-right"></i></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEM LAB FEATURE — additive entry point to the interactive learning area -->
+  <section class="stem-teaser" aria-label="Explore the EazyLife STEM Lab">
+    <div class="container">
+      <div class="stem-teaser-inner">
+        <div>
+          <div class="section-label">Explore · Experiment · Engineer</div>
+          <h2>Don't just learn how technology works. Try it.</h2>
+          <p>Step into the EazyLife STEM Lab. Experiment with circuits, control a virtual motor and discover how sensors measure the world.</p>
+        </div>
+        <a href="stem-lab.html" class="btn btn-primary"><i class="fas fa-flask"></i> Enter the STEM Lab <i class="fas fa-arrow-right"></i></a>
       </div>
     </div>
   </section>
