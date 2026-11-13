@@ -253,9 +253,75 @@
   }
   ['overflow-level','overflow-threshold'].forEach(id => $(id).addEventListener('input', overflowUpdate));
 
+
+  // 13 — servo-mounted ultrasonic radar: bearing plus measured range.
+  function radarUpdate() {
+    const angle=Number($('radar-angle').value), bearing=Number($('radar-target-angle').value), distance=Number($('radar-distance').value);
+    const hit=Math.abs(angle-bearing)<=8;
+    setText('radar-angle-value',angle+'°'); setText('radar-target-angle-value',bearing+'°'); setText('radar-distance-value',distance+' cm');
+    $('radar-sweep').style.transform='rotate('+(angle-90)+'deg)';
+    const radius=clamp(distance/200*42,5,42);
+    $('radar-target').style.left=(50+(bearing-90)/90*radius)+'%';
+    $('radar-target').style.top=(50-radius)+'%';
+    $('radar-target').style.opacity=distance>180?'.45':'1';
+    $('radar-target').style.transform='translate(-50%,-50%)';
+    setText('radar-echo',hit?'DETECTED':'NO ECHO'); setText('radar-servo',angle+'°'); setText('radar-range',hit?distance+' cm':'—');
+    setText('radar-status',hit?'TARGET IN BEAM · ECHO RECEIVED':'SENSOR AIMING · NO TARGET');
+    setText('radar-explain',hit?'The sensor beam is within 8° of the target bearing. The echo time can be converted to range.':'The target is outside the sensor beam. Change the servo angle or target bearing until they align.');
+  }
+  ['radar-angle','radar-target-angle','radar-distance'].forEach(id=>$ (id).addEventListener('input',radarUpdate));
+  $('radar-scan').addEventListener('click',()=>{ $('radar-angle').value=$('radar-target-angle').value; radarUpdate(); });
+  $('radar-reset').addEventListener('click',()=>{ $('radar-angle').value=90; $('radar-target-angle').value=125; $('radar-distance').value=80; radarUpdate(); });
+
+  // 14 — parking assistant: distance zones and approximate ultrasonic echo time.
+  function parkingUpdate() {
+    const cm=Number($('parking-distance').value), echo=cm*58/1000;
+    const danger=cm<=20, caution=cm<=60;
+    setText('parking-distance-value',cm+' cm'); setText('parking-echo',echo.toFixed(2)+' ms');
+    setText('parking-warning',danger?'STOP':caution?'CAUTION':'SAFE');
+    setText('parking-beep',danger?'CONTINUOUS':caution?'FAST':'SLOW / OFF');
+    setText('parking-status',danger?'TOO CLOSE · STOP':caution?'OBSTACLE APPROACHING':'SAFE DISTANCE');
+    $('parking-buzzer').classList.toggle('warn',caution&&!danger); $('parking-buzzer').classList.toggle('danger',danger);
+    $('parking-beams').style.right=(clamp(cm/150*38,3,38))+'%';
+    $('parking-beams').style.background=danger?'#df5548':caution?'#e2a13b':'#70b6a1';
+    setText('parking-explain',danger?'The obstacle is within 20 cm. The simulated buzzer becomes continuous; stop the vehicle.':caution?'The obstacle is within the caution zone. A real controller can shorten the interval between beeps as distance decreases.':'The obstacle is far enough away for the safe zone. The warning output remains inactive.');
+  }
+  $('parking-distance').addEventListener('input',parkingUpdate);
+  $('parking-reset').addEventListener('click',()=>{$('parking-distance').value=100;parkingUpdate();});
+
+  // 15 — proportional temperature control for a DC fan.
+  function fanUpdate() {
+    const temp=Number($('fan-temp').value), setpoint=Number($('fan-setpoint').value);
+    const pwm=Math.round(clamp((temp-setpoint)*18,0,100));
+    const cooling=pwm===0?'OFF':pwm<35?'LOW':pwm<70?'MEDIUM':'HIGH';
+    setText('fan-temp-value',temp+'°C');setText('fan-setpoint-value',setpoint+'°C');setText('fan-room-temp',temp+'°C');
+    setText('fan-pwm',pwm+'%');setText('fan-motor',pwm?'ON':'OFF');setText('fan-cooling',cooling);
+    $('fan-visual').classList.toggle('spinning',pwm>0);
+    $('fan-visual').style.animationDuration=(pwm?Math.max(.18,1.2-pwm/100):0.25)+'s';
+    setText('fan-status',pwm?'FAN RUNNING · '+cooling+' SPEED':'BELOW SETPOINT · FAN OFF');
+    setText('fan-explain',pwm?'Temperature is '+(temp-setpoint)+'°C above setpoint. The proportional controller requests '+pwm+'% PWM.':'Temperature is at or below the setpoint, so the fan is off.');
+  }
+  ['fan-temp','fan-setpoint'].forEach(id=>$ (id).addEventListener('input',fanUpdate));
+
+  // 16 — two digital reflectance sensors and a simple line-following truth table.
+  let lineLeft=false,lineRight=false;
+  function lineUpdate() {
+    $('line-left-eye').classList.toggle('detect',lineLeft);$('line-right-eye').classList.toggle('detect',lineRight);
+    setText('line-left-state',lineLeft?'YES · BLACK':'NO · WHITE');setText('line-right-state',lineRight?'YES · BLACK':'NO · WHITE');
+    let left=0,right=0,action='STOP',status='BOTH SENSORS ON WHITE · LINE LOST',explain='Both sensors see the white floor. The basic controller stops because it cannot locate the line.';
+    if(lineLeft&&lineRight){left=65;right=65;action='FORWARD';status='BOTH SENSORS ON LINE · FORWARD';explain='Both sensors detect the black line. The robot drives forward at matching motor speeds.';}
+    else if(lineLeft){left=28;right=72;action='TURN LEFT';status='LEFT SENSOR ON LINE · CORRECT LEFT';explain='Only the left sensor sees the line. The controller slows the left wheel and speeds up the right wheel to steer left.';}
+    else if(lineRight){left=72;right=28;action='TURN RIGHT';status='RIGHT SENSOR ON LINE · CORRECT RIGHT';explain='Only the right sensor sees the line. The controller slows the right wheel and speeds up the left wheel to steer right.';}
+    $('line-bot').style.transform=action==='TURN LEFT'?'rotate(-8deg) translateX(-8px)':action==='TURN RIGHT'?'rotate(8deg) translateX(8px)':'';
+    setText('line-left-motor',left+'%');setText('line-right-motor',right+'%');setText('line-action',action);setText('line-status',status);setText('line-explain',explain);
+  }
+  $('line-left-toggle').addEventListener('click',()=>{lineLeft=!lineLeft;lineUpdate();});
+  $('line-right-toggle').addEventListener('click',()=>{lineRight=!lineRight;lineUpdate();});
+  $('line-reset').addEventListener('click',()=>{lineLeft=false;lineRight=false;lineUpdate();});
+
   // Initialise all project states.
   $('sp-year').textContent = new Date().getFullYear();
-  pirOff(); digitalUpdate(false); analogUpdate(); fireUpdate(); gasUpdate(); pumpUpdate();
+  pirOff(); digitalUpdate(false); analogUpdate(); fireUpdate(); gasUpdate(); pumpUpdate(); radarUpdate(); parkingUpdate(); fanUpdate(); lineUpdate();
   valveUpdate(); dhtUpdate(); ldrUpdate(); trafficRender(); servoClose(); overflowUpdate();
   window.addEventListener('beforeunload', () => { timers.forEach(clearTimeout); if (trafficTimer) clearInterval(trafficTimer); });
 })();
