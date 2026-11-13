@@ -20,6 +20,14 @@
     <priority>0.9</priority>
   </url>
 
+  <!-- Expanded Arduino Project Playground -->
+  <url>
+    <loc>https://eazylife.ng/stem-projects.html</loc>
+    <lastmod>2026-11-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
   <!-- Sections (anchor links for reference) -->
   <url>
     <loc>https://eazylife.ng/#services</loc>
