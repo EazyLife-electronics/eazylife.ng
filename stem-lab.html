@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#00B09B">
+  <title>STEM Lab | Interactive Engineering Experiments | EazyLife</title>
+  <meta name="description" content="Explore interactive electronics, robotics and sensor experiments at the EazyLife STEM Lab. Change values, run simulations and learn engineering by doing.">
+  <link rel="canonical" href="https://eazylife.ng/stem-lab.html">
+  <link rel="icon" type="image/png" href="assets/pictures/icon_dark.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/site-theme.css">
+  <link rel="stylesheet" href="assets/css/stem-lab.css">
+</head>
+<body class="stem-page">
+  <nav class="stem-nav" aria-label="Main navigation">
+    <div class="stem-nav-inner">
+      <a class="stem-brand" href="index.html" aria-label="EazyLife home"><img data-theme-logo data-theme-logo-light="assets/pictures/logo_black_transparent.png" data-theme-logo-dark="assets/pictures/logo_white_transparent.png" src="assets/pictures/logo_black_transparent.png" alt="EazyLife"></a>
+      <div class="stem-nav-links">
+        <a class="stem-nav-link active" href="stem-lab.html"><i class="fas fa-flask"></i> STEM Lab</a>
+        <a class="stem-nav-link" href="projects.html"><i class="fas fa-diagram-project"></i> Projects</a>
+        <a class="stem-nav-link" href="shop.html"><i class="fas fa-store"></i> Shop</a>
+        <button class="el-theme-toggle" type="button" aria-label="Switch colour theme"><i class="fas fa-moon"></i></button>
+      </div>
+    </div>
+  </nav>
+
+  <header class="stem-hero">
+    <div class="stem-shell stem-hero-grid">
+      <div class="stem-hero-copy">
+        <div class="stem-kicker"><span class="pulse-dot"></span> EAZYLife · LEARNING BY DOING</div>
+        <h1>Curiosity becomes <span>engineering.</span></h1>
+        <p>Don't just read how technology works. Change the inputs, run experiments and see the engineering principles come alive.</p>
+        <div class="stem-hero-actions">
+          <a class="stem-button stem-button-primary" href="#experiments">Explore experiments <i class="fas fa-arrow-down"></i></a>
+          <a class="stem-button stem-button-quiet" href="projects.html">See real EazyLife builds <i class="fas fa-arrow-up-right-from-square"></i></a>
+        </div>
+        <div class="stem-hero-proof"><span><i class="fas fa-bolt"></i> Instant feedback</span><span><i class="fas fa-mobile-screen"></i> Works on mobile</span><span><i class="fas fa-graduation-cap"></i> Learn at your pace</span></div>
+      </div>
+      <div class="stem-hero-art" aria-label="Illustration of a circuit board with connected components">
+        <div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div>
+        <div class="art-chip"><i class="fas fa-microchip"></i><span>MAKE IT<br>WORK</span></div>
+        <div class="art-node node-led"><i class="fas fa-lightbulb"></i></div>
+        <div class="art-node node-robot"><i class="fas fa-robot"></i></div>
+        <div class="art-node node-wave"><i class="fas fa-wave-square"></i></div>
+        <div class="art-trace trace-a"></div><div class="art-trace trace-b"></div><div class="art-trace trace-c"></div>
+        <span class="art-caption">IDEAS → EXPERIMENTS → BUILDS</span>
+      </div>
+    </div>
+    <div class="stem-shell stem-stats">
+      <div><strong>03</strong><span>Interactive stations</span></div><div><strong>04</strong><span>Core concepts</span></div><div><strong>∞</strong><span>Ways to experiment</span></div>
+    </div>
+  </header>
+
+  <main>
+    <section class="stem-section" id="experiments">
+      <div class="stem-shell">
+        <div class="stem-section-heading">
+          <div><div class="stem-eyebrow">YOUR DIGITAL WORKBENCH</div><h2>Choose an experiment</h2><p>Each station is a small simulation. Change a control and watch what happens.</p></div>
+          <div class="stem-level"><i class="fas fa-signal"></i> BEGINNER FRIENDLY</div>
+        </div>
+
+        <div class="stem-lab-layout">
+          <aside class="stem-station-list" aria-label="Experiment stations">
+            <button class="station-button active" type="button" data-station="led" aria-pressed="true"><span class="station-icon icon-led"><i class="fas fa-lightbulb"></i></span><span><strong>Light an LED</strong><small>Ohm's law · Current</small></span><i class="fas fa-chevron-right station-chevron"></i></button>
+            <button class="station-button" type="button" data-station="motor" aria-pressed="false"><span class="station-icon icon-motor"><i class="fas fa-fan"></i></span><span><strong>Control a motor</strong><small>PWM · Motor speed</small></span><i class="fas fa-chevron-right station-chevron"></i></button>
+            <button class="station-button" type="button" data-station="sensor" aria-pressed="false"><span class="station-icon icon-sensor"><i class="fas fa-satellite-dish"></i></span><span><strong>Measure distance</strong><small>Ultrasonic · Echo time</small></span><i class="fas fa-chevron-right station-chevron"></i></button>
+            <div class="station-coming"><span><i class="fas fa-lock"></i> NEXT UP</span><strong>Self-balancing robot</strong><small>PID control · Stability · Feedback</small></div>
+          </aside>
+
+          <div class="stem-workspace">
+            <section class="experiment-panel active" data-panel="led" aria-labelledby="led-title">
+              <div class="experiment-heading"><div><div class="stem-eyebrow">EXPERIMENT 01 / ELECTRONICS</div><h3 id="led-title">Build an LED circuit</h3><p>Discover how voltage, resistance and current work together.</p></div><span class="difficulty">5 MIN</span></div>
+              <div class="simulation-card">
+                <div class="simulation-topline"><span><i class="fas fa-circle-nodes"></i> LIVE CIRCUIT</span><span class="live-indicator" id="led-state">POWER ON</span></div>
+                <svg class="circuit-svg" viewBox="0 0 620 230" role="img" aria-label="A battery, resistor and LED connected in a series circuit">
+                  <defs><filter id="ledGlow"><feGaussianBlur stdDeviation="9" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+                  <path class="wire" d="M80 108 V48 H540 V108 M540 142 V190 H80 V142"/>
+                  <path class="wire wire-live" id="led-wire-live" d="M80 108 V48 H540 V108 M540 142 V190 H80 V142"/>
+                  <g class="battery"><path d="M65 108 H95 M71 142 H89" stroke="currentColor" stroke-width="5" stroke-linecap="round"/><text x="80" y="166">5V SUPPLY</text></g>
+                  <g class="resistor"><rect x="260" y="34" width="100" height="28" rx="6"/><path d="M270 48 l12 -9 l12 18 l12 -18 l12 18 l12 -18 l12 9"/></g><text class="component-label" x="310" y="22">RESISTOR</text>
+                  <g id="led-lamp"><circle class="lamp-halo" cx="540" cy="125" r="34"/><circle class="lamp-body" cx="540" cy="125" r="17"/><path d="M532 117 L548 133 M548 117 L532 133" class="lamp-cross"/><path class="lamp-ray" d="M520 92 L511 82 M540 87 V73 M560 92 L569 82"/></g>
+                  <text class="component-label" x="540" y="169">LED</text><text class="component-label" x="310" y="215">SERIES CIRCUIT</text>
+                  <path class="current-arrow" d="M180 48 H225 M215 41 L225 48 L215 55"/>
+                </svg>
+                <div class="metric-grid">
+                  <div class="stem-metric"><span>Current</span><strong id="led-current">10.0 <small>mA</small></strong></div>
+                  <div class="stem-metric"><span>LED voltage</span><strong id="led-drop">2.0 <small>V</small></strong></div>
+                  <div class="stem-metric"><span>Brightness</span><strong id="led-brightness">50 <small>%</small></strong></div>
+                </div>
+              </div>
+              <div class="control-card">
+                <div class="control-card-heading"><strong><i class="fas fa-sliders"></i> Experiment controls</strong><button type="button" class="text-reset" id="led-reset">Reset</button></div>
+                <label class="range-label" for="led-voltage"><span>Supply voltage</span><output id="led-voltage-value">5.0 V</output></label><input class="stem-range" id="led-voltage" type="range" min="0" max="12" step="0.5" value="5">
+                <label class="range-label" for="led-resistance"><span>Resistor value</span><output id="led-resistance-value">300 Ω</output></label><input class="stem-range" id="led-resistance" type="range" min="100" max="2000" step="50" value="300">
+                <div class="control-bottom"><span class="control-hint">LED forward voltage: 2.0 V</span><button class="stem-button stem-button-primary stem-button-small" id="led-power" type="button">Switch power off</button></div>
+              </div>
+              <div class="learning-note"><span class="learning-icon"><i class="fas fa-lightbulb"></i></span><div><strong>What is happening?</strong><p id="led-explanation">The resistor limits the current flowing through the LED. Lower resistance allows more current to flow.</p><small>Model note: simplified LED with a constant 2.0 V forward drop. Real LEDs have current and thermal limits.</small></div></div>
+            </section>
+
+            <section class="experiment-panel" data-panel="motor" aria-labelledby="motor-title" hidden>
+              <div class="experiment-heading"><div><div class="stem-eyebrow">EXPERIMENT 02 / ROBOTICS</div><h3 id="motor-title">Control a DC motor</h3><p>Use PWM to change the average power delivered to a motor.</p></div><span class="difficulty">5 MIN</span></div>
+              <div class="simulation-card">
+                <div class="simulation-topline"><span><i class="fas fa-rotate"></i> MOTOR SIMULATOR</span><span class="live-indicator" id="motor-state">RUNNING</span></div>
+                <div class="motor-stage"><div class="motor-housing"><div class="motor-rotor" id="motor-rotor"><span class="rotor-blade blade-a"></span><span class="rotor-blade blade-b"></span><span class="rotor-blade blade-c"></span><span class="rotor-blade blade-d"></span><span class="rotor-hub"></span></div></div><div class="motor-shaft"></div><div class="motor-label">DC MOTOR · PWM DRIVE</div></div>
+                <div class="metric-grid"><div class="stem-metric"><span>Duty cycle</span><strong id="motor-duty">60 <small>%</small></strong></div><div class="stem-metric"><span>Estimated speed</span><strong id="motor-rpm">1,800 <small>RPM</small></strong></div><div class="stem-metric"><span>Average voltage</span><strong id="motor-average">7.2 <small>V</small></strong></div></div>
+              </div>
+              <div class="control-card">
+                <div class="control-card-heading"><strong><i class="fas fa-sliders"></i> Experiment controls</strong><button type="button" class="text-reset" id="motor-reset">Reset</button></div>
+                <label class="range-label" for="motor-pwm"><span>PWM duty cycle</span><output id="motor-pwm-value">60%</output></label><input class="stem-range" id="motor-pwm" type="range" min="0" max="100" step="1" value="60">
+                <label class="range-label" for="motor-voltage"><span>Supply voltage</span><output id="motor-voltage-value">12 V</output></label><input class="stem-range" id="motor-voltage" type="range" min="3" max="24" step="1" value="12">
+                <div class="control-bottom"><span class="control-hint">Idealised no-load motor model</span><button class="stem-button stem-button-primary stem-button-small" id="motor-power" type="button">Stop motor</button></div>
+              </div>
+              <div class="learning-note"><span class="learning-icon"><i class="fas fa-gears"></i></span><div><strong>What is happening?</strong><p id="motor-explanation">PWM switches power rapidly on and off. At 60% duty cycle, the signal is on for 60% of each cycle, producing an average voltage of 7.2 V from a 12 V supply.</p><small>Model note: speed is estimated as proportional to average voltage. Real motors also depend on load, torque, friction and driver losses.</small></div></div>
+            </section>
+
+            <section class="experiment-panel" data-panel="sensor" aria-labelledby="sensor-title" hidden>
+              <div class="experiment-heading"><div><div class="stem-eyebrow">EXPERIMENT 03 / SENSORS</div><h3 id="sensor-title">Measure distance with sound</h3><p>See how an ultrasonic sensor measures the time taken by an echo.</p></div><span class="difficulty">5 MIN</span></div>
+              <div class="simulation-card">
+                <div class="simulation-topline"><span><i class="fas fa-satellite-dish"></i> HC-SR04 SIMULATOR</span><span class="live-indicator" id="sensor-state">READY</span></div>
+                <svg class="sensor-svg" viewBox="0 0 620 235" role="img" aria-label="Ultrasonic sensor emitting sound waves towards a movable object">
+                  <rect x="35" y="70" width="105" height="92" rx="13" class="sensor-board"/><circle cx="72" cy="111" r="24" class="sensor-eye"/><circle cx="111" cy="111" r="24" class="sensor-eye"/><circle cx="72" cy="111" r="15" class="sensor-eye-inner"/><circle cx="111" cy="111" r="15" class="sensor-eye-inner"/><text x="87" y="184" class="component-label">HC-SR04</text>
+                  <g class="sound-waves"><path d="M145 75 Q235 8 325 75 M145 150 Q235 217 325 150" class="sound-wave wave-a"/><path d="M145 91 Q220 42 290 91 M145 135 Q220 184 290 135" class="sound-wave wave-b"/><path d="M145 111 H340" class="sound-center"/></g>
+                  <path d="M150 111 H520" class="distance-line"/><text id="sensor-svg-distance" x="330" y="99" text-anchor="middle" class="distance-text">30 cm</text>
+                  <g id="sensor-object" transform="translate(390 0)"><rect x="-12" y="48" width="24" height="126" rx="5" class="object-shape"/><path d="M-19 43 H19" class="object-cap"/></g>
+                  <text x="390" y="202" class="component-label" id="sensor-object-label">OBJECT</text>
+                </svg>
+                <div class="metric-grid"><div class="stem-metric"><span>Measured distance</span><strong id="sensor-distance">30.0 <small>cm</small></strong></div><div class="stem-metric"><span>Echo time</span><strong id="sensor-echo">1,749 <small>µs</small></strong></div><div class="stem-metric"><span>Sound speed</span><strong>343 <small>m/s</small></strong></div></div>
+              </div>
+              <div class="control-card">
+                <div class="control-card-heading"><strong><i class="fas fa-arrows-left-right"></i> Move the object</strong><button type="button" class="text-reset" id="sensor-reset">Reset</button></div>
+                <label class="range-label" for="sensor-range"><span>Object distance</span><output id="sensor-range-value">30 cm</output></label><input class="stem-range" id="sensor-range" type="range" min="2" max="400" step="1" value="30">
+                <div class="control-bottom"><span class="control-hint">Typical HC-SR04 range: 2–400 cm</span><button class="stem-button stem-button-primary stem-button-small" id="sensor-trigger" type="button">Send pulse <i class="fas fa-paper-plane"></i></button></div>
+                <p class="sensor-feedback" id="sensor-feedback" aria-live="polite">Ready to measure. Send an ultrasonic pulse.</p>
+              </div>
+              <div class="learning-note"><span class="learning-icon"><i class="fas fa-wave-square"></i></span><div><strong>What is happening?</strong><p>Distance = (echo time × speed of sound) ÷ 2. The division by two accounts for the sound travelling to the object and back again.</p><small>Model note: assumes a sound speed of 343 m/s at approximately 20°C and a clean echo.</small></div></div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stem-challenge-section">
+      <div class="stem-shell">
+        <div class="challenge-card">
+          <div class="challenge-copy"><div class="stem-eyebrow">THINK LIKE AN ENGINEER</div><h2>Quick engineering challenge</h2><p>A 5 V supply powers a red LED with a 2 V forward drop. Which resistor gives approximately 10 mA of current?</p><span class="challenge-hint"><i class="fas fa-trophy"></i> One question · Instant feedback</span></div>
+          <div class="challenge-options" id="challenge-options">
+            <button type="button" class="challenge-option" data-answer="wrong">100 Ω <i class="fas fa-arrow-right"></i></button>
+            <button type="button" class="challenge-option" data-answer="correct">300 Ω <i class="fas fa-arrow-right"></i></button>
+            <button type="button" class="challenge-option" data-answer="wrong">1,000 Ω <i class="fas fa-arrow-right"></i></button>
+            <p class="challenge-feedback" id="challenge-feedback" aria-live="polite">Choose an answer to test your understanding.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stem-next-section">
+      <div class="stem-shell stem-next-grid">
+        <div><div class="stem-eyebrow">THE LAB WILL KEEP GROWING</div><h2>From virtual experiments to real builds.</h2><p>Next, we want to add servo positioning, gear ratios, solar energy, Arduino logic and a self-balancing robot simulator. Then connect experiments to real component kits in the EazyLife store.</p><a class="stem-button stem-button-primary" href="shop.html">Explore components <i class="fas fa-arrow-right"></i></a></div>
+        <div class="next-feature"><div class="next-robot-icon"><i class="fas fa-robot"></i></div><span class="next-tag">COMING NEXT</span><h3>Can you balance the robot?</h3><p>Adjust PID values, change the centre of gravity and see how a two-wheel robot reacts to a push.</p><div class="next-pills"><span>PID control</span><span>Gyroscope</span><span>Feedback</span></div></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="stem-footer"><div class="stem-shell"><a href="index.html" class="footer-brand">EazyLife <span>Robotics & Electronics Solutions</span></a><p>Explore boldly. Build thoughtfully. Make useful things.</p><div><a href="projects.html">Projects</a><a href="shop.html">Shop</a><a href="https://wa.me/2347051548082">Talk to an engineer</a></div><small>© <span id="stem-year"></span> EazyLife Robotics & Electronics Solutions · Ibadan, Nigeria</small></div></footer>
+
+  <script src="js/site-theme.js"></script>
+  <script src="js/stem-lab.js"></script>
+</body>
+</html>
