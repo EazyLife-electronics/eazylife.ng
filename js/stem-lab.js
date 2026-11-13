@@ -38,7 +38,6 @@
       panel.classList.toggle('active', active);
       panel.hidden = !active;
     });
-    markExplored(name);
   }
 
   root.querySelectorAll('[data-station]').forEach(button => {
@@ -76,10 +75,11 @@
     $('led-explanation').textContent = explanation;
   }
 
-  $('led-voltage').addEventListener('input', updateLed);
-  $('led-resistance').addEventListener('input', updateLed);
-  $('led-power').addEventListener('click', () => { ledPowered = !ledPowered; updateLed(); });
+  $('led-voltage').addEventListener('input', () => { markExplored('led'); updateLed(); });
+  $('led-resistance').addEventListener('input', () => { markExplored('led'); updateLed(); });
+  $('led-power').addEventListener('click', () => { markExplored('led'); ledPowered = !ledPowered; updateLed(); });
   $('led-reset').addEventListener('click', () => {
+    markExplored('led');
     $('led-voltage').value = '5';
     $('led-resistance').value = '300';
     ledPowered = true;
@@ -110,9 +110,10 @@
     $('motor-explanation').textContent = explanation;
   }
 
-  ['motor-pwm', 'motor-voltage'].forEach(id => $(id).addEventListener('input', updateMotor));
-  $('motor-power').addEventListener('click', () => { motorPowered = !motorPowered; updateMotor(); });
+  ['motor-pwm', 'motor-voltage'].forEach(id => $(id).addEventListener('input', () => { markExplored('motor'); updateMotor(); }));
+  $('motor-power').addEventListener('click', () => { markExplored('motor'); motorPowered = !motorPowered; updateMotor(); });
   $('motor-reset').addEventListener('click', () => {
+    markExplored('motor');
     $('motor-pwm').value = '60';
     $('motor-voltage').value = '12';
     motorPowered = true;
@@ -136,8 +137,9 @@
       : 'Ready to measure. Send an ultrasonic pulse.';
   }
 
-  $('sensor-range').addEventListener('input', () => updateSensor(false));
+  $('sensor-range').addEventListener('input', () => { markExplored('sensor'); updateSensor(false); });
   $('sensor-trigger').addEventListener('click', () => {
+    markExplored('sensor');
     if (sensorPulseTimer) window.clearTimeout(sensorPulseTimer);
     const button = $('sensor-trigger');
     const distance = Number($('sensor-range').value);
@@ -156,6 +158,7 @@
     }, clamp(echoMicroseconds / 1000, 120, 900));
   });
   $('sensor-reset').addEventListener('click', () => {
+    markExplored('sensor');
     if (sensorPulseTimer) window.clearTimeout(sensorPulseTimer);
     $('sensor-range').value = '30';
     $('sensor-trigger').disabled = false;
