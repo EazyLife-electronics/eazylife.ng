@@ -206,9 +206,21 @@
       transform: translateY(-1px);
     }
     @media (max-width: 520px) {
-      .hero-ctas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; }
-      .hero-ctas .btn { padding: 13px 10px; font-size: 0.82rem; white-space: nowrap; }
-      .hero-ctas .btn-stem-hero { grid-column: 1 / -1; justify-self: center; min-width: 170px; }
+      /* Keep all three hero actions in one horizontal row on phones. */
+      .hero-ctas { display: flex; flex-wrap: nowrap; align-items: stretch; gap: 6px; width: 100%; }
+      .hero-ctas .btn {
+        flex: 1 1 0;
+        min-width: 0;
+        min-height: 48px;
+        padding: 9px 4px;
+        gap: 4px;
+        font-size: clamp(0.56rem, 2.7vw, 0.72rem);
+        line-height: 1.15;
+        text-align: center;
+        white-space: normal;
+        overflow-wrap: anywhere;
+      }
+      .hero-ctas .btn i { flex: 0 0 auto; }
     }
     :root[data-theme="dark"] .hero-ctas .btn-stem-hero {
       color: #b6f3e7;
