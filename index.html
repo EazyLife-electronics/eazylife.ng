@@ -163,6 +163,26 @@
     .nav-actions .el-theme-toggle { flex: 0 0 40px; }
     .nav-actions .btn { padding: 10px 16px; font-size: 0.78rem; }
 
+    /* Give the interactive STEM Lab a gentle visual priority in the main navigation. */
+    .nav-actions .btn-stem-lab {
+      color: var(--teal-dark);
+      background: linear-gradient(135deg, rgba(0,176,155,0.11), rgba(141,198,63,0.13));
+      border: 1.5px solid rgba(0,176,155,0.38);
+      box-shadow: 0 2px 10px rgba(0,176,155,0.09);
+    }
+    .nav-actions .btn-stem-lab i { color: var(--teal); }
+    .nav-actions .btn-stem-lab:hover {
+      background: linear-gradient(135deg, rgba(0,176,155,0.17), rgba(141,198,63,0.2));
+      border-color: rgba(0,176,155,0.58);
+      box-shadow: 0 4px 14px rgba(0,176,155,0.15);
+    }
+    :root[data-theme="dark"] .nav-actions .btn-stem-lab {
+      color: #a9f0df;
+      background: linear-gradient(135deg, rgba(0,176,155,0.2), rgba(141,198,63,0.12));
+      border-color: rgba(0,176,155,0.48);
+    }
+    :root[data-theme="dark"] .nav-actions .btn-stem-lab i { color: #5ee0c4; }
+
     /* HERO */
     .hero { padding: 36px 0 28px; background: linear-gradient(180deg, var(--teal-light) 0%, #fff 100%); }
     .hero-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
@@ -360,7 +380,7 @@
           <span id="navCartCount" style="background:var(--teal); color:#fff; border-radius:999px; padding:1px 7px; font-size:0.68rem; font-weight:800;">0</span>
         </a>
         <a href="#projects" class="btn btn-outline"><i class="fas fa-diagram-project"></i> Projects</a>
-        <a href="stem-lab.html" class="btn btn-outline"><i class="fas fa-flask"></i> STEM Lab</a>
+        <a href="stem-lab.html" class="btn btn-outline btn-stem-lab" aria-label="Explore the interactive STEM Lab"><i class="fas fa-flask"></i> STEM Lab</a>
         <a href="shop.html" class="btn btn-outline"><i class="fas fa-shopping-basket"></i> Shop</a>
         <a href="track.html" class="btn btn-outline" title="Track Order"><i class="fas fa-truck-fast"></i></a>
         <a href="https://wa.me/2347051548082" target="_blank" class="btn btn-wa"><i class="fab fa-whatsapp"></i></a>
