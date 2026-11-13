@@ -157,7 +157,7 @@
   }
   ['soil-moisture','soil-threshold'].forEach(id => $(id).addEventListener('input', valveUpdate));
   $('valve-auto').addEventListener('click', () => { valveAuto = !valveAuto; valveUpdate(); });
-  $('valve-manual').addEventListener('click', () => { valveManual = !valveManual; if (!valveAuto) valveOpen = valveManual; valveUpdate(); });
+  $('valve-manual').addEventListener('click', () => { valveAuto = false; valveManual = !valveManual; valveUpdate(); });
 
   // 08 — DHT temperature/humidity values rendered to a 16x2 character LCD.
   function lcdLine(value) { return String(value).slice(0,16).padEnd(16,' '); }
