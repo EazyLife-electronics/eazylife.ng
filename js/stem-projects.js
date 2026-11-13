@@ -319,9 +319,25 @@
   $('line-right-toggle').addEventListener('click',()=>{lineRight=!lineRight;lineUpdate();});
   $('line-reset').addEventListener('click',()=>{lineLeft=false;lineRight=false;lineUpdate();});
 
+
+  // 17 — stepper motor angle-to-pulse model.
+  let stepperPosition=0;
+  function stepperUpdate(){const target=Number($('stepper-target').value),mode=Number($('stepper-mode').value),pulses=Math.round(Math.abs(target-stepperPosition)/360*200*mode);setText('stepper-target-value',target+'°');setText('stepper-position',stepperPosition+'°');setText('stepper-pulses',pulses);setText('stepper-state',target===stepperPosition?'HOLDING':'TARGET READY');setText('stepper-status',target===stepperPosition?'POSITION REACHED':'READY · '+pulses+' PULSES');$('stepper-rotor').style.transform='rotate('+stepperPosition+'deg)';setText('stepper-explain','At '+(1.8/mode).toFixed(3)+'° per pulse, moving from '+stepperPosition+'° to '+target+'° requires about '+pulses+' pulses.');}
+  ['stepper-target','stepper-mode'].forEach(id=>$(id).addEventListener('input',stepperUpdate));$('stepper-move').addEventListener('click',()=>{stepperPosition=Number($('stepper-target').value);stepperUpdate();});$('stepper-zero').addEventListener('click',()=>{stepperPosition=0;stepperUpdate();});
+  // 18 — IR remote command decoder demonstration.
+  const irCodes={POWER:'0xFFA25D',UP:'0xFF629D',MODE:'0xFFE21D',LEFT:'0xFF22DD',OK:'0xFF02FD',RIGHT:'0xFFC23D',DOWN:'0xFFA857'},irActions={POWER:'Toggle main output',UP:'Increase setting',MODE:'Change operating mode',LEFT:'Move left',OK:'Confirm selection',RIGHT:'Move right',DOWN:'Decrease setting'};
+  document.querySelectorAll('[data-ir]').forEach(b=>b.addEventListener('click',()=>{const k=b.dataset.ir;$('ir-transmitter').classList.add('sending');setText('ir-receiver-state','DECODED');setText('ir-command',k);setText('ir-code',irCodes[k]);setText('ir-action',irActions[k]);setText('ir-status','COMMAND RECEIVED · '+k);setText('ir-explain','The receiver decoded '+k+' ('+irCodes[k]+'). The sketch can execute: '+irActions[k]+'.');}));
+  $('ir-clear').addEventListener('click',()=>{$('ir-transmitter').classList.remove('sending');setText('ir-receiver-state','WAITING');setText('ir-command','NONE');setText('ir-code','—');setText('ir-action','No action');setText('ir-status','POINT REMOTE AT RECEIVER');});
+  // 19 — battery voltage divider and illustrative voltage estimate.
+  function batteryUpdate(){const v=Number($('battery-voltage').value),a=Number($('battery-load').value),divider=v/3,adc=Math.round(divider/5*1023),pct=clamp((v-9.6)/3*100,0,100),low=v<=10.5,warn=v<=11;setText('battery-voltage-value',v.toFixed(1)+' V');setText('battery-load-value',a.toFixed(1)+' A');setText('battery-voltage-read',v.toFixed(1)+' V');setText('battery-percent',Math.round(pct)+'%');setText('battery-adc',adc+' / 1023');setText('battery-divider',divider.toFixed(2)+' V');setText('battery-power',(v*a).toFixed(1)+' W');setText('battery-health',low?'LOW VOLTAGE':warn?'CHECK BATTERY':'NORMAL');setText('battery-status',low?'LOW VOLTAGE · DISCONNECT LOAD':warn?'BATTERY VOLTAGE FALLING':'BATTERY LEVEL NORMAL');$('battery-fill').style.height=pct+'%';$('battery-fill').classList.toggle('low',warn);setText('battery-explain','A 3:1 divider converts '+v.toFixed(1)+' V to '+divider.toFixed(2)+' V at the ADC ('+adc+'/1023). The '+Math.round(pct)+'% estimate is illustrative, not a fuel gauge.');}
+  ['battery-voltage','battery-load'].forEach(id=>$(id).addEventListener('input',batteryUpdate));
+  // 20 — encoder pulse frequency and period from RPM and PPR.
+  function encoderUpdate(){const rpm=Number($('encoder-rpm-input').value),ppr=Number($('encoder-ppr').value),hz=rpm*ppr/60,period=hz?1000/hz:0;setText('encoder-rpm-value',rpm+' RPM');setText('encoder-rpm',rpm+' RPM');setText('encoder-frequency',hz.toFixed(1)+' Hz');setText('encoder-period',hz?period.toFixed(1)+' ms':'—');setText('encoder-counts',hz.toFixed(1));setText('encoder-status',rpm?'WHEEL TURNING':'WHEEL STOPPED');setText('encoder-scene-status',rpm?'ENCODER PULSES DETECTED':'NO PULSES · MOTOR STOPPED');$('encoder-wheel').classList.toggle('turning',rpm>0);$('encoder-wheel').style.animationDuration=rpm?Math.max(.25,60/rpm)+'s':'0s';setText('encoder-explain',rpm+' RPM × '+ppr+' pulses/rev ÷ 60 = '+hz.toFixed(1)+' pulses per second. Pulse period: '+(hz?period.toFixed(1)+' ms':'—')+'.');}
+  ['encoder-rpm-input','encoder-ppr'].forEach(id=>$(id).addEventListener('input',encoderUpdate));
+
   // Initialise all project states.
   $('sp-year').textContent = new Date().getFullYear();
-  pirOff(); digitalUpdate(false); analogUpdate(); fireUpdate(); gasUpdate(); pumpUpdate(); radarUpdate(); parkingUpdate(); fanUpdate(); lineUpdate();
+  pirOff(); digitalUpdate(false); analogUpdate(); fireUpdate(); gasUpdate(); pumpUpdate(); radarUpdate(); parkingUpdate(); fanUpdate(); lineUpdate(); stepperUpdate(); batteryUpdate(); encoderUpdate();
   valveUpdate(); dhtUpdate(); ldrUpdate(); trafficRender(); servoClose(); overflowUpdate();
   window.addEventListener('beforeunload', () => { timers.forEach(clearTimeout); if (trafficTimer) clearInterval(trafficTimer); });
 })();
