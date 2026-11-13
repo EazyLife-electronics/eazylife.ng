@@ -192,6 +192,30 @@
     .hero h1 span { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .hero p.lead { color: var(--text-light); font-size: 1rem; max-width: 480px; margin-bottom: 24px; }
     .hero-ctas { display: flex; flex-wrap: wrap; gap: 10px; }
+    .hero-ctas { justify-content: center; }
+    .hero-ctas .btn-stem-hero {
+      color: #087f72;
+      background: linear-gradient(135deg, rgba(0,176,155,0.13), rgba(141,198,63,0.17));
+      border: 1.5px solid rgba(0,176,155,0.42);
+      box-shadow: 0 5px 18px rgba(0,176,155,0.12);
+    }
+    .hero-ctas .btn-stem-hero i { color: var(--teal); }
+    .hero-ctas .btn-stem-hero:hover {
+      background: linear-gradient(135deg, rgba(0,176,155,0.2), rgba(141,198,63,0.23));
+      box-shadow: 0 7px 22px rgba(0,176,155,0.18);
+      transform: translateY(-1px);
+    }
+    @media (max-width: 520px) {
+      .hero-ctas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; }
+      .hero-ctas .btn { padding: 13px 10px; font-size: 0.82rem; white-space: nowrap; }
+      .hero-ctas .btn-stem-hero { grid-column: 1 / -1; justify-self: center; min-width: 170px; }
+    }
+    :root[data-theme="dark"] .hero-ctas .btn-stem-hero {
+      color: #b6f3e7;
+      background: linear-gradient(135deg, rgba(0,176,155,0.22), rgba(141,198,63,0.13));
+      border-color: rgba(0,176,155,0.5);
+    }
+    :root[data-theme="dark"] .hero-ctas .btn-stem-hero i { color: #5ee0c4; }
 
     /* FEATURED / HERO CAROUSEL */
     #featured { padding: 24px 0 8px; }
@@ -400,6 +424,7 @@
       <p class="lead">We work on practical electronics, robotics, embedded systems, custom prototypes and hands-on STEM education. We also source components on request and arrange doorstep delivery. Mobile lab sessions and in-person meetings are available by appointment.</p>
       <div class="hero-ctas">
         <a href="#services" class="btn btn-primary"><i class="fas fa-microchip"></i> Explore Engineering</a>
+        <a href="stem-lab.html" class="btn btn-stem-hero"><i class="fas fa-flask"></i> STEM Lab</a>
         <a href="https://wa.me/2347051548082?text=Hello%20Eazylife,%20I%20would%20like%20to%20discuss%20an%20engineering%20project." target="_blank" rel="noopener" class="btn btn-outline"><i class="fab fa-whatsapp"></i> Discuss a Project</a>
       </div>
     </div>
