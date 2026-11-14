@@ -90,7 +90,7 @@ let currentAdminOrders = [];
 function updateAdminAttention() {
   const pendingOrders = currentAdminOrders.filter(order => String(order.status || 'new').toLowerCase() === 'new').length;
   const pendingRequests = currentAdminRequests.filter(request => String(request.status || 'new').toLowerCase() === 'new').length;
-  const pendingReviews = currentAdminReviews.filter(review => review.adminReviewed !== true).length;
+  const pendingReviews = currentAdminReviews.filter(review => review.approved !== true && review.adminReviewed !== true).length;
   const total = pendingOrders + pendingRequests + pendingReviews;
   const panel = document.getElementById('adminAttentionPanel');
   if (panel) panel.classList.toggle('hidden', total === 0);
