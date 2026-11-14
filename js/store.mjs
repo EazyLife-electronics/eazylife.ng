@@ -362,11 +362,32 @@ export function watchReviews(callback) {
 }
 
 export async function addReview(review) {
-  return addDoc(collection(db, 'reviews'), review);
+  return addDoc(collection(db, 'reviews'), {
+    ...review,
+    createdAt: review.createdAt || serverTimestamp(),
+    adminReviewed: review.approved === true,
+    ...(review.approved === true ? { adminReviewedAt: serverTimestamp() } : {})
+  });
 }
 
 export async function updateReview(id, updates) {
   return updateDoc(doc(db, 'reviews', id), updates);
+}
+
+export async function setReviewApproval(id, approved) {
+  return updateDoc(doc(db, 'reviews', id), {
+    approved: approved === true,
+    adminReviewed: true,
+    adminReviewedAt: serverTimestamp()
+  });
+}
+
+export async function markReviewHandled(id) {
+  return updateDoc(doc(db, 'reviews', id), {
+    adminReviewed: true,
+    adminReviewedAt: serverTimestamp()
+  });
+}
 }
 
 export async function deleteReview(id) {
