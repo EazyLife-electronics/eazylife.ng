@@ -388,7 +388,6 @@ export async function markReviewHandled(id) {
     adminReviewedAt: serverTimestamp()
   });
 }
-}
 
 export async function deleteReview(id) {
   return deleteDoc(doc(db, 'reviews', id));
