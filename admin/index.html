@@ -109,6 +109,17 @@
                 <button type="button" id="clearProductFilters" class="px-3 py-2.5 rounded-xl bg-gray-100 text-gray-600 text-xs font-bold whitespace-nowrap">Clear filters</button>
               </div>
             </div>
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-3 space-y-2">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <label class="flex items-center gap-2 text-xs font-bold text-amber-900"><input type="checkbox" id="selectAllVisibleProducts"> Select all visible products</label>
+                <span id="selectedProductCount" class="text-xs font-black text-amber-900">0 selected</span>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <button type="button" id="clearProductSelection" class="px-3 py-2 rounded-lg bg-white border border-amber-200 text-amber-900 text-xs font-bold">Clear selection</button>
+                <button type="button" id="bulkDeleteProducts" disabled class="px-3 py-2 rounded-lg bg-red-600 text-white text-xs font-black disabled:opacity-40 disabled:cursor-not-allowed">Delete selected products</button>
+              </div>
+              <p class="text-[10px] leading-relaxed text-amber-800">Warning: deletion is permanent and removes selected products from the catalogue. Use search and filters first to narrow the list. Existing order records are not deleted.</p>
+            </div>
             <div id="productList" class="grid gap-3"></div>
         </div>
         <div id="panel-inventory" class="tab-panel hidden"><div id="inventoryContent"></div></div>
