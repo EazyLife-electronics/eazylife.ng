@@ -1523,6 +1523,7 @@
             const trackingCode = await placeOrder({
                 items: checkoutSnapshot.map(i => ({
                     productId: i.productId,
+                    variantId: i.variantId,
                     name: i.productName,
                     variant: i.variantLabel,
                     upgrades: i.upgradeNames,
