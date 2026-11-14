@@ -83,6 +83,41 @@ let unsubOrders = null;
 let unsubProjects = null;
 let projectPublishTimer = null;
 
+let currentAdminReviews = [];
+let currentAdminRequests = [];
+let currentAdminOrders = [];
+
+function updateAdminAttention() {
+  const pendingOrders = currentAdminOrders.filter(order => String(order.status || 'new').toLowerCase() === 'new').length;
+  const pendingRequests = currentAdminRequests.filter(request => String(request.status || 'new').toLowerCase() === 'new').length;
+  const pendingReviews = currentAdminReviews.filter(review => review.approved !== true && review.adminReviewed !== true).length;
+  const total = pendingOrders + pendingRequests + pendingReviews;
+  const panel = document.getElementById('adminAttentionPanel');
+  if (panel) panel.classList.toggle('hidden', total === 0);
+  const totalEl = document.getElementById('adminAttentionTotal');
+  if (totalEl) totalEl.textContent = String(total);
+  const values = {
+    orders: pendingOrders,
+    requests: pendingRequests,
+    reviews: pendingReviews
+  };
+  Object.entries(values).forEach(([key, count]) => {
+    const summary = document.getElementById('attention' + key[0].toUpperCase() + key.slice(1) + 'Count');
+    const badge = document.getElementById(key + 'NotificationBadge');
+    if (summary) summary.textContent = String(count);
+    if (badge) {
+      badge.textContent = String(count);
+      badge.classList.toggle('hidden', count === 0);
+    }
+  });
+}
+
+document.querySelectorAll('[data-notification-tab]').forEach(button => {
+  button.addEventListener('click', () => {
+    document.querySelector('[data-tab="' + button.dataset.notificationTab + '"]')?.click();
+  });
+});
+
 /* ---------------- AUTH ---------------- */
 
 document.getElementById('loginBtn').addEventListener('click', async () => {
@@ -131,9 +166,21 @@ function startDashboard() {
     setProductsForHeroLinks(products);
   });
   unsubHeroes = watchHeroes(renderHeroes);
-  unsubReviews = watchReviews(renderReviews);
-  unsubRequests = watchRequests(renderRequestList);
-  unsubOrders = watchOrders(renderOrderList);
+  unsubReviews = watchReviews((reviews) => {
+    currentAdminReviews = reviews;
+    renderReviews(reviews);
+    updateAdminAttention();
+  });
+  unsubRequests = watchRequests((requests) => {
+    currentAdminRequests = requests;
+    renderRequestList(requests);
+    updateAdminAttention();
+  });
+  unsubOrders = watchOrders((orders) => {
+    currentAdminOrders = orders;
+    renderOrderList(orders);
+    updateAdminAttention();
+  });
   unsubProjects = watchProjects(renderProjects);
   loadSettingsForm();
 }
