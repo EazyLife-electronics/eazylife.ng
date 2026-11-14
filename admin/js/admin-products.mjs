@@ -216,8 +216,6 @@ function renderProductList() {
     const searchText = [p.name, p.brand, p.category, p.desc].filter(Boolean).join(' ').toLowerCase();
     const prices = productEffectivePrices(p);
     const hasAvailableVariant = (p.variants || []).some(v => v.inStock !== false);
-    const productMin = prices.length ? Math.min(...prices) : null;
-    const productMax = prices.length ? Math.max(...prices) : null;
 
     if (term && !searchText.includes(term)) return false;
     if (category && (p.category || '').trim() !== category) return false;
