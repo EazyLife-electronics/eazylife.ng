@@ -66,7 +66,42 @@
             </div>
             <div class="flex gap-2 mb-3"><button type="button" id="exportExcelBtn" class="flex-1 bg-white border border-gray-200 text-gray-700 py-2.5 rounded-xl font-bold text-xs"><i class="fas fa-file-export"></i> Export to Excel</button><label class="flex-1 bg-white border border-gray-200 text-gray-700 py-2.5 rounded-xl font-bold text-xs text-center cursor-pointer"><i class="fas fa-file-import"></i> Import from Excel<input type="file" id="importExcelInput" accept=".xlsx,.xls" class="hidden"></label></div>
             <p id="importStatus" class="text-[11px] font-bold text-teal-600 mb-2 px-1 hidden"></p><p class="text-[10px] text-gray-400 mb-3 px-1">Export gives you an Excel file with your current catalog. Edit it (or add new rows with the Product ID left blank), then import it back — matching IDs update existing products, blank IDs create new ones.</p>
-            <div class="flex justify-between items-center mb-3"><input id="productSearch" placeholder="Search products..." class="w-full max-w-xs p-3 bg-white rounded-xl border border-gray-200 text-sm outline-none"><span class="text-xs text-gray-400 font-bold ml-3" id="productCount">0 items</span></div><div id="productList" class="grid gap-3"></div>
+            <div class="space-y-2 mb-3">
+              <div class="flex flex-wrap items-center gap-2">
+                <input id="productSearch" placeholder="Search name, brand or category..." class="flex-1 min-w-[180px] p-3 bg-white rounded-xl border border-gray-200 text-sm outline-none">
+                <span class="text-xs text-gray-400 font-bold whitespace-nowrap" id="productCount">0 items</span>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <select id="productSort" aria-label="Sort products" class="min-w-0 p-2.5 bg-white rounded-xl border border-gray-200 text-xs outline-none">
+                  <option value="newest">Newest first</option>
+                  <option value="oldest">Oldest first</option>
+                  <option value="name-asc">Name: A–Z</option>
+                  <option value="name-desc">Name: Z–A</option>
+                  <option value="price-asc">Price: Low–High</option>
+                  <option value="price-desc">Price: High–Low</option>
+                </select>
+                <select id="productCategoryFilter" aria-label="Filter by category" class="min-w-0 p-2.5 bg-white rounded-xl border border-gray-200 text-xs outline-none">
+                  <option value="">All categories</option>
+                </select>
+                <select id="productVisibilityFilter" aria-label="Filter by shop visibility" class="min-w-0 p-2.5 bg-white rounded-xl border border-gray-200 text-xs outline-none">
+                  <option value="">All visibility</option>
+                  <option value="visible">Visible in shop</option>
+                  <option value="hidden">Hidden from shop</option>
+                </select>
+                <select id="productAvailabilityFilter" aria-label="Filter by availability" class="min-w-0 p-2.5 bg-white rounded-xl border border-gray-200 text-xs outline-none">
+                  <option value="">All availability</option>
+                  <option value="available">Available variants</option>
+                  <option value="unavailable">No available variants</option>
+                </select>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="text-[11px] text-gray-500 font-bold">Price (₦)</span>
+                <input id="productMinPrice" type="number" min="0" inputmode="numeric" placeholder="Minimum" aria-label="Minimum product price" class="w-28 flex-1 p-2.5 bg-white rounded-xl border border-gray-200 text-xs outline-none">
+                <input id="productMaxPrice" type="number" min="0" inputmode="numeric" placeholder="Maximum" aria-label="Maximum product price" class="w-28 flex-1 p-2.5 bg-white rounded-xl border border-gray-200 text-xs outline-none">
+                <button type="button" id="clearProductFilters" class="px-3 py-2.5 rounded-xl bg-gray-100 text-gray-600 text-xs font-bold whitespace-nowrap">Clear filters</button>
+              </div>
+            </div>
+            <div id="productList" class="grid gap-3"></div>
         </div>
         <div id="panel-inventory" class="tab-panel hidden"><div id="inventoryContent"></div></div>
         <div id="panel-reports" class="tab-panel hidden"><div id="reportsContent"></div></div>
