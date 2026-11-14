@@ -328,55 +328,71 @@ async function loadMedia() {
     setStatus("mediaLibraryStatus", error.message || "Could not load the media library.", "error");
   }
 }
-async function uploadSelectedImage() {
-  const file = $('mediaFileInput').files?.[0];
-  if (!file) {
-    setStatus('mediaUploadStatus', 'Choose an image first.', 'error');
+async function uploadSelectedImages() {
+  const files = Array.from($('mediaFileInput').files || []);
+  if (!files.length) {
+    setStatus('mediaUploadStatus', 'Choose one or more images first.', 'error');
     return;
   }
-  if (!allowedTypes.has(file.type)) {
-    setStatus('mediaUploadStatus', 'Please choose a JPG, PNG, WebP, GIF or AVIF image.', 'error');
-    return;
-  }
-  if (file.size > MAX_IMAGE_BYTES) {
-    setStatus('mediaUploadStatus', 'This image is larger than 25 MB. Please resize it before uploading.', 'error');
-    return;
-  }
-
   const button = $('mediaUploadBtn');
+  const input = $('mediaFileInput');
+  const folder = $('mediaFolder').value;
+  const validFiles = [];
+  const failures = [];
+  files.forEach(file => {
+    if (!allowedTypes.has(file.type)) failures.push(file.name + ': unsupported image format');
+    else if (file.size > MAX_IMAGE_BYTES) failures.push(file.name + ': larger than 25 MB');
+    else validFiles.push(file);
+  });
+  if (!validFiles.length) {
+    setStatus('mediaUploadStatus', failures.join(' | '), 'error');
+    return;
+  }
+
   button.disabled = true;
-  button.textContent = 'Uploading…';
-  setStatus('mediaUploadStatus', 'Getting secure upload authorization…');
-
+  input.disabled = true;
+  let uploaded = 0;
   try {
-    const authParams = await getUploadAuth();
-    const form = new FormData();
-    form.append('file', file);
-    form.append('fileName', file.name);
-    form.append('folder', $('mediaFolder').value);
-    form.append('publicKey', authParams.publicKey);
-    form.append('token', authParams.token);
-    form.append('expire', String(authParams.expire));
-    form.append('signature', authParams.signature);
-    form.append('useUniqueFileName', 'true');
-
-    setStatus('mediaUploadStatus', 'Sending image securely to ImageKit…');
-    const response = await fetch(UPLOAD_URL, { method: 'POST', body: form });
-    const result = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      throw new Error(result.message || result.error || `ImageKit upload failed (${response.status}).`);
+    for (let index = 0; index < validFiles.length; index++) {
+      const file = validFiles[index];
+      setStatus('mediaUploadStatus', 'Uploading ' + (index + 1) + ' of ' + validFiles.length + ': ' + file.name + '…');
+      try {
+        const authParams = await getUploadAuth();
+        const form = new FormData();
+        form.append('file', file);
+        form.append('fileName', file.name);
+        form.append('folder', folder);
+        form.append('publicKey', authParams.publicKey);
+        form.append('token', authParams.token);
+        form.append('expire', String(authParams.expire));
+        form.append('signature', authParams.signature);
+        form.append('useUniqueFileName', 'true');
+        const response = await fetch(UPLOAD_URL, { method: 'POST', body: form });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.message || result.error || 'ImageKit upload failed (' + response.status + ').');
+        uploaded++;
+      } catch (error) {
+        console.error('ImageKit upload failed for ' + file.name + ':', error);
+        failures.push(file.name + ': ' + (error.message || 'upload failed'));
+      }
     }
-
-    $('mediaFileInput').value = '';
-    setStatus('mediaUploadStatus', `Uploaded successfully: ${result.name || file.name}`, 'success');
-    if ($('mediaBrowseFolder')) $('mediaBrowseFolder').value = 'all';
-    await loadMedia();
+    if (uploaded > 0) {
+      if ($('mediaBrowseFolder')) $('mediaBrowseFolder').value = 'all';
+      await loadMedia();
+    }
+    if (failures.length) {
+      setStatus('mediaUploadStatus', uploaded + ' of ' + validFiles.length + ' uploaded. Failed: ' + failures.join(' | ') + '. Reselect and retry failed files.', 'error');
+    } else {
+      input.value = '';
+      setStatus('mediaUploadStatus', uploaded + ' image(s) uploaded successfully to ' + folder + '.', 'success');
+    }
   } catch (error) {
-    console.error('ImageKit upload failed:', error);
-    setStatus('mediaUploadStatus', error.message || 'Upload failed. Please try again.', 'error');
+    console.error('Batch upload failed:', error);
+    setStatus('mediaUploadStatus', uploaded + ' image(s) uploaded before the batch stopped: ' + (error.message || 'Please try again.'), 'error');
   } finally {
     button.disabled = false;
-    button.textContent = 'Upload image';
+    input.disabled = false;
+    button.textContent = 'Upload selected images';
   }
 }
 
@@ -556,7 +572,7 @@ $('hImage')?.addEventListener('input', () => updateTargetPreview('hImage'));
 $('heroForm')?.addEventListener('reset', () => setTimeout(() => updateTargetPreview('hImage'), 0));
 $('reviewAddForm')?.addEventListener('reset', () => setTimeout(() => updateTargetPreview('rvCoverImage'), 0));
 
-$('mediaUploadBtn')?.addEventListener('click', uploadSelectedImage);
+$('mediaUploadBtn')?.addEventListener('click', uploadSelectedImages);
 $('mediaRefreshBtn')?.addEventListener('click', loadMedia);
 $('mediaFolder')?.addEventListener('change', loadMedia);
 document.querySelector('[data-tab="media"]')?.addEventListener('click', () => {

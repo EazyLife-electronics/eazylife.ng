@@ -167,12 +167,12 @@
                   <option value="/eazylife/general">General</option>
                 </select>
               </label>
-              <label class="text-xs font-bold text-gray-600">Choose an image
-                <input id="mediaFileInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" class="mt-1 block w-full text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-teal-50 file:px-4 file:py-2 file:text-xs file:font-bold file:text-teal-700">
+              <label class="text-xs font-bold text-gray-600">Choose images
+                <input id="mediaFileInput" type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif,image/avif" class="mt-1 block w-full text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-teal-50 file:px-4 file:py-2 file:text-xs file:font-bold file:text-teal-700">
               </label>
-              <p class="text-[10px] text-gray-400">Images only. Maximum 25 MB per image on the current free-plan upload limit.</p>
-              <button id="mediaUploadBtn" type="button" class="bg-gray-900 text-white py-3 rounded-xl text-sm font-bold">Upload image</button>
-              <p id="mediaUploadStatus" class="text-xs text-gray-500" role="status" aria-live="polite">Choose a folder and image to begin.</p>
+              <p class="text-[10px] text-gray-400">Select multiple images at once. JPG, PNG, WebP, GIF and AVIF are supported, maximum 25 MB per image.</p>
+              <button id="mediaUploadBtn" type="button" class="bg-gray-900 text-white py-3 rounded-xl text-sm font-bold">Upload selected images</button>
+              <p id="mediaUploadStatus" class="text-xs text-gray-500" role="status" aria-live="polite">Choose a folder and one or more images to begin.</p>
             </div>
           </div>
           <div class="bg-white p-5 rounded-[24px] shadow-sm">
