@@ -185,31 +185,95 @@ function priceRangeLabel(p) {
   return min === max ? `₦${min.toLocaleString()}` : `₦${min.toLocaleString()} – ₦${max.toLocaleString()}`;
 }
 
+function productEffectivePrices(p) {
+  return (p.variants || [])
+    .map(v => Number(v.promoPrice) > 0 ? Number(v.promoPrice) : Number(v.price))
+    .filter(price => Number.isFinite(price) && price > 0);
+}
+
+function productSortTimestamp(p) {
+  const value = p.createdAt || p.created_at || p.dateCreated || p.timestamp;
+  if (!value) return 0;
+  if (typeof value.toDate === 'function') return value.toDate().getTime();
+  if (typeof value === 'number') return value < 1e12 ? value * 1000 : value;
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function updateProductCategoryOptions() {
+  const select = document.getElementById('productCategoryFilter');
+  if (!select) return;
+  const current = select.value;
+  const categories = [...new Set(allProducts.map(p => (p.category || '').trim()).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+  select.innerHTML = '<option value="">All categories</option>' +
+    categories.map(category => '<option value="' + escapeHtml(category) + '">' + escapeHtml(category) + '</option>').join('');
+  select.value = categories.includes(current) ? current : '';
+}
+
 function renderProductList() {
-  const term = document.getElementById('productSearch').value.toLowerCase();
-  const filtered = allProducts.filter(p => (p.name || '').toLowerCase().includes(term));
-  document.getElementById('productCount').textContent = `${allProducts.length} items`;
+  const term = document.getElementById('productSearch').value.trim().toLowerCase();
+  const category = document.getElementById('productCategoryFilter')?.value || '';
+  const visibility = document.getElementById('productVisibilityFilter')?.value || '';
+  const availability = document.getElementById('productAvailabilityFilter')?.value || '';
+  const minRaw = document.getElementById('productMinPrice')?.value.trim() || '';
+  const maxRaw = document.getElementById('productMaxPrice')?.value.trim() || '';
+  const minPrice = minRaw === '' ? null : Number(minRaw);
+  const maxPrice = maxRaw === '' ? null : Number(maxRaw);
+
+  let filtered = allProducts.filter(p => {
+    const searchText = [p.name, p.brand, p.category, p.desc].filter(Boolean).join(' ').toLowerCase();
+    const prices = productEffectivePrices(p);
+    const hasAvailableVariant = (p.variants || []).some(v => v.inStock !== false);
+    const productMin = prices.length ? Math.min(...prices) : null;
+    const productMax = prices.length ? Math.max(...prices) : null;
+
+    if (term && !searchText.includes(term)) return false;
+    if (category && (p.category || '').trim() !== category) return false;
+    if (visibility === 'visible' && p.inStock === false) return false;
+    if (visibility === 'hidden' && p.inStock !== false) return false;
+    if (availability === 'available' && !hasAvailableVariant) return false;
+    if (availability === 'unavailable' && hasAvailableVariant) return false;
+    if (minPrice !== null && (!Number.isFinite(minPrice) || productMax === null || productMax < minPrice)) return false;
+    if (maxPrice !== null && (!Number.isFinite(maxPrice) || productMin === null || productMin > maxPrice)) return false;
+    return true;
+  });
+
+  const sort = document.getElementById('productSort')?.value || 'newest';
+  filtered.sort((a, b) => {
+    if (sort === 'name-asc') return (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' });
+    if (sort === 'name-desc') return (b.name || '').localeCompare(a.name || '', undefined, { sensitivity: 'base' });
+    if (sort === 'price-asc' || sort === 'price-desc') {
+      const aPrices = productEffectivePrices(a), bPrices = productEffectivePrices(b);
+      const aPrice = aPrices.length ? Math.min(...aPrices) : (sort === 'price-asc' ? Infinity : -Infinity);
+      const bPrice = bPrices.length ? Math.min(...bPrices) : (sort === 'price-asc' ? Infinity : -Infinity);
+      return sort === 'price-asc' ? aPrice - bPrice : bPrice - aPrice;
+    }
+    const dateDiff = productSortTimestamp(a) - productSortTimestamp(b);
+    return sort === 'oldest' ? dateDiff : -dateDiff;
+  });
+
+  document.getElementById('productCount').textContent = filtered.length === allProducts.length
+    ? allProducts.length + ' items'
+    : filtered.length + ' of ' + allProducts.length + ' items';
 
   document.getElementById('productList').innerHTML = filtered.map(p => {
     const thumb = (p.variants && p.variants[0] && p.variants[0].image) || 'assets/pictures/placeholder.svg';
     const variantCount = (p.variants || []).length;
-    return `
-    <div class="bg-white p-4 rounded-2xl border border-gray-100 flex items-center gap-4 shadow-sm">
-      <img src="${thumb.startsWith('http') ? escapeHtml(thumb) : escapeHtml('../' + thumb)}" class="w-12 h-12 rounded-lg object-cover bg-gray-100">
-      <div class="flex-grow min-w-0">
-        <h4 class="font-bold text-xs text-gray-800 leading-tight truncate">${escapeHtml(p.name)}</h4>
-        <p class="text-[10px] text-gray-400 font-bold uppercase">${p.brand ? escapeHtml(p.brand) + ' · ' : ''}${escapeHtml(p.category || '')} · ${priceRangeLabel(p)}
-          ${p.inStock === false ? '<span class="text-red-400">· HIDDEN</span>' : ''}
-        </p>
-        <p class="text-[10px] text-gray-400">${variantCount} variant${variantCount === 1 ? '' : 's'}${(p.upgrades || []).length ? ` · ${p.upgrades.length} upgrade option${p.upgrades.length === 1 ? '' : 's'}` : ''}</p>
-        <p class="text-[9px] text-gray-300 font-mono select-all">ID: ${escapeHtml(p.id)}</p>
-      </div>
-      <div class="flex flex-col gap-1 flex-shrink-0">
-        <button data-edit="${escapeHtml(p.id)}" class="text-[10px] bg-gray-100 hover:bg-black hover:text-white px-3 py-1 rounded-md font-bold transition-all">EDIT</button>
-        <button data-del="${escapeHtml(p.id)}" class="text-[10px] bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-3 py-1 rounded-md font-bold transition-all">DEL</button>
-      </div>
-    </div>`;
-  }).join('') || `<p class="text-center text-gray-400 text-sm py-10">No products yet — add your first one above.</p>`;
+    return '<div class="bg-white p-4 rounded-2xl border border-gray-100 flex items-center gap-4 shadow-sm">' +
+      '<img src="' + (thumb.startsWith('http') ? escapeHtml(thumb) : escapeHtml('../' + thumb)) + '" class="w-12 h-12 rounded-lg object-cover bg-gray-100">' +
+      '<div class="flex-grow min-w-0">' +
+      '<h4 class="font-bold text-xs text-gray-800 leading-tight truncate">' + escapeHtml(p.name) + '</h4>' +
+      '<p class="text-[10px] text-gray-400 font-bold uppercase">' + (p.brand ? escapeHtml(p.brand) + ' · ' : '') + escapeHtml(p.category || '') + ' · ' + priceRangeLabel(p) +
+      (p.inStock === false ? '<span class="text-red-400">· HIDDEN</span>' : '') + '</p>' +
+      '<p class="text-[10px] text-gray-400">' + variantCount + ' variant' + (variantCount === 1 ? '' : 's') +
+      ((p.upgrades || []).length ? ' · ' + p.upgrades.length + ' upgrade option' + (p.upgrades.length === 1 ? '' : 's') : '') + '</p>' +
+      '<p class="text-[9px] text-gray-300 font-mono select-all">ID: ' + escapeHtml(p.id) + '</p></div>' +
+      '<div class="flex flex-col gap-1 flex-shrink-0">' +
+      '<button data-edit="' + escapeHtml(p.id) + '" class="text-[10px] bg-gray-100 hover:bg-black hover:text-white px-3 py-1 rounded-md font-bold transition-all">EDIT</button>' +
+      '<button data-del="' + escapeHtml(p.id) + '" class="text-[10px] bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-3 py-1 rounded-md font-bold transition-all">DEL</button>' +
+      '</div></div>';
+  }).join('') || '<p class="text-center text-gray-400 text-sm py-10">No products match these search and filter settings.</p>';
 
   document.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => editProduct(b.dataset.edit)));
   document.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => removeProduct(b.dataset.del)));
@@ -437,7 +501,21 @@ export function initProducts() {
   });
 
   document.getElementById('resetFormBtn').addEventListener('click', resetForm);
-  document.getElementById('productSearch').addEventListener('keyup', renderProductList);
+  updateProductCategoryOptions();
+  ['productSearch', 'productSort', 'productCategoryFilter', 'productVisibilityFilter', 'productAvailabilityFilter', 'productMinPrice', 'productMaxPrice']
+    .forEach(id => document.getElementById(id)?.addEventListener('input', renderProductList));
+  ['productSort', 'productCategoryFilter', 'productVisibilityFilter', 'productAvailabilityFilter']
+    .forEach(id => document.getElementById(id)?.addEventListener('change', renderProductList));
+  document.getElementById('clearProductFilters').addEventListener('click', () => {
+    document.getElementById('productSearch').value = '';
+    document.getElementById('productSort').value = 'newest';
+    document.getElementById('productCategoryFilter').value = '';
+    document.getElementById('productVisibilityFilter').value = '';
+    document.getElementById('productAvailabilityFilter').value = '';
+    document.getElementById('productMinPrice').value = '';
+    document.getElementById('productMaxPrice').value = '';
+    renderProductList();
+  });
   document.getElementById('exportExcelBtn').addEventListener('click', exportProductsToExcel);
   document.getElementById('importExcelInput').addEventListener('change', handleImportFile);
 }
