@@ -239,9 +239,8 @@ function renderProductList() {
     return true;
   });
 
-  const sort = document.getElementById('productSort')?.value || 'newest';
+  const sort = document.getElementById('productSort')?.value || 'name-asc';
   filtered.sort((a, b) => {
-    if (sort === 'name-asc') return (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' });
     if (sort === 'name-desc') return (b.name || '').localeCompare(a.name || '', undefined, { sensitivity: 'base' });
     if (sort === 'price-asc' || sort === 'price-desc') {
       const aPrices = productEffectivePrices(a), bPrices = productEffectivePrices(b);
@@ -249,8 +248,11 @@ function renderProductList() {
       const bPrice = bPrices.length ? Math.min(...bPrices) : (sort === 'price-asc' ? Infinity : -Infinity);
       return sort === 'price-asc' ? aPrice - bPrice : bPrice - aPrice;
     }
-    const dateDiff = productSortTimestamp(a) - productSortTimestamp(b);
-    return sort === 'oldest' ? dateDiff : -dateDiff;
+    if (sort === 'variants-asc' || sort === 'variants-desc') {
+      const countDiff = (a.variants || []).length - (b.variants || []).length;
+      return sort === 'variants-asc' ? countDiff : -countDiff;
+    }
+    return (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' });
   });
 
   document.getElementById('productCount').textContent = filtered.length === allProducts.length
@@ -508,7 +510,7 @@ export function initProducts() {
     .forEach(id => document.getElementById(id)?.addEventListener('change', renderProductList));
   document.getElementById('clearProductFilters').addEventListener('click', () => {
     document.getElementById('productSearch').value = '';
-    document.getElementById('productSort').value = 'newest';
+    document.getElementById('productSort').value = 'name-asc';
     document.getElementById('productCategoryFilter').value = '';
     document.getElementById('productVisibilityFilter').value = '';
     document.getElementById('productAvailabilityFilter').value = '';
@@ -522,6 +524,7 @@ export function initProducts() {
 
 export function renderProducts(products) {
   allProducts = products;
+  updateProductCategoryOptions();
   renderProductList();
 }
 
