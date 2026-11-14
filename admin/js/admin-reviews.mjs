@@ -97,7 +97,7 @@ function renderReviewList() {
       <div class="flex flex-wrap gap-2">
         <button data-edit="${escapeHtml(r.id)}" class="bg-teal-50 text-teal-700 px-3 py-1.5 rounded-md text-[10px] font-bold">Manage story & photos</button>
         <button data-toggle="${escapeHtml(r.id)}" data-current="${r.approved}" class="text-[10px] ${r.approved ? 'bg-gray-100 text-gray-600' : 'bg-gray-900 text-white'} px-3 py-1.5 rounded-md font-bold">${r.approved ? 'Hide' : 'Approve'}</button>
-        ${r.adminReviewed !== true ? `<button data-review-handled="${escapeHtml(r.id)}" class="text-[10px] bg-amber-50 text-amber-800 px-3 py-1.5 rounded-md font-bold">Mark handled</button>` : `<span class="text-[10px] text-green-700 font-bold px-2 py-1.5">Handled</span>`}
+        ${r.approved !== true && r.adminReviewed !== true ? `<button data-review-handled="${escapeHtml(r.id)}" class="text-[10px] bg-amber-50 text-amber-800 px-3 py-1.5 rounded-md font-bold">Mark handled</button>` : `<span class="text-[10px] text-green-700 font-bold px-2 py-1.5">Handled</span>`}
         <button data-rvdel="${escapeHtml(r.id)}" class="text-[10px] bg-red-50 text-red-600 px-3 py-1.5 rounded-md font-bold">Delete</button>
       </div></div>`;
   }).join('') || '<p class="text-center text-gray-400 text-sm py-10">No reviews yet - add one above.</p>';
