@@ -191,15 +191,6 @@ function productEffectivePrices(p) {
     .filter(price => Number.isFinite(price) && price > 0);
 }
 
-function productSortTimestamp(p) {
-  const value = p.createdAt || p.created_at || p.dateCreated || p.timestamp;
-  if (!value) return 0;
-  if (typeof value.toDate === 'function') return value.toDate().getTime();
-  if (typeof value === 'number') return value < 1e12 ? value * 1000 : value;
-  const parsed = Date.parse(value);
-  return Number.isFinite(parsed) ? parsed : 0;
-}
-
 function updateProductCategoryOptions() {
   const select = document.getElementById('productCategoryFilter');
   if (!select) return;
@@ -234,8 +225,11 @@ function renderProductList() {
     if (visibility === 'hidden' && p.inStock !== false) return false;
     if (availability === 'available' && !hasAvailableVariant) return false;
     if (availability === 'unavailable' && hasAvailableVariant) return false;
-    if (minPrice !== null && (!Number.isFinite(minPrice) || productMax === null || productMax < minPrice)) return false;
-    if (maxPrice !== null && (!Number.isFinite(maxPrice) || productMin === null || productMin > maxPrice)) return false;
+    if (minPrice !== null && !Number.isFinite(minPrice)) return false;
+    if (maxPrice !== null && !Number.isFinite(maxPrice)) return false;
+    if ((minPrice !== null || maxPrice !== null) && !prices.some(price =>
+      (minPrice === null || price >= minPrice) && (maxPrice === null || price <= maxPrice)
+    )) return false;
     return true;
   });
 
