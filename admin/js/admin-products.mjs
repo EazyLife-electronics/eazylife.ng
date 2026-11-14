@@ -6,6 +6,7 @@ import { addProduct, updateProduct, deleteProduct } from '../../js/store.mjs';
 import { escapeHtml, updateImagePreview } from './admin-shared.mjs';
 
 let allProducts = [];
+const selectedProductIds = new Set();
 
 /* ---------------- FORM ---------------- */
 
@@ -176,6 +177,43 @@ async function removeProduct(id) {
   await deleteProduct(id);
 }
 
+async function bulkDeleteSelectedProducts() {
+  const ids = [...selectedProductIds].filter(id => allProducts.some(p => p.id === id));
+  if (!ids.length) return;
+  const names = ids.map(id => allProducts.find(p => p.id === id)?.name || id);
+  const preview = names.slice(0, 8).map(name => '• ' + name).join('\n');
+  const remainder = names.length > 8 ? '\n…and ' + (names.length - 8) + ' more' : '';
+  const warning = 'You are about to permanently delete ' + ids.length + ' product(s):\n\n' +
+    preview + remainder + '\n\nThis cannot be undone. Products will be removed from the shop catalogue. Existing order records will remain. Continue?';
+  if (!confirm(warning)) return;
+  const typed = prompt('Final safety check: type DELETE to permanently remove these ' + ids.length + ' product(s).');
+  if (typed !== 'DELETE') {
+    alert('Bulk deletion cancelled. No products were deleted.');
+    return;
+  }
+  const button = document.getElementById('bulkDeleteProducts');
+  button.disabled = true;
+  button.textContent = 'Deleting...';
+  let deleted = 0;
+  const failed = [];
+  try {
+    for (const id of ids) {
+      try {
+        await deleteProduct(id);
+        selectedProductIds.delete(id);
+        deleted++;
+      } catch (err) {
+        console.error('Failed to delete product', id, err);
+        failed.push(id);
+      }
+    }
+    alert(deleted + ' product(s) deleted.' + (failed.length ? ' ' + failed.length + ' failed; check the console and try again.' : ''));
+  } finally {
+    button.textContent = 'Delete selected products';
+    renderProductList();
+  }
+}
+
 /* ---------------- LIST ---------------- */
 
 function priceRangeLabel(p) {
@@ -251,10 +289,22 @@ function renderProductList() {
     ? allProducts.length + ' items'
     : filtered.length + ' of ' + allProducts.length + ' items';
 
+  const selectedCount = selectedProductIds.size;
+  document.getElementById('selectedProductCount').textContent = selectedCount + ' selected';
+  const bulkButton = document.getElementById('bulkDeleteProducts');
+  bulkButton.disabled = selectedCount === 0;
+  bulkButton.textContent = selectedCount ? 'Delete ' + selectedCount + ' selected product(s)' : 'Delete selected products';
+  const selectAll = document.getElementById('selectAllVisibleProducts');
+  const visibleIds = filtered.map(p => p.id);
+  const selectedVisible = visibleIds.filter(id => selectedProductIds.has(id)).length;
+  selectAll.checked = visibleIds.length > 0 && selectedVisible === visibleIds.length;
+  selectAll.indeterminate = selectedVisible > 0 && selectedVisible < visibleIds.length;
+
   document.getElementById('productList').innerHTML = filtered.map(p => {
     const thumb = (p.variants && p.variants[0] && p.variants[0].image) || 'assets/pictures/placeholder.svg';
     const variantCount = (p.variants || []).length;
-    return '<div class="bg-white p-4 rounded-2xl border border-gray-100 flex items-center gap-4 shadow-sm">' +
+    return '<div class="bg-white p-4 rounded-2xl border border-gray-100 flex items-center gap-3 shadow-sm">' +
+      '<input type="checkbox" data-select-product="' + escapeHtml(p.id) + '" aria-label="Select ' + escapeHtml(p.name) + '" class="w-5 h-5 flex-shrink-0 accent-red-600" ' + (selectedProductIds.has(p.id) ? 'checked' : '') + '>' +
       '<img src="' + (thumb.startsWith('http') ? escapeHtml(thumb) : escapeHtml('../' + thumb)) + '" class="w-12 h-12 rounded-lg object-cover bg-gray-100">' +
       '<div class="flex-grow min-w-0">' +
       '<h4 class="font-bold text-xs text-gray-800 leading-tight truncate">' + escapeHtml(p.name) + '</h4>' +
@@ -271,6 +321,13 @@ function renderProductList() {
 
   document.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => editProduct(b.dataset.edit)));
   document.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => removeProduct(b.dataset.del)));
+  document.querySelectorAll('[data-select-product]').forEach(input => {
+    input.addEventListener('change', () => {
+      if (input.checked) selectedProductIds.add(input.dataset.selectProduct);
+      else selectedProductIds.delete(input.dataset.selectProduct);
+      renderProductList();
+    });
+  });
 }
 
 /* ---------------- EXCEL EXPORT / IMPORT ---------------- */
@@ -510,6 +567,18 @@ export function initProducts() {
     document.getElementById('productMaxPrice').value = '';
     renderProductList();
   });
+  document.getElementById('selectAllVisibleProducts').addEventListener('change', (e) => {
+    document.querySelectorAll('[data-select-product]').forEach(input => {
+      if (e.target.checked) selectedProductIds.add(input.dataset.selectProduct);
+      else selectedProductIds.delete(input.dataset.selectProduct);
+    });
+    renderProductList();
+  });
+  document.getElementById('clearProductSelection').addEventListener('click', () => {
+    selectedProductIds.clear();
+    renderProductList();
+  });
+  document.getElementById('bulkDeleteProducts').addEventListener('click', bulkDeleteSelectedProducts);
   document.getElementById('exportExcelBtn').addEventListener('click', exportProductsToExcel);
   document.getElementById('importExcelInput').addEventListener('change', handleImportFile);
 }
