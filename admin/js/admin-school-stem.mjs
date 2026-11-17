@@ -199,9 +199,24 @@ async function loadData() {
   renderEstimate();
 }
 
+export function resetSchoolStem() {
+  initialized = false;
+  meetings = [];
+  pricing = {
+    preparation: 0, facilitationPerSession: 0, instructorPerSession: 0,
+    kitPerLearner: 0, consumablesPerLearner: 0, travelPerVisit: 0,
+    equipment: 0, assessmentReporting: 0, contingencyPercent: 10,
+    targetMarginPercent: 35, minimumMarginPercent: 15
+  };
+  const host = document.getElementById("schoolStemContent");
+  if (host) host.innerHTML = "";
+  document.querySelector('[data-tab="school-stem"]')?.classList.add("hidden");
+}
+
 export function initSchoolStem() {
   if (initialized) return;
   initialized = true;
+  document.querySelector('[data-tab="school-stem"]')?.classList.remove("hidden");
   const host = document.getElementById("schoolStemContent");
   if (!host) return;
   host.innerHTML = `
