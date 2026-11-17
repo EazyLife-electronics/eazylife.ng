@@ -1,7 +1,7 @@
 // School STEM management module for the EazyLife admin dashboard.
 // All records are stored in admin-only Firestore collections.
 import {
-  collection, addDoc, getDocs, getDoc, setDoc, doc, query, orderBy, serverTimestamp
+  collection, addDoc, getDocs, getDoc, setDoc, updateDoc, deleteDoc, doc, query, orderBy, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { initFirebase } from "../../js/firebase.mjs";
 
@@ -16,6 +16,7 @@ let pricing = {
 let meetings = [];
 let offerCatalogue = [{title:'Practical STEM Education',items:['Electronics and circuit building','Arduino and microcontroller programming','Sensors, automation and control','Hands-on science experiments']},{title:'Robotics and Engineering',items:['Robot design and construction','Mobile robotics and control','Embedded systems and sensors','Mechanical design and prototyping']},{title:'Innovation, Competitions and Exhibitions',items:['Student innovation projects','Project documentation and presentation','Exhibition preparation','Competition preparation, subject to confirmed opportunity and eligibility']},{title:'STEM Laboratory Development',items:['STEM lab planning and setup','Equipment and component supply','Practical learning stations','Teacher training and capacity development']},{title:'Extended Learning',items:['School STEM clubs','Holiday STEM programmes','Teacher development workshops','Project mentoring and technical support']}];
 let selectedOffers = [];
+let editingMeetingId = null;
 
 const money = n => new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 }).format(Number(n) || 0);
 const num = id => Math.max(0, Number(document.getElementById(id)?.value) || 0);
@@ -155,18 +156,27 @@ async function saveMeeting() {
   const record = {
     schoolName, contact: val("ssContact"), phone: val("ssPhone"), email: val("ssEmail"),
     location: val("ssLocation"), schoolType: val("ssType"), curriculum: val("ssCurriculum"),
-    meetingDate: val("ssDate"), goals, model, classes: val("ssClasses"),
+    meetingDate: val("ssDate"), appointmentDate: val("ssAppointmentDate"), appointmentTime: val("ssAppointmentTime"), appointmentPurpose: val("ssAppointmentPurpose"), appointmentStatus: val("ssAppointmentStatus") || "Scheduled", goals, model, classes: val("ssClasses"),
     learners: c.learners, groups: c.groups, sessions: c.sessions, visits: c.visits,
     instructors: c.instructors, frequency: val("ssFrequency"), duration: val("ssDuration"),
     facilities: val("ssFacilities"), budgetPosition: val("ssBudget"), notes: val("ssNotes"),
     schoolPrice: num("ssCustomerPrice"), offers: [...selectedOffers],
-    conclusion: val("ssConclusion"),
+    conclusion: val("ssConclusion"), agreementStatus: val("ssAgreementStatus"), nextStep: val("ssNextStep"), agreedScope: val("ssAgreedScope"),
     internalEstimate: { deliveryCost: c.total, projectKitBOM: c.kits, preferredPrice: c.preferred, minimumPrice: c.minimum },
     updatedAt: serverTimestamp()
   };
-  await addDoc(collection(db, "schoolStemMeetings"), { ...record, createdAt: serverTimestamp() });
-  alert("School meeting saved.");
-  meetings.unshift(record);
+  if (editingMeetingId) {
+    await updateDoc(doc(db, "schoolStemMeetings", editingMeetingId), { ...record, updatedAt: serverTimestamp() });
+    const index = meetings.findIndex(x => x.id === editingMeetingId);
+    if (index >= 0) meetings[index] = { ...meetings[index], ...record };
+    editingMeetingId = null;
+    document.getElementById("ssSaveMeeting").textContent = "Save school meeting";
+    alert("School meeting updated.");
+  } else {
+    const ref = await addDoc(collection(db, "schoolStemMeetings"), { ...record, createdAt: serverTimestamp() });
+    meetings.unshift({ ...record, id:ref.id });
+    alert("School meeting saved.");
+  }
   renderMeetings();
 }
 
