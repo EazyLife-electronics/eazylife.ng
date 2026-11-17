@@ -21,7 +21,7 @@ import { renderOrderList } from './admin-orders.mjs';
 import { initProjects, renderProjects, checkDueProjectPublications, setProjectKitProducts } from './admin-projects.mjs';
 import { initSettings, loadSettingsForm } from './admin-settings.mjs';
 import { setQuotationProducts } from './admin-quotations.mjs';
-import { initSchoolStem } from './admin-school-stem.mjs';
+import { initSchoolStem, resetSchoolStem } from './admin-school-stem.mjs';
 
 const { auth } = initFirebase();
 
@@ -146,6 +146,7 @@ onAuthStateChanged(auth, (user) => {
     projectPublishTimer = setInterval(checkDueProjectPublications, 60000);
   } else {
     document.getElementById('dashboard').classList.add('hidden');
+    resetSchoolStem();
     document.getElementById('loginScreen').classList.remove('hidden');
     if (unsubProducts) unsubProducts();
     if (unsubHeroes) unsubHeroes();
@@ -158,7 +159,8 @@ onAuthStateChanged(auth, (user) => {
 });
 
 function startDashboard() {
-  initSchoolStem();
+  if (auth.currentUser?.email === 'damzyeazy@gmail.com') initSchoolStem();
+  else resetSchoolStem();
   unsubProducts = watchProducts((products) => {
     renderProducts(products);
     setQuotationProducts(products);
