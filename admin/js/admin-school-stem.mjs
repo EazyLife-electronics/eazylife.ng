@@ -9,7 +9,7 @@ const { db } = initFirebase();
 let initialized = false;
 let pricing = {
   preparation: 0, facilitationPerSession: 0, instructorPerSession: 0,
-  kitPerLearner: 0, consumablesPerLearner: 0, travelPerVisit: 0,
+  consumablesPerLearner: 0, travelPerVisit: 0,
   equipment: 0, assessmentReporting: 0, contingencyPercent: 10,
   targetMarginPercent: 35, minimumMarginPercent: 15
 };
@@ -36,7 +36,7 @@ function calculate() {
   const preparation = pricing.preparation;
   const facilitation = pricing.facilitationPerSession * sessions * groups;
   const instructorCost = pricing.instructorPerSession * sessions * instructors;
-  const kits = pricing.kitPerLearner * learners;
+  const kits = num("ssKitTotal"); // Engagement-specific total from the project bill of materials.
   const consumables = pricing.consumablesPerLearner * learners * Math.max(1, sessions);
   const travel = pricing.travelPerVisit * visits;
   const equipment = pricing.equipment;
@@ -67,7 +67,7 @@ function renderEstimate() {
       <div class="flex justify-between"><span>Preparation</span><b>${money(c.preparation)}</b></div>
       <div class="flex justify-between"><span>Facilitation</span><b>${money(c.facilitation)}</b></div>
       <div class="flex justify-between"><span>Additional instructors</span><b>${money(c.instructorCost)}</b></div>
-      <div class="flex justify-between"><span>Learner kits</span><b>${money(c.kits)}</b></div>
+      <div class="flex justify-between"><span>Project-specific kit / BOM</span><b>${money(c.kits)}</b></div>
       <div class="flex justify-between"><span>Consumables</span><b>${money(c.consumables)}</b></div>
       <div class="flex justify-between"><span>Travel and logistics</span><b>${money(c.travel)}</b></div>
       <div class="flex justify-between"><span>Equipment</span><b>${money(c.equipment)}</b></div>
@@ -142,7 +142,7 @@ async function saveMeeting() {
     facilities: val("ssFacilities"), budgetPosition: val("ssBudget"), notes: val("ssNotes"),
     schoolPrice: num("ssCustomerPrice"),
     conclusion: val("ssConclusion"),
-    internalEstimate: { deliveryCost: c.total, preferredPrice: c.preferred, minimumPrice: c.minimum },
+    internalEstimate: { deliveryCost: c.total, projectKitBOM: c.kits, preferredPrice: c.preferred, minimumPrice: c.minimum },
     updatedAt: serverTimestamp()
   };
   await addDoc(collection(db, "schoolStemMeetings"), { ...record, createdAt: serverTimestamp() });
@@ -152,7 +152,7 @@ async function saveMeeting() {
 }
 
 async function savePricing() {
-  const fields = ["preparation","facilitationPerSession","instructorPerSession","kitPerLearner","consumablesPerLearner","travelPerVisit","equipment","assessmentReporting","contingencyPercent","targetMarginPercent","minimumMarginPercent"];
+  const fields = ["preparation","facilitationPerSession","instructorPerSession","consumablesPerLearner","travelPerVisit","equipment","assessmentReporting","contingencyPercent","targetMarginPercent","minimumMarginPercent"];
   fields.forEach(k => { pricing[k] = Math.max(0, Number(document.getElementById("rate_" + k)?.value) || 0); });
   await setDoc(doc(db, "schoolStemPricing", "default"), { ...pricing, updatedAt: serverTimestamp() });
   alert("Internal pricing configuration saved securely.");
@@ -164,7 +164,6 @@ function renderPricingInputs() {
     preparation:"Planning and preparation (per programme)",
     facilitationPerSession:"Lead facilitator (per session, per group)",
     instructorPerSession:"Additional instructor (per session)",
-    kitPerLearner:"Project kit (per learner)",
     consumablesPerLearner:"Consumables (per learner, per session)",
     travelPerVisit:"Travel and logistics (per visit)",
     equipment:"Equipment / lab provision (programme total)",
@@ -206,7 +205,7 @@ export function resetSchoolStem() {
   meetings = [];
   pricing = {
     preparation: 0, facilitationPerSession: 0, instructorPerSession: 0,
-    kitPerLearner: 0, consumablesPerLearner: 0, travelPerVisit: 0,
+    consumablesPerLearner: 0, travelPerVisit: 0,
     equipment: 0, assessmentReporting: 0, contingencyPercent: 10,
     targetMarginPercent: 35, minimumMarginPercent: 15
   };
@@ -253,6 +252,7 @@ export function initSchoolStem() {
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <label class="text-xs font-semibold">Classes / levels<input id="ssClasses" class="mt-1 w-full rounded-lg border p-2.5 text-sm" placeholder="e.g. JSS1–JSS3"></label>
           <label class="text-xs font-semibold">Learners<input id="ssLearners" type="number" min="1" value="30" class="mt-1 w-full rounded-lg border p-2.5 text-sm"></label>
+          <label class="text-xs font-semibold">Project kit / BOM total for this engagement (₦)<input id="ssKitTotal" type="number" min="0" value="0" inputmode="numeric" class="mt-1 w-full rounded-lg border p-2.5 text-sm" placeholder="Enter total from project materials list"><span class="block mt-1 text-[10px] font-normal text-slate-500">Variable by project. Enter the full cost of reusable components, learner kits and project-specific materials for this engagement.</span></label>
           <label class="text-xs font-semibold">Groups<input id="ssGroups" type="number" min="1" value="1" class="mt-1 w-full rounded-lg border p-2.5 text-sm"></label>
           <label class="text-xs font-semibold">Sessions<input id="ssSessions" type="number" min="1" value="1" class="mt-1 w-full rounded-lg border p-2.5 text-sm"></label>
           <label class="text-xs font-semibold">Visits<input id="ssVisits" type="number" min="1" value="1" class="mt-1 w-full rounded-lg border p-2.5 text-sm"></label>
@@ -285,7 +285,7 @@ export function initSchoolStem() {
       <section class="bg-white rounded-2xl p-4 shadow-sm space-y-3"><h3 class="font-black text-base">Saved school meetings</h3><div id="ssMeetingList" class="space-y-2"></div></section>
     </div>`;
 
-  const recalcIds = ["ssLearners","ssGroups","ssSessions","ssVisits","ssInstructors","ssOffer","ssFrequency","ssDuration","ssLab"];
+  const recalcIds = ["ssLearners","ssKitTotal","ssGroups","ssSessions","ssVisits","ssInstructors","ssOffer","ssFrequency","ssDuration","ssLab"];
   recalcIds.forEach(id => document.getElementById(id)?.addEventListener("input", () => {
     document.getElementById("ssModel").textContent = modelFor(checked("ssGoal"), val("ssFrequency"), val("ssDuration"), val("ssLab"));
     renderEstimate();
