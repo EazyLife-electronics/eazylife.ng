@@ -17,6 +17,7 @@ let meetings = [];
 let offerCatalogue = [{title:'Practical STEM Education',items:['Electronics and circuit building','Arduino and microcontroller programming','Sensors, automation and control','Hands-on science experiments']},{title:'Robotics and Engineering',items:['Robot design and construction','Mobile robotics and control','Embedded systems and sensors','Mechanical design and prototyping']},{title:'Innovation, Competitions and Exhibitions',items:['Student innovation projects','Project documentation and presentation','Exhibition preparation','Competition preparation, subject to confirmed opportunity and eligibility']},{title:'STEM Laboratory Development',items:['STEM lab planning and setup','Equipment and component supply','Practical learning stations','Teacher training and capacity development']},{title:'Extended Learning',items:['School STEM clubs','Holiday STEM programmes','Teacher development workshops','Project mentoring and technical support']}];
 let selectedOffers = [];
 let editingMeetingId = null;
+let appointmentReminderTimer = null;
 
 const money = n => new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 }).format(Number(n) || 0);
 const num = id => Math.max(0, Number(document.getElementById(id)?.value) || 0);
@@ -101,7 +102,7 @@ function appointmentDateTime(m) {
   return Number.isNaN(d.getTime()) ? null : d;
 }
 function publishAppointmentNotice() {
-  const floor = new Date(); floor.setHours(0,0,0,0);
+  const floor = new Date();
   const upcoming = meetings.filter(m => ["Scheduled","Rescheduled"].includes(m.appointmentStatus || "Scheduled"))
     .map(m => ({...m, _when:appointmentDateTime(m)}))
     .filter(m => m._when && m._when >= floor).sort((a,b)=>a._when-b._when)[0] || null;
