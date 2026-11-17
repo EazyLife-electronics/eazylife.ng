@@ -178,6 +178,10 @@ function buildSchoolSummary() {
 async function saveMeeting() {
   const schoolName = val("ssSchool");
   if (!schoolName) { alert("Enter the school name first."); return; }
+  const appointmentDate = val("ssAppointmentDate");
+  const appointmentTime = val("ssAppointmentTime");
+  if (appointmentDate && !appointmentTime) { alert("Please select an appointment time."); document.getElementById("ssAppointmentTime")?.focus(); return; }
+  if (appointmentTime && !appointmentDate) { alert("Please select an appointment date for this time."); document.getElementById("ssAppointmentDate")?.focus(); return; }
   const goals = checked("ssGoal");
   const model = modelFor(goals, val("ssFrequency"), val("ssDuration"), val("ssLab"));
   const c = calculate();
@@ -299,8 +303,8 @@ export function initSchoolStem() {
           <label class="text-xs font-semibold">Email<input id="ssEmail" type="email" class="mt-1 w-full rounded-lg border p-2.5 text-sm" placeholder="Email address"></label>
           <label class="text-xs font-semibold">Location<input id="ssLocation" class="mt-1 w-full rounded-lg border p-2.5 text-sm" placeholder="Area / city"></label>
           <label class="text-xs font-semibold">Meeting date<input id="ssDate" type="date" class="mt-1 w-full rounded-lg border p-2.5 text-sm"></label>
-          <label class="text-xs font-semibold">Appointment date<input id="ssAppointmentDate" type="date" class="mt-1 w-full rounded-lg border p-2.5 text-sm"></label>
-          <label class="text-xs font-semibold">Appointment time<input id="ssAppointmentTime" type="time" value="09:00" class="mt-1 w-full rounded-lg border p-2.5 text-sm"></label>
+          <label class="text-xs font-semibold">Appointment date<input id="ssAppointmentDate" type="date" class="mt-1 w-full rounded-lg border p-2.5 text-sm"><span class="block mt-1 text-[10px] font-normal text-slate-500">Required together with appointment time.</span></label>
+          <label class="text-xs font-semibold">Appointment time<input id="ssAppointmentTime" type="time" value="09:00" class="mt-1 w-full rounded-lg border p-2.5 text-sm"><span class="block mt-1 text-[10px] font-normal text-slate-500">Choose the exact meeting time. Both date and time are required when scheduling.</span></label>
           <label class="text-xs font-semibold">Appointment status<select id="ssAppointmentStatus" class="mt-1 w-full rounded-lg border p-2.5 text-sm"><option>Scheduled</option><option>Rescheduled</option><option>Concluded</option><option>Cancelled</option><option>No-show</option><option>Closed</option></select></label>
           <label class="text-xs font-semibold">Meeting purpose<input id="ssAppointmentPurpose" class="mt-1 w-full rounded-lg border p-2.5 text-sm" placeholder="Follow-up, proposal review, demonstration…"></label>
           <label class="text-xs font-semibold">School type<select id="ssType" class="mt-1 w-full rounded-lg border p-2.5 text-sm"><option>Private</option><option>Public</option><option>Faith-based</option><option>Other</option></select></label>
