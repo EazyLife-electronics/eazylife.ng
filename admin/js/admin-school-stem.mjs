@@ -100,7 +100,7 @@ function renderMeetings() {
   el.innerHTML = meetings.length ? meetings.map(m => `
     <article class="border border-slate-200 rounded-xl p-3">
       <div class="flex items-start justify-between gap-2"><div><p class="font-bold text-sm">${esc(m.schoolName || "Unnamed school")}</p><p class="text-[11px] text-slate-500">${esc(m.location || "")} · ${esc(m.meetingDate || "Date not set")}</p></div><span class="text-[10px] rounded-full bg-teal-50 text-teal-800 px-2 py-1">${esc(m.model || "Unassigned")}</span></div>
-      <p class="text-xs text-slate-600 mt-2">${esc(m.conclusion || m.notes || "No meeting notes yet")}</p>
+      <p class="text-xs text-slate-600 mt-2">${esc(m.conclusion || m.notes || "No meeting notes yet")}</p>${m.offers?.length ? '<p class="text-[10px] text-teal-700 mt-2">Selected offer: ' + esc(m.offers.slice(0,3).join(", ")) + (m.offers.length > 3 ? " +" + (m.offers.length - 3) + " more" : "") + "</p>" : ""}
     </article>`).join("") : '<p class="text-xs text-slate-400">No school meetings saved yet.</p>';
 }
 
@@ -265,7 +265,7 @@ export function initSchoolStem() {
           <label class="text-xs font-semibold">Curriculum<select id="ssCurriculum" class="mt-1 w-full rounded-lg border p-2.5 text-sm"><option value="To confirm">To confirm</option><option>British</option><option>Nigerian</option><option>Montessori</option><option>Mixed</option><option>Other</option></select></label>
         </div>
         <div><p class="text-xs font-bold mb-2">What does the school want to achieve?</p><div class="grid grid-cols-2 gap-2 text-xs">
-          <label class="flex gap-2 items-center"><input type="checkbox" name="ssGoal" value="practical STEM"> Practical STEM</label>
+          <label class="flex gap-2 items-center rounded-xl border border-slate-200 bg-slate-50 p-3 min-h-12 cursor-pointer has-[:checked]:border-teal-400 has-[:checked]:bg-teal-50"><input type="checkbox" name="ssGoal" value="practical STEM"> Practical STEM</label>
           <label class="flex gap-2 items-center"><input type="checkbox" name="ssGoal" value="robotics"> Robotics</label>
           <label class="flex gap-2 items-center"><input type="checkbox" name="ssGoal" value="projects"> Engineering projects</label>
           <label class="flex gap-2 items-center"><input type="checkbox" name="ssGoal" value="competitions"> Competitions / exhibitions</label>
