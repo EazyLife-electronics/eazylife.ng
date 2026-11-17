@@ -116,7 +116,7 @@ function renderMeetings() {
   if (!el) return;
   el.innerHTML = meetings.length ? meetings.map(m => {
     const status = m.appointmentStatus || "Scheduled";
-    const statuses = ["Scheduled","Rescheduled","Concluded","Closed","Cancelled","No-show"];
+    const statuses = ["Scheduled","Concluded","Closed","Cancelled","No-show"];
     return '<article class="border border-slate-200 rounded-xl p-3">' +
       '<div class="flex items-start justify-between gap-2"><div><p class="font-bold text-sm">' + esc(m.schoolName || "Unnamed school") +
       '</p><p class="text-[11px] text-slate-500">' + esc(m.location || "") + ' · Meeting: ' + esc(m.meetingDate || "Date not set") +
