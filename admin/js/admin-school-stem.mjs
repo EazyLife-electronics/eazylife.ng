@@ -14,6 +14,8 @@ let pricing = {
   targetMarginPercent: 35, minimumMarginPercent: 15
 };
 let meetings = [];
+let offerCatalogue = [{title:'Practical STEM Education',items:['Electronics and circuit building','Arduino and microcontroller programming','Sensors, automation and control','Hands-on science experiments']},{title:'Robotics and Engineering',items:['Robot design and construction','Mobile robotics and control','Embedded systems and sensors','Mechanical design and prototyping']},{title:'Innovation, Competitions and Exhibitions',items:['Student innovation projects','Project documentation and presentation','Exhibition preparation','Competition preparation, subject to confirmed opportunity and eligibility']},{title:'STEM Laboratory Development',items:['STEM lab planning and setup','Equipment and component supply','Practical learning stations','Teacher training and capacity development']},{title:'Extended Learning',items:['School STEM clubs','Holiday STEM programmes','Teacher development workshops','Project mentoring and technical support']}];
+let selectedOffers = [];
 
 const money = n => new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 }).format(Number(n) || 0);
 const num = id => Math.max(0, Number(document.getElementById(id)?.value) || 0);
@@ -35,7 +37,7 @@ function calculate() {
   const instructors = Math.max(1, num("ssInstructors"));
   const preparation = pricing.preparation;
   const facilitation = pricing.facilitationPerSession * sessions * groups;
-  const instructorCost = pricing.instructorPerSession * sessions * instructors;
+  const instructorCost = pricing.instructorPerSession * sessions * Math.max(0, instructors - 1);
   const kits = num("ssKitTotal"); // Engagement-specific total from the project bill of materials.
   const consumables = pricing.consumablesPerLearner * learners * Math.max(1, sessions);
   const travel = pricing.travelPerVisit * visits;
@@ -102,6 +104,20 @@ function renderMeetings() {
     </article>`).join("") : '<p class="text-xs text-slate-400">No school meetings saved yet.</p>';
 }
 
+function renderOfferCatalogue() {
+  const host = document.getElementById("ssOfferCatalogue");
+  if (!host) return;
+  host.innerHTML = offerCatalogue.map(group => '<div class="rounded-xl border border-slate-200 p-3 space-y-2"><p class="text-xs font-black">' + esc(group.title) + '</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-2">' + group.items.map(item => '<label class="flex items-start gap-2 rounded-lg bg-slate-50 has-[:checked]:bg-teal-50 has-[:checked]:border-teal-400 border border-transparent p-3 text-xs cursor-pointer"><input type="checkbox" name="ssOfferItem" value="' + esc(item) + '" class="mt-0.5 accent-teal-600"><span>' + esc(item) + '</span></label>').join("") + '</div></div>').join("");
+  host.querySelectorAll('[name="ssOfferItem"]').forEach(x => { x.checked = selectedOffers.includes(x.value); x.addEventListener("change", () => { selectedOffers = [...host.querySelectorAll('[name="ssOfferItem"]:checked')].map(n => n.value); renderOfferSummary(); refreshProposal(); }); });
+  renderOfferSummary();
+}
+function renderOfferSummary() {
+  const host = document.getElementById("ssOfferSummary");
+  if (!host) return;
+  const items = selectedOffers.length ? selectedOffers : ["Practical, age-appropriate STEM learning","Guided engineering activities and project work","Evidence of learner progress"];
+  host.innerHTML = '<p class="text-[10px] uppercase tracking-wide text-teal-700 font-bold mb-2">What EazyLife can bring to this school</p><ul class="space-y-1.5 text-xs text-slate-700">' + items.map(x => '<li>✓ ' + esc(x) + '</li>').join("") + '</ul><p class="text-[10px] text-slate-500 mt-3">Final activities and deliverables depend on the agreed programme and scope.</p>';
+}
+function refreshProposal() { const box = document.getElementById("ssProposal"); if (box) box.value = buildSchoolSummary(); }
 function buildSchoolSummary() {
   const goals = checked("ssGoal");
   const model = modelFor(goals, val("ssFrequency"), val("ssDuration"), val("ssLab"));
@@ -113,13 +129,16 @@ function buildSchoolSummary() {
     "Meeting date: " + val("ssDate"),
     "Proposed engagement: " + model,
     "Priority areas: " + (goals.join(", ") || "To be confirmed"),
+    "EazyLife offer: " + (selectedOffers.join("; ") || "Practical STEM learning and guided engineering projects, to be scoped"),
     "Learner group: " + val("ssClasses"),
     "Proposed learners: " + val("ssLearners"),
     "Suggested delivery: " + val("ssFrequency") + ", " + val("ssDuration"),
     "Proposed investment: " + (val("ssCustomerPrice") ? money(num("ssCustomerPrice")) : "To be confirmed"),
     "",
     "Proposed focus:",
-    "Practical, age-appropriate STEM learning with guided activities, engineering projects and evidence of learner progress.",
+    "Practical, age-appropriate STEM learning through guided activities, engineering projects and hands-on use of technology.",
+    "Selected offer areas: " + (selectedOffers.join("; ") || "To be agreed after discovery"),
+    "Possible outcomes include stronger practical understanding, project-building confidence and documented learner work, depending on the agreed programme.",
     "Final activities, schedule, equipment, class size and investment will be confirmed after scope validation.",
     "",
     "Prepared by EazyLife Robotics and Electronics Solutions"
@@ -154,7 +173,7 @@ async function saveMeeting() {
 async function savePricing() {
   const fields = ["preparation","facilitationPerSession","instructorPerSession","consumablesPerLearner","travelPerVisit","equipment","assessmentReporting","contingencyPercent","targetMarginPercent","minimumMarginPercent"];
   fields.forEach(k => { pricing[k] = Math.max(0, Number(document.getElementById("rate_" + k)?.value) || 0); });
-  await setDoc(doc(db, "schoolStemPricing", "default"), { ...pricing, updatedAt: serverTimestamp() });
+  await setDoc(doc(db, "schoolStemPricing", "default"), { ...pricing, offerCatalogue, updatedAt: serverTimestamp() });
   alert("Internal pricing configuration saved securely.");
   renderEstimate();
 }
@@ -179,7 +198,7 @@ function renderPricingInputs() {
 async function loadData() {
   try {
     const p = await getDoc(doc(db, "schoolStemPricing", "default"));
-    if (p.exists()) pricing = { ...pricing, ...p.data() };
+    if (p.exists()) { pricing = { ...pricing, ...p.data() }; if (Array.isArray(p.data().offerCatalogue)) offerCatalogue = p.data().offerCatalogue; }
     const snap = await getDocs(query(collection(db, "schoolStemMeetings"), orderBy("createdAt", "desc")));
     meetings = snap.docs.map(d => ({ id:d.id, ...d.data() }));
   } catch (err) {
@@ -197,12 +216,16 @@ async function loadData() {
     }));
   }
   renderMeetings();
+  renderOfferCatalogue();
+  const editor = document.getElementById("ssCatalogueEditor");
+  if (editor) editor.value = offerCatalogue.flatMap(g => g.items.map(item => g.title + ": " + item)).join(String.fromCharCode(10));
   renderEstimate();
 }
 
 export function resetSchoolStem() {
   initialized = false;
   meetings = [];
+  selectedOffers = [];
   pricing = {
     preparation: 0, facilitationPerSession: 0, instructorPerSession: 0,
     consumablesPerLearner: 0, travelPerVisit: 0,
@@ -224,12 +247,13 @@ export function initSchoolStem() {
     <div class="space-y-4">
       <section class="rounded-2xl bg-slate-900 text-white p-5">
         <p class="text-[10px] uppercase tracking-widest text-teal-300 font-bold">EazyLife internal workspace</p>
-        <h2 class="text-xl font-black mt-1">School STEM Management</h2>
-        <p class="text-xs text-slate-300 mt-2">Prepare school meetings, recommend an engagement model and protect your pricing position.</p>
+        <h2 class="text-xl font-black mt-1">School STEM Meeting Assistant</h2>
+        <p class="text-xs text-slate-300 mt-2">Discover the school's needs, present a relevant EazyLife offer, then shape and price the scope.</p>
+        <div class="grid grid-cols-3 gap-2 mt-4 text-center text-[11px] font-bold"><a href="#ssDiscover" class="rounded-lg bg-white/10 px-2 py-3">1. Discover</a><a href="#ssPresent" class="rounded-lg bg-white/10 px-2 py-3">2. Present</a><a href="#ssNegotiate" class="rounded-lg bg-white/10 px-2 py-3">3. Negotiate</a></div>
       </section>
       <p id="ssStatus" class="text-[11px] text-slate-500">Loading secure school records…</p>
-      <section class="bg-white rounded-2xl p-4 shadow-sm space-y-3">
-        <div><h3 class="font-black text-base">New school meeting</h3><p class="text-[11px] text-slate-500">Capture needs first. Confirm scope and delivery assumptions before quoting.</p></div>
+      <section id="ssDiscover" class="bg-white rounded-2xl p-4 shadow-sm space-y-3 scroll-mt-4">
+        <div><h3 class="font-black text-base">1. Discover the school’s needs</h3><p class="text-[11px] text-slate-500">Capture needs first. Confirm scope and delivery assumptions before quoting.</p></div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <label class="text-xs font-semibold">School name<input id="ssSchool" class="mt-1 w-full rounded-lg border p-2.5 text-sm" placeholder="School name"></label>
           <label class="text-xs font-semibold">Contact person<input id="ssContact" class="mt-1 w-full rounded-lg border p-2.5 text-sm" placeholder="Name and role"></label>
@@ -268,8 +292,14 @@ export function initSchoolStem() {
         <div class="rounded-xl bg-teal-50 border border-teal-100 p-3"><p class="text-[10px] uppercase tracking-wide text-teal-800 font-bold">Recommended engagement model</p><p id="ssModel" class="font-black text-sm text-teal-900 mt-1">STEM Experience</p><p class="text-[10px] text-teal-800 mt-1">A rules-based starting recommendation, not an automatic commitment.</p></div>
         <button id="ssSaveMeeting" class="w-full rounded-xl bg-slate-900 text-white py-3 text-sm font-bold">Save school meeting</button>
       </section>
-      <section class="bg-white rounded-2xl p-4 shadow-sm space-y-3">
-        <div><h3 class="font-black text-base">Internal costing and negotiation</h3><p class="text-[11px] text-slate-500">Only administrators can read these settings and estimates.</p></div>
+      <section id="ssPresent" class="bg-white rounded-2xl p-4 shadow-sm space-y-3 scroll-mt-4">
+        <div><h3 class="font-black text-base">2. Present the EazyLife offer</h3><p class="text-[11px] text-slate-500">Select relevant services as you explain what EazyLife can deliver.</p></div>
+        <div id="ssOfferCatalogue" class="space-y-3"></div>
+        <div id="ssOfferSummary" class="rounded-xl bg-teal-50 border border-teal-100 p-3"></div>
+        <div class="rounded-xl border border-slate-200 p-3 space-y-2"><p class="text-xs font-black">Edit the reusable offer catalogue</p><p class="text-[10px] text-slate-500">One offer per line. Format: Category: item. Saving the internal rate card also saves this catalogue.</p><textarea id="ssCatalogueEditor" rows="8" class="w-full rounded-lg border p-2.5 text-xs"></textarea><button id="ssApplyCatalogue" type="button" class="rounded-lg bg-slate-900 text-white px-4 py-2.5 text-xs font-bold">Apply catalogue edits</button></div>
+      </section>
+      <section id="ssNegotiate" class="bg-white rounded-2xl p-4 shadow-sm space-y-3 scroll-mt-4">
+        <div><h3 class="font-black text-base">3. Configure scope and negotiate</h3><p class="text-[11px] text-slate-500">Only administrators can read these settings and estimates.</p></div>
         <div id="ssRateInputs" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
         <button id="ssSavePricing" class="w-full rounded-xl border border-slate-300 py-2.5 text-xs font-bold">Save internal rate card</button>
         <div id="ssEstimate"></div>
@@ -285,6 +315,15 @@ export function initSchoolStem() {
       <section class="bg-white rounded-2xl p-4 shadow-sm space-y-3"><h3 class="font-black text-base">Saved school meetings</h3><div id="ssMeetingList" class="space-y-2"></div></section>
     </div>`;
 
+  document.getElementById("ssApplyCatalogue")?.addEventListener("click", () => {
+    const lines = (document.getElementById("ssCatalogueEditor")?.value || "").split(String.fromCharCode(10)).map(x => x.trim()).filter(Boolean);
+    const groups = new Map();
+    lines.forEach(line => { const i = line.indexOf(":"); const title = i > 0 ? line.slice(0, i).trim() : "Other EazyLife Offers"; const item = i > 0 ? line.slice(i + 1).trim() : line; if (!item) return; if (!groups.has(title)) groups.set(title, []); groups.get(title).push(item); });
+    offerCatalogue = [...groups.entries()].map(([title, items]) => ({ title, items }));
+    selectedOffers = selectedOffers.filter(x => offerCatalogue.some(g => g.items.includes(x)));
+    renderOfferCatalogue(); refreshProposal();
+    alert("Catalogue updated for this meeting. Save the internal rate card to reuse it in future meetings.");
+  });
   const recalcIds = ["ssLearners","ssKitTotal","ssGroups","ssSessions","ssVisits","ssInstructors","ssOffer","ssFrequency","ssDuration","ssLab"];
   recalcIds.forEach(id => document.getElementById(id)?.addEventListener("input", () => {
     document.getElementById("ssModel").textContent = modelFor(checked("ssGoal"), val("ssFrequency"), val("ssDuration"), val("ssLab"));
