@@ -76,6 +76,12 @@ function renderEstimate() {
       <div class="flex justify-between border-t pt-2 font-black"><span>Total estimated cost</span><b>${money(c.total)}</b></div>
     </div>
     <p class="text-[10px] text-slate-500 mt-2">Planning estimate only. Confirm actual scope, staffing, travel, equipment ownership and tax treatment before issuing a binding quotation.</p>`;
+  if (configured < 8) {
+    const warning = document.createElement("p");
+    warning.className = "mt-2 rounded-lg bg-amber-50 p-2 text-[11px] text-amber-800 font-semibold";
+    warning.textContent = "Rate card incomplete. Configure all applicable cost items before relying on this estimate. A zero value is treated as unconfigured, not as a confirmed free service.";
+    out.append(warning);
+  }
   const offer = num("ssOffer");
   const result = document.getElementById("ssNegotiationResult");
   if (result) {
