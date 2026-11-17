@@ -181,7 +181,14 @@ async function loadData() {
     if (status) status.textContent = "Could not load School STEM records. Check Firestore rules after deployment.";
   }
   const rateWrap = document.getElementById("ssRateInputs");
-  if (rateWrap) rateWrap.innerHTML = renderPricingInputs();
+  if (rateWrap) {
+    rateWrap.innerHTML = renderPricingInputs();
+    rateWrap.querySelectorAll("input").forEach(input => input.addEventListener("input", () => {
+      const key = input.id.replace("rate_", "");
+      pricing[key] = Math.max(0, Number(input.value) || 0);
+      renderEstimate();
+    }));
+  }
   renderMeetings();
   renderEstimate();
 }
