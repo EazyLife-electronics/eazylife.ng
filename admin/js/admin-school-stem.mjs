@@ -95,14 +95,41 @@ function renderEstimate() {
   }
 }
 
+function appointmentDateTime(m) {
+  if (!m.appointmentDate) return null;
+  const d = new Date(m.appointmentDate + "T" + (m.appointmentTime || "09:00") + ":00");
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+function publishAppointmentNotice() {
+  const floor = new Date(); floor.setHours(0,0,0,0);
+  const upcoming = meetings.filter(m => ["Scheduled","Rescheduled"].includes(m.appointmentStatus || "Scheduled"))
+    .map(m => ({...m, _when:appointmentDateTime(m)}))
+    .filter(m => m._when && m._when >= floor).sort((a,b)=>a._when-b._when)[0] || null;
+  window.dispatchEvent(new CustomEvent("school-stem-appointments-updated", {detail:upcoming ? {
+    id:upcoming.id, schoolName:upcoming.schoolName, date:upcoming.appointmentDate,
+    time:upcoming.appointmentTime || "", purpose:upcoming.appointmentPurpose || "School STEM meeting"
+  } : null}));
+}
 function renderMeetings() {
   const el = document.getElementById("ssMeetingList");
   if (!el) return;
-  el.innerHTML = meetings.length ? meetings.map(m => `
-    <article class="border border-slate-200 rounded-xl p-3">
-      <div class="flex items-start justify-between gap-2"><div><p class="font-bold text-sm">${esc(m.schoolName || "Unnamed school")}</p><p class="text-[11px] text-slate-500">${esc(m.location || "")} · ${esc(m.meetingDate || "Date not set")}</p></div><span class="text-[10px] rounded-full bg-teal-50 text-teal-800 px-2 py-1">${esc(m.model || "Unassigned")}</span></div>
-      <p class="text-xs text-slate-600 mt-2">${esc(m.conclusion || m.notes || "No meeting notes yet")}</p>${m.offers?.length ? '<p class="text-[10px] text-teal-700 mt-2">Selected offer: ' + esc(m.offers.slice(0,3).join(", ")) + (m.offers.length > 3 ? " +" + (m.offers.length - 3) + " more" : "") + "</p>" : ""}
-    </article>`).join("") : '<p class="text-xs text-slate-400">No school meetings saved yet.</p>';
+  el.innerHTML = meetings.length ? meetings.map(m => {
+    const status = m.appointmentStatus || "Scheduled";
+    const statuses = ["Concluded","Closed","Cancelled","No-show","Scheduled"];
+    return '<article class="border border-slate-200 rounded-xl p-3">' +
+      '<div class="flex items-start justify-between gap-2"><div><p class="font-bold text-sm">' + esc(m.schoolName || "Unnamed school") +
+      '</p><p class="text-[11px] text-slate-500">' + esc(m.location || "") + ' · Meeting: ' + esc(m.meetingDate || "Date not set") +
+      '</p><p class="text-[11px] text-slate-500">Appointment: ' + esc(m.appointmentDate || "Not scheduled") + ' ' + esc(m.appointmentTime || "") +
+      '</p></div><span class="text-[10px] rounded-full bg-teal-50 text-teal-800 px-2 py-1">' + esc(status) + '</span></div>' +
+      '<p class="text-xs text-slate-600 mt-2">' + esc(m.appointmentPurpose || m.conclusion || m.notes || "No meeting notes yet") + '</p>' +
+      '<div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3">' +
+      ['edit','followup','duplicate','delete'].map((a,i)=>'<button type="button" data-meeting-action="' + a + '" data-id="' + esc(m.id) +
+        '" class="rounded-lg border py-2 text-[11px] font-bold">' + ['Open / edit','New meeting','Duplicate','Delete'][i] + '</button>').join("") +
+      '</div><div class="flex flex-wrap gap-2 mt-2">' + statuses.map(x=>'<button type="button" data-meeting-status="' + x +
+        '" data-id="' + esc(m.id) + '" class="rounded-full border px-3 py-1.5 text-[10px] ' + (status===x?'bg-teal-50 border-teal-300':'text-slate-600') +
+        '">' + x + '</button>').join("") + '</div></article>';
+  }).join("") : '<p class="text-xs text-slate-400">No school meetings saved yet.</p>';
+  publishAppointmentNotice();
 }
 
 function renderOfferCatalogue() {
