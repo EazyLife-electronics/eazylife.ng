@@ -116,6 +116,7 @@ function buildSchoolSummary() {
     "Learner group: " + val("ssClasses"),
     "Proposed learners: " + val("ssLearners"),
     "Suggested delivery: " + val("ssFrequency") + ", " + val("ssDuration"),
+    "Proposed investment: " + (val("ssCustomerPrice") ? money(num("ssCustomerPrice")) : "To be confirmed"),
     "",
     "Proposed focus:",
     "Practical, age-appropriate STEM learning with guided activities, engineering projects and evidence of learner progress.",
@@ -139,6 +140,7 @@ async function saveMeeting() {
     learners: c.learners, groups: c.groups, sessions: c.sessions, visits: c.visits,
     instructors: c.instructors, frequency: val("ssFrequency"), duration: val("ssDuration"),
     facilities: val("ssFacilities"), budgetPosition: val("ssBudget"), notes: val("ssNotes"),
+    schoolPrice: num("ssCustomerPrice"),
     conclusion: val("ssConclusion"),
     internalEstimate: { deliveryCost: c.total, preferredPrice: c.preferred, minimumPrice: c.minimum },
     updatedAt: serverTimestamp()
@@ -276,6 +278,7 @@ export function initSchoolStem() {
       </section>
       <section class="bg-white rounded-2xl p-4 shadow-sm space-y-3">
         <div><h3 class="font-black text-base">School-facing summary</h3><p class="text-[11px] text-slate-500">This output deliberately excludes internal costs, margins and negotiation limits.</p></div>
+        <label class="block text-xs font-semibold">Approved price to show the school (₦)<input id="ssCustomerPrice" type="number" min="0" inputmode="numeric" class="mt-1 w-full rounded-lg border p-2.5 text-sm" placeholder="Leave blank until you decide"></label>
         <textarea id="ssProposal" rows="12" class="w-full rounded-xl border p-3 text-xs" readonly></textarea>
         <div class="grid grid-cols-2 gap-2"><button id="ssGenerateProposal" class="rounded-xl bg-teal-600 text-white py-2.5 text-xs font-bold">Generate summary</button><button id="ssCopyProposal" class="rounded-xl border py-2.5 text-xs font-bold">Copy summary</button></div>
       </section>
