@@ -63,7 +63,7 @@ function renderEstimate() {
       <div class="rounded-xl bg-slate-50 p-3"><p class="text-[10px] text-slate-500">Estimated delivery cost</p><p class="font-black text-sm">${money(c.total)}</p></div>
       <div class="rounded-xl bg-teal-50 p-3"><p class="text-[10px] text-teal-700">Preferred price</p><p class="font-black text-sm text-teal-800">${money(c.preferred)}</p></div>
       <div class="rounded-xl bg-amber-50 p-3"><p class="text-[10px] text-amber-700">Minimum price</p><p class="font-black text-sm text-amber-800">${money(c.minimum)}</p></div>
-      <div class="rounded-xl bg-slate-50 p-3"><p class="text-[10px] text-slate-500">Configured cost items</p><p class="font-black text-sm">${configured}/8</p></div>
+      <div class="rounded-xl bg-slate-50 p-3"><p class="text-[10px] text-slate-500">Configured cost items</p><p class="font-black text-sm">${configured}/7</p></div>
     </div>
     <div class="rounded-xl border border-slate-200 p-3 text-xs space-y-1">
       <div class="flex justify-between"><span>Preparation</span><b>${money(c.preparation)}</b></div>
@@ -159,7 +159,7 @@ async function saveMeeting() {
     learners: c.learners, groups: c.groups, sessions: c.sessions, visits: c.visits,
     instructors: c.instructors, frequency: val("ssFrequency"), duration: val("ssDuration"),
     facilities: val("ssFacilities"), budgetPosition: val("ssBudget"), notes: val("ssNotes"),
-    schoolPrice: num("ssCustomerPrice"),
+    schoolPrice: num("ssCustomerPrice"), offers: [...selectedOffers],
     conclusion: val("ssConclusion"),
     internalEstimate: { deliveryCost: c.total, projectKitBOM: c.kits, preferredPrice: c.preferred, minimumPrice: c.minimum },
     updatedAt: serverTimestamp()
@@ -331,6 +331,7 @@ export function initSchoolStem() {
   }));
   document.querySelectorAll('[name="ssGoal"]').forEach(x => x.addEventListener("change", () => {
     document.getElementById("ssModel").textContent = modelFor(checked("ssGoal"), val("ssFrequency"), val("ssDuration"), val("ssLab"));
+    refreshProposal();
   }));
   document.getElementById("ssSaveMeeting").addEventListener("click", () => saveMeeting().catch(e => alert("Could not save meeting: " + e.message)));
   document.getElementById("ssSavePricing").addEventListener("click", () => savePricing().catch(e => alert("Could not save pricing: " + e.message)));
