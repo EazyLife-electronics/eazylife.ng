@@ -43,6 +43,7 @@
                 <button type="button" data-notification-tab="orders" class="flex items-center justify-between gap-2 bg-white rounded-xl px-3 py-2 text-left"><span class="text-xs font-bold text-gray-700">New orders</span><span id="attentionOrdersCount" class="text-xs font-black text-red-600">0</span></button>
                 <button type="button" data-notification-tab="requests" class="flex items-center justify-between gap-2 bg-white rounded-xl px-3 py-2 text-left"><span class="text-xs font-bold text-gray-700">New requests</span><span id="attentionRequestsCount" class="text-xs font-black text-red-600">0</span></button>
                 <button type="button" data-notification-tab="reviews" class="flex items-center justify-between gap-2 bg-white rounded-xl px-3 py-2 text-left"><span class="text-xs font-bold text-gray-700">Reviews to handle</span><span id="attentionReviewsCount" class="text-xs font-black text-red-600">0</span></button>
+                <button type="button" data-notification-tab="school-stem" id="attentionSchoolStem" class="hidden sm:col-span-3 flex flex-col gap-1 bg-white rounded-xl px-3 py-2 text-left"><span class="text-xs font-bold text-gray-700">Closest School STEM meeting</span><span id="attentionSchoolStemText" class="text-[11px] text-teal-700"></span></button>
             </div>
         </section>
         <div class="flex gap-2 mb-6 overflow-x-auto no-scrollbar">
@@ -56,6 +57,7 @@
             <button data-tab="media" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Media</button>
             <button data-tab="heroes" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Heroes</button>
             <button data-tab="reviews" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Reviews<span id="reviewsNotificationBadge" class="hidden ml-1.5 min-w-4 h-4 px-1 rounded-full bg-red-600 text-white text-[9px] inline-flex items-center justify-center align-middle">0</span></button>
+            <button data-tab="school-stem" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">School STEM<span id="schoolStemNotificationBadge" class="hidden ml-1.5 min-w-4 h-4 px-1 rounded-full bg-teal-600 text-white text-[9px] inline-flex items-center justify-center align-middle">0</span></button>
             <button data-tab="settings" class="tab-btn px-5 py-2 rounded-full text-xs font-bold bg-gray-100">Settings</button>
         </div>
         <div id="panel-products" class="tab-panel">
@@ -206,6 +208,7 @@
         <div id="panel-requests" class="tab-panel hidden"><p class="text-xs text-gray-400 mb-4 px-1">"Can't find what you want" and budget-based sourcing requests from the shop. Move each through New → Contacted → Fulfilled.</p><div id="requestList" class="grid gap-3"></div></div>
         <div id="panel-orders" class="tab-panel hidden"><div id="orderList" class="grid gap-3"></div></div>
         <div id="panel-delivery" class="tab-panel hidden"><div id="deliveryContent"></div></div>
+        <div id="panel-school-stem" class="tab-panel hidden"><div id="schoolStemContent"></div></div>
         <div id="panel-settings" class="tab-panel hidden"><div id="settingsContent"></div></div>
     </div>
 </div>

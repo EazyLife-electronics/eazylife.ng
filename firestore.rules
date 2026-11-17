@@ -96,6 +96,15 @@ service cloud.firestore {
       allow read, create, update, delete: if isAdmin();
     }
 
+    // Private School STEM records and pricing. No public reads or writes.
+    match /schoolStemMeetings/{meetingId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
+    match /schoolStemPricing/{configId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
     match /deliveries/{deliveryId} {
       // Public `get` only (never `list`): the tracking page fetches one
       // specific delivery by ID, which it can only learn from the order's
