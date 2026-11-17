@@ -87,12 +87,13 @@ let projectPublishTimer = null;
 let currentAdminReviews = [];
 let currentAdminRequests = [];
 let currentAdminOrders = [];
+let upcomingSchoolAppointment = null;
 
 function updateAdminAttention() {
   const pendingOrders = currentAdminOrders.filter(order => String(order.status || 'new').toLowerCase() === 'new').length;
   const pendingRequests = currentAdminRequests.filter(request => String(request.status || 'new').toLowerCase() === 'new').length;
   const pendingReviews = currentAdminReviews.filter(review => review.approved !== true && review.adminReviewed !== true).length;
-  const total = pendingOrders + pendingRequests + pendingReviews;
+  const total = pendingOrders + pendingRequests + pendingReviews + (upcomingSchoolAppointment ? 1 : 0);
   const panel = document.getElementById('adminAttentionPanel');
   if (panel) panel.classList.toggle('hidden', total === 0);
   const totalEl = document.getElementById('adminAttentionTotal');
@@ -100,7 +101,8 @@ function updateAdminAttention() {
   const values = {
     orders: pendingOrders,
     requests: pendingRequests,
-    reviews: pendingReviews
+    reviews: pendingReviews,
+    schoolStem: upcomingSchoolAppointment ? 1 : 0
   };
   Object.entries(values).forEach(([key, count]) => {
     const summary = document.getElementById('attention' + key[0].toUpperCase() + key.slice(1) + 'Count');
@@ -112,6 +114,20 @@ function updateAdminAttention() {
     }
   });
 }
+
+
+window.addEventListener('school-stem-appointments-updated', (event) => {
+  upcomingSchoolAppointment = event.detail || null;
+  const card = document.getElementById('attentionSchoolStem');
+  const text = document.getElementById('attentionSchoolStemText');
+  if (card) card.classList.toggle('hidden', !upcomingSchoolAppointment);
+  if (text && upcomingSchoolAppointment) {
+    const d = new Date(upcomingSchoolAppointment.date + 'T' + (upcomingSchoolAppointment.time || '09:00') + ':00');
+    const when = d.toLocaleString('en-NG', { dateStyle:'medium', timeStyle:'short' });
+    text.textContent = upcomingSchoolAppointment.schoolName + ' · ' + when + ' · ' + (upcomingSchoolAppointment.purpose || 'School STEM meeting');
+  }
+  updateAdminAttention();
+});
 
 document.querySelectorAll('[data-notification-tab]').forEach(button => {
   button.addEventListener('click', () => {
