@@ -298,6 +298,10 @@ export function initSchoolStem() {
           <label class="text-xs font-semibold">Email<input id="ssEmail" type="email" class="mt-1 w-full rounded-lg border p-2.5 text-sm" placeholder="Email address"></label>
           <label class="text-xs font-semibold">Location<input id="ssLocation" class="mt-1 w-full rounded-lg border p-2.5 text-sm" placeholder="Area / city"></label>
           <label class="text-xs font-semibold">Meeting date<input id="ssDate" type="date" class="mt-1 w-full rounded-lg border p-2.5 text-sm"></label>
+          <label class="text-xs font-semibold">Appointment date<input id="ssAppointmentDate" type="date" class="mt-1 w-full rounded-lg border p-2.5 text-sm"></label>
+          <label class="text-xs font-semibold">Appointment time<input id="ssAppointmentTime" type="time" value="09:00" class="mt-1 w-full rounded-lg border p-2.5 text-sm"></label>
+          <label class="text-xs font-semibold">Appointment status<select id="ssAppointmentStatus" class="mt-1 w-full rounded-lg border p-2.5 text-sm"><option>Scheduled</option><option>Rescheduled</option><option>Concluded</option><option>Cancelled</option><option>No-show</option><option>Closed</option></select></label>
+          <label class="text-xs font-semibold">Meeting purpose<input id="ssAppointmentPurpose" class="mt-1 w-full rounded-lg border p-2.5 text-sm" placeholder="Follow-up, proposal review, demonstration…"></label>
           <label class="text-xs font-semibold">School type<select id="ssType" class="mt-1 w-full rounded-lg border p-2.5 text-sm"><option>Private</option><option>Public</option><option>Faith-based</option><option>Other</option></select></label>
           <label class="text-xs font-semibold">Curriculum<select id="ssCurriculum" class="mt-1 w-full rounded-lg border p-2.5 text-sm"><option value="To confirm">To confirm</option><option>British</option><option>Nigerian</option><option>Montessori</option><option>Mixed</option><option>Other</option></select></label>
         </div>
@@ -325,6 +329,9 @@ export function initSchoolStem() {
         </div>
         <label class="block text-xs font-semibold">Facilities / resources available<textarea id="ssFacilities" rows="2" class="mt-1 w-full rounded-lg border p-2.5 text-sm" placeholder="Classroom, power, projector, existing kits, storage…"></textarea></label>
         <label class="block text-xs font-semibold">Meeting notes<textarea id="ssNotes" rows="3" class="mt-1 w-full rounded-lg border p-2.5 text-sm" placeholder="What they said, expectations, concerns, constraints…"></textarea></label>
+        <label class="text-xs font-semibold">Agreement status<select id="ssAgreementStatus" class="mt-1 w-full rounded-lg border p-2.5 text-sm"><option>Discussion</option><option>Proposal to prepare</option><option>Proposal sent</option><option>Negotiation</option><option>Agreed, awaiting confirmation</option><option>Confirmed</option><option>On hold</option><option>Declined</option><option>Completed</option></select></label>
+        <label class="block text-xs font-semibold">Next action<textarea id="ssNextStep" rows="2" class="mt-1 w-full rounded-lg border p-2.5 text-sm" placeholder="Prepare proposal, call school, arrange demonstration…"></textarea></label>
+        <label class="block text-xs font-semibold">Agreed scope / terms<textarea id="ssAgreedScope" rows="3" class="mt-1 w-full rounded-lg border p-2.5 text-sm" placeholder="Classes, sessions, deliverables, payment terms…"></textarea></label>
         <label class="block text-xs font-semibold">Agreed next step / conclusion<textarea id="ssConclusion" rows="2" class="mt-1 w-full rounded-lg border p-2.5 text-sm" placeholder="What was agreed, what needs confirmation…"></textarea></label>
         <div class="rounded-xl bg-teal-50 border border-teal-100 p-3"><p class="text-[10px] uppercase tracking-wide text-teal-800 font-bold">Recommended engagement model</p><p id="ssModel" class="font-black text-sm text-teal-900 mt-1">STEM Experience</p><p class="text-[10px] text-teal-800 mt-1">A rules-based starting recommendation, not an automatic commitment.</p></div>
         <button id="ssSaveMeeting" class="w-full rounded-xl bg-slate-900 text-white py-3 text-sm font-bold">Save school meeting</button>
@@ -371,6 +378,54 @@ export function initSchoolStem() {
     refreshProposal();
   }));
   document.getElementById("ssSaveMeeting").addEventListener("click", () => saveMeeting().catch(e => alert("Could not save meeting: " + e.message)));
+  document.getElementById("ssMeetingList").addEventListener("click", async event => {
+    const statusButton=event.target.closest("[data-meeting-status]");
+    const actionButton=event.target.closest("[data-meeting-action]");
+    const id=statusButton?.dataset.id || actionButton?.dataset.id;
+    if(!id) return;
+    const record=meetings.find(x=>x.id===id); if(!record) return;
+    if(statusButton) {
+      const status=statusButton.dataset.meetingStatus;
+      if(!confirm("Change appointment status to "+status+"?")) return;
+      try { await updateDoc(doc(db,"schoolStemMeetings",id),{appointmentStatus:status,updatedAt:serverTimestamp()}); record.appointmentStatus=status; renderMeetings(); }
+      catch(err) { alert("Could not update appointment: "+err.message); }
+      return;
+    }
+    const action=actionButton.dataset.meetingAction;
+    if(action==="delete") {
+      if(!confirm("Permanently delete this meeting record? This cannot be undone.")) return;
+      try { await deleteDoc(doc(db,"schoolStemMeetings",id)); meetings=meetings.filter(x=>x.id!==id); if(editingMeetingId===id) editingMeetingId=null; renderMeetings(); }
+      catch(err) { alert("Could not delete meeting: "+err.message); }
+      return;
+    }
+    const set=(key,value)=>{const node=document.getElementById(key);if(node)node.value=value??"";};
+    const fill=()=>{
+      set("ssSchool",record.schoolName);set("ssContact",record.contact);set("ssPhone",record.phone);set("ssEmail",record.email);set("ssLocation",record.location);
+      set("ssType",record.schoolType);set("ssCurriculum",record.curriculum);set("ssClasses",record.classes);set("ssLearners",record.learners);
+      set("ssGroups",record.groups);set("ssSessions",record.sessions);set("ssVisits",record.visits);set("ssInstructors",record.instructors);
+      set("ssFrequency",record.frequency);set("ssDuration",record.duration);set("ssFacilities",record.facilities);set("ssBudget",record.budgetPosition);
+      set("ssKitTotal",record.internalEstimate?.projectKitBOM);
+      document.querySelectorAll('[name="ssGoal"]').forEach(x=>x.checked=(record.goals||[]).includes(x.value));
+      selectedOffers=[...(record.offers||[])];renderOfferCatalogue();
+    };
+    fill();
+    if(action==="edit") {
+      editingMeetingId=id;set("ssDate",record.meetingDate);set("ssAppointmentDate",record.appointmentDate);set("ssAppointmentTime",record.appointmentTime);
+      set("ssAppointmentPurpose",record.appointmentPurpose);set("ssAppointmentStatus",record.appointmentStatus||"Scheduled");
+      set("ssNotes",record.notes);set("ssConclusion",record.conclusion);set("ssAgreementStatus",record.agreementStatus);
+      set("ssNextStep",record.nextStep);set("ssAgreedScope",record.agreedScope);set("ssCustomerPrice",record.schoolPrice);
+      document.getElementById("ssSaveMeeting").textContent="Update saved school meeting";
+    } else {
+      editingMeetingId=null;set("ssDate",new Date().toISOString().slice(0,10));set("ssAppointmentDate","");set("ssAppointmentTime","09:00");
+      set("ssAppointmentPurpose",action==="duplicate"?"Initial school meeting":"Follow-up meeting");set("ssAppointmentStatus","Scheduled");
+      set("ssNotes","");set("ssConclusion","");set("ssNextStep","");set("ssAgreedScope","");set("ssCustomerPrice","");
+      set("ssAgreementStatus",record.agreementStatus||"Discussion");
+      if(action==="duplicate"){set("ssSchool","");set("ssContact","");set("ssPhone","");set("ssEmail","");set("ssLocation","");set("ssDate","");set("ssBudget","not discussed");}
+      document.getElementById("ssSaveMeeting").textContent=action==="duplicate"?"Save duplicated setup":"Save new follow-up meeting";
+    }
+    renderEstimate();refreshProposal();document.getElementById("ssDiscover").scrollIntoView({behavior:"smooth"});
+  });
+
   document.getElementById("ssSavePricing").addEventListener("click", () => savePricing().catch(e => alert("Could not save pricing: " + e.message)));
   document.getElementById("ssGenerateProposal").addEventListener("click", () => { document.getElementById("ssProposal").value = buildSchoolSummary(); });
   document.getElementById("ssCopyProposal").addEventListener("click", async () => {
