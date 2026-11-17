@@ -116,7 +116,7 @@ function renderMeetings() {
   if (!el) return;
   el.innerHTML = meetings.length ? meetings.map(m => {
     const status = m.appointmentStatus || "Scheduled";
-    const statuses = ["Concluded","Closed","Cancelled","No-show","Scheduled"];
+    const statuses = ["Scheduled","Rescheduled","Concluded","Closed","Cancelled","No-show"];
     return '<article class="border border-slate-200 rounded-xl p-3">' +
       '<div class="flex items-start justify-between gap-2"><div><p class="font-bold text-sm">' + esc(m.schoolName || "Unnamed school") +
       '</p><p class="text-[11px] text-slate-500">' + esc(m.location || "") + ' · Meeting: ' + esc(m.meetingDate || "Date not set") +
@@ -187,7 +187,7 @@ async function saveMeeting() {
     meetingDate: val("ssDate"), appointmentDate: val("ssAppointmentDate"), appointmentTime: val("ssAppointmentTime"), appointmentPurpose: val("ssAppointmentPurpose"), appointmentStatus: val("ssAppointmentStatus") || "Scheduled", goals, model, classes: val("ssClasses"),
     learners: c.learners, groups: c.groups, sessions: c.sessions, visits: c.visits,
     instructors: c.instructors, frequency: val("ssFrequency"), duration: val("ssDuration"),
-    facilities: val("ssFacilities"), budgetPosition: val("ssBudget"), notes: val("ssNotes"),
+    facilities: val("ssFacilities"), labLevel: val("ssLab"), budgetPosition: val("ssBudget"), notes: val("ssNotes"),
     schoolPrice: num("ssCustomerPrice"), offers: [...selectedOffers],
     conclusion: val("ssConclusion"), agreementStatus: val("ssAgreementStatus"), nextStep: val("ssNextStep"), agreedScope: val("ssAgreedScope"),
     internalEstimate: { deliveryCost: c.total, projectKitBOM: c.kits, preferredPrice: c.preferred, minimumPrice: c.minimum },
@@ -404,7 +404,7 @@ export function initSchoolStem() {
       set("ssSchool",record.schoolName);set("ssContact",record.contact);set("ssPhone",record.phone);set("ssEmail",record.email);set("ssLocation",record.location);
       set("ssType",record.schoolType);set("ssCurriculum",record.curriculum);set("ssClasses",record.classes);set("ssLearners",record.learners);
       set("ssGroups",record.groups);set("ssSessions",record.sessions);set("ssVisits",record.visits);set("ssInstructors",record.instructors);
-      set("ssFrequency",record.frequency);set("ssDuration",record.duration);set("ssFacilities",record.facilities);set("ssBudget",record.budgetPosition);
+      set("ssFrequency",record.frequency);set("ssDuration",record.duration);set("ssFacilities",record.facilities);set("ssLab",record.labLevel);set("ssBudget",record.budgetPosition);
       set("ssKitTotal",record.internalEstimate?.projectKitBOM);
       document.querySelectorAll('[name="ssGoal"]').forEach(x=>x.checked=(record.goals||[]).includes(x.value));
       selectedOffers=[...(record.offers||[])];renderOfferCatalogue();
