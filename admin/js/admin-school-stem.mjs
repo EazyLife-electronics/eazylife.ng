@@ -123,9 +123,9 @@ function renderMeetings() {
       '</p><p class="text-[11px] text-slate-500">Appointment: ' + esc(m.appointmentDate || "Not scheduled") + ' ' + esc(m.appointmentTime || "") +
       '</p></div><span class="text-[10px] rounded-full bg-teal-50 text-teal-800 px-2 py-1">' + esc(status) + '</span></div>' +
       '<p class="text-xs text-slate-600 mt-2">' + esc(m.appointmentPurpose || m.conclusion || m.notes || "No meeting notes yet") + '</p>' +
-      '<div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3">' +
-      ['edit','followup','duplicate','delete'].map((a,i)=>'<button type="button" data-meeting-action="' + a + '" data-id="' + esc(m.id) +
-        '" class="rounded-lg border py-2 text-[11px] font-bold">' + ['Open / edit','New meeting','Duplicate','Delete'][i] + '</button>').join("") +
+      '<div class="grid grid-cols-2 sm:grid-cols-5 gap-2 mt-3">' +
+      ['edit','followup','duplicate','removeAppointment','delete'].map((a,i)=>'<button type="button" data-meeting-action="' + a + '" data-id="' + esc(m.id) +
+        '" class="rounded-lg border py-2 text-[11px] font-bold">' + ['Open / edit','New meeting','Duplicate','Remove appt.','Delete record'][i] + '</button>').join("") +
       '</div><div class="flex flex-wrap gap-2 mt-2">' + statuses.map(x=>'<button type="button" data-meeting-status="' + x +
         '" data-id="' + esc(m.id) + '" class="rounded-full border px-3 py-1.5 text-[10px] ' + (status===x?'bg-teal-50 border-teal-300':'text-slate-600') +
         '">' + x + '</button>').join("") + '</div></article>';
@@ -393,6 +393,14 @@ export function initSchoolStem() {
       return;
     }
     const action=actionButton.dataset.meetingAction;
+    if(action==="removeAppointment") {
+      if(!confirm("Remove this appointment date and time while keeping the school's meeting notes and agreement?")) return;
+      try {
+        await updateDoc(doc(db,"schoolStemMeetings",id),{appointmentDate:"",appointmentTime:"",appointmentPurpose:"",appointmentStatus:"Cancelled",updatedAt:serverTimestamp()});
+        Object.assign(record,{appointmentDate:"",appointmentTime:"",appointmentPurpose:"",appointmentStatus:"Cancelled"});renderMeetings();
+      } catch(err) { alert("Could not remove appointment: "+err.message); }
+      return;
+    }
     if(action==="delete") {
       if(!confirm("Permanently delete this meeting record? This cannot be undone.")) return;
       try { await deleteDoc(doc(db,"schoolStemMeetings",id)); meetings=meetings.filter(x=>x.id!==id); if(editingMeetingId===id) editingMeetingId=null; renderMeetings(); }
