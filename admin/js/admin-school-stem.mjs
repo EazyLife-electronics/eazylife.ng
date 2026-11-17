@@ -435,4 +435,6 @@ export function initSchoolStem() {
     catch { document.getElementById("ssProposal").value = text; alert("Select and copy the summary manually."); }
   });
   loadData();
+  if (appointmentReminderTimer) clearInterval(appointmentReminderTimer);
+  appointmentReminderTimer = setInterval(publishAppointmentNotice, 60000);
 }
