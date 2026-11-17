@@ -266,12 +266,12 @@ export function initSchoolStem() {
         </div>
         <div><p class="text-xs font-bold mb-2">What does the school want to achieve?</p><div class="grid grid-cols-2 gap-2 text-xs">
           <label class="flex gap-2 items-center rounded-xl border border-slate-200 bg-slate-50 p-3 min-h-12 cursor-pointer has-[:checked]:border-teal-400 has-[:checked]:bg-teal-50"><input type="checkbox" name="ssGoal" value="practical STEM"> Practical STEM</label>
-          <label class="flex gap-2 items-center"><input type="checkbox" name="ssGoal" value="robotics"> Robotics</label>
-          <label class="flex gap-2 items-center"><input type="checkbox" name="ssGoal" value="projects"> Engineering projects</label>
-          <label class="flex gap-2 items-center"><input type="checkbox" name="ssGoal" value="competitions"> Competitions / exhibitions</label>
-          <label class="flex gap-2 items-center"><input type="checkbox" name="ssGoal" value="lab"> STEM laboratory</label>
-          <label class="flex gap-2 items-center"><input type="checkbox" name="ssGoal" value="teacher"> Teacher development</label>
-          <label class="flex gap-2 items-center"><input type="checkbox" name="ssGoal" value="club"> STEM club / holiday programme</label>
+          <label class="flex gap-2 items-center rounded-xl border border-slate-200 bg-slate-50 p-3 min-h-12 cursor-pointer has-[:checked]:border-teal-400 has-[:checked]:bg-teal-50"><input type="checkbox" name="ssGoal" value="robotics"> Robotics</label>
+          <label class="flex gap-2 items-center rounded-xl border border-slate-200 bg-slate-50 p-3 min-h-12 cursor-pointer has-[:checked]:border-teal-400 has-[:checked]:bg-teal-50"><input type="checkbox" name="ssGoal" value="projects"> Engineering projects</label>
+          <label class="flex gap-2 items-center rounded-xl border border-slate-200 bg-slate-50 p-3 min-h-12 cursor-pointer has-[:checked]:border-teal-400 has-[:checked]:bg-teal-50"><input type="checkbox" name="ssGoal" value="competitions"> Competitions / exhibitions</label>
+          <label class="flex gap-2 items-center rounded-xl border border-slate-200 bg-slate-50 p-3 min-h-12 cursor-pointer has-[:checked]:border-teal-400 has-[:checked]:bg-teal-50"><input type="checkbox" name="ssGoal" value="lab"> STEM laboratory</label>
+          <label class="flex gap-2 items-center rounded-xl border border-slate-200 bg-slate-50 p-3 min-h-12 cursor-pointer has-[:checked]:border-teal-400 has-[:checked]:bg-teal-50"><input type="checkbox" name="ssGoal" value="teacher"> Teacher development</label>
+          <label class="flex gap-2 items-center rounded-xl border border-slate-200 bg-slate-50 p-3 min-h-12 cursor-pointer has-[:checked]:border-teal-400 has-[:checked]:bg-teal-50"><input type="checkbox" name="ssGoal" value="club"> STEM club / holiday programme</label>
         </div></div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <label class="text-xs font-semibold">Classes / levels<input id="ssClasses" class="mt-1 w-full rounded-lg border p-2.5 text-sm" placeholder="e.g. JSS1–JSS3"></label>
