@@ -21,7 +21,7 @@ import { renderOrderList } from './admin-orders.mjs';
 import { initProjects, renderProjects, checkDueProjectPublications, setProjectKitProducts } from './admin-projects.mjs';
 import { initSettings, loadSettingsForm } from './admin-settings.mjs';
 import { setQuotationProducts } from './admin-quotations.mjs';
-import { initSchoolStem, resetSchoolStem } from './admin-school-stem.mjs';
+import { initSchoolStem, resetSchoolStem } from './admin-school-stem.mjs';\nimport { initTechnicalTraining, resetTechnicalTraining } from './admin-technical-training.mjs';
 
 const { auth } = initFirebase();
 
