@@ -82,7 +82,7 @@ async function loadData(){
   if(p.exists()){const d=p.data();prices={...defaultPriceMap(),...(d.prices||{})};fees={...fees,...(d.fees||{})};}
   const snap=await getDocs(query(collection(db,"technicalTrainingLeads"),orderBy("createdAt","desc")));
   leads=snap.docs.map(d=>({id:d.id,...d.data()}));
- }catch(e){console.error("Technical training data load failed",e);const s=document.getElementById("ttStatus");if(s)s.textContent="Could not load private training data. Confirm Firestore rules are deployed.";}
+ }catch(e){console.error("Technical training data load failed",e);const s=document.getElementById("ttLoadStatus");if(s)s.textContent="Could not load private training data. Confirm Firestore rules are deployed.";}
  renderPriceEditor();renderFees();renderEstimate();renderLeads();
 }
 export function resetTechnicalTraining(){initialized=false;prices={};fees={registration:0,materialsPerCourse:0,assessmentPerCourse:0,certificationPerCourse:0,physicalPerLearner:0,hybridPerLearner:0,institutionalPerLearner:0};leads=[];const h=document.getElementById("technicalTrainingContent");if(h)h.innerHTML="";document.querySelector('[data-tab="technical-training"]')?.classList.add("hidden");}
@@ -93,7 +93,7 @@ export function initTechnicalTraining(){
  host.innerHTML=`
  <div class="space-y-4">
   <section class="rounded-2xl bg-slate-900 text-white p-5"><p class="text-[10px] uppercase tracking-widest text-teal-300 font-bold">EazyLife internal workspace</p><h2 class="text-xl font-black mt-1">Technical Training Assistant</h2><p class="text-xs text-slate-300 mt-2">Prepare a training offer, configure course fees and keep private learner or institutional enquiries.</p><div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4 text-center text-[11px] font-bold"><a href="#ttEnquiry" class="rounded-lg bg-white/10 p-3">1. Enquiry</a><a href="#ttPricing" class="rounded-lg bg-white/10 p-3">2. Pricing</a><a href="#ttQuoteSection" class="rounded-lg bg-white/10 p-3">3. Quote</a><a href="#ttRecords" class="rounded-lg bg-white/10 p-3">4. Records</a></div></section>
-  <p id="ttStatus" class="text-[11px] text-slate-500">Loading secure technical training records…</p>
+  <p id="ttLoadStatus" class="text-[11px] text-slate-500">Loading secure technical training records…</p>
   <section id="ttEnquiry" class="bg-white rounded-2xl p-4 shadow-sm space-y-3"><div><h3 class="font-black">1. Learner or institutional enquiry</h3><p class="text-[11px] text-slate-500">Learners enrol in individual specialisations. Select multiple only when the proposed enrolment genuinely includes them.</p></div>
    <div class="grid sm:grid-cols-2 gap-3">
     <label class="text-xs font-semibold">Learner / client name<input id="ttName" class="mt-1 w-full rounded-lg border p-2.5 text-sm" placeholder="Full name or organisation"></label>
