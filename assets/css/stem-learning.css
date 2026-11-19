@@ -21,3 +21,9 @@
 @media(max-width:800px){.sl-hero-grid{grid-template-columns:1fr;gap:12px}.sl-hero-visual{height:220px}.sl-visual-ring{width:190px;height:190px}.sl-lesson-grid,.sl-sim-grid,.sl-build-grid{grid-template-columns:1fr}.sl-path-grid{grid-template-columns:1fr}.sl-challenge-card{grid-template-columns:1fr}.sl-section{padding:50px 0}.sl-section-head{align-items:flex-start;flex-direction:column}.sl-nav-links{gap:10px}.sl-nav-links>a{font-size:.68rem}}
 @media(max-width:520px){.sl-wrap{width:min(100% - 28px,1160px)}.sl-nav-inner{height:62px}.sl-brand img{height:34px;max-width:115px}.sl-nav-links{gap:8px}.sl-nav-links>a{font-size:0}.sl-nav-links>a i{font-size:1rem;margin:0}.sl-nav-links .el-theme-toggle{width:36px;height:36px;flex-basis:36px}.sl-hero{padding:48px 0 42px}.sl-hero h1{font-size:2.65rem}.sl-meta{gap:9px}.sl-path-card{padding:18px}.sl-theory,.sl-glossary,.sl-build-card,.sl-code-card,.sl-results{padding:17px}.sl-readings{gap:5px}.sl-readings>div{padding:9px 7px}.sl-readings strong{font-size:.78rem}.sl-trouble-grid{grid-template-columns:1fr}.sl-wire-row{font-size:.66rem}.sl-footer-brand span{display:block;margin:3px 0 0}.sl-challenge-card{padding:20px}}
 @media(prefers-reduced-motion:reduce){.sl-page *{scroll-behavior:auto!important;transition:none!important}}
+
+/* Keep the learning hero readable when the shared site theme is dark. */
+:root[data-theme="dark"] .sl-hero{background-color:var(--el-surface)!important;background-image:none!important;color:var(--el-text)!important}
+:root[data-theme="dark"] .sl-hero h1{color:var(--el-text)}
+:root[data-theme="dark"] .sl-hero p,:root[data-theme="dark"] .sl-meta,:root[data-theme="dark"] .sl-hero-visual>small{color:var(--el-muted)}
+:root[data-theme="dark"] .sl-kicker{color:var(--el-teal)}
