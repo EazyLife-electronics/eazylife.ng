@@ -8,7 +8,7 @@
       const position = Number(slider.value);
       const voltage = position / 100 * 5;
       const adc = Math.round(position / 100 * 1023);
-      const pwm = Math.round(adc * 255 / 1023);
+      const pwm = Math.floor(adc * 255 / 1023);
       const brightness = pwm / 255 * 100;
       $('pot-percent').textContent = position + '%';
       $('pot-voltage').textContent = voltage.toFixed(2) + ' V';
