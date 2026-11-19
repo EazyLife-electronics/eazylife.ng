@@ -8,6 +8,20 @@ Base: `main`
 
 This is a read-only audit of the current public STEM Lab pages and the older `feature/stem-lab` development branch. No production files, Firebase data, Firestore rules, or existing site routes were changed as part of the audit.
 
+## Implementation update on `feature/stem-learning-platform`
+
+The following additive milestone has now been implemented after the initial audit:
+
+- Added `stem-electronics-fundamentals.html` as the first public learning module.
+- Added a three-module Electronics Fundamentals domain overview. Only the first module is presented as available; the other two are clearly marked as in development.
+- Completed the Potentiometer-to-LED module with concept explanations, a behavioural ADC/PWM experiment, physical components, Uno wiring, an Arduino sketch, expected observations, troubleshooting, safety guidance and a knowledge check.
+- Added module navigation from both existing STEM pages and listed the module in `sitemap.xml`.
+- Added responsive page styles and client-side interactions. The new page uses the existing shared site theme and does not introduce Firebase dependencies.
+- Corrected the virtual PWM calculation to match Arduino integer `map()` behaviour for the supplied sketch.
+- Added dark-theme contrast overrides for the learning hero.
+
+Source-level checks on the new module found no duplicate HTML IDs, no JavaScript element lookups missing from the page, and confirmed the local stylesheet/script references, navigation links and sitemap entry. These checks do not replace browser testing on real mobile and desktop devices.
+
 ## Current implementation on `main`
 
 ### Public pages and assets
