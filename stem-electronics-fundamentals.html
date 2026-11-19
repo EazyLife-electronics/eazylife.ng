@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#00B09B">
+  <title>Electronics Fundamentals | EazyLife STEM Lab</title>
+  <meta name="description" content="Learn voltage division, analogue input and PWM by experimenting with and building a potentiometer-controlled LED.">
+  <link rel="canonical" href="https://eazylife.ng/stem-electronics-fundamentals.html">
+  <link rel="icon" type="image/png" href="assets/pictures/icon_dark.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/site-theme.css">
+  <link rel="stylesheet" href="assets/css/stem-learning.css">
+</head>
+<body class="sl-page">
+  <nav class="sl-nav" aria-label="Main navigation">
+    <div class="sl-wrap sl-nav-inner">
+      <a class="sl-brand" href="index.html" aria-label="EazyLife home"><img data-theme-logo data-theme-logo-light="assets/pictures/logo_black_transparent.png" data-theme-logo-dark="assets/pictures/logo_white_transparent.png" src="assets/pictures/logo_black_transparent.png" alt="EazyLife"></a>
+      <div class="sl-nav-links">
+        <a href="stem-lab.html"><i class="fas fa-flask"></i> STEM Lab</a>
+        <a class="active" href="stem-electronics-fundamentals.html"><i class="fas fa-book-open"></i> Learn</a>
+        <a href="stem-projects.html"><i class="fas fa-microchip"></i> Experiments</a>
+        <button class="el-theme-toggle" type="button" aria-label="Switch colour theme"><i class="fas fa-moon"></i></button>
+      </div>
+    </div>
+  </nav>
+
+  <header class="sl-hero">
+    <div class="sl-wrap sl-hero-grid">
+      <div>
+        <div class="sl-kicker"><span></span> EAZYLife STEM LAB · ELECTRONICS FUNDAMENTALS</div>
+        <h1>Understand it.<br><em>Test it. Build it.</em></h1>
+        <p>Start with a simple control circuit and uncover the ideas behind it: voltage division, analogue measurement and pulse-width modulation.</p>
+        <div class="sl-hero-actions">
+          <a class="sl-button primary" href="#lesson">Start this module <i class="fas fa-arrow-down"></i></a>
+          <a class="sl-button quiet" href="stem-projects.html">Explore project models</a>
+        </div>
+        <div class="sl-meta"><span><i class="fas fa-unlock"></i> Open access</span><span><i class="fas fa-screwdriver-wrench"></i> Physical build included</span><span><i class="fas fa-mobile-screen"></i> Mobile friendly</span></div>
+      </div>
+      <div class="sl-hero-visual" aria-hidden="true">
+        <div class="sl-visual-ring"></div><div class="sl-visual-chip"><i class="fas fa-sliders"></i><b>INPUT<br>TO OUTPUT</b></div>
+        <span class="sl-float f-a"><i class="fas fa-lightbulb"></i></span><span class="sl-float f-b"><i class="fas fa-wave-square"></i></span>
+        <small>TURN · MEASURE · CONTROL</small>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="sl-section sl-path">
+      <div class="sl-wrap">
+        <div class="sl-section-head"><div><div class="sl-eyebrow">LEARNING DOMAIN</div><h2>Electronics Fundamentals</h2><p>Build a working foundation in the behaviour of basic electronic components and circuits.</p></div><span class="sl-level"><i class="fas fa-signal"></i> BEGINNER</span></div>
+        <div class="sl-path-grid">
+          <article class="sl-path-card current"><span class="sl-step">MODULE 01 · START HERE</span><div class="sl-card-icon"><i class="fas fa-sliders"></i></div><h3>Potentiometer to LED</h3><p>Use a variable resistor as an input, read its position and control LED brightness.</p><span class="sl-card-status"><i class="fas fa-circle-play"></i> Available now</span></article>
+          <article class="sl-path-card"><span class="sl-step">MODULE 02 · PLANNED</span><div class="sl-card-icon"><i class="fas fa-bolt"></i></div><h3>Voltage, current and resistance</h3><p>Explore Ohm's law, series circuits, parallel paths and practical measurements.</p><span class="sl-card-status muted">In development</span></article>
+          <article class="sl-path-card"><span class="sl-step">MODULE 03 · PLANNED</span><div class="sl-card-icon"><i class="fas fa-wave-square"></i></div><h3>Signals and switching</h3><p>Compare digital states, analogue values and switched output signals.</p><span class="sl-card-status muted">In development</span></article>
+        </div>
+        <p class="sl-path-note"><i class="fas fa-circle-info"></i> Modules are independent learning units. Suggested foundations are shown where useful, but you can explore topics in the order that makes sense to you.</p>
+      </div>
+    </section>
+
+    <section class="sl-section sl-lesson" id="lesson">
+      <div class="sl-wrap">
+        <div class="sl-section-head"><div><div class="sl-eyebrow">MODULE 01 · LEARN</div><h2>How does the circuit work?</h2><p>Follow the signal from your hand to the LED.</p></div><span class="sl-time"><i class="far fa-clock"></i> About 30–45 minutes</span></div>
+        <div class="sl-lesson-grid">
+          <article class="sl-theory">
+            <div class="sl-concept"><span class="sl-concept-number">01</span><div><h3>The potentiometer is a variable voltage divider</h3><p>A potentiometer has three terminals. The two outer terminals connect across a supply. The middle terminal, called the wiper, provides a voltage that changes as the knob turns.</p><p>With a 10 kΩ potentiometer connected across 5 V, the wiper can produce a voltage from approximately 0 V to 5 V.</p></div></div>
+            <div class="sl-concept"><span class="sl-concept-number">02</span><div><h3>The microcontroller measures the voltage</h3><p>An Arduino Uno's 10-bit analogue-to-digital converter (ADC) represents the input as a number from 0 to 1023 when using the default 5 V reference.</p><p>Zero represents approximately 0 V; 1023 represents a voltage close to the reference voltage. The reading is a digital representation, not a direct measurement in volts.</p></div></div>
+            <div class="sl-concept"><span class="sl-concept-number">03</span><div><h3>PWM controls the LED's average power</h3><p>The Arduino Uno does not produce a continuously variable analogue voltage on its PWM pins. Instead, it switches the output rapidly between LOW and HIGH. Changing the fraction of time spent HIGH changes the duty cycle and the LED's apparent brightness.</p><p>On an Uno, <code>analogWrite()</code> uses values from 0 to 255. Pin 9 supports PWM.</p></div></div>
+            <div class="sl-callout"><i class="fas fa-lightbulb"></i><p><strong>Key distinction:</strong> the potentiometer produces a variable voltage, the ADC measures it, and PWM switches the LED output rapidly. These are three related but different operations.</p></div>
+          </article>
+          <aside class="sl-glossary">
+            <h3>Key terms</h3>
+            <dl><dt>Voltage divider</dt><dd>A circuit that provides a fraction of an input voltage.</dd><dt>Wiper</dt><dd>The moving middle contact of a potentiometer.</dd><dt>ADC</dt><dd>Analogue-to-digital converter, turns an analogue input into a number.</dd><dt>PWM</dt><dd>Pulse-width modulation, controls average output by changing ON time.</dd><dt>Duty cycle</dt><dd>The percentage of each PWM cycle that the output is HIGH.</dd></dl>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="sl-section sl-experiment" id="experiment">
+      <div class="sl-wrap">
+        <div class="sl-section-head"><div><div class="sl-eyebrow">INTERACTIVE WORKBENCH · EXPERIMENT</div><h2>Turn the virtual potentiometer</h2><p>Move the slider and follow the input voltage, ADC reading and PWM output.</p></div><span class="sl-model-label"><i class="fas fa-laptop-code"></i> Behavioural model</span></div>
+        <div class="sl-sim-grid">
+          <div class="sl-sim-panel">
+            <div class="sl-sim-top"><strong><i class="fas fa-sliders"></i> Potentiometer position</strong><output id="pot-percent">50%</output></div>
+            <input id="pot-position" type="range" min="0" max="100" value="50" step="1" aria-label="Potentiometer position">
+            <div class="sl-range-labels"><span>0% · GND</span><span>100% · 5 V</span></div>
+            <div class="sl-pot-visual"><div class="sl-pot-track"><span id="pot-marker"></span></div><div class="sl-pot-label">10 kΩ potentiometer · wiper output</div></div>
+            <button class="sl-button quiet" type="button" id="pot-reset"><i class="fas fa-rotate-left"></i> Reset experiment</button>
+          </div>
+          <div class="sl-sim-panel sl-output-panel">
+            <strong><i class="fas fa-chart-line"></i> What the controller sees</strong>
+            <div class="sl-readings"><div><span>Wiper voltage</span><strong id="pot-voltage">2.50 V</strong></div><div><span>ADC reading</span><strong id="pot-adc">512 / 1023</strong></div><div><span>PWM command</span><strong id="pot-pwm">128 / 255</strong></div></div>
+            <div class="sl-led-stage"><div class="sl-led-glow" id="led-glow"></div><div class="sl-led-bulb" id="led-bulb"><i class="fas fa-lightbulb"></i></div><span>LED · D9</span></div>
+            <div class="sl-brightness-row"><span>LED brightness (model)</span><strong id="led-brightness">50%</strong></div><div class="sl-brightness-track"><span id="brightness-fill"></span></div>
+            <p class="sl-explain" id="pot-explanation" aria-live="polite">At the middle position, the wiper is approximately 2.5 V. The ADC reads about 512 and the PWM command is about 128.</p>
+          </div>
+        </div>
+        <div class="sl-model-caveat"><i class="fas fa-circle-info"></i><p>This is a simplified behavioural model of the signal relationship. It does not emulate Arduino electrical characteristics, ADC noise, PWM frequency, LED current or component tolerances. Your physical circuit may produce slightly different readings and brightness.</p></div>
+        <div class="sl-challenges">
+          <h3>Experiment prompts</h3>
+          <ol><li>Set the potentiometer to 0%. What are the voltage, ADC and PWM readings?</li><li>Move it to about 25%. Are the ADC and PWM values also about one quarter of their maximum?</li><li>Try 100%. What happens to the LED in the model?</li><li>Why does the Arduino use a value from 0–1023 for the input but 0–255 for the PWM command?</li></ol>
+        </div>
+      </div>
+    </section>
+
+    <section class="sl-section sl-build" id="build">
+      <div class="sl-wrap">
+        <div class="sl-section-head"><div><div class="sl-eyebrow">TAKE IT TO THE WORKBENCH · BUILD</div><h2>Build the real circuit</h2><p>Use an Arduino Uno, a potentiometer and one LED to reproduce the experiment.</p></div><span class="sl-level"><i class="fas fa-screwdriver"></i> HANDS-ON</span></div>
+        <div class="sl-build-grid">
+          <article class="sl-build-card">
+            <h3><i class="fas fa-box-open"></i> Components</h3>
+            <ul class="sl-check-list"><li>Arduino Uno or compatible 5 V board</li><li>10 kΩ potentiometer</li><li>One standard indicator LED</li><li>220 Ω to 330 Ω resistor</li><li>Breadboard and jumper wires</li><li>USB cable and computer with Arduino IDE</li></ul>
+            <div class="sl-safety"><i class="fas fa-shield-halved"></i><p><strong>Before powering:</strong> include the series resistor with the LED. Never connect an LED directly between an Arduino output pin and GND. Keep the circuit to the board's low-voltage supply; disconnect USB power before changing wiring.</p></div>
+          </article>
+          <article class="sl-build-card">
+            <h3><i class="fas fa-diagram-project"></i> Wiring connections</h3>
+            <div class="sl-wiring">
+              <div class="sl-wire-row"><b>Potentiometer outer terminal 1</b><span>5 V</span></div>
+              <div class="sl-wire-row"><b>Potentiometer outer terminal 2</b><span>GND</span></div>
+              <div class="sl-wire-row"><b>Potentiometer middle terminal (wiper)</b><span>A0</span></div>
+              <div class="sl-wire-row"><b>Arduino pin 9 (PWM)</b><span>LED anode (+), through 220–330 Ω resistor</span></div>
+              <div class="sl-wire-row"><b>LED cathode (−)</b><span>GND</span></div>
+            </div>
+            <p class="sl-small-note">If the potentiometer turns in the opposite direction from what you expect, swap its two outer connections. The wiper remains connected to A0.</p>
+          </article>
+        </div>
+        <article class="sl-code-card">
+          <div class="sl-code-head"><h3><i class="fas fa-code"></i> Arduino sketch</h3><button type="button" class="sl-copy" id="copy-code"><i class="far fa-copy"></i> Copy code</button></div>
+          <pre><code id="arduino-code">const int potPin = A0;
+const int ledPin = 9;
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int sensorValue = analogRead(potPin);       // 0 to 1023
+  int brightness = map(sensorValue, 0, 1023, 0, 255);
+
+  analogWrite(ledPin, brightness);            // PWM output
+  Serial.print("ADC: ");
+  Serial.print(sensorValue);
+  Serial.print("  PWM: ");
+  Serial.println(brightness);
+
+  delay(20);
+}</code></pre>
+          <p class="sl-small-note" id="copy-feedback" aria-live="polite">Upload the sketch, open Serial Monitor at 9600 baud and turn the potentiometer.</p>
+        </article>
+        <div class="sl-results">
+          <h3>What you should observe</h3>
+          <ul><li>Turning the potentiometer changes the voltage at A0.</li><li>The ADC reading changes between approximately 0 and 1023.</li><li>The PWM command changes between 0 and 255.</li><li>The LED becomes brighter or dimmer as the PWM duty cycle changes.</li></ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="sl-section sl-troubleshoot">
+      <div class="sl-wrap">
+        <div class="sl-section-head"><div><div class="sl-eyebrow">WHEN IT DOES NOT WORK · INVESTIGATE</div><h2>Troubleshooting guide</h2><p>Check the signal path one stage at a time.</p></div></div>
+        <div class="sl-trouble-grid">
+          <article><h3>ADC value does not change</h3><p>Check that the potentiometer's wiper is connected to A0, the outer terminals go to 5 V and GND, and all ground connections are common.</p></article>
+          <article><h3>LED stays off</h3><p>Check LED polarity, the D9 connection, the resistor path to GND, and that the sketch is uploaded to the correct board and port.</p></article>
+          <article><h3>LED is always fully bright</h3><p>Check whether the wiper is accidentally connected to 5 V, or whether the code reads a different analogue pin from the one wired.</p></article>
+          <article><h3>Brightness changes in reverse</h3><p>Swap the potentiometer's two outer terminals. Keep the middle wiper terminal connected to A0.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="sl-section sl-challenge">
+      <div class="sl-wrap">
+        <div class="sl-challenge-card">
+          <div><div class="sl-eyebrow">CHECK YOUR UNDERSTANDING · CHALLENGE</div><h2>Why are there two different number ranges?</h2><p>The Arduino Uno reads an analogue input as a 10-bit value, then sends an 8-bit PWM command.</p></div>
+          <div class="sl-quiz" id="quiz">
+            <p><strong>Which statement is correct?</strong></p>
+            <button type="button" data-correct="false">The ADC and PWM are both 10-bit values.</button>
+            <button type="button" data-correct="true">The ADC reading is 0–1023, while analogWrite uses 0–255 on Uno PWM pins.</button>
+            <button type="button" data-correct="false">PWM creates a true, continuously variable analogue voltage on pin 9.</button>
+            <p class="sl-quiz-feedback" id="quiz-feedback" aria-live="polite">Choose an answer to check your understanding.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="sl-footer"><div class="sl-wrap"><a href="index.html" class="sl-footer-brand">EazyLife <span>Robotics & Electronics Solutions</span></a><p>Explore boldly. Build thoughtfully. Make useful things.</p><div><a href="stem-lab.html">STEM Lab</a><a href="stem-projects.html">Project playground</a><a href="shop.html">Components</a><a href="https://wa.me/2347051548082">Talk to an engineer</a></div><small>© <span id="sl-year"></span> EazyLife Robotics & Electronics Solutions · Ibadan, Nigeria</small></div></footer>
+  <script src="js/site-theme.js"></script>
+  <script src="js/stem-learning.js"></script>
+</body>
+</html>
