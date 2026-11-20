@@ -22,6 +22,19 @@ The following additive milestone has now been implemented after the initial audi
 
 Source-level checks on the new module found no duplicate HTML IDs, no JavaScript element lookups missing from the page, and confirmed the local stylesheet/script references, navigation links and sitemap entry. These checks do not replace browser testing on real mobile and desktop devices.
 
+### Additional milestone: open learning and guidance model
+
+- Documented the Open Learning and Paid Guidance Model in the curriculum seed: free public learning remains valuable and ungated; paid services cover personalised guidance, masterclasses, mentorship and practical support; free/sponsored referrals are only described as opportunities when genuinely available.
+- Added optional guidance enquiry sections to the STEM Lab, learning module and project playground. These direct enquiries to EazyLife's existing WhatsApp contact; no checkout, pricing claims, account requirement or payment gate was introduced.
+
+### Additional milestone: resistor colour-code calculator
+
+- Added `stem-resistor-colour-code.html`, a standalone public 4-band/5-band calculator with colour selectors, a resistor preview, nominal resistance, tolerance range, band explanations, quick reference table and reverse lookup.
+- Added separate CSS and JavaScript assets. The tool is client-side only and introduces no Firebase dependency.
+- Added navigation links from the existing STEM pages and included the calculator in the sitemap.
+
+Source checks are pending in this commit and will be recorded after validation. Browser/device testing remains outstanding.
+
 ## Current implementation on `main`
 
 ### Public pages and assets
@@ -103,7 +116,7 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 
 ## Non-goals for this first implementation
 
-- No compulsory learner accounts or payment gate.
+- No compulsory learner accounts, payment gate or subscription. Paid guidance is enquiry-based and optional.
 - No new Firebase project or migration of existing Firestore data.
 - No changes to existing Firestore collections or security rules.
 - No full Wokwi-style breadboard or microcontroller emulator.
