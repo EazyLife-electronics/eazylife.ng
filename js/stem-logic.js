@@ -44,7 +44,8 @@
     table.querySelectorAll('tbody tr').forEach(row => {
       const rowA = Number(row.dataset.a);
       const rowB = Number(row.dataset.b);
-      row.classList.toggle('active', rowA === a && (name === 'NOT' || rowB === b));
+      row.hidden = name === 'NOT' && rowB === 1;
+      row.classList.toggle('active', rowA === a && (name === 'NOT' ? rowB === 0 : rowB === b));
       row.cells[2].textContent = String(calculate(name, rowA, rowB));
     });
     if (name === 'NOT') {
