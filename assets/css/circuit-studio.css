@@ -40,3 +40,7 @@
 .cs-annotation-selected{filter:drop-shadow(0 0 2px var(--cs-accent));stroke:var(--cs-accent);stroke-width:.7px;paint-order:stroke;cursor:move}
 .cs-selected .cs-selection-box{stroke-width:2.5;stroke-dasharray:4 3}
 @media(max-width:620px){.cs-selection-toolbar{top:6px;gap:4px;padding:5px}.cs-selection-toolbar button{padding:7px 9px;font-size:10px;min-height:40px}}
+
+/* Explicit tool modes and touch-sized pin handles */
+.cs-btn.active{background:var(--cs-accent);border-color:var(--cs-accent);color:#fff}.cs-pin{cursor:crosshair;touch-action:none}.cs-pin circle{stroke-width:2.5}.cs-pin-edit{cursor:move}.cs-pin-edit circle{fill:#f0a52b;stroke:#fff;stroke-width:2}.cs-pin-cross{stroke:#fff;stroke-width:1.5;pointer-events:none}.cs-pin-start circle{fill:#e49b22;stroke:#fff;stroke-width:3}.cs-selection-box{pointer-events:all;cursor:move}.cs-selected .cs-selection-box{pointer-events:all}
+@media(max-width:620px){.cs-toolbar{gap:6px}.cs-tool-group{gap:4px}.cs-btn{white-space:nowrap}.cs-pin circle{r:9}}
