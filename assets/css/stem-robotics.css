@@ -1,0 +1,24 @@
+/* Module 20: robotics and mechatronic systems */
+.rbt-card{background:var(--el-card,var(--el-bg,#fff));border:1px solid var(--el-border,rgba(120,130,140,.24));border-radius:14px;padding:20px;margin:16px 0;min-width:0}
+.rbt-card h3{margin-top:0}
+.rbt-card svg{display:block;width:100%;height:auto;max-height:420px}
+.rbt-caption,.rbt-note{font-size:.9rem;opacity:.82;line-height:1.6}
+.rbt-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch}
+.rbt-grid>.rbt-card{margin:0}
+.rbt-equations{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:18px 0}
+.rbt-equation{padding:15px;border:1px solid var(--el-border,rgba(120,130,140,.25));border-radius:10px;text-align:center;font-weight:700;background:var(--el-soft,rgba(22,134,110,.06))}
+.rbt-calc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.rbt-calc-grid label{display:grid;gap:6px;font-weight:600}
+.rbt-calc-grid input{width:100%;min-width:0;padding:10px;border:1px solid var(--el-border,rgba(120,130,140,.35));border-radius:8px;background:var(--el-card,var(--el-bg,#fff));color:inherit}
+.rbt-result-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:18px}
+.rbt-result-grid>div{padding:12px;border-radius:9px;background:var(--el-soft,rgba(22,134,110,.07));display:grid;gap:7px;min-width:0}
+.rbt-result-grid span{font-size:.82rem;opacity:.8}
+.rbt-result-grid strong{font-size:1.05rem;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.rbt-table-wrap{overflow-x:auto;margin:18px 0}
+.rbt-table-wrap table{width:100%;min-width:580px;border-collapse:collapse}
+.rbt-table-wrap th,.rbt-table-wrap td{padding:10px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--el-border,rgba(120,130,140,.25))}
+.rbt-card pre{overflow-x:auto;white-space:pre}
+.rbt-card pre code{font-size:.82rem;line-height:1.6}
+.rbt-card li{margin:7px 0}
+@media(max-width:760px){.rbt-grid{grid-template-columns:1fr}.rbt-equations{grid-template-columns:1fr}.rbt-result-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.rbt-card{padding:15px}}
+@media(max-width:420px){.rbt-calc-grid{grid-template-columns:1fr}}
