@@ -192,3 +192,12 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - Added a low-voltage LED practical build, measurement guidance, common mistakes and a three-question knowledge check. No mains build or high-energy activity is included.
 - Linked Module 04 from the Electronics Fundamentals directory, updated Module 03's next-lesson button, and added the new page to the XML sitemap.
 - Source-level checks should verify unique IDs, all JavaScript element references, valid JS syntax, expected local assets, correct module navigation, sitemap structure and calculator edge cases. Browser/mobile testing and physical build verification remain separate tasks.
+
+
+### Module 04 visual clarification: voltage-divider wiring
+
+- Added a labelled SVG circuit diagram directly above the voltage-divider calculator.
+- The diagram shows the DC input supply, upper resistor R1, output junction, lower resistor R2, ground reference and load resistor RL.
+- It explicitly depicts RL across the same two nodes as R2, making the parallel connection clear, and labels Vout as the voltage from the output junction to ground.
+- Added a caption explaining each connection and responsive styling for narrow screens and the existing light/dark theme.
+- This is a conceptual circuit diagram, not a physical breadboard layout. Browser rendering and mobile legibility still require manual QA.
