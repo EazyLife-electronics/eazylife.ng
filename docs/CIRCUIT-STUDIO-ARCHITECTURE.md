@@ -83,3 +83,13 @@ A production admin upload path must use a stricter sanitizer and server-side val
 ## Current implementation note
 
 The first foundation is being developed on `feature/circuit-studio`. The initial milestone is intentionally client-only. The current component artwork editor is source-based with live preview; a direct visual path/node editor is a planned refinement stage, not yet claimed as complete.
+
+## Interaction update (2026-11-20)
+
+- Added explicit Select / Move, Connect wires, Edit pins and Pan tool modes.
+- Pin handles are touch-sized. In Edit pins mode, drag a pin directly on the symbol; pin coordinates are stored as per-instance custom pin geometry, separate from artwork.
+- Connect wires mode makes the two-pin connection sequence explicit. Created connections are rendered as orthogonal routes and remain attached to the referenced component pins when components move or rotate.
+- Pan mode provides a deliberate canvas-drag gesture; Space + drag and middle-mouse pan remain available.
+- Rotation remains a discrete 90-degree action rather than free rotation.
+
+The current routing stage uses a generated orthogonal route between endpoints. Manual bend editing, junctions, crossing semantics and multi-segment route persistence remain subsequent work.
