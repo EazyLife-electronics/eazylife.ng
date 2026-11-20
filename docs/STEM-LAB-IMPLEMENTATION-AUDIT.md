@@ -618,3 +618,37 @@ Module 29 is the final lesson in the series. It should offer project-based pract
 - All changes remain on `feature/stem-learning-platform`. No production merge or deployment was performed.
 
 - Refined the Electronics Fundamentals category taxonomy: Modules 28 (Electronics Product Design) and 29 (Applied Electronics Projects) now use a dedicated **Product design and applied projects** filter category rather than being grouped under Circuit foundations. The directory now has six categories while retaining all 29 module cards and combined search/filter behaviour.
+
+
+## Website-wide consistency pass
+
+Date: 2026-11-20  
+Target branch: `feature/stem-learning-platform`
+
+### Corrections made
+
+- Changed the homepage logo link from the placeholder fragment `#` to the explicit `index.html` route, so it behaves as a predictable home link.
+- Updated `Retailer.html`: the EazyLife logo now links back to the homepage, a visible theme toggle is provided in the header, and the page loads the shared `js/site-theme.js` controller. This makes the saved light/dark preference, toggle icon/accessible label and theme-aware logo behave consistently with the shared site theme.
+- Verified that the project gallery already has page-specific dark-mode overrides for its project-kit section, kit rows, manual notes and text. No duplicate override was added.
+
+### Navigation review
+
+- The STEM Lab, lesson directory and standalone lesson pages use the shared STEM navigation pattern and load `assets/css/site-navigation.css`.
+- The homepage, project gallery and reviews page use a compact horizontal navigation. The shop and order-tracking pages use a collapsible menu with the same core destinations; this is a responsive presentation difference rather than a missing destination.
+- The project-kit order page intentionally keeps a contextual header with a home logo, project-gallery return link, shop link and theme control.
+- The Retailer Price Finder was the clearest navigation omission: it previously had a non-clickable logo and no visible theme control. Both are now corrected.
+- Page-specific actions such as cart access, order tracking, WhatsApp and the project-kit return link remain in their relevant contexts rather than being removed to force identical headers.
+
+### Lesson navigation review
+
+- Reviewed the final sequence, Modules 24–29. The previous/next links progress in order through Modules 24, 25, 26, 27, 28 and 29.
+- Module 29 correctly has a previous-lesson link only. It is the agreed final module, so it must not show a pending, coming-soon or broken next-lesson control.
+- The earlier apparent `pending` match in Module 23 was ordinary lesson prose (“Depending on its purpose”), not a pending navigation state.
+- The project-kit dark-mode row correction was already present in `projects.html`; this audit did not mistake that existing fix for a new change.
+
+### Verification and limits
+
+- Re-fetched the changed files from the target branch after committing and confirmed the updated source is present.
+- Confirmed the shared theme script and stylesheet paths referenced by the Retailer Price Finder exist in the repository tree.
+- Checked the source markup for the final lesson sequence and confirmed the Module 29 navigation contains no next-lesson link.
+- These are repository/source-level checks. No live-site deployment, Firebase/Firestore changes, browser automation, or physical-device rendering test was performed. The branch remains separate from `main`; deployment and merge are not authorised by this audit.
