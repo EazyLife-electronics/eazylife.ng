@@ -12,7 +12,7 @@ body{transition:background-color .18s ease,color .18s ease}
 :root[data-theme="dark"] .bg-white,:root[data-theme="dark"] .bg-gray-50,:root[data-theme="dark"] .bg-gray-100,:root[data-theme="dark"] .section,:root[data-theme="dark"] .card,:root[data-theme="dark"] .kit-item{background-color:var(--el-surface)!important;border-color:var(--el-border)!important;color:var(--el-text)}
 :root[data-theme="dark"] .bg-gray-200{background-color:#263530!important}
 :root[data-theme="dark"] .text-gray-900,:root[data-theme="dark"] .text-gray-800,:root[data-theme="dark"] .text-gray-700,:root[data-theme="dark"] .text-gray-600,:root[data-theme="dark"] h1,:root[data-theme="dark"] h2,:root[data-theme="dark"] h3{color:var(--el-text)}
-:root[data-theme="dark"] .text-gray-500,:root[data-theme="dark"] .text-gray-400,:root[data-theme="dark"] .muted,:root[data-theme="dark"] .meta,:root[data-theme="dark"] p{ }
+:root[data-theme="dark"] .text-gray-500,:root[data-theme="dark"] .text-gray-400,:root[data-theme="dark"] .muted,:root[data-theme="dark"] .meta,:root[data-theme="dark"] .intro,:root[data-theme="dark"] .notice,:root[data-theme="dark"] .summary,:root[data-theme="dark"] .empty{color:var(--el-muted)!important}
 :root[data-theme="dark"] input:not([type="checkbox"]):not([type="radio"]),:root[data-theme="dark"] select,:root[data-theme="dark"] textarea{background-color:#14201c!important;color:var(--el-text)!important;border-color:var(--el-border)!important}
 :root[data-theme="dark"] input::placeholder,:root[data-theme="dark"] textarea::placeholder{color:#8b9a94}
 :root[data-theme="dark"] .border,:root[data-theme="dark"] [class*="border-gray-"]{border-color:var(--el-border)!important}
@@ -22,3 +22,13 @@ body{transition:background-color .18s ease,color .18s ease}
 :root[data-theme="dark"] .nav-actions .btn-primary{background:linear-gradient(135deg,#00B09B,#8DC63F);color:#fff;border-color:transparent}
 :root[data-theme="dark"] .el-theme-toggle{background:#182420;color:#eef2f0;border-color:#2a3835}
 @media(prefers-reduced-motion:reduce){body{transition:none}}
+
+/* Contrast corrections for pages using the shared theme layer. */
+:root[data-theme="dark"] .back{color:var(--el-text)!important}
+:root[data-theme="dark"] .project-label,:root[data-theme="dark"] .eyebrow{color:#69d9c4!important}
+:root[data-theme="dark"] .text-teal-700{color:#69d9c4!important}
+:root[data-theme="dark"] .quote{color:var(--el-text)}
+:root[data-theme="dark"] .empty{background:var(--el-soft)!important;border-color:var(--el-border)!important}
+:root[data-theme="dark"] .card,:root[data-theme="dark"] .project{color:var(--el-text)}
+:root[data-theme="dark"] .card h1,:root[data-theme="dark"] .card h2,:root[data-theme="dark"] .card h3,:root[data-theme="dark"] .project h2{color:var(--el-text)}
+:root[data-theme="dark"] .card p,:root[data-theme="dark"] .project p{color:var(--el-muted)}
