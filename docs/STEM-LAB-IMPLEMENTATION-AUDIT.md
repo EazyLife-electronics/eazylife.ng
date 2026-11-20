@@ -464,3 +464,11 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - Source-level checks required: unique IDs, local CSS/JS links, JavaScript DOM references, SVG/section/anchor balance, quiz markup, navigation, directory entry and sitemap XML. No browser rendering, Arduino compilation/upload, Wi-Fi network test or physical ESP32 test has been performed.
 
 - Final Module 22 cross-check: Module 21 next-lesson button now links to Module 22. Module 22 JavaScript parses successfully; no duplicate IDs or missing JavaScript element references; three SVGs, ten sections and anchors are balanced; four shared-format quiz cards with twelve answer buttons are present; directory and sitemap each contain one entry; sitemap URL tags are balanced. These are source-level checks only.
+
+
+## Electronics Fundamentals directory: search and category filters
+
+- Updated stem-electronics-fundamentals.html with a live search field, category selector, clear-filters action, live result count and accessible no-results message.
+- Categorised all 22 module cards into Circuit foundations (Modules 01–10), Power and workshop (11–14), Sensors and embedded systems (15–18), Control and robotics (19–21), and Wireless and IoT (22).
+- Added responsive styling in assets/css/stem-directory.css and client-side filtering in js/stem-directory.js. Search matches module card text, including module number, title and lesson description; category and text filters combine.
+- Source validation: 22 module cards categorised, expected category counts 10/4/4/3/1, no invalid categories or duplicate IDs, JavaScript parses, stylesheet braces balance, CSS and JS assets are linked. Browser/device rendering has not been independently tested.
