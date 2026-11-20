@@ -451,3 +451,14 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - Source-level validation: verify unique IDs, JavaScript references, SVG/section/anchor balance, script/style links, navigation, directory and sitemap XML. No browser rendering, sensor calibration, Arduino upload or physical rover testing has been performed.
 
 - Module 21 source-level validation completed: no duplicate HTML IDs, all calculator element references exist, four SVGs and ten sections are balanced, lesson anchors are balanced, CSS/JS assets are linked, Module 20 next navigation is connected, and the directory and sitemap each contain exactly one Module 21 entry. Sitemap URL elements are balanced. This is source inspection only; no browser rendering, Arduino compile/upload, sensor calibration or physical rover test was performed.
+
+
+## Module 22: Wireless Communication and IoT Systems
+
+- Added standalone lesson stem-wireless-communication-iot.html, responsive stylesheet assets/css/stem-iot.css and client-side telemetry teaching model js/stem-iot.js.
+- Covers IoT architecture and device roles; Wi-Fi, Bluetooth Classic/BLE, Zigbee, Thread, LoRa/LoRaWAN and cellular trade-offs; access points, IP addressing, DHCP, DNS, routing and local-versus-internet connectivity; HTTP, MQTT publish/subscribe, WebSocket and telemetry payloads.
+- Includes labelled SVG diagrams for the IoT data path, local Wi-Fi network and ESP32 potentiometer wiring; interactive telemetry payload/data-rate estimator; and a practical ESP32 local HTTP sensor dashboard with Arduino sketch, staged test plan, troubleshooting and extension challenges.
+- Practical uses a 10 kΩ potentiometer between 3.3 V and GND, wiper to an ADC-capable ESP32 input (GPIO34 on common original ESP32 boards). ADC scaling is explicitly approximate and board-specific.
+- Security guidance covers credential handling, authentication, encryption, permissions, network isolation, stale telemetry, offline behaviour and safe command validation. The unauthenticated example is restricted to a trusted isolated learning network and must not be exposed publicly.
+- Connected Module 21 previous/next lesson navigation, added Module 22 to the Electronics Fundamentals directory and XML sitemap.
+- Source-level checks required: unique IDs, local CSS/JS links, JavaScript DOM references, SVG/section/anchor balance, quiz markup, navigation, directory entry and sitemap XML. No browser rendering, Arduino compilation/upload, Wi-Fi network test or physical ESP32 test has been performed.
