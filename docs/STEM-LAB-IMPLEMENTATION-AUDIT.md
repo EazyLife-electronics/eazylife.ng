@@ -677,3 +677,24 @@ A follow-up source audit was performed on the active learning-platform branch af
 - The stylesheet change was committed to `feature/stem-learning-platform` only.
 - Source inspection confirms the shared theme file contains the new rules. No live-browser rendering, automated accessibility scan, mobile-device test or production deployment was performed as part of this source-only pass.
 - The branch remains separate from `main`; no merge or deployment was performed.
+
+
+## Follow-up navigation and contrast refinements: 2026-11-20
+
+### Changes applied
+
+- Updated `assets/css/site-theme.css` additively so the main horizontal navigation and STEM learning navigation use a shared compact pill treatment, consistent spacing, link sizing, hover states and horizontal scrolling on narrow screens.
+- Added shared dark-mode safeguards for custom project-kit rows, secondary text and item links. The project gallery already has local overrides for these elements; the shared rules also protect the same component pattern if it appears on another page.
+- Kept each page's contextual actions and responsive layout. The shop and tracking pages retain their collapsible menu; STEM pages retain their dedicated learning navigation; kit ordering retains its return-to-gallery context.
+
+### Source checks
+
+- Reviewed the navigation markup on the homepage, project gallery, reviews, shop, tracking, kit-order, Retailer Price Finder, STEM Lab, lesson directory and representative standalone lessons.
+- Reviewed the final module navigation sequence and sampled earlier lesson navigation links. The visible next-lesson links examined point to named lesson pages; Module 29 remains the intentional endpoint with no next lesson.
+- Searches for `pending` and `disabled` also match ordinary lesson prose and interactive teaching-code variables. Those matches were not treated as pending navigation controls without corresponding UI evidence.
+- The project gallery's own dark-mode rules already cover `.kit-line` and `.kit-manual`; the shared safeguards are additive protection, not a claim that the gallery-specific fix was newly introduced.
+
+### Remaining verification
+
+- These changes are committed to `feature/stem-learning-platform` only. No merge to `main`, production deployment, Firestore modification or Firebase configuration change was made.
+- This was a source-level review. Live browser rendering, screen-reader testing, automated contrast measurements and real-device responsive testing remain outstanding.
