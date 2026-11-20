@@ -485,3 +485,15 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - Connected Module 22 next-lesson navigation, added Module 23 to the Electronics Fundamentals directory and XML sitemap. Directory counts now reflect 23 lessons, with Module 23 in Circuit foundations.
 - Source-level checks required: unique IDs, JavaScript DOM references and syntax, SVG/section/anchor balance, quiz structure, local asset links, previous/next navigation, directory filters/count and sitemap XML. No browser rendering, IC bench test or hardware validation has been performed.
 
+
+
+## Module 24: Combinational Logic Design
+
+- Added standalone lesson `stem-combinational-logic-design.html`, responsive stylesheet `assets/css/stem-combinational.css` and interactive truth-table teaching model `js/stem-combinational.js`.
+- Covers combinational versus sequential logic, design workflow, Boolean identities, De Morgan's theorems, expression simplification, two-variable Karnaugh-map introduction, NAND/NOR universal-gate constructions, multiplexers, decoders, encoders and half/full-adder concepts.
+- Interactive design bench allows learners to select AND, OR, XOR, NAND, NOR, XNOR or a defined 2:1 multiplexer example, toggle inputs and inspect a generated truth table. It is labelled as a logic teaching model, not an electrical IC emulator.
+- Practical build implements a one-bit half adder using a 74HC86 XOR gate for SUM and a 74HC08 AND gate for CARRY. Both ICs use their first gate (pins 1 and 2 inputs, pin 3 output), pins 14/7 for supply/ground, local 100 nF bypass capacitors, two button inputs with 10 kΩ pull-down resistors and two LED indicators with 1 kΩ series resistors.
+- Includes labelled SVGs for design workflow, De Morgan equivalences, a Boolean gate combination, universal-gate examples, MUX/decoder/encoder/half-adder blocks, half-adder logic and DIP-14 pin connections; includes wiring instructions, expected observations, test procedure, troubleshooting and four knowledge-check questions.
+- Safety: use regulated current-limited extra-low-voltage supply, verify exact manufacturer pinouts and voltage limits, define all CMOS inputs, disconnect power before rewiring and do not drive motors/relays directly from logic outputs.
+- Connected Module 23 next-lesson navigation, added Module 24 to the Circuit foundations directory category and XML sitemap.
+- Source-level checks: verify unique IDs, all JS DOM references, JS syntax, SVG/section/anchor balance, quiz structure, responsive CSS, navigation, directory category/search and sitemap XML. No browser rendering, breadboard assembly, IC bench test or physical hardware validation has been performed.
