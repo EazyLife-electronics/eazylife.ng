@@ -232,3 +232,31 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - Added Module 06 to the Electronics Fundamentals directory, connected Module 05's next-lesson button, linked Module 06 back to Module 05, and added the page to the XML sitemap.
 - Source-level checks completed: no duplicate HTML IDs; all direct JavaScript element references match page IDs; CSS and JS assets are referenced; directory and previous/next navigation links are present; sitemap entry exists and URL tags are balanced; three quiz questions are present; RC exponential expressions and series/parallel capacitance calculation paths are included.
 - These are source-level checks only. Browser rendering, keyboard/accessibility behaviour, real-device mobile layout and practical capacitor measurements still require separate verification.
+
+## Batch 02: Modules 07–09
+
+### Module 07: Inductors and Magnetic Fields
+- Added standalone lesson `stem-inductors-magnetic-fields.html`.
+- Covers magnetic fields, inductance, Lenz's law, energy storage, RL time constant, inductor families, filtering/conversion/actuation applications, component selection, safe low-voltage observation and common errors.
+- Includes an interactive ideal series-RL current-rise model with editable supply voltage, resistance, inductance and elapsed time. It calculates time constant, steady-state current and transient current, with an exponential chart.
+- Explicitly discusses current interruption transients and the need for a designed current path.
+
+### Module 08: Transistors and Electronic Switching
+- Added standalone lesson `stem-transistors-electronic-switching.html`.
+- Covers BJT terminals and operation, MOSFET gate control, low-side switching, amplifier biasing, relay/motor interfaces, flyback protection, datasheet selection and common pinout/drive errors.
+- Includes a simplified BJT base-resistor estimator using a forced-beta design assumption. It warns that controller pin current limits and transistor datasheets must be checked.
+- Practical guidance starts with a current-limited LED or small rated extra-low-voltage load; it does not encourage powering motors or relay coils directly from microcontroller pins.
+
+### Module 09: Operational Amplifiers and Basic Analog Circuits
+- Added standalone lesson `stem-op-amps-analog-circuits.html`.
+- Covers op-amp terminals, ideal-model assumptions and limitations, negative feedback, inverting/non-inverting gain, comparator concepts, signal conditioning and device selection.
+- Includes an ideal inverting/non-inverting gain calculator with a simplified output-limit warning. Real output swing, input common-mode range, bandwidth, slew rate and supply requirements are called out as device-dependent.
+- Practical guidance requires checking the selected IC datasheet and keeping signals within its specified supply/input/output limits.
+
+### Batch integration and validation
+- Added shared responsive styling `assets/css/stem-advanced.css` and shared interaction logic `js/stem-advanced.js`.
+- Connected Module 06 to Module 07; Module 07 to Module 08; Module 08 to Module 09; Module 09 points to the upcoming Power Supplies and Regulation lesson.
+- Added all three pages to the Electronics Fundamentals directory and XML sitemap.
+- Updated this audit.
+- The interactive models are idealised teaching models, not exact device emulators. No mains/high-energy practical build instructions are included.
+- Source-level checks are required before review. Browser rendering, device-specific verification and physical experiments have not been performed as part of this source update.
