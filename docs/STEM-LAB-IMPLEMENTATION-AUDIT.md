@@ -398,3 +398,16 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - Safety boundaries: keep activities extra-low voltage; observe MCU pin voltage/current and absolute maximum ratings; do not drive motors, relays or other external loads directly from GPIO; use appropriate drivers and protection; check exact board/device datasheets.
 - Connected Module 16's next-lesson navigation, added Module 17 to the Electronics Fundamentals directory and XML sitemap.
 - Source-level validation should check unique IDs, script references, SVG/section/anchor balance, previous/next navigation, directory links and sitemap XML. No browser rendering, board upload or physical hardware test has been performed.
+
+
+## Module 18: Embedded Systems Design and Real-Time Control
+
+- Added standalone lesson `stem-embedded-systems-real-time-control.html`, responsive stylesheet `assets/css/stem-embedded-design.css` and interactive task timing estimator `js/stem-embedded-design.js`.
+- Covers requirements engineering, embedded-system architecture, layered firmware responsibilities, finite-state machines, real-time correctness, hard/soft real-time concepts, latency, jitter, timing budgets, cooperative superloops, RTOS trade-offs, watchdogs, fault detection, safe-state design, feedback control and verification.
+- Includes labelled SVG diagrams for system architecture, firmware layers, an operating-state machine, timing budget, fault/recovery path, closed-loop control and the practical pedestrian-crossing controller.
+- Practical project: extra-low-voltage Arduino tabletop pedestrian-crossing sequence using three indicator LEDs and a request button. Uses an explicit FSM and non-blocking millis()-based timing. Clearly labelled as educational only, not suitable for real road traffic or safety-critical control.
+- Interactive task estimator calculates single-task utilisation, remaining period slack and whether a task's execution time exceeds its period. It explicitly excludes other tasks, interrupts, blocking and scheduling overhead.
+- Includes requirements checklist, task scheduling comparison, watchdog limitations, hardware-independent protection guidance, testing methods, troubleshooting concepts and knowledge check.
+- Safety: practical is LED-only and extra-low-voltage; never use the sketch for actual traffic signals, machinery or life-safety control. Define safe states for the physical hazard and use independent hardware protection where required.
+- Connected Module 17's next-lesson navigation, added Module 18 to the Electronics Fundamentals directory and XML sitemap.
+- Source-level validation should check unique IDs, script references, SVG/section/article/anchor balance, previous/next navigation, directory link and sitemap XML. No browser rendering, Arduino upload, timing measurement or physical hardware test has been performed.
