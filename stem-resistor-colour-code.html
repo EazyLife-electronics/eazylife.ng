@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#00B09B">
+  <title>Resistor Colour Code Calculator | EazyLife STEM Lab</title>
+  <meta name="description" content="Read 4-band and 5-band resistor colour codes, calculate resistance and tolerance ranges, and find colour bands for a resistance value.">
+  <link rel="canonical" href="https://eazylife.ng/stem-resistor-colour-code.html">
+  <link rel="icon" type="image/png" href="assets/pictures/icon_dark.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/site-theme.css">
+  <link rel="stylesheet" href="assets/css/stem-learning.css">
+  <link rel="stylesheet" href="assets/css/stem-resistor-calculator.css">
+  <link rel="stylesheet" href="assets/css/stem-guidance.css">
+</head>
+<body class="sl-page">
+  <nav class="sl-nav" aria-label="Main navigation">
+    <div class="sl-wrap sl-nav-inner">
+      <a class="sl-brand" href="index.html" aria-label="EazyLife home"><img data-theme-logo data-theme-logo-light="assets/pictures/logo_black_transparent.png" data-theme-logo-dark="assets/pictures/logo_white_transparent.png" src="assets/pictures/logo_black_transparent.png" alt="EazyLife"></a>
+      <div class="sl-nav-links">
+        <a href="stem-lab.html"><i class="fas fa-flask"></i> STEM Lab</a>
+        <a href="stem-electronics-fundamentals.html"><i class="fas fa-book-open"></i> Learn</a>
+        <a class="active" href="stem-resistor-colour-code.html"><i class="fas fa-palette"></i> Tools</a>
+        <a href="stem-projects.html"><i class="fas fa-microchip"></i> Experiments</a>
+        <button class="el-theme-toggle" type="button" aria-label="Switch colour theme"><i class="fas fa-moon"></i></button>
+      </div>
+    </div>
+  </nav>
+
+  <header class="sl-hero">
+    <div class="sl-wrap sl-hero-grid">
+      <div>
+        <div class="sl-kicker"><span></span> EAZYLife STEM LAB · ELECTRONICS TOOLKIT</div>
+        <h1>Read the bands.<br><em>Know the value.</em></h1>
+        <p>Identify a resistor's nominal resistance and tolerance from its colour bands, or work backwards from a resistance value to a suitable band arrangement.</p>
+        <div class="sl-hero-actions">
+          <a class="sl-button primary" href="#calculator">Open calculator <i class="fas fa-arrow-down"></i></a>
+          <a class="sl-button quiet" href="stem-electronics-fundamentals.html">Explore lessons</a>
+        </div>
+        <div class="sl-meta"><span><i class="fas fa-unlock"></i> Free to use</span><span><i class="fas fa-mobile-screen"></i> Mobile friendly</span><span><i class="fas fa-calculator"></i> 4-band and 5-band</span></div>
+      </div>
+      <div class="sl-hero-visual" aria-hidden="true">
+        <div class="sl-visual-ring"></div><div class="sl-visual-chip"><i class="fas fa-palette"></i><b>COLOUR<br>TO VALUE</b></div>
+        <span class="sl-float f-a"><i class="fas fa-resistor"></i></span><span class="sl-float f-b"><i class="fas fa-ruler-combined"></i></span>
+        <small>IDENTIFY · CALCULATE · VERIFY</small>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="sl-section rc-workbench" id="calculator">
+      <div class="sl-wrap">
+        <div class="sl-section-head">
+          <div><div class="sl-eyebrow">INTERACTIVE REFERENCE TOOL</div><h2>Resistor colour-code calculator</h2><p>Select the bands in the same order they appear on the resistor, starting from the end with the closer-spaced bands.</p></div>
+          <label class="rc-mode-label" for="band-count">Resistor type
+            <select id="band-count"><option value="4">4-band resistor</option><option value="5">5-band resistor</option></select>
+          </label>
+        </div>
+        <div class="rc-layout">
+          <section class="rc-panel" aria-labelledby="band-heading">
+            <h3 id="band-heading"><i class="fas fa-sliders"></i> Select the colour bands</h3>
+            <div class="rc-resistor-wrap">
+              <div class="rc-resistor" role="img" aria-label="Resistor preview; selected colour bands are shown below">
+                <span class="rc-wire"></span><span class="rc-body"><i class="rc-band" id="preview-band-1"></i><i class="rc-band" id="preview-band-2"></i><i class="rc-band" id="preview-band-3"></i><i class="rc-band" id="preview-band-4"></i><i class="rc-band" id="preview-band-5"></i></span><span class="rc-wire"></span>
+              </div>
+              <p class="rc-preview-caption">Illustrative resistor preview. Band spacing and body colour are not to scale.</p>
+            </div>
+            <div class="rc-band-controls" id="band-controls"></div>
+            <div class="rc-result" aria-live="polite">
+              <span class="rc-result-label">Calculated nominal resistance</span>
+              <strong id="nominal-result">1 kΩ</strong>
+              <div class="rc-range"><span>Minimum: <b id="minimum-result">950 Ω</b></span><span>Maximum: <b id="maximum-result">1.05 kΩ</b></span></div>
+              <p id="tolerance-result">Tolerance: ±5% (gold)</p>
+            </div>
+            <button class="sl-button quiet rc-reset" type="button" id="reset-bands"><i class="fas fa-rotate-left"></i> Reset bands</button>
+          </section>
+
+          <aside class="rc-panel rc-explainer">
+            <h3><i class="fas fa-book-open"></i> How to read the bands</h3>
+            <ol class="rc-band-meaning" id="band-meaning">
+              <li><b>Band 1:</b> first significant digit.</li>
+              <li><b>Band 2:</b> second significant digit.</li>
+              <li><b>Band 3:</b> multiplier.</li>
+              <li><b>Band 4:</b> tolerance.</li>
+            </ol>
+            <div class="rc-formula"><b>Resistance = significant digits × multiplier</b><span>The tolerance band describes the allowed range around the nominal value.</span></div>
+            <h4>Worked examples</h4>
+            <ul class="rc-examples">
+              <li><span class="rc-example-dots"><i style="--dot:#8b4513"></i><i style="--dot:#000"></i><i style="--dot:#f00"></i><i style="--dot:#d4af37"></i></span><span><b>Brown · Black · Red · Gold</b><small>10 × 100 = 1,000 Ω ±5%</small></span></li>
+              <li><span class="rc-example-dots"><i style="--dot:#f00"></i><i style="--dot:#800080"></i><i style="--dot:#0000ff"></i><i style="--dot:#d4af37"></i><i style="--dot:#8b4513"></i></span><span><b>Red · Violet · Black · Blue · Brown</b><small>270 × 1,000,000 = 270 MΩ ±1%</small></span></li>
+            </ul>
+            <p class="rc-note"><i class="fas fa-circle-info"></i> Start reading from the end where the bands are grouped closer together. The tolerance band is usually separated slightly from the others.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="sl-section rc-reverse">
+      <div class="sl-wrap">
+        <div class="sl-section-head"><div><div class="sl-eyebrow">REVERSE LOOKUP</div><h2>Find bands from a resistance value</h2><p>Enter a value in ohms. The tool will find the closest representation using the selected band count.</p></div></div>
+        <div class="rc-reverse-panel">
+          <label for="target-resistance">Resistance value (Ω)<input id="target-resistance" type="number" min="0.01" step="any" value="4700" inputmode="decimal"></label>
+          <label for="target-tolerance">Tolerance
+            <select id="target-tolerance"><option value="1">±1%</option><option value="2">±2%</option><option value="0.5">±0.5%</option><option value="0.25">±0.25%</option><option value="0.1">±0.1%</option><option value="0.05">±0.05%</option><option value="5" selected>±5%</option><option value="10">±10%</option><option value="20">±20%</option></select>
+          </label>
+          <button class="sl-button primary" type="button" id="reverse-lookup"><i class="fas fa-magnifying-glass"></i> Find colour bands</button>
+          <p id="reverse-feedback" class="rc-reverse-feedback" aria-live="polite">Example: 4700 Ω can be represented as yellow, violet, red, gold in 4-band mode.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="sl-section rc-reference">
+      <div class="sl-wrap">
+        <div class="sl-section-head"><div><div class="sl-eyebrow">REFERENCE</div><h2>Colour code quick guide</h2><p>Digit, multiplier and tolerance meanings for common resistor bands.</p></div></div>
+        <div class="rc-table-wrap"><table class="rc-table"><thead><tr><th>Colour</th><th>Digit</th><th>Multiplier</th><th>Tolerance</th></tr></thead><tbody>
+          <tr><td><i style="--swatch:#000"></i> Black</td><td>0</td><td>×1</td><td>—</td></tr>
+          <tr><td><i style="--swatch:#8b4513"></i> Brown</td><td>1</td><td>×10</td><td>±1%</td></tr>
+          <tr><td><i style="--swatch:#f00"></i> Red</td><td>2</td><td>×100</td><td>±2%</td></tr>
+          <tr><td><i style="--swatch:#f80"></i> Orange</td><td>3</td><td>×1 k</td><td>—</td></tr>
+          <tr><td><i style="--swatch:#ff0"></i> Yellow</td><td>4</td><td>×10 k</td><td>—</td></tr>
+          <tr><td><i style="--swatch:#008000"></i> Green</td><td>5</td><td>×100 k</td><td>±0.5%</td></tr>
+          <tr><td><i style="--swatch:#00f"></i> Blue</td><td>6</td><td>×1 M</td><td>±0.25%</td></tr>
+          <tr><td><i style="--swatch:#800080"></i> Violet</td><td>7</td><td>×10 M</td><td>±0.1%</td></tr>
+          <tr><td><i style="--swatch:#808080"></i> Grey</td><td>8</td><td>×100 M</td><td>±0.05%</td></tr>
+          <tr><td><i style="--swatch:#fff"></i> White</td><td>9</td><td>×1 G</td><td>—</td></tr>
+          <tr><td><i style="--swatch:#d4af37"></i> Gold</td><td>—</td><td>×0.1</td><td>±5%</td></tr>
+          <tr><td><i style="--swatch:#c0c0c0"></i> Silver</td><td>—</td><td>×0.01</td><td>±10%</td></tr>
+        </tbody></table></div>
+        <p class="rc-note"><i class="fas fa-triangle-exclamation"></i> A missing tolerance band is commonly interpreted as ±20% on a 4-band resistor. This calculator does not support every specialised or non-standard resistor marking.</p>
+      </div>
+    </section>
+
+    <section class="sl-guidance">
+      <div class="sl-wrap sl-guidance-inner">
+        <div><span class="sl-guidance-kicker">WHEN YOU WANT TO GO FURTHER</span><h2>Need help applying what you've learned?</h2><p>Keep using the free lessons and tools. If you need a personal explanation, project-specific troubleshooting, guided practical training or a focused masterclass, EazyLife can help you take the next step.</p><p class="sl-guidance-note">Looking for free or sponsored training? Ask about referral opportunities when available. These depend on active programmes and are not guaranteed.</p></div>
+        <a class="sl-button primary" href="https://wa.me/2347051548082?text=Hello%20EazyLife%2C%20I%20would%20like%20to%20enquire%20about%20personalised%20guidance%20or%20a%20masterclass."><i class="fas fa-comments"></i> Enquire about guidance</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="sl-footer"><div class="sl-wrap"><a href="index.html" class="sl-footer-brand">EazyLife <span>Robotics & Electronics Solutions</span></a><p>Explore boldly. Build thoughtfully. Make useful things.</p><div><a href="stem-lab.html">STEM Lab</a><a href="stem-electronics-fundamentals.html">Lessons</a><a href="stem-projects.html">Project playground</a><a href="shop.html">Components</a></div><small>© <span id="sl-year"></span> EazyLife Robotics & Electronics Solutions · Ibadan, Nigeria</small></div></footer>
+  <script src="js/site-theme.js"></script>
+  <script src="js/stem-resistor-calculator.js"></script>
+</body>
+</html>
