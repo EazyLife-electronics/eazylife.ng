@@ -24,4 +24,4 @@
 :root[data-theme="dark"] .combo-grid svg [fill="#dff3eb"],:root[data-theme="dark"] .combo-blocks svg [fill="#dff3eb"]{fill:#21463e}
 @media(max-width:760px){.combo-grid,.combo-sim,.combo-blocks{grid-template-columns:1fr}}
 
-:root[data-theme="dark"] .combo-grid svg g[fill="#153b34"]{fill:#eef2f0}
+:root[data-theme="dark"] .combo-grid svg g[fill="#153b34"],:root[data-theme="dark"] .combo-blocks svg g[fill="#153b34"]{fill:#eef2f0}
