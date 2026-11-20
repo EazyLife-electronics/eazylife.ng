@@ -11,10 +11,11 @@
 <section class="sl-section"><div class="sl-wrap"><div class="sl-eyebrow">05 · PATH PLANNING AND OBSTACLE AVOIDANCE</div><h2>Choose a route, then keep checking it</h2><p>Path planning selects a route through a known or represented environment. Local obstacle avoidance reacts to nearby changes. A planned path is not a promise that the route remains clear.</p><div class="aut-card"><h3>Global route and local response</h3><svg viewBox="0 0 760 330" role="img" aria-label="Grid map showing start and goal, planned route, blocked obstacle cells and a local detour around an obstacle"><g stroke="#c3ced7" stroke-width="1" fill="none"><path d="M70 40V280M120 40V280M170 40V280M220 40V280M270 40V280M320 40V280M370 40V280M420 40V280M470 40V280M520 40V280M570 40V280M620 40V280M670 40V280M70 40H670M70 90H670M70 140H670M70 190H670M70 240H670M70 280H670"/></g><g fill="#bd7070"><rect x="320" y="90" width="50" height="50"/><rect x="370" y="90" width="50" height="50"/><rect x="370" y="140" width="50" height="50"/><rect x="420" y="140" width="50" height="50"/></g><path d="M95 260L145 260L195 210L245 210L295 210L345 210L395 210L445 210L495 160L545 110L595 110L645 60" stroke="#16866e" stroke-width="4" fill="none" stroke-dasharray="8 5"/><circle cx="95" cy="260" r="10" fill="#16866e"/><circle cx="645" cy="60" r="10" fill="#b7791f"/><g fill="currentColor" font-size="13"><text x="75" y="300">START</text><text x="610" y="35">GOAL</text><text x="385" y="125" text-anchor="middle">Obstacle</text></g></svg><p class="aut-caption">Conceptual grid only. A real planner needs map coordinates, robot footprint, obstacle inflation, route costs and sensor updates.</p></div><h3>Common planning approaches</h3><ul><li><b>Wall following:</b> a simple local rule for constrained environments, but it can fail in open spaces or complex layouts.</li><li><b>Breadth-first search:</b> finds a shortest path in an unweighted grid, if a valid grid map is available.</li><li><b>Dijkstra's algorithm:</b> finds a minimum-cost route with non-negative edge costs.</li><li><b>A* search:</b> uses a cost estimate toward the goal to guide search; performance depends on the heuristic and map.</li><li><b>Potential fields:</b> use attractive and repulsive influences to guide motion, but can become trapped in local minima.</li></ul><div class="aut-card"><h3>Stopping distance matters</h3><p>A robot needs enough distance to detect, decide and stop. A simplified physical estimate is braking distance = speed² ÷ (2 × deceleration). The robot also travels during sensor and control latency. The calculator below is an ideal estimate, not a certified safety limit.</p><div class="aut-input-grid"><label>Speed (m/s)<input id="au-speed" type="number" min="0" max="5" step="0.05" value="0.5"></label><label>Deceleration (m/s²)<input id="au-decel" type="number" min="0.05" max="10" step="0.05" value="1"></label><label>Detection/control latency (ms)<input id="au-latency" type="number" min="0" max="2000" step="10" value="100"></label><label>Extra margin (cm)<input id="au-margin" type="number" min="0" max="500" step="1" value="10"></label></div><div class="aut-results"><div><span>Ideal braking distance</span><strong id="au-brake">12.5 cm</strong></div><div><span>Distance during latency</span><strong id="au-latency-distance">5.0 cm</strong></div><div><span>Illustrative total + margin</span><strong id="au-total-distance">27.5 cm</strong></div></div><p class="aut-note" id="au-stop-status" aria-live="polite">Real stopping distance varies with surface, load, battery, tyres, driver behaviour and control delays.</p></div></div></section>
 <section class="sl-section ael-alt"><div class="sl-wrap"><div class="sl-eyebrow">06 · PRACTICAL BUILD</div><h2>Build an obstacle-aware rover behaviour</h2><p>Extend the differential-drive rover from Module 20 with a forward-facing distance sensor. The goal is to detect a nearby object, stop, perform a controlled scan or turn, and continue only when the path appears clear. This is a learning exercise, not a collision-prevention product.</p><div class="aut-card"><h3>System layout</h3><svg viewBox="0 0 760 300" role="img" aria-label="Arduino controller connected to ultrasonic distance sensor and dual motor driver, which drives left and right motors; separate motor supply powers driver"><g fill="#e5effb" stroke="#527da9" stroke-width="2"><rect x="35" y="85" width="150" height="85" rx="10"/><rect x="300" y="85" width="160" height="85" rx="10"/><rect x="575" y="35" width="150" height="75" rx="10"/><rect x="575" y="185" width="150" height="75" rx="10"/><rect x="300" y="210" width="160" height="55" rx="10" fill="#fff2d9" stroke="#b7791f"/></g><g fill="#23445f" text-anchor="middle" font-size="14" font-weight="bold"><text x="110" y="120">Distance sensor</text><text x="110" y="143" font-size="11">TRIG / ECHO</text><text x="380" y="120">Microcontroller</text><text x="380" y="143" font-size="11">measure · decide</text><text x="650" y="68">Left motor</text><text x="650" y="91" font-size="11">driver output A</text><text x="650" y="218">Right motor</text><text x="650" y="241" font-size="11">driver output B</text><text x="380" y="233">Dual motor driver</text><text x="380" y="251" font-size="11">external motor supply</text></g><g stroke="#16866e" stroke-width="3" fill="none"><path d="M185 127H300M460 110H520V72H575M460 145H520V222H575M380 170V210"/></g><text x="380" y="290" fill="currentColor" text-anchor="middle" font-size="12">Use a common ground for this non-isolated low-voltage setup; keep motor current out of GPIO.</text></svg></div>
 <div class="aut-grid"><article class="aut-card"><h3>Parts and checks</h3><ul><li>Module 20 differential-drive rover, Arduino Uno-compatible controller and suitable dual H-bridge.</li><li>HC-SR04-compatible ultrasonic module, only if its supply and logic are compatible with the board.</li><li>Protected extra-low-voltage motor supply, switch and secure wiring.</li><li>Check sensor blind zone, beam width, update interval and echo voltage before connection.</li><li>Mount the sensor firmly and avoid pointing it at the floor or chassis.</li></ul></article><article class="aut-card"><h3>Example connection map</h3><ul><li>TRIG → D2; ECHO → D3 on a 5 V Uno-compatible setup.</li><li>Motor-driver connections remain as in Module 20.</li><li>Sensor VCC → regulated 5 V only if the module requires and accepts it; GND → common ground.</li><li>Never assume a 3.3 V controller input is 5 V tolerant; use a suitable level shifter or divider for ECHO if required.</li><li>Do not power motors from the controller's 5 V pin.</li></ul></article></div>
-<h3>Arduino sketch: stop and turn away</h3><p>This compact example illustrates a reactive policy. It assumes the motor helper functions from your driver setup are adapted to the actual breakout and that a valid distance reading is returned in centimetres. Start with wheels lifted and verify the stop behaviour before a slow floor test.</p><pre><code>// Illustrative control logic for an extra-low-voltage rover.
-// Adapt motor pins, polarity and driver functions to your hardware.
-const byte TRIG_PIN = 2;
-const byte ECHO_PIN = 3;
+<h3>Arduino sketch: stop and turn away</h3><p>This compact example illustrates a reactive policy. It assumes the motor helper functions from your driver setup are adapted to the actual breakout and that a valid distance reading is returned in centimetres. Start with wheels lifted and verify the stop behaviour before a slow floor test.</p><pre><code>// Arduino Uno-compatible board + TB6612FNG-style driver.
+// Verify breakout pin labels, motor polarity and supply ratings first.
+const byte PWMA = 5, AIN1 = 7, AIN2 = 8;
+const byte PWMB = 6, BIN1 = 9, BIN2 = 10, STBY = 4;
+const byte TRIG_PIN = 2, ECHO_PIN = 3;
 const float STOP_DISTANCE_CM = 25.0;
 const unsigned long ECHO_TIMEOUT_US = 25000UL;
 
@@ -29,21 +30,38 @@ float readDistanceCm() {
   return duration * 0.0343f / 2.0f;
 }
 
-// Implement these using the verified driver wiring.
-void stopMotors();
-void driveForward(int pwm);
-void turnRight(int pwm);
+void setMotor(byte in1, byte in2, byte pwmPin, int command) {
+  command = constrain(command, -255, 255);
+  digitalWrite(in1, command >= 0 ? HIGH : LOW);
+  digitalWrite(in2, command >= 0 ? LOW : HIGH);
+  analogWrite(pwmPin, abs(command));
+}
+void stopMotors() {
+  analogWrite(PWMA, 0); analogWrite(PWMB, 0);
+  digitalWrite(AIN1, LOW); digitalWrite(AIN2, LOW);
+  digitalWrite(BIN1, LOW); digitalWrite(BIN2, LOW);
+}
+void driveForward(int pwm) {
+  setMotor(AIN1, AIN2, PWMA, pwm);
+  setMotor(BIN1, BIN2, PWMB, pwm);
+}
+void turnRight(int pwm) {
+  setMotor(AIN1, AIN2, PWMA, pwm);
+  setMotor(BIN1, BIN2, PWMB, -pwm);
+}
 
 void setup() {
-  pinMode(TRIG_PIN, OUTPUT);
-  pinMode(ECHO_PIN, INPUT);
+  pinMode(PWMA, OUTPUT); pinMode(AIN1, OUTPUT); pinMode(AIN2, OUTPUT);
+  pinMode(PWMB, OUTPUT); pinMode(BIN1, OUTPUT); pinMode(BIN2, OUTPUT);
+  pinMode(STBY, OUTPUT); digitalWrite(STBY, HIGH);
+  pinMode(TRIG_PIN, OUTPUT); pinMode(ECHO_PIN, INPUT);
   stopMotors();
 }
 
 void loop() {
   float distance = readDistanceCm();
   if (distance < 0 || distance <= STOP_DISTANCE_CM) {
-    stopMotors();             // fail-safe response to invalid / near reading
+    stopMotors();              // stop on invalid or near reading
     delay(150);
     turnRight(90);             // short, supervised manoeuvre
     delay(300);
@@ -53,7 +71,7 @@ void loop() {
     driveForward(90);          // begin slowly; tune for the actual chassis
   }
 }</code></pre>
-<p class="aut-note">The sketch intentionally leaves motor-driver functions as hardware-specific placeholders. The fixed timed turn is not localisation-aware and may not clear the obstacle. A production-quality controller needs non-blocking timing, repeated valid measurements, sensor plausibility checks, motor feedback, bounded retries and an explicit fault state.</p>
+<p class="aut-note">This is a deliberately simple blocking teaching sketch. Confirm that the driver input polarity matches your motors; reverse the relevant motor command if needed. A fixed timed turn is not localisation-aware and may not clear the obstacle. A more robust controller needs non-blocking timing, repeated valid measurements, sensor plausibility checks, motor feedback, bounded retries and an explicit fault state.</p>
 <h3>Test in stages</h3><ol><li>With motors disconnected, verify sensor supply, logic levels and distance readings against a ruler at several distances.</li><li>Test invalid/no-echo handling and confirm the controller requests a stop.</li><li>Lift the wheels, verify motor direction and that the stop command actually stops both motors.</li><li>Run at low speed in a clear, bounded area with a reachable power switch and a spotter.</li><li>Introduce a large soft obstacle, observe detection and stopping, then repeat at lower speed and greater separation.</li><li>Record missed detections, false detections, stopping distance and repeatability. Change one variable at a time.</li></ol>
 <h3>Extension challenges</h3><ul><li>Replace the timed turn with a servo-mounted sensor scan and compare left/right clearance.</li><li>Add encoder feedback so a turn can be measured rather than timed.</li><li>Use a state machine with <code>DRIVE</code>, <code>STOP</code>, <code>SCAN</code>, <code>TURN</code> and <code>FAULT</code> states.</li><li>Combine wheel odometry and IMU yaw as a learning exercise; observe drift before and after correction.</li><li>Represent a small test area as a grid and implement breadth-first search or A* on a computer before deploying a bounded planner.</li></ul></div></section>
 <section class="sl-section"><div class="sl-wrap"><div class="sl-eyebrow">07 · KNOWLEDGE CHECK</div><h2>Check your understanding</h2><div class="ael-quiz" data-quiz><article class="ael-question"><h3>1. What is localisation?</h3><label><input type="radio" name="aut-q1" value="a"> Selecting the fastest motor PWM</label><label><input type="radio" name="aut-q1" value="b"> Estimating the robot's position and orientation</label><label><input type="radio" name="aut-q1" value="c"> Measuring battery capacity</label><p class="ael-feedback" data-answer="b" data-explain="Localisation estimates the robot's pose in a reference frame."></p></article><article class="ael-question"><h3>2. Why can averaging two sensors still give a poor estimate?</h3><label><input type="radio" name="aut-q2" value="a"> Sensors can have correlated bias, different timestamps or observe different targets</label><label><input type="radio" name="aut-q2" value="b"> Averages always remove systematic error</label><label><input type="radio" name="aut-q2" value="c"> All sensors use the same units</label><p class="ael-feedback" data-answer="a" data-explain="Fusion must consider uncertainty, timing, correlation and what each sensor actually observes."></p></article><article class="ael-question"><h3>3. What should a robot do when a required range reading is invalid?</h3><label><input type="radio" name="aut-q3" value="a"> Assume the path is clear</label><label><input type="radio" name="aut-q3" value="b"> Keep the previous motor command forever</label><label><input type="radio" name="aut-q3" value="c"> Apply a defined degraded or safe response, such as slowing or stopping</label><p class="ael-feedback" data-answer="c" data-explain="Invalid data needs an explicit policy. The correct response depends on the robot and hazard."></p></article><article class="ael-question"><h3>4. What does A* use to guide its search?</h3><label><input type="radio" name="aut-q4" value="a"> A path cost and a heuristic estimate toward the goal</label><label><input type="radio" name="aut-q4" value="b"> Only motor current</label><label><input type="radio" name="aut-q4" value="c"> An ultrasonic echo pulse width</label><p class="ael-feedback" data-answer="a" data-explain="A* combines the known cost so far with a heuristic estimate of remaining cost."></p></article><button class="sl-button primary" type="button" data-quiz-check>Check answers</button><p class="ael-quiz-result" data-quiz-result aria-live="polite"></p></div></div></section>
