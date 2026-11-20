@@ -520,3 +520,17 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - Security note: the hard-coded demonstration code is educational only, not secure access control. Real systems require secure credential handling and an appropriate security design. Board voltage, I²C pins/address, LCD backpack compatibility and library API must be verified for actual hardware.
 - Connected Module 25 next-lesson navigation, added Module 26 to the Circuit foundations directory category and XML sitemap.
 - Source-level checks: unique HTML IDs, JS element references and syntax, SVG/section/article/anchor balance, quiz structure, responsive CSS braces, directory count/category, sitemap XML and previous/next navigation. No browser rendering, Arduino compilation/upload, keypad scan test or LCD hardware test has been performed.
+
+
+## Confirmed closing curriculum sequence (Modules 24–29)
+
+The user reconfirmed the agreed finite ending sequence. This is the authoritative roadmap; do not replace Module 27 with a separate serial-communications module or extend the sequence without explicit user agreement.
+
+- **24. Combinational Logic Design:** Design useful logic circuits.
+- **25. Sequential Logic and Digital Memory:** Understand state, timing and memory.
+- **26. Digital Displays and Human Interfaces:** Build practical input/output interfaces. The implemented lesson includes keypad scanning, seven-segment displays, LCDs and OLEDs.
+- **27. DAC and Signal Generation:** Connect digital and analogue systems. This is the next module to implement.
+- **28. Electronics Product Design:** Integrate circuits into usable products.
+- **29. Continue Your Journey with EazyLife:** Transition from free learning to guided training, clearly presenting optional paid guidance, masterclasses and project-specific support without withholding useful free learning.
+
+Module 26's upcoming navigation now points to Module 27: DAC and Signal Generation. Modules 27–29 are planned, not yet implemented.
