@@ -93,3 +93,10 @@ The first foundation is being developed on `feature/circuit-studio`. The initial
 - Rotation remains a discrete 90-degree action rather than free rotation.
 
 The current routing stage uses a generated orthogonal route between endpoints. Manual bend editing, junctions, crossing semantics and multi-segment route persistence remain subsequent work.
+
+## Visual styles and viewport navigation (2026-11-20)
+
+- Engineering style remains the clean monochrome symbol presentation.
+- Educational style now visibly changes symbols using soft labelled plates, teal artwork, stronger strokes, and visible pin-name labels. The selected style is restored when loading the saved browser draft.
+- Workspace zoom now supports pointer-centred mouse-wheel zoom, pinch-to-zoom on touch screens, and zoom buttons with an expanded 25%–400% range.
+- Pinch gestures also translate the viewport with the gesture midpoint. Dedicated Pan mode and Space + drag remain available.
