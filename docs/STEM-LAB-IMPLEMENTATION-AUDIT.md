@@ -531,7 +531,7 @@ The user reconfirmed the agreed finite ending sequence. This is the authoritativ
 - **26. Digital Displays and Human Interfaces:** Build practical input/output interfaces. The implemented lesson includes keypad scanning, seven-segment displays, LCDs and OLEDs.
 - **27. DAC and Signal Generation:** Connect digital and analogue systems. This is the next module to implement.
 - **28. Electronics Product Design:** Integrate circuits into usable products.
-- **29. Continue Your Journey with EazyLife:** Transition from free learning to guided training, clearly presenting optional paid guidance, masterclasses and project-specific support without withholding useful free learning.
+- **29. Applied Electronics Projects:** Apply the curriculum through practical project briefs, build stages, test evidence and optional project-specific guidance.
 
 Module 26's upcoming navigation now points to Module 27: DAC and Signal Generation. Modules 27–29 are planned, not yet implemented.
 
