@@ -343,3 +343,19 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - Safety boundaries: effective local fume extraction, eye protection, hot-iron stand and supervision; no live-circuit continuity testing; no mains/high-voltage/high-energy battery/safety-critical PCB design in this beginner lesson. No deliberate shorting of powered circuits.
 - Connected Module 12's next-lesson button, added Module 13 to the Electronics Fundamentals directory and XML sitemap.
 - Source-level validation should check unique IDs, SVG integrity, balanced section/anchor tags, navigation, directory links and sitemap XML. No browser rendering, soldering process test or PCB fabrication has been performed.
+
+
+## Module 14: Workshop Measurement and Instrumentation
+
+- Added standalone lesson page `stem-workshop-measurement-instrumentation.html` with separate responsive stylesheet `assets/css/stem-instrumentation.css` and calculator script `js/stem-instrumentation.js`.
+- Covers digital multimeter sockets and functions; voltage measurement in parallel; current measurement in series; resistance and continuity only on de-energised circuits; diode-test limitations; resolution, accuracy, precision and uncertainty.
+- Explains oscilloscope volts/div, time/div, peak-to-peak voltage, period, frequency, triggering, probe attenuation and earth-referenced probe-ground hazards.
+- Introduces signal-generator setup, amplitude/load conventions and controlled low-voltage circuit testing.
+- Includes labelled SVG diagrams for generic DMM front panel/sockets, voltmeter and ammeter connections, resistance and continuity tests, oscilloscope display/probe connection, and signal-generator test setup.
+- Includes interactive teaching calculators for approximate DMM display resolution and converting oscilloscope divisions into voltage, period and frequency.
+- Practical activities: verify a low-voltage resistor network with a DMM; observe a low-voltage function-generator waveform using an oscilloscope; locate a prepared open connection on an unpowered practice board.
+- Safety boundaries explicitly prohibit mains/high-energy beginner activities, current-mode measurement directly across a source, resistance/continuity tests on powered circuits, and unsafe use of grounded oscilloscope probe clips. Activities require isolated extra-low-voltage sources and equipment-specific manuals.
+- Connected Module 13's next-lesson navigation to Module 14, added Module 14 to the Electronics Fundamentals directory and XML sitemap.
+- Corrected malformed nested anchor markup around the Module 12 and Module 13 directory cards so each card is a separate link.
+- Source-level checks should verify unique IDs, JavaScript element references, SVG/section/anchor balance, navigation, directory and sitemap entries. These checks do not constitute browser QA or physical instrument testing.
+- No browser rendering, oscilloscope operation, DMM calibration, or physical workshop testing has been performed.
