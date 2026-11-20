@@ -702,3 +702,25 @@ A follow-up source audit was performed on the active learning-platform branch af
 - A second SVG contrast check found Module 24's dark-theme rule changed pale gate-diagram blocks to dark green while retaining dark green label text. Added a matching dark-mode text override for those label groups. Also brightened shared dark-mode error, success and teal action text used by the kit-order flow, and the shop's dark-mode error state.
 
 - Standardised the footer navigation on STEM Lab, Project Playground, the learning directory, resistor calculator and all 29 lesson pages. Each now provides the same eight core destinations, with responsive wrapping rather than page-specific link sets or missing footer links.
+
+
+## Additional main-site and utility-page pass: 2026-11-20
+
+### Corrections applied
+
+- Added an explicit current-page Reviews destination to the Reviews page's horizontal navigation. Previously, the page linked to the other main destinations but omitted Reviews itself.
+- Removed the duplicate second inclusion of `js/site-theme.js` from `kit-order.html`. The shared theme controller was already loaded earlier on that page; the second load was redundant.
+
+### Additional observations
+
+- The shop and order-tracking pages use a separate Tailwind `.dark` class theme controller rather than the shared `data-theme` controller. Both initialise from the same `eazylife-theme` local-storage key and update the logo and toggle icon. Their separate implementation is retained to avoid binding a second theme toggle or disturbing their cart and tracking interactions.
+- The Reviews and project-gallery pages use the shared theme stylesheet/controller. Their horizontal navigation now receives the shared link treatment.
+- The Retailer Price Finder and admin pages load the shared theme layer. The Retailer tool has a working home link and theme control; admin pages retain their dedicated admin workflow.
+- The MAYTECH microsite and receipt generator under `maytechng/` and `r/` have their own distinct visual systems and workflows. They were not forced into EazyLife's customer-site navigation or theme.
+- The kit-order page intentionally retains its focused project-order header.
+
+### Verification limits
+
+- Re-fetched the updated Reviews and kit-order files after committing and confirmed the source changes.
+- No Firebase, Firestore, pricing, order, customer, admin, or receipt-generation logic was changed.
+- Live browser checks, visual comparison at multiple viewport widths, automated contrast calculations, and end-to-end order/review workflows remain unperformed.
