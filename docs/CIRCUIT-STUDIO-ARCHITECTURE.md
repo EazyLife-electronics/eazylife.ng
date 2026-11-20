@@ -100,3 +100,11 @@ The current routing stage uses a generated orthogonal route between endpoints. M
 - Educational style now visibly changes symbols using soft labelled plates, teal artwork, stronger strokes, and visible pin-name labels. The selected style is restored when loading the saved browser draft.
 - Workspace zoom now supports pointer-centred mouse-wheel zoom, pinch-to-zoom on touch screens, and zoom buttons with an expanded 25%–400% range.
 - Pinch gestures also translate the viewport with the gesture midpoint. Dedicated Pan mode and Space + drag remain available.
+
+## Wire routing refinement (2026-11-20)
+
+- Wire routes can persist manually positioned intermediate bend points in project JSON. Endpoints remain attached to their component pins.
+- Selecting a wire opens a routing inspector. Users can add a bend, edit bend coordinates, remove individual bends or clear all bends.
+- Bend handles can be dragged directly on the canvas with mouse or touch.
+- Explicit junction markers can be toggled at route bends. Ordinary wire crossings remain non-connected; the editor does not infer electrical connection from visual intersection.
+- Wire selection and deletion are supported. Junctions are route-bend markers in this milestone; shared multi-wire electrical node modelling and automatic intersection detection remain future work.
