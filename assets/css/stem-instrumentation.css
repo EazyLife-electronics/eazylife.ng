@@ -1,0 +1,6 @@
+/* Module 14 instrumentation additions */
+.mi-waveform{width:100%;height:auto}
+.mi-meter-note{font-size:.76rem;line-height:1.7;color:var(--el-muted)}
+#mi-resolution,#mi-vpp,#mi-period,#mi-frequency{display:block;margin:5px 0 12px}
+:root[data-theme="dark"] .ael-card svg text{fill:currentColor}
+@media(max-width:600px){.ael-card svg{max-width:100%;height:auto}.ael-card{overflow:hidden}}
