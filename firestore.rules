@@ -8,7 +8,7 @@ service cloud.firestore {
         && request.auth.token.email == 'damzyeazy@gmail.com';
     }
 
-    match /products/{productId} {
+    match /circuitComponents/{componentId} {\n      allow read: if isAdmin() || resource.data.status == 'published';\n      allow create, update, delete: if isAdmin();\n    }\n\n    match /products/{productId} {
       allow read: if true;
       allow write: if isAdmin();
     }
