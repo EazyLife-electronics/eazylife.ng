@@ -616,3 +616,5 @@ Module 29 is the final lesson in the series. It should offer project-based pract
 - Performed source-level checks on navigation markup, destination paths, module sequence, pending/upcoming markers, stylesheet references and dark-theme overrides.
 - No live-browser visual regression pass, automated screenshot comparison, real-device layout test or runtime JavaScript console test has been performed. The branch preview should still be reviewed in light and dark modes at desktop and phone widths before merge/deployment.
 - All changes remain on `feature/stem-learning-platform`. No production merge or deployment was performed.
+
+- Refined the Electronics Fundamentals category taxonomy: Modules 28 (Electronics Product Design) and 29 (Applied Electronics Projects) now use a dedicated **Product design and applied projects** filter category rather than being grouped under Circuit foundations. The directory now has six categories while retaining all 29 module cards and combined search/filter behaviour.
