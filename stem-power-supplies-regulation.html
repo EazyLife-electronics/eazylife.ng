@@ -11,25 +11,22 @@
 <div class="ael-card"><h3>From source to regulated DC</h3><svg viewBox="0 0 720 190" role="img" aria-label="Power supply block diagram: isolated low voltage AC source, rectifier, smoothing capacitor, voltage regulator and DC load"><g fill="none" stroke="#159b83" stroke-width="2.5"><rect x="12" y="48" width="118" height="80" rx="9"/><rect x="158" y="48" width="118" height="80" rx="9"/><rect x="304" y="48" width="118" height="80" rx="9"/><rect x="450" y="48" width="118" height="80" rx="9"/><rect x="596" y="48" width="112" height="80" rx="9"/><path d="M130 88H158M276 88H304M422 88H450M568 88H596"/></g><g fill="currentColor" font-size="13" text-anchor="middle"><text x="71" y="78">Isolated</text><text x="71" y="97">AC source</text><text x="217" y="78">Rectifier</text><text x="217" y="97">AC → DC</text><text x="363" y="78">Smoothing</text><text x="363" y="97">capacitor</text><text x="509" y="78">Voltage</text><text x="509" y="97">regulator</text><text x="652" y="78">DC load</text><text x="652" y="97">circuit</text><text x="360" y="166">A regulated supply aims to keep its output suitable as input and load conditions change.</text></g></svg><p class="ael-caption">This is a functional block diagram. Some modern supplies use switching conversion rather than a linear regulator, and many DC-input supplies do not need an AC rectifier stage.</p></div>
 <div class="ael-note"><i class="fas fa-lightbulb"></i><p><strong>Four questions before choosing a supply:</strong> What voltage does the load require? How much continuous and peak current does it draw? How clean and stable must the rail be? What happens during fault, overload, start-up and loss of power?</p></div></div></section>
 <section class="sl-section ael-alt"><div class="sl-wrap"><div class="sl-eyebrow">02 · RECTIFICATION AND SMOOTHING</div><h2>Turn low-voltage AC into smoother DC</h2><p>A bridge rectifier uses four diodes so both halves of an AC waveform produce current in the same direction through the load. A reservoir capacitor charges near waveform peaks and supplies the load between peaks. The output is pulsating DC with ripple, not perfectly flat DC.</p>
-<div class="ael-card"><h3>Full-wave bridge rectifier</h3><svg viewBox="0 0 680 390" role="img" aria-label="Full-wave bridge rectifier schematic using four diode symbols. AC terminals are left and right. D1 and D2 conduct from either AC terminal toward the positive output rail. D3 and D4 conduct from the negative output rail toward either AC terminal. A reservoir capacitor and load are in parallel across positive and negative DC outputs.">
+<div class="ael-card"><h3>Full-wave bridge rectifier</h3><svg viewBox="0 0 680 360" role="img" aria-label="Full-wave bridge rectifier with AC input at left and right, positive output at top and negative output at bottom. D1 and D2 have cathodes toward the positive rail. D3 and D4 have anodes toward the negative rail. Reservoir capacitor and load are connected in parallel across the DC rails.">
 <g fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-<path d="M95 185H185L310 65H370L495 185H585M95 185H185L310 305H370L495 185H585"/>
-<path d="M340 65V25H565M340 305V355H565"/>
-<path d="M185 185H95M495 185H585"/>
-<path d="M565 25V105M565 105V355"/>
-<path d="M565 105V145M555 145H575M555 155H575M565 155V225M565 225V265M555 265H575M555 275H575M565 275V355"/>
-<path d="M565 25H625V355H565"/>
+<path d="M40 180H100V130H160M230 130H300L340 65H380L450 130H520M590 130H580V180H640"/>
+<path d="M100 180V230H160M230 230H300L340 295H380L450 230H520M590 230H580V180"/>
+<path d="M340 65V35H625V325H340V295"/>
+<path d="M100 130H100M100 230H100M580 130V230"/>
+<path d="M625 35V115M615 115H635M615 125H635M625 125V235M625 235V285M615 285H635M615 295H635M625 295V325"/>
 </g>
-<g stroke="#159b83" stroke-width="2.5" fill="none">
-<path d="M225 147L250 122L250 172Z"/><path d="M254 117V177"/>
-<path d="M455 147L430 122L430 172Z"/><path d="M426 117V177"/>
-<path d="M225 223L250 198L250 248Z"/><path d="M254 193V253"/>
-<path d="M455 223L430 198L430 248Z"/><path d="M426 193V253"/>
+<g stroke="#159b83" stroke-width="2.5" fill="none" stroke-linejoin="round">
+<path d="M160 112L205 130L160 148Z" fill="#159b83"/><path d="M210 108V152"/>
+<path d="M520 112L475 130L520 148Z" fill="#159b83"/><path d="M470 108V152"/>
+<path d="M160 212L205 230L160 248Z" fill="#159b83"/><path d="M210 208V252"/>
+<path d="M520 212L475 230L520 248Z" fill="#159b83"/><path d="M470 208V252"/>
 </g>
-<g fill="currentColor" font-size="14"><text x="30" y="175">AC ~</text><text x="600" y="175">AC ~</text><text x="340" y="16" text-anchor="middle">+ DC</text><text x="340" y="380" text-anchor="middle">− DC</text><text x="230" y="105">D1</text><text x="450" y="105">D2</text><text x="230" y="280">D3</text><text x="450" y="280">D4</text><text x="585" y="125">C reservoir</text><text x="585" y="245">Load</text></g>
-<path d="M565 25V95M555 95H575M555 105H575M565 105V355" stroke="#159b83" stroke-width="2.5" fill="none"/>
-<path d="M565 25H625V355H565" stroke="currentColor" stroke-width="2.5" fill="none"/>
-<text x="340" y="205" fill="currentColor" font-size="12" text-anchor="middle">Four diodes steer both AC half-cycles</text>
+<g fill="currentColor" font-size="14"><text x="20" y="165">AC ~</text><text x="642" y="165">AC ~</text><text x="340" y="20" text-anchor="middle">+ DC</text><text x="340" y="350" text-anchor="middle">− DC</text><text x="180" y="95">D1</text><text x="500" y="95">D2</text><text x="180" y="275">D3</text><text x="500" y="275">D4</text><text x="570" y="75">C and load</text><text x="570" y="93">in parallel</text></g>
+<text x="340" y="180" text-anchor="middle" fill="currentColor" font-size="12">Full-wave bridge</text>
 </svg><p class="ael-caption">Conceptual bridge topology. The positive and negative DC rails are across the bridge output; the reservoir capacitor and load connect in parallel across those rails. For real wiring, follow a bridge module's printed AC and +/− markings or a verified diode schematic, not the artistic placement alone.</p></div>
 <div class="ael-note warning"><i class="fas fa-triangle-exclamation"></i><p><strong>Safety boundary:</strong> all practical activities in this lesson use a certified, isolated, extra-low-voltage AC adapter or a current-limited DC bench supply. Do not connect a breadboard, exposed bridge, capacitor or regulator circuit directly to household mains. Do not build an exposed mains transformer or line-powered supply here.</p></div>
 <div class="ael-grid"><article class="ael-card"><h3>What the capacitor does</h3><p>The reservoir capacitor charges near the peaks of the rectified waveform and discharges into the load as the rectified voltage falls. Larger capacitance generally reduces ripple for the same load current and ripple frequency, but increases inrush current and diode/transformer stress.</p><div class="ael-equation">C ≈ ILOAD / (fRIPPLE × VRIPPLE)</div><p>For full-wave rectification, ripple frequency is twice the AC frequency: 100 Hz from 50 Hz AC, or 120 Hz from 60 Hz AC.</p></article><article class="ael-card"><h3>Ripple is not the same as regulation</h3><p>Ripple is the periodic variation remaining on a DC rail. Load regulation describes how much the average output changes when the load current changes. Line regulation describes how much output changes when the input voltage changes.</p><p>A regulator can reduce ripple and variation, but it cannot correct an input that falls below its required operating headroom.</p></article></div>
