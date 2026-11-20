@@ -698,3 +698,5 @@ A follow-up source audit was performed on the active learning-platform branch af
 
 - These changes are committed to `feature/stem-learning-platform` only. No merge to `main`, production deployment, Firestore modification or Firebase configuration change was made.
 - This was a source-level review. Live browser rendering, screen-reader testing, automated contrast measurements and real-device responsive testing remain outstanding.
+
+- A second SVG contrast check found Module 24's dark-theme rule changed pale gate-diagram blocks to dark green while retaining dark green label text. Added a matching dark-mode text override for those label groups. Also brightened shared dark-mode error, success and teal action text used by the kit-order flow, and the shop's dark-mode error state.
