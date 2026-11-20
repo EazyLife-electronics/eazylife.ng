@@ -59,3 +59,43 @@
 .cs-canvas-wrap{background-color:var(--cs-panel);background-image:none}.cs-canvas-wrap.cs-grid-dots{background-image:radial-gradient(color-mix(in srgb,var(--cs-muted) 48%,transparent) 1.15px,transparent 1.15px);background-size:18px 18px}.cs-canvas-wrap.cs-grid-plain{background-image:none}
 .cs-capture-frame{fill:rgba(0,176,155,.035);stroke:#00a88f;stroke-width:3;stroke-dasharray:14 8;vector-effect:non-scaling-stroke;pointer-events:none}
 #toolCapture.active{background:var(--cs-accent);border-color:var(--cs-accent);color:#fff}
+
+
+/* Full-viewport studio: the canvas is the base layer, tool panels float above it. */
+@media(min-width:621px){
+ .cs-page{overflow:hidden}
+ .cs-topbar{position:fixed;z-index:30;inset:0 0 auto;height:54px;background:color-mix(in srgb,var(--cs-panel) 92%,transparent);backdrop-filter:blur(12px)}
+ .cs-app{position:fixed;inset:0;width:100vw;height:100dvh;min-height:0}
+ .cs-toolbar{position:fixed;z-index:25;top:54px;left:50%;transform:translateX(-50%);width:min(96vw,1500px);max-height:104px;overflow:auto;border:1px solid var(--cs-border);border-radius:13px;box-shadow:0 8px 28px #10251f1c;background:color-mix(in srgb,var(--cs-panel) 94%,transparent);backdrop-filter:blur(12px)}
+ .cs-workspace{position:fixed;inset:0;display:block;width:100vw;height:100dvh}
+ .cs-canvas-panel{position:absolute;inset:0;min-width:0;min-height:0}
+ .cs-canvas-head{position:absolute;z-index:12;top:166px;left:50%;transform:translateX(-50%);width:max-content;max-width:calc(100vw - 30px);border:1px solid var(--cs-border);border-radius:11px;box-shadow:0 5px 20px #10251f16;background:color-mix(in srgb,var(--cs-panel) 92%,transparent);backdrop-filter:blur(10px)}
+ .cs-canvas-wrap{position:absolute;inset:0;width:100vw;height:100dvh;flex:none}
+ #circuitCanvas{width:100%;height:100%}
+ .cs-statusbar{position:fixed;z-index:15;bottom:8px;left:50%;transform:translateX(-50%);width:max-content;max-width:90vw;border:1px solid var(--cs-border);border-radius:9px;background:color-mix(in srgb,var(--cs-panel) 92%,transparent);backdrop-filter:blur(10px)}
+ .cs-library-panel{position:fixed;z-index:20;left:12px;top:170px;bottom:44px;width:220px;max-height:none;border:1px solid var(--cs-border);border-radius:13px;box-shadow:0 8px 28px #10251f18;background:color-mix(in srgb,var(--cs-panel) 94%,transparent);backdrop-filter:blur(12px)}
+ .cs-properties-panel{position:fixed;z-index:20;right:12px;top:170px;bottom:44px;width:250px;max-height:none;border:1px solid var(--cs-border);border-radius:13px;box-shadow:0 8px 28px #10251f18;background:color-mix(in srgb,var(--cs-panel) 94%,transparent);backdrop-filter:blur(12px)}
+}
+@media(max-width:620px){
+ .cs-page{overflow:hidden;width:100vw;height:100dvh;min-height:0}
+ .cs-topbar{position:fixed;z-index:40;top:0;left:0;right:0;height:48px;padding:0 10px;background:color-mix(in srgb,var(--cs-panel) 92%,transparent);backdrop-filter:blur(12px)}
+ .cs-brand img{height:27px}.cs-brand{gap:7px;font-size:12px}.cs-brand span{padding-left:7px}
+ .cs-app{position:fixed;inset:0;width:100vw;height:100dvh;min-height:0;overflow:hidden}
+ .cs-toolbar{position:fixed;z-index:35;top:52px;left:8px;right:8px;width:auto;max-height:82px;overflow-x:auto;overflow-y:hidden;display:flex;flex-wrap:nowrap;justify-content:flex-start;gap:5px;padding:5px;border:1px solid var(--cs-border);border-radius:11px;background:color-mix(in srgb,var(--cs-panel) 91%,transparent);backdrop-filter:blur(12px);box-shadow:0 5px 18px #10251f18}
+ .cs-tool-group{flex:0 0 auto;flex-wrap:nowrap;gap:4px}
+ .cs-btn{min-height:34px;padding:6px 8px;font-size:10px}
+ .cs-workspace{position:fixed;inset:0;display:block;width:100vw;height:100dvh;min-height:0;flex:none}
+ .cs-canvas-panel{position:absolute;inset:0;min-height:0;width:100vw;height:100dvh}
+ .cs-canvas-wrap{position:absolute;inset:0;width:100vw;height:100dvh;min-height:0;flex:none}
+ #circuitCanvas{display:block;width:100%;height:100%}
+ .cs-canvas-head{position:fixed;z-index:32;top:142px;left:8px;right:8px;width:auto;transform:none;min-height:38px;height:auto;flex-wrap:nowrap;justify-content:space-between;gap:5px;padding:5px 7px;border:1px solid var(--cs-border);border-radius:10px;background:color-mix(in srgb,var(--cs-panel) 90%,transparent);backdrop-filter:blur(10px);box-shadow:0 4px 15px #10251f14}
+ .cs-canvas-head>div:first-child{min-width:0}.cs-canvas-head strong{font-size:10px}.cs-canvas-head span{font-size:9px}
+ .cs-canvas-actions{flex-wrap:nowrap;gap:3px}.cs-small-btn{min-height:32px;padding:5px 6px;font-size:9px}
+ .cs-library-panel{position:fixed;z-index:38;left:8px;right:8px;bottom:8px;top:auto;order:initial;width:auto;max-height:24dvh;min-height:0;overflow:auto;padding:8px 10px;border:1px solid var(--cs-border);border-radius:13px;background:color-mix(in srgb,var(--cs-panel) 95%,transparent);backdrop-filter:blur(14px);box-shadow:0 8px 28px #10251f24}
+ .cs-library-panel .cs-panel-heading{margin-bottom:5px}.cs-library-panel .cs-panel-heading h2{font-size:13px}.cs-library-panel .cs-eyebrow{font-size:8px}.cs-library-panel .cs-search{padding:7px;font-size:12px}.cs-library-panel .cs-categories{margin:5px 0}.cs-library-panel .cs-component-list{grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}.cs-component-card{padding:4px 3px}.cs-component-card svg{height:28px}.cs-component-card span{font-size:9px}.cs-library-panel .cs-hint{display:none}
+ .cs-properties-panel{position:fixed;z-index:37;left:8px;right:8px;bottom:calc(24dvh + 16px);top:auto;width:auto;max-height:20dvh;min-height:0;overflow:auto;padding:8px 10px;border:1px solid var(--cs-border);border-radius:12px;background:color-mix(in srgb,var(--cs-panel) 95%,transparent);backdrop-filter:blur(12px)}
+ .cs-properties-panel .cs-panel-heading{margin-bottom:5px}.cs-properties-panel .cs-panel-heading h2{font-size:13px}.cs-inspector-note{display:none}
+ .cs-statusbar{position:fixed;z-index:34;bottom:calc(24dvh + 18px);left:8px;right:8px;width:auto;min-height:26px;padding:4px 7px;border:1px solid var(--cs-border);border-radius:8px;background:color-mix(in srgb,var(--cs-panel) 90%,transparent);backdrop-filter:blur(10px)}
+ .cs-statusbar span:nth-child(2){display:none}
+ .cs-selection-toolbar{top:190px}
+}
