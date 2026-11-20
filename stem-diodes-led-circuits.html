@@ -64,7 +64,33 @@
 <div class="sl-section-head"><div><div class="sl-eyebrow">05 · RECTIFICATION</div><h2>Using diodes to steer AC current</h2><p>Rectifiers convert an alternating input into a unidirectional, pulsating output. A filter capacitor can smooth the output, but the result is not automatically a regulated DC supply.</p></div></div>
 <div class="dle-two-col">
 <article class="dle-card"><h3>Half-wave rectifier</h3><svg viewBox="0 0 440 150" role="img" aria-label="Half-wave rectifier concept using one diode and a load"><circle cx="55" cy="72" r="28" fill="none" stroke="currentColor" stroke-width="3"/><path d="M55 50 Q75 72 55 94 Q35 72 55 50 M83 72 H145 L145 45 L185 72 L145 99 V72 H185 H300" fill="none" stroke="currentColor" stroke-width="3"/><path d="M185 47 V97" stroke="currentColor" stroke-width="4"/><rect x="300" y="57" width="55" height="30" rx="4" fill="#ead8b6" stroke="#9b713b" stroke-width="2"/><path d="M355 72 H400" stroke="currentColor" stroke-width="3"/><g fill="currentColor" font-size="14"><text x="20" y="125">AC</text><text x="285" y="112">Load</text></g></svg><p>One diode passes one half-cycle and blocks the other in the idealised model. The output contains large gaps and has substantial ripple.</p></article>
-<article class="dle-card"><h3>Bridge rectifier</h3><svg viewBox="0 0 440 190" role="img" aria-label="Conceptual four-diode bridge rectifier"><path d="M220 25 L340 95 L220 165 L100 95 Z" fill="none" stroke="currentColor" stroke-width="2.5"/><g fill="#0a9b86" stroke="#0a9b86" stroke-width="2"><path d="M155 58 L185 78 L155 98 Z"/><path d="M285 58 L255 78 L285 98 Z"/><path d="M155 132 L185 112 L155 92 Z"/><path d="M285 132 L255 112 L285 92 Z"/></g><g fill="currentColor" font-size="14"><text x="192" y="15">+ DC</text><text x="194" y="187">− DC</text><text x="25" y="100">AC ~</text><text x="355" y="100">AC ~</text></g></svg><p>Four diodes steer both input half-cycles so load current keeps the same direction. Two diode drops are typically in the conducting path. This is a functional concept drawing, not a construction layout.</p></article>
+<article class="dle-card"><h3>Bridge rectifier</h3><svg viewBox="0 0 500 250" role="img" aria-label="Bridge rectifier with four upward-oriented diodes, AC inputs connected to the two side midpoints, positive DC output at the top and negative DC output at the bottom">
+<g fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+<path d="M170 40 H330 M170 210 H330"/>
+<path d="M170 40 V56 M170 88 V125 M170 145 V185 M170 185 V210"/>
+<path d="M330 40 V56 M330 88 V125 M330 145 V185 M330 185 V210"/>
+<path d="M42 125 H170 M330 125 H458"/>
+<path d="M250 40 V20 M250 210 V230"/>
+</g>
+<g fill="#0a9b86" stroke="#0a9b86" stroke-width="2.5" stroke-linejoin="round">
+<path d="M154 88 L186 88 L170 62 Z"/>
+<path d="M314 88 L346 88 L330 62 Z"/>
+<path d="M154 185 L186 185 L170 159 Z"/>
+<path d="M314 185 L346 185 L330 159 Z"/>
+</g>
+<g stroke="currentColor" stroke-width="4">
+<path d="M152 56 H188 M312 56 H348 M152 145 H188 M312 145 H348"/>
+</g>
+<g fill="currentColor">
+<circle cx="170" cy="125" r="5"/><circle cx="330" cy="125" r="5"/>
+<circle cx="170" cy="40" r="4"/><circle cx="330" cy="40" r="4"/>
+<circle cx="170" cy="210" r="4"/><circle cx="330" cy="210" r="4"/>
+</g>
+<g fill="currentColor" font-size="17" font-weight="600" font-family="Arial,sans-serif">
+<text x="266" y="25">+ DC</text><text x="266" y="238">− DC</text>
+<text x="8" y="116">AC ~</text><text x="462" y="116">AC ~</text>
+</g>
+</svg><p>Four diodes steer both input half-cycles so load current keeps the same direction. Two diode drops are typically in the conducting path. This is a functional concept drawing, not a construction layout.</p></article>
 </div>
 <div class="dle-note"><i class="fas fa-triangle-exclamation"></i><p><b>Safety boundary:</b> this lesson does not provide a mains rectifier construction activity. Mains rectifiers and non-isolated power supplies can expose lethal voltage and stored energy. Study the concept using isolated, current-limited extra-low-voltage AC equipment under suitable supervision.</p></div>
 </div></section>
