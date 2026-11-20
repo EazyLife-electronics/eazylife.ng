@@ -76,6 +76,30 @@
     <priority>0.82</priority>
   </url>
 
+  <!-- Module 7: Inductors and Magnetic Fields -->
+  <url>
+    <loc>https://eazylife.ng/stem-inductors-magnetic-fields.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Module 8: Transistors and Electronic Switching -->
+  <url>
+    <loc>https://eazylife.ng/stem-transistors-electronic-switching.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Module 9: Operational Amplifiers and Basic Analog Circuits -->
+  <url>
+    <loc>https://eazylife.ng/stem-op-amps-analog-circuits.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
   <!-- Resistor colour-code calculator -->
   <url>
     <loc>https://eazylife.ng/stem-resistor-colour-code.html</loc>
