@@ -5,7 +5,7 @@
  const ohms=n=>n>=1e6?fmt(n/1e6)+" MΩ":n>=1e3?fmt(n/1e3)+" kΩ":fmt(n)+" Ω";
  const amps=n=>Math.abs(n)>=1?fmt(n)+" A":Math.abs(n)>=.001?fmt(n*1000)+" mA":fmt(n*1e6)+" µA";
  const e12=[10,12,15,18,22,27,33,39,47,56,68,82];
- function nearestE12(value){let best=null,diff=Infinity;for(let decade=-1;decade<=9;decade++)for(const base of e12){const candidate=base*Math.pow(10,decade);const delta=Math.abs(candidate-value);if(delta<diff){diff=delta;best=candidate;}}return best;}
+ function nearestE12(value){let best=null,diff=Infinity;for(let decade=-1;decade<=9;decade++)for(const base of e12){const candidate=base*Math.pow(10,decade);const delta=Math.abs(candidate-value);if(delta<diff||(delta===diff&&candidate>best)){diff=delta;best=candidate;}}return best;}
  function ledCalc(){
   const vs=read("rpc-supply"),vf=read("rpc-forward"),ma=read("rpc-current"),fb=byId("rpc-led-feedback");
   if([vs,vf,ma].some(v=>v===null||!Number.isFinite(v))||vs<0||vf<0||ma<=0){fb.textContent="Enter valid values. Supply and LED forward voltage cannot be negative; target current must be greater than zero.";return;}
