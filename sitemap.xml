@@ -172,6 +172,14 @@
     <priority>0.82</priority>
   </url>
 
+  <!-- Module 20: Robotics and Mechatronic Systems -->
+  <url>
+    <loc>https://eazylife.ng/stem-robotics-mechatronic-systems.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
   <!-- Module 19: Digital Control, Motor Control and Feedback Systems -->
   <url>
     <loc>https://eazylife.ng/stem-digital-control-motor-feedback.html</loc>
