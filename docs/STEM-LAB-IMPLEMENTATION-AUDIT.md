@@ -45,6 +45,13 @@ Source-level checks completed for this milestone:
 
 These are source-level checks, not browser rendering or real-device testing. The calculator and guidance sections still need manual testing in mobile and desktop browsers, including dark mode, keyboard operation and actual WhatsApp link behaviour.
 
+### Previous and next lesson previews
+
+- Added a consistent previous/next navigation area to the two available Electronics Fundamentals module pages.
+- Each destination includes its module number or directory role, title and a short description of what the learner will explore.
+- Module 01 links back to the directory and forward to Module 02. Module 02 links back to Module 01 and previews Module 03 as coming soon without presenting an unavailable page as a working link.
+- Navigation remains optional; learners can still enter modules directly from the directory. Responsive styling stacks the cards on narrow screens.
+
 ### Learning page architecture update: one module per page
 
 - Converted `stem-electronics-fundamentals.html` into a concise learning-domain directory rather than a long page containing the full first lesson.
