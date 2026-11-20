@@ -33,7 +33,17 @@ Source-level checks on the new module found no duplicate HTML IDs, no JavaScript
 - Added separate CSS and JavaScript assets. The tool is client-side only and introduces no Firebase dependency.
 - Added navigation links from the existing STEM pages and included the calculator in the sitemap.
 
-Source checks are pending in this commit and will be recorded after validation. Browser/device testing remains outstanding.
+Source-level checks completed for this milestone:
+
+- The calculator page has 20 unique HTML IDs; no duplicate IDs were found.
+- All 13 distinct JavaScript ID lookups used by the calculator are present in its HTML.
+- All five local CSS/JavaScript asset references on the calculator page are present in its markup.
+- The calculator JavaScript passes a JavaScript syntax parse.
+- The existing STEM Lab, project playground and Electronics Fundamentals pages all link to the calculator and load the shared guidance styles; each contains the optional guidance enquiry section.
+- The sitemap has balanced URL opening/closing tags, includes the calculator and no longer contains the previously malformed escaped-newline learning entry.
+- The calculator is client-side only; no Firebase, Firestore or network fetch dependency was introduced.
+
+These are source-level checks, not browser rendering or real-device testing. The calculator and guidance sections still need manual testing in mobile and desktop browsers, including dark mode, keyboard operation and actual WhatsApp link behaviour.
 
 ## Current implementation on `main`
 
