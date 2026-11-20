@@ -386,3 +386,15 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - Safety boundaries: verify exact module pinout, supply and logic voltage; use level shifting where required; never apply unchecked 5 V to 3.3 V-only pins; do not connect RS-232 directly to logic UART; keep practicals extra-low voltage and use ESD precautions.
 - Connected Module 15's next-lesson navigation, added Module 16 to the Electronics Fundamentals directory and XML sitemap.
 - Source-level validation should check unique IDs, JavaScript references, SVG/section/anchor balance, links and sitemap XML. No browser rendering, sensor hardware test, I²C bus measurement or physical Arduino test has been performed.
+
+
+## Module 17: Microcontrollers and Embedded Programming
+
+- Added standalone lesson `stem-microcontrollers-embedded-programming.html`, responsive stylesheet `assets/css/stem-microcontrollers.css` and page script `js/stem-microcontrollers.js`.
+- Covers microcontroller architecture and embedded systems; CPU, Flash, RAM, GPIO and peripheral roles; reset and firmware execution; Arduino setup/loop structure; digital inputs and outputs; ADC, PWM and hardware timers; cooperative non-blocking timing with `millis()`; interrupts and ISR constraints; memory types, data widths and overflow; reliability and firmware debugging.
+- Includes labelled SVG diagrams for MCU architecture, program execution, GPIO connections, ADC/PWM behaviour, interrupt flow and a potentiometer/button/PWM-LED practical.
+- Practical build combines an analogue potentiometer input, active-low button with internal pull-up, software debounce, PWM LED output and serial observations. The sketch is explicitly scoped to a classic 5 V Uno-compatible board; other boards may differ in ADC resolution, PWM API, voltage and pin capabilities.
+- Includes example code for GPIO input, non-blocking LED timing and an external interrupt event counter, with limitations and platform-specific pin/API caveats.
+- Safety boundaries: keep activities extra-low voltage; observe MCU pin voltage/current and absolute maximum ratings; do not drive motors, relays or other external loads directly from GPIO; use appropriate drivers and protection; check exact board/device datasheets.
+- Connected Module 16's next-lesson navigation, added Module 17 to the Electronics Fundamentals directory and XML sitemap.
+- Source-level validation should check unique IDs, script references, SVG/section/anchor balance, previous/next navigation, directory links and sitemap XML. No browser rendering, board upload or physical hardware test has been performed.
