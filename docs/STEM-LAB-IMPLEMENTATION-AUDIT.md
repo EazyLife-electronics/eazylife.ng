@@ -148,3 +148,14 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - No changes to existing Firestore collections or security rules.
 - No full Wokwi-style breadboard or microcontroller emulator.
 - No assumption that a simplified browser model exactly reproduces physical hardware.
+
+
+## Module 03: Voltage, Current and Resistance
+
+- Added standalone page `stem-voltage-current-resistance.html` with its own stylesheet and script.
+- Lesson covers voltage, current and resistance definitions/units; Ohm's law with an interactive two-known-values calculator; ideal series and parallel resistor-network calculations; correct multimeter connections for voltage, current and resistance; battery series/parallel concepts and safety; a low-voltage practical build; troubleshooting prompts and a three-question knowledge check.
+- Calculator and network outputs are labelled as ideal calculations/models. The lesson explains real-world deviations caused by component tolerance, temperature, source behaviour, wiring and meter effects.
+- Measurement safety explicitly states that current is measured in series, resistance only on an unpowered circuit, and a meter in current mode must never be placed directly across a source.
+- Battery guidance warns against casually paralleling unmatched cells and notes that lithium packs require suitable protection and charging management.
+- Added the lesson to the Electronics Fundamentals directory and XML sitemap. Previous/next navigation links back to Module 02 and previews a future Module 04 topic without linking to a nonexistent page.
+- Source-level validation is required before considering the milestone complete. No browser or hardware QA is implied by source checks alone.
