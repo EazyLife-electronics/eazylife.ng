@@ -159,3 +159,6 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - Battery guidance warns against casually paralleling unmatched cells and notes that lithium packs require suitable protection and charging management.
 - Added the lesson to the Electronics Fundamentals directory and XML sitemap. Previous/next navigation links back to Module 02 and previews a future Module 04 topic without linking to a nonexistent page.
 - Source-level validation is required before considering the milestone complete. No browser or hardware QA is implied by source checks alone.
+- Source-level checks completed: no duplicate IDs; every direct JavaScript element lookup has a matching HTML ID; expected local stylesheet/script references are present; module directory and previous/next links are present; sitemap entry and URL element balance are valid; mobile CSS rules are present; Ohm's law and series/parallel calculation paths are present; current-mode short-circuit and live resistance-measurement warnings are included.
+- These checks do not replace browser testing on desktop/mobile or practical verification with a physical multimeter and circuit.
+
