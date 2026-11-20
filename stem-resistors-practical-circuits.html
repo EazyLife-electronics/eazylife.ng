@@ -60,6 +60,42 @@
 </div></section>
 <section class="sl-section rpc-soft" id="divider"><div class="sl-wrap">
 <div class="sl-section-head"><div><div class="sl-eyebrow">04 · VOLTAGE DIVIDERS</div><h2>Calculate the output, then add a load</h2><p>A divider's output is taken across the lower resistor. A connected load sits in parallel with that lower resistor and changes the output voltage.</p></div><span class="sl-model-label"><i class="fas fa-wave-square"></i> Ideal resistor model</span></div>
+<figure class="rpc-divider-diagram">
+<div class="rpc-divider-diagram-heading"><strong>How the voltage divider is connected</strong><span>Conceptual circuit · DC supply</span></div>
+<svg viewBox="0 0 760 390" role="img" aria-labelledby="rpc-divider-svg-title rpc-divider-svg-desc">
+<title id="rpc-divider-svg-title">Voltage divider with a load connected in parallel with the lower resistor</title>
+<desc id="rpc-divider-svg-desc">The positive input supply connects through upper resistor R1 to the output node. Lower resistor R2 connects from that node to ground. Load resistor RL connects between the same output node and ground, in parallel with R2. Output voltage is measured between the output node and ground.</desc>
+<defs><marker id="rpc-vout-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6" fill="none" stroke="#079b86" stroke-width="1.5"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+<path d="M145 95 H330 M330 95 V130 M330 205 V230 M330 305 V325 H600 M600 95 H690" opacity="0"/>
+<path d="M145 95 H330 V130 M330 205 V230 M330 305 V325 H600 M600 325 V305"/>
+<path d="M145 95 V145 M145 245 V325 H330"/>
+<path d="M330 95 V130 M330 205 V230 M330 305 V325"/>
+<path d="M330 205 H600 V230 M600 305 V325"/>
+<path d="M330 205 H690" stroke="#079b86" stroke-width="3" marker-end="url(#rpc-vout-arrow)"/>
+<path d="M330 325 H600"/>
+<path d="M330 130 L315 138 L345 150 L315 162 L345 174 L315 186 L345 198 L330 205" stroke="#b27a2d"/>
+<path d="M330 230 L315 238 L345 250 L315 262 L345 274 L315 286 L345 298 L330 305" stroke="#b27a2d"/>
+<path d="M600 230 L585 238 L615 250 L585 262 L615 274 L585 286 L615 298 L600 305" stroke="#b27a2d"/>
+<path d="M145 145 V175 M130 175 H160 M136 190 H154 M145 190 V245" stroke="#64748b"/>
+<path d="M315 325 H345 M320 335 H340 M325 345 H335" stroke="#079b86"/>
+</g>
+<circle cx="145" cy="195" r="54" fill="none" stroke="currentColor" stroke-width="0" />
+<g fill="currentColor" font-family="Arial,sans-serif">
+<text x="55" y="65" font-size="19" font-weight="700">DC supply</text><text x="55" y="88" font-size="15">Vin = 5 V</text>
+<text x="172" y="151" font-size="19" font-weight="700">+</text><text x="172" y="252" font-size="19" font-weight="700">−</text>
+<text x="370" y="165" font-size="20" font-weight="700">R1</text><text x="370" y="188" font-size="15">Upper resistor</text>
+<text x="370" y="265" font-size="20" font-weight="700">R2</text><text x="370" y="288" font-size="15">Lower resistor</text>
+<text x="640" y="265" font-size="20" font-weight="700">RL</text><text x="640" y="288" font-size="15">Load</text>
+<text x="700" y="198" font-size="18" font-weight="700" fill="#079b86">Vout</text>
+<text x="240" y="360" font-size="15">Ground / 0 V reference</text>
+<text x="470" y="190" font-size="14" fill="#079b86">Output node</text>
+</g>
+<g fill="none" stroke="#079b86" stroke-width="2" stroke-dasharray="5 5"><path d="M330 218 V225 H600 V218"/></g>
+</svg>
+<figcaption><b>Read the connections:</b> R1 is between Vin and Vout. R2 runs from Vout to ground. RL is connected across the same two points as R2, so R2 and RL are in parallel. Measure Vout between the output node and ground.</figcaption>
+<div class="rpc-divider-key"><span><i class="rpc-key-node"></i> Output junction</span><span><i class="rpc-key-resistor"></i> Resistor</span><span><i class="rpc-key-ground"></i> Ground reference</span></div>
+</figure>
 <div class="rpc-divider-grid">
 <div class="rpc-panel">
 <div class="rpc-field"><label for="rpc-divider-input">Input voltage (V)</label><input id="rpc-divider-input" type="number" min="0" step="any" value="5"></div>
