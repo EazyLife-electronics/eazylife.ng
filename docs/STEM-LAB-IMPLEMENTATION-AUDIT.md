@@ -568,3 +568,16 @@ The user reconfirmed that the learning series ends at Module 29, with no Module 
 ## Confirmed Module 29 closing presentation
 
 Module 29 is the final lesson in the series. It should offer project-based practical training directions and a useful sense of what learners can build next, then end naturally. Do not make it an obvious advertisement, do not withhold free learning content, do not add a Module 30, and do not show a next-lesson button or further lesson teaser after Module 29. Its final paragraph and lesson navigation should clearly communicate that the published learning series is complete.
+
+
+## Module 29: Applied Electronics Projects
+
+- Added standalone lesson `stem-applied-electronics-projects.html`, responsive stylesheet `assets/css/stem-applied-projects.css` and interactive project-brief selector/checklist in `js/stem-applied-projects.js`.
+- Presents six adaptable project briefs: smart room environment monitor; tank-level monitor; line-following and obstacle-aware rover; closed-loop DC motor controller; local IoT monitoring dashboard; programmable extra-low-voltage test station.
+- Each selectable brief provides a summary, skills demonstrated, suggested system blocks, build milestones, test evidence and an extension challenge. A project selector and matching project-card actions update the displayed brief.
+- Covers a repeatable engineering workflow from problem definition and requirements through architecture, component selection, subsystem tests, integration, verification, revision and handover. Includes an eight-point interactive project evidence checklist and portfolio guidance.
+- Safety boundaries keep activities within appropriately designed extra-low-voltage learning prototypes. Tank monitoring begins with indication only; no mains, hazardous battery, high-voltage or safety-critical build instructions. The test-station project explicitly excludes mains measurement.
+- Added four knowledge-check questions, links to the learning directory, project playground, resistor calculator and component shop. Optional EazyLife project guidance is secondary to the open learning content.
+- Module 28 next navigation now points to Module 29: Applied Electronics Projects. Module 29 has only a previous-lesson button, no next-lesson button or Module 30 teaser. Added Module 29 to the directory and XML sitemap; directory count now reflects 29 modules.
+- Source-level validation: check unique IDs, JavaScript syntax and DOM references, all project selector data keys, quiz markup, CSS braces, responsive styles, previous/next navigation, directory search/filter count and sitemap XML. No browser rendering, microcontroller compilation, physical project build or hardware testing has been performed.
+- This is the final module. No Module 30 or further lesson is planned.
