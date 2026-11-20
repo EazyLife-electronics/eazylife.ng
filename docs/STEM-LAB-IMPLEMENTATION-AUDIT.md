@@ -273,3 +273,15 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - Added responsive styling for numbered practical steps, circuit captions and diagrams in `assets/css/stem-advanced.css`.
 - Safety boundary: both practicals use extra-low-voltage DC only. The RL circuit includes a flyback diode; learners are explicitly warned not to remove it for an uncontrolled switching demonstration. No mains, automotive ignition or high-energy coil work is included.
 - Source-level validation and browser rendering should be completed before treating the module as fully QA-approved. No physical build or measurement has been performed by EazyLife as part of this source update.
+
+
+## Module 08: Transistors and Electronic Switching — practical rebuild
+
+- Rebuilt `stem-transistors-electronic-switching.html` around two low-voltage switching builds rather than a mostly descriptive overview.
+- Added labelled NPN BJT and N-channel MOSFET terminal illustrations, plus a low-side switching concept diagram.
+- Practical 1: Arduino-controlled NPN LED switch using a 1 kΩ base resistor and 330 Ω LED current-limiting resistor. Includes an explicit connection schematic, component list, wiring sequence, Arduino sketch and a measurement task across the LED resistor.
+- Practical 2: Arduino-controlled logic-level N-channel MOSFET motor switch. Includes a circuit schematic, 100 Ω gate resistor, 10 kΩ gate pull-down, flyback diode polarity, common-ground arrangement, Arduino PWM sketch and motor current/supply precautions.
+- Expanded BJT cutoff, active and saturation regions; MOSFET gate drive and RDS(on); low-side switching; amplifier biasing; datasheet selection; troubleshooting and inductive-load protection.
+- Retained the forced-beta BJT base-resistor estimator. Its displayed assumptions and controller output-current warnings remain important; the calculator is not a substitute for checking the actual GPIO output characteristics and transistor datasheet.
+- Safety boundary: the BJT activity is limited to a small LED load. The MOSFET activity uses a small extra-low-voltage brushed motor, separate suitably rated supply, current limiting, correctly oriented flyback diode and a verified logic-level MOSFET. Learners are warned about motor stall current and moving parts. No mains or high-energy switching is included.
+- Source-level checks and browser rendering should be completed before considering the lesson fully QA-approved. No physical build, motor-current measurement or hardware verification has been performed as part of this source update.
