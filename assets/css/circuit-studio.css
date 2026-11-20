@@ -29,3 +29,14 @@
  .cs-statusbar{min-height:30px}
  .cs-pin-editor{grid-template-columns:1fr 1fr 1fr}
 }
+
+/* Contextual selection toolbar and group selection */
+.cs-selection-toolbar{position:absolute;z-index:5;top:12px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:5px;padding:6px;background:var(--cs-panel);border:1px solid var(--cs-border);border-radius:12px;box-shadow:0 5px 22px #10251f22;max-width:calc(100% - 20px);overflow-x:auto}
+.cs-selection-toolbar[hidden]{display:none}
+.cs-selection-toolbar button{border:1px solid var(--cs-border);background:var(--cs-soft);color:var(--cs-ink);border-radius:8px;padding:8px 10px;font-size:11px;font-weight:650;white-space:nowrap;min-height:36px}
+.cs-selection-toolbar button:active{background:var(--cs-accent);color:#fff}
+.cs-selection-toolbar button.danger{color:var(--cs-danger)}
+.cs-selection-toolbar span{height:22px;border-left:1px solid var(--cs-border);margin:0 2px}
+.cs-annotation-selected{filter:drop-shadow(0 0 2px var(--cs-accent));stroke:var(--cs-accent);stroke-width:.7px;paint-order:stroke;cursor:move}
+.cs-selected .cs-selection-box{stroke-width:2.5;stroke-dasharray:4 3}
+@media(max-width:620px){.cs-selection-toolbar{top:6px;gap:4px;padding:5px}.cs-selection-toolbar button{padding:7px 9px;font-size:10px;min-height:40px}}
