@@ -16,11 +16,14 @@
 .cs-properties-content input,.cs-properties-content textarea{font-size:16px;min-height:42px}
 .cs-properties-content .cs-pin-btn,.cs-small-btn,.cs-btn{min-height:38px;touch-action:manipulation}
 @media(max-width:620px){
+ /* Keep the editor viewport tall; the drawing area grows into the available space
+    instead of being capped at a short viewport-height fraction. */
  .cs-app{height:auto;min-height:calc(100dvh - 64px)}
  .cs-toolbar{overflow-x:auto;flex-wrap:nowrap;justify-content:flex-start;scrollbar-width:thin}
  .cs-tool-group{flex:0 0 auto;flex-wrap:nowrap}
- .cs-canvas-panel{min-height:62dvh}
- .cs-canvas-wrap{min-height:52dvh}
+ .cs-workspace{flex:1 0 auto;min-height:calc(100dvh - 190px)}
+ .cs-canvas-panel{min-height:0;flex:1 0 auto}
+ .cs-canvas-wrap{min-height:calc(100dvh - 255px);flex:1 0 auto}
  .cs-library-panel{max-height:none;padding:12px}
  .cs-component-list{grid-template-columns:repeat(3,minmax(0,1fr))}
  .cs-properties-panel{max-height:none;padding:12px}
