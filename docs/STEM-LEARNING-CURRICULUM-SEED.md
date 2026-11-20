@@ -21,6 +21,37 @@ The product remains an open-access learning platform for independent learners an
 - Treat the syllabus as a content source, not a compulsory timetable.
 - Use EazyLife's project portfolio as evidence of possible engineering applications, not as a claim that every project is suitable for beginners or should be replicated by learners.
 
+
+## Open Learning and Paid Guidance Model
+
+### Purpose
+
+The public STEM Lab is both a genuinely useful open learning resource and a demonstration of EazyLife's ability to explain, design, troubleshoot and teach practical engineering. Free access is intentional: learners should gain real value without being forced to register, pay or contact the business.
+
+### Three connected levels
+
+1. **Open learning:** Public lessons, calculators, behavioural experiments, challenges, project explanations and safe practical guides remain accessible without a payment gate or mandatory account.
+2. **Guided learning:** Learners who need more than the public material can enquire about paid one-to-one guidance, personalised explanations, project-specific troubleshooting, mentorship and focused masterclasses.
+3. **Practical application:** Learners and organisations can enquire about supervised practical training, project development, prototyping, components and kits where relevant.
+
+### Free and sponsored learning referrals
+
+EazyLife may refer learners to genuinely free lessons, community programmes or sponsored training opportunities when suitable programmes are active. Do not imply that a free referral, scholarship or sponsored place is always available. Clearly distinguish public self-learning from funded instructor-led training.
+
+### Commercial and learner-experience boundaries
+
+- Do not deliberately make a free lesson incomplete or misleading to force conversion.
+- Do not place aggressive payment prompts throughout lessons or block core educational content.
+- Paid offers should appear as a natural next step when learners need personal attention, custom responses, advanced practice or supervised support.
+- Explain what a paid service includes before quoting or accepting payment; do not invent fixed prices or guaranteed outcomes in the learning interface.
+- A general public answer is not an unlimited commitment to provide custom, individual troubleshooting or design work for free.
+- Referral to free/sponsored programmes depends on real availability and eligibility; never promise placement.
+- Keep the core platform open-access. No payment integration, learner account requirement, subscription or access gate is part of this milestone.
+
+### Initial calls to action
+
+Use calm, optional language such as **Enquire about guidance**, **Explore masterclasses** or **Get help with your project**. Route enquiries to EazyLife's existing contact channel until a dedicated booking and service workflow is justified.
+
 ## Learning domains and content map
 
 ### 1. Electrical foundations and component literacy
