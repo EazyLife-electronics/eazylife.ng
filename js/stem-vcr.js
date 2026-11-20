@@ -7,20 +7,37 @@
   const calcButton=byId("vcr-calculate");
   function calculateOhms(){
     const ids=["vcr-voltage","vcr-current","vcr-resistance"];
-    const vals=ids.map(number), filled=vals.filter(v=>v!==null);
+    const vals=ids.map(number),filled=vals.filter(v=>v!==null);
     const feedback=byId("vcr-feedback"),result=byId("vcr-result-value"),caption=byId("vcr-result-caption"),equation=byId("vcr-equation");
-    if(filled.length!==2||vals.some(v=>v!==null&&(!Number.isFinite(v)||v<0))){
-      feedback.textContent="Enter exactly two valid non-negative values. Leave the quantity to calculate blank.";
-      result.textContent="Check inputs";caption.textContent="Two known quantities are required.";equation.textContent="V = I × R";return;
+    if(filled.length===3){
+      feedback.textContent="All three fields contain values. Leave the quantity you want to calculate blank, then calculate again.";
+      result.textContent="Leave one blank";caption.textContent="The calculator needs exactly two known quantities.";equation.textContent="V = I × R";return;
     }
-    let [v,i,r]=vals,answer,label,eq;
-    if(v===null){if(r===null){feedback.textContent="Enter a resistance value.";return;}v=i*r;answer=fmt(v)+" V";label="Voltage across the component";eq="V = I × R = "+fmt(i)+" × "+prettyResistance(r)+" = "+fmt(v)+" V";}
-    else if(i===null){if(r===0){feedback.textContent="Resistance cannot be zero when calculating current.";return;}i=v/r;answer=prettyCurrent(i);label="Current through the component";eq="I = V ÷ R = "+fmt(v)+" ÷ "+prettyResistance(r)+" = "+fmt(i)+" A";}
-    else{if(i===0){feedback.textContent="Current must be greater than zero when calculating resistance.";return;}r=v/i;answer=prettyResistance(r);label="Resistance of the component";eq="R = V ÷ I = "+fmt(v)+" ÷ "+fmt(i)+" = "+prettyResistance(r);}
-    result.textContent=answer;caption.textContent=label;equation.textContent=eq;feedback.textContent="Calculation complete. Compare this ideal value with a real measurement when you build the circuit.";
+    if(filled.length!==2){
+      feedback.textContent="Enter exactly two values and leave the quantity you want to calculate blank.";
+      result.textContent="Two values needed";caption.textContent="One quantity will be calculated.";equation.textContent="V = I × R";return;
+    }
+    const [v,i,r]=vals;
+    if(vals.some((value,index)=>value!==null&&(!Number.isFinite(value)||(index===0?value<0:value<=0)))){
+      feedback.textContent="Voltage must be zero or greater. Current and resistance must each be greater than zero.";
+      result.textContent="Check inputs";caption.textContent="Use valid values for the two known quantities.";equation.textContent="V = I × R";return;
+    }
+    let answer,label,eq,target,value;
+    if(v===null){
+      value=i*r;target=0;answer=fmt(value)+" V";label="Calculated voltage";eq="V = I × R = "+fmt(i)+" × "+prettyResistance(r)+" = "+fmt(value)+" V";
+    }else if(i===null){
+      if(r===0){feedback.textContent="Resistance must be greater than zero when calculating current.";return;}
+      value=v/r;target=1;answer=prettyCurrent(value);label="Calculated current";eq="I = V ÷ R = "+fmt(v)+" ÷ "+prettyResistance(r)+" = "+fmt(value)+" A";
+    }else{
+      if(i===0){feedback.textContent="Current must be greater than zero when calculating resistance.";return;}
+      value=v/i;target=2;answer=prettyResistance(value);label="Calculated resistance";eq="R = V ÷ I = "+fmt(v)+" ÷ "+fmt(i)+" = "+prettyResistance(value);
+    }
+    byId(ids[target]).value=String(value);
+    result.textContent=answer;caption.textContent=label;equation.textContent=eq;
+    feedback.textContent="Calculated successfully. The missing value has been filled in. Clear that field before solving for another quantity.";
   }
   calcButton.addEventListener("click",calculateOhms);
-  byId("vcr-reset").addEventListener("click",()=>{byId("vcr-voltage").value="9";byId("vcr-current").value="";byId("vcr-resistance").value="1000";calculateOhms();});
+  byId("vcr-reset").addEventListener("click",()=>{byId("vcr-voltage").value="2";byId("vcr-current").value="";byId("vcr-resistance").value="1000";calculateOhms();});
   function updateNetworks(){
     const supply=number("vcr-network-voltage");
     const pairs=[["series","series"],["parallel","parallel"]];
