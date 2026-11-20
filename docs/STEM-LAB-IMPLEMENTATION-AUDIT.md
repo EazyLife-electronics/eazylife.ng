@@ -201,3 +201,14 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - It explicitly depicts RL across the same two nodes as R2, making the parallel connection clear, and labels Vout as the voltage from the output junction to ground.
 - Added a caption explaining each connection and responsive styling for narrow screens and the existing light/dark theme.
 - This is a conceptual circuit diagram, not a physical breadboard layout. Browser rendering and mobile legibility still require manual QA.
+
+
+## Module 05: Diodes and LED Circuits
+
+- Added standalone lesson page `stem-diodes-led-circuits.html` with dedicated responsive CSS and client-side JavaScript. It follows the one-module-per-page structure and shared EazyLife theme, navigation, guidance and previous/next lesson controls.
+- Covers PN-junction diode terminals and symbol, forward and reverse bias, approximate silicon forward voltage, LED polarity and series current limiting, half-wave and bridge rectification concepts, flyback protection for DC coils, Zener diode basics, Schottky/fast diode selection and key datasheet ratings.
+- Added an interactive behavioural model that estimates current through a forward-biased diode and series resistor using an explicitly stated constant-forward-drop approximation. Reverse bias and open circuit are represented as ideal blocking states; limitations are disclosed.
+- Includes circuit illustrations, diode-test procedure using a multimeter, low-voltage measurement cautions and a three-question knowledge check.
+- Safety boundary: no mains rectifier or non-isolated power-supply construction instructions. Rectification is taught conceptually; any practical AC investigation is limited to isolated, current-limited extra-low-voltage equipment under suitable supervision.
+- Linked Module 05 from the Electronics Fundamentals directory, connected Module 04's next-lesson button to the new page and added the new URL to the XML sitemap.
+- Source-level checks completed: page has unique IDs; JavaScript ID lookups match page IDs; CSS and JS paths exist; interactive model controls and quiz targets exist; Module 04 next navigation, directory card and sitemap entry are present; sitemap URL elements are balanced. These checks do not replace browser rendering/accessibility QA or physical diode testing.
