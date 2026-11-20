@@ -411,3 +411,16 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - Safety: practical is LED-only and extra-low-voltage; never use the sketch for actual traffic signals, machinery or life-safety control. Define safe states for the physical hazard and use independent hardware protection where required.
 - Connected Module 17's next-lesson navigation, added Module 18 to the Electronics Fundamentals directory and XML sitemap.
 - Source-level validation should check unique IDs, script references, SVG/section/article/anchor balance, previous/next navigation, directory link and sitemap XML. No browser rendering, Arduino upload, timing measurement or physical hardware test has been performed.
+
+
+## Module 19: Digital Control, Motor Control and Feedback Systems
+
+- Added standalone lesson `stem-digital-control-motor-feedback.html`, responsive stylesheet `assets/css/stem-motor-control.css` and client-side teaching calculators `js/stem-motor-control.js`.
+- Covers PWM duty cycle and its limits as a motor-speed proxy; H-bridge current paths, direction, coast/braking concepts and shoot-through; encoder pulse measurement and quadrature direction; open-loop versus closed-loop control; proportional, integral and derivative actions; PI/PID tuning considerations, saturation and integral windup; driver and motor selection.
+- Includes labelled SVG diagrams for the overall motor-control architecture, PWM waveform, conceptual H-bridge, quadrature encoder signals, open-loop and closed-loop control, and the Arduino/motor-driver/encoder practical wiring overview.
+- Interactive tools calculate ideal PWM duty-cycle average voltage and illustrate how feedback correction can reduce a static disturbance. Both are explicitly labelled as teaching models, not motor or dynamic PID simulations.
+- Practical project: extra-low-voltage encoder-equipped DC gearmotor controlled through a TB6612FNG-based H-bridge breakout. Includes a component list, pin map, separate motor and logic supplies, common-ground guidance, current/thermal selection cautions, an Arduino single-channel encoder speed measurement and basic fixed-period PI example, observation tasks and troubleshooting.
+- The sketch requires the learner to set the actual encoder pulses per output-shaft revolution and verify encoder voltage, interrupt edge and motor/driver compatibility. It is an educational starting point, not production or safety-critical firmware.
+- Safety boundaries: no direct motor connection to GPIO; use current-limited extra-low-voltage supplies; check motor stall current and driver continuous/peak/thermal ratings; secure the motor and keep clear of moving parts; no deliberate stall or short-circuit testing; no use in safety-critical machinery or vehicles.
+- Connected Module 18's next-lesson button, added Module 19 to the Electronics Fundamentals directory and XML sitemap.
+- Source-level checks are required for unique IDs, JavaScript references, SVG/section/anchor balance, page navigation, directory and sitemap integrity, and calculator edge cases. No browser rendering, Arduino upload, motor/encoder measurement or physical hardware verification has been performed.
