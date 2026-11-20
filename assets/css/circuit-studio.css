@@ -48,3 +48,6 @@
 /* Meaningful engineering vs educational symbol treatments */
 .cs-symbol-art{color:var(--cs-ink)}.cs-edu-plate{fill:#e7f6f2;stroke:#8ed7c8;stroke-width:1.5;stroke-dasharray:3 3;pointer-events:none}.cs-style-educational .cs-symbol-art{color:#087f8c}.cs-style-educational .cs-symbol-art path,.cs-style-educational .cs-symbol-art line,.cs-style-educational .cs-symbol-art rect,.cs-style-educational .cs-symbol-art circle,.cs-style-educational .cs-symbol-art polygon{stroke-width:4;stroke-linecap:round;stroke-linejoin:round}.cs-style-educational .cs-editable-label{fill:#075d57;font-weight:700}.cs-edu-pin-label{font:9px system-ui,sans-serif;fill:#087f8c;pointer-events:none}.cs-zoom-help{font-size:10px;color:var(--cs-muted);white-space:nowrap}
 .cs-canvas-wrap{touch-action:none;cursor:default}.cs-canvas-wrap svg{touch-action:none;user-select:none;-webkit-user-select:none}
+
+/* Editable orthogonal wire routing */
+.cs-wire{pointer-events:stroke;cursor:pointer;stroke-width:3.5}.cs-wire-selected{stroke:#1676d2;stroke-width:4.5}.cs-bend-handle{fill:#fff;stroke:#1676d2;stroke-width:2.5;cursor:move;touch-action:none}.cs-junction{fill:#168f80;stroke:#fff;stroke-width:1.5;pointer-events:none}.cs-wire-bends{margin-top:8px}.cs-wire-bends .cs-pin-editor{grid-template-columns:1fr 1fr auto;align-items:end}.cs-wire-bends .cs-pin-btn{min-width:36px;min-height:38px}
