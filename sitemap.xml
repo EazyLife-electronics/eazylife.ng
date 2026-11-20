@@ -20,6 +20,254 @@
     <priority>0.9</priority>
   </url>
 
+  <!-- Public Electronics Fundamentals learning module -->
+  <url>
+    <loc>https://eazylife.ng/stem-electronics-fundamentals.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- Potentiometer to LED standalone lesson -->
+  <url>
+    <loc>https://eazylife.ng/stem-potentiometer-led.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.84</priority>
+  </url>
+
+  <!-- Component identification and polarity lesson -->
+  <url>
+    <loc>https://eazylife.ng/stem-component-identification.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Voltage, current and resistance lesson -->
+  <url>
+    <loc>https://eazylife.ng/stem-voltage-current-resistance.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Resistors in practical circuits lesson -->
+  <url>
+    <loc>https://eazylife.ng/stem-resistors-practical-circuits.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Diodes and LED circuits lesson -->
+  <url>
+    <loc>https://eazylife.ng/stem-diodes-led-circuits.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Capacitors and energy storage lesson -->
+  <url>
+    <loc>https://eazylife.ng/stem-capacitors-energy-storage.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Module 7: Inductors and Magnetic Fields -->
+  <url>
+    <loc>https://eazylife.ng/stem-inductors-magnetic-fields.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Module 8: Transistors and Electronic Switching -->
+  <url>
+    <loc>https://eazylife.ng/stem-transistors-electronic-switching.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Module 9: Operational Amplifiers and Basic Analog Circuits -->
+  <url>
+    <loc>https://eazylife.ng/stem-op-amps-analog-circuits.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Module 10: The 555 Timer, Timing, Oscillators and Control -->
+  <url>
+    <loc>https://eazylife.ng/stem-555-timer-timing-oscillators.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Module 11: Power Supplies and Voltage Regulation -->
+  <url>
+    <loc>https://eazylife.ng/stem-power-supplies-regulation.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Module 12: Power Supply Protection and Battery Systems -->
+  <url>
+    <loc>https://eazylife.ng/stem-power-protection-battery-systems.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Module 13: Workshop Practice, Soldering and PCB Fundamentals -->
+  <url>
+    <loc>https://eazylife.ng/stem-workshop-soldering-pcb.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Module 14: Workshop Measurement and Instrumentation -->
+  <url>
+    <loc>https://eazylife.ng/stem-workshop-measurement-instrumentation.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Module 15: Analog Sensors and Signal Conditioning -->
+  <url>
+    <loc>https://eazylife.ng/stem-analog-sensors-signal-conditioning.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Module 16: Digital Sensors and Communication Interfaces -->
+  <url>
+    <loc>https://eazylife.ng/stem-digital-sensors-communication-interfaces.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Module 17: Microcontrollers and Embedded Programming -->
+  <url>
+    <loc>https://eazylife.ng/stem-microcontrollers-embedded-programming.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Module 18: Embedded Systems Design and Real-Time Control -->
+  <url>
+    <loc>https://eazylife.ng/stem-embedded-systems-real-time-control.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Module 20: Robotics and Mechatronic Systems -->
+  <url>
+    <loc>https://eazylife.ng/stem-robotics-mechatronic-systems.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Module 19: Digital Control, Motor Control and Feedback Systems -->
+  <url>
+    <loc>https://eazylife.ng/stem-digital-control-motor-feedback.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Module 21: Robotics Sensors, Navigation and Autonomy -->
+  <url>
+    <loc>https://eazylife.ng/stem-robotics-sensors-navigation-autonomy.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Module 22: Wireless Communication and IoT Systems -->
+  <url>
+    <loc>https://eazylife.ng/stem-wireless-communication-iot.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Module 23: Integrated Circuits and Logic Gates -->
+  <url>
+    <loc>https://eazylife.ng/stem-integrated-circuits-logic-gates.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Module 24: Combinational Logic Design -->
+  <url>
+    <loc>https://eazylife.ng/stem-combinational-logic-design.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Module 25: Sequential Logic, Flip-Flops and Digital Memory -->
+  <url>
+    <loc>https://eazylife.ng/stem-sequential-logic-flip-flops-memory.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Module 26: Digital Displays, Keypads and Human Interfaces -->
+  <url>
+    <loc>https://eazylife.ng/stem-digital-displays-keypads-interfaces.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Module 27: DAC and Signal Generation -->
+  <url>
+    <loc>https://eazylife.ng/stem-dac-signal-generation.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Module 28: Electronics Product Design -->
+  <url>
+    <loc>https://eazylife.ng/stem-electronics-product-design.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Module 29: Applied Electronics Projects -->
+  <url>
+    <loc>https://eazylife.ng/stem-applied-electronics-projects.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
+  <!-- Resistor colour-code calculator -->
+  <url>
+    <loc>https://eazylife.ng/stem-resistor-colour-code.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- Expanded Arduino Project Playground -->
   <url>
     <loc>https://eazylife.ng/stem-projects.html</loc>

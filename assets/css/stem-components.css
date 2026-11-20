@@ -1,0 +1,44 @@
+/* Component identification and polarity lesson, scoped to this page. */
+.ci-hero{padding:54px 0;background:linear-gradient(125deg,#e8faf3,#f4fbe9 58%,#eef8f7);color:#17382f}
+.ci-hero h1{font:800 clamp(2.3rem,5vw,4rem)/1.1 Poppins,sans-serif;margin:12px 0;letter-spacing:-.04em}
+.ci-hero p{max-width:720px;color:#587168;line-height:1.8}
+.ci-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.ci-card{background:var(--el-surface);border:1px solid var(--el-border);border-radius:15px;padding:20px}
+.ci-card h3{font:700 1rem Poppins,sans-serif;margin:0 0 9px}
+.ci-card p,.ci-card li{font-size:.82rem;color:var(--el-muted);line-height:1.75}
+.ci-parts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:16px}
+.ci-part{padding:15px;border:1px solid var(--el-border);border-radius:12px;background:var(--el-soft)}
+.ci-part strong{display:block;margin:8px 0 4px;font:700 .84rem Poppins,sans-serif}
+.ci-part p{font-size:.74rem;margin:0;color:var(--el-muted)}
+.ci-icon{height:58px;display:flex;align-items:center;justify-content:center;font-size:2rem;color:var(--el-teal)}
+.ci-resistor{width:92px;height:27px;border-radius:12px;background:#d9bd8b;position:relative;display:flex;justify-content:space-evenly;align-items:center;box-shadow:inset 0 0 0 1px #9a815c}
+.ci-resistor:before,.ci-resistor:after{content:"";position:absolute;width:28px;height:2px;background:#aaa;top:12px;z-index:-1}
+.ci-resistor:before{right:100%}.ci-resistor:after{left:100%}
+.ci-resistor i{height:27px;width:6px;background:#8b4513}
+.ci-led{width:30px;height:30px;border-radius:7px 7px 13px 13px;background:#e74b4b;position:relative;box-shadow:inset 0 -5px 0 #a91e1e}
+.ci-led:before,.ci-led:after{content:"";position:absolute;top:28px;width:2px;height:22px;background:#aaa}
+.ci-led:before{left:8px}.ci-led:after{right:8px}
+.ci-cap{width:40px;height:36px;border-radius:5px;background:#293d55;position:relative}
+.ci-cap:before{content:"";position:absolute;left:8px;right:8px;top:-5px;height:5px;background:#c5cbd2}
+.ci-cap:after{content:"−";position:absolute;right:4px;top:7px;color:#fff;font-weight:900}
+.ci-table{width:100%;border-collapse:collapse;font-size:.78rem;margin-top:12px}
+.ci-table th,.ci-table td{padding:10px;text-align:left;border-bottom:1px solid var(--el-border)}
+.ci-table th{color:var(--el-text)}
+.ci-lab{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:center}
+.ci-led-board{min-height:180px;border-radius:13px;background:var(--el-soft);display:flex;align-items:center;justify-content:center;gap:30px}
+.ci-led-drawing{display:flex;flex-direction:column;align-items:center;gap:8px}
+.ci-led-drawing .ci-led{width:46px;height:46px;transition:opacity .2s,filter .2s}
+.ci-led-drawing .ci-leg{display:flex;gap:17px;font-size:.7rem;color:var(--el-muted)}
+.ci-led-drawing .ci-leg span:first-child{border-left:2px solid var(--el-muted);padding-left:4px}
+.ci-controls{display:grid;gap:12px}
+.ci-controls label{font-size:.8rem;font-weight:700}
+.ci-controls select{width:100%;padding:11px;border:1px solid var(--el-border);border-radius:9px;background:var(--el-surface);color:var(--el-text)}
+.ci-feedback{padding:12px;border-radius:10px;background:var(--el-soft);font-size:.8rem;color:var(--el-muted);min-height:48px}
+.ci-quiz{display:grid;gap:10px}
+.ci-quiz button{padding:12px;text-align:left;border:1px solid var(--el-border);border-radius:9px;background:var(--el-surface);color:var(--el-text);cursor:pointer}
+.ci-quiz button:focus-visible,.ci-controls select:focus-visible{outline:3px solid var(--el-teal);outline-offset:2px}
+.ci-quiz button.correct{border-color:#24945f;background:#24945f18}.ci-quiz button.incorrect{border-color:#d97706;background:#d9770618}
+.ci-note{padding:13px 15px;border-left:4px solid var(--el-teal);background:var(--el-soft);font-size:.8rem;color:var(--el-muted);border-radius:0 9px 9px 0}
+@media(max-width:720px){.ci-grid,.ci-lab{grid-template-columns:1fr}.ci-parts{grid-template-columns:1fr}.ci-hero{padding:40px 0}.ci-card{padding:16px}}
+:root[data-theme="dark"] .ci-hero{background:var(--el-surface);color:var(--el-text)}
+:root[data-theme="dark"] .ci-hero p{color:var(--el-muted)}

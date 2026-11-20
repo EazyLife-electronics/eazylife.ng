@@ -33,7 +33,7 @@
         .dark #search { background: #1c2925; color: #eef2f0; }
         .dark #search::placeholder { color: #7d8f8b; }
         .nav-menu { position: relative; }
-        .nav-menu-panel { position: absolute; top: calc(100% + 8px); left: 0; background: #fff; border: 1px solid #eee; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); padding: 8px; min-width: 170px; z-index: 60; }
+        .nav-menu-panel { position: absolute; top: calc(100% + 8px); right: 0; left: auto; background: #fff; border: 1px solid #eee; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); padding: 8px; width: min(250px, calc(100vw - 32px)); max-height: 70vh; overflow-y: auto; z-index: 60; }
         .dark .nav-menu-panel { background: #182420; border-color: #2a3835; }
         .nav-menu-panel a { display: block; padding: 10px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; color: #1a2e2b; }
         .dark .nav-menu-panel a { color: #eef2f0; }
@@ -43,6 +43,7 @@
         .dark .request-tile { background: #16302c; }
         .request-tile h3 { color: #1a2e2b; }
         .dark .request-tile h3 { color: #eef2f0; }
+        .dark .text-red-500 { color: #f87171 !important; }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-[#0f1715] pb-24">
@@ -61,11 +62,18 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <div id="navMenuPanel" class="nav-menu-panel hidden">
-                    <a href="index.html"><i class="fas fa-house fa-fw"></i> Home</a>
-                    <a href="track.html"><i class="fas fa-truck-fast fa-fw"></i> Track Order</a>
-                    <a href="index.html#services"><i class="fas fa-layer-group fa-fw"></i> Services</a>
-                    <a href="index.html#contact"><i class="fas fa-address-card fa-fw"></i> Contact</a>
-                </div>
+<a href="index.html"><i class="fas fa-house fa-fw"></i> Home</a>
+<a href="projects.html"><i class="fas fa-diagram-project fa-fw"></i> Project Gallery</a>
+<a href="stem-lab.html"><i class="fas fa-flask fa-fw"></i> STEM Lab</a>
+<a href="stem-electronics-fundamentals.html"><i class="fas fa-book-open fa-fw"></i> Lessons</a>
+<a href="stem-projects.html"><i class="fas fa-microchip fa-fw"></i> Project Playground</a>
+<a href="stem-resistor-colour-code.html"><i class="fas fa-calculator fa-fw"></i> Tools</a>
+<a href="shop.html"><i class="fas fa-store fa-fw"></i> Shop</a>
+<a href="track.html"><i class="fas fa-truck-fast fa-fw"></i> Track Order</a>
+<a href="reviews.html"><i class="fas fa-star fa-fw"></i> Reviews</a>
+<a href="index.html#services"><i class="fas fa-layer-group fa-fw"></i> Services</a>
+<a href="index.html#contact"><i class="fas fa-address-card fa-fw"></i> Contact</a>
+</div>
             </div>
             <button onclick="showCart()" class="bg-eazylife text-white px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 shadow-lg hover:opacity-90 transition-all">
                 <i class="fas fa-shopping-basket"></i>

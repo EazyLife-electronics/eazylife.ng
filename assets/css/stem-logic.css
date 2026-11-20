@@ -1,0 +1,26 @@
+/* Module 23: Integrated Circuits and Logic Gates */
+.logic-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;margin:18px 0}
+.logic-grid>.ael-card{min-width:0}
+.logic-grid svg{width:100%;height:auto;max-height:none}
+.logic-gates{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:18px 0}
+.logic-gates>.ael-card{min-width:0}
+.logic-gates svg{width:100%;height:auto}
+.logic-table-wrap{width:100%;overflow-x:auto;margin:16px 0}
+.logic-table{width:100%;border-collapse:collapse;min-width:430px;background:var(--el-surface);color:var(--el-text);font-size:.84rem}
+.logic-table th,.logic-table td{padding:11px 13px;border:1px solid var(--el-border);text-align:center}
+.logic-table th{background:var(--el-soft);font-weight:800}
+.logic-table tbody tr.active{background:#00a99022;outline:2px solid var(--el-teal);outline-offset:-2px}
+.logic-simulator{display:grid;grid-template-columns:.9fr 1.1fr;gap:15px;margin:18px 0}
+.logic-switches{display:flex;gap:14px;flex-wrap:wrap;margin:18px 0}
+.logic-switches>div{display:grid;gap:8px;min-width:110px}
+.logic-switches span{font-size:.72rem;font-weight:800;letter-spacing:.08em;color:var(--el-muted)}
+.logic-toggle{padding:12px 16px;border:1px solid var(--el-border);border-radius:9px;background:var(--el-soft);color:var(--el-text);font-weight:800;cursor:pointer}
+.logic-toggle[aria-pressed="true"]{background:#159b83;color:#fff;border-color:#159b83}
+.logic-output{padding:16px;border-radius:11px;background:var(--el-soft);margin-top:12px}
+.logic-output small{display:block;color:var(--el-muted);font-weight:800;letter-spacing:.1em}
+.logic-output strong{display:block;font:800 1.7rem Poppins,sans-serif;color:var(--el-teal);margin:5px 0}
+.logic-output p{font-size:.78rem;color:var(--el-text);margin:0}
+.logic-gates .ael-equation{font-size:.95rem}
+:root[data-theme="dark"] .logic-gates svg path[fill="#dff3eb"],:root[data-theme="dark"] .logic-gates svg path[fill="#dff3eb"]{fill:#21463e}
+@media(max-width:760px){.logic-grid,.logic-simulator{grid-template-columns:1fr}.logic-gates{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.logic-gates{grid-template-columns:1fr}.logic-switches{gap:9px}.logic-switches>div{flex:1}}

@@ -1,0 +1,33 @@
+/* Module 25: Sequential Logic, Flip-Flops and Digital Memory */
+.seq-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;margin:18px 0}
+.seq-grid>.ael-card{min-width:0}
+.seq-grid svg{display:block;width:100%;height:auto}
+.seq-table{width:100%;border-collapse:collapse;background:var(--el-surface);color:var(--el-text);font-size:.86rem}
+.seq-table th,.seq-table td{padding:9px 11px;border:1px solid var(--el-border);text-align:left;vertical-align:top}
+.seq-table th{background:var(--el-soft);font-weight:800}
+.seq-table-wrap{width:100%;overflow-x:auto;margin:12px 0}
+.seq-caption,.seq-grid .ael-caption{font-size:.8rem;color:var(--el-muted)}
+.seq-sim{display:grid;grid-template-columns:.9fr 1.1fr;gap:15px;margin:18px 0}
+.seq-field{display:grid;gap:7px;margin:8px 0 15px}
+.seq-field label,.seq-control label{font-size:.82rem;font-weight:800}
+.seq-field select,.seq-control select{width:100%;padding:10px;border:1px solid var(--el-border);border-radius:8px;background:var(--el-surface);color:var(--el-text)}
+.seq-controls{display:flex;flex-wrap:wrap;gap:10px}
+.seq-control{display:grid;gap:6px;min-width:110px;flex:1}
+.seq-actions{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}
+.seq-state,.seq-counter-top{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:15px 0}
+.seq-state>div,.seq-counter-top>div{padding:14px;border-radius:10px;background:var(--el-soft)}
+.seq-state small,.seq-counter-top small{display:block;font-size:.7rem;font-weight:800;letter-spacing:.08em;color:var(--el-muted)}
+.seq-state strong,.seq-counter-top strong{display:block;font:800 1.8rem Poppins,sans-serif;color:var(--el-teal);margin-top:4px}
+.seq-feedback{padding:10px 12px;border-left:3px solid var(--el-teal);background:var(--el-soft);border-radius:5px;font-size:.86rem}
+.seq-equation{padding:12px 15px;border-radius:9px;background:var(--el-soft);font-weight:800;font-size:1.15rem;margin:10px 0}
+.seq-counter{max-width:760px;margin:18px auto;padding:18px;border:1px solid var(--el-border);border-radius:14px;background:var(--el-surface)}
+.seq-counter-top{grid-template-columns:repeat(3,minmax(0,1fr))}
+.seq-leds{display:flex;justify-content:center;gap:38px;padding:16px 0}
+.seq-leds>div{display:grid;justify-items:center;gap:8px;font-size:.8rem}
+.seq-led{width:32px;height:32px;border-radius:50%;border:2px solid var(--el-muted);background:var(--el-soft);display:block}
+.seq-led.on{background:#21c77a;border-color:#159b83;box-shadow:0 0 16px #21c77a99}
+.seq-counter #seq-count-feedback{text-align:center;font-size:.86rem}
+:root[data-theme="dark"] .seq-grid svg [fill="#dff3eb"]{fill:#21463e}
+:root[data-theme="dark"] .seq-grid svg [fill="#e9e4fa"]{fill:#3a3152}
+@media(max-width:760px){.seq-grid,.seq-sim{grid-template-columns:1fr}.seq-counter-top{grid-template-columns:repeat(3,minmax(0,1fr))}.seq-counter-top strong{font-size:1.4rem}}
+@media(max-width:420px){.seq-table{font-size:.78rem}.seq-table th,.seq-table td{padding:7px}.seq-actions .sl-button{flex:1;justify-content:center}.seq-leds{gap:24px}}

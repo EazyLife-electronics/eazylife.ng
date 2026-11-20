@@ -452,4 +452,277 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 
 - Module 21 source-level validation completed: no duplicate HTML IDs, all calculator element references exist, four SVGs and ten sections are balanced, lesson anchors are balanced, CSS/JS assets are linked, Module 20 next navigation is connected, and the directory and sitemap each contain exactly one Module 21 entry. Sitemap URL elements are balanced. This is source inspection only; no browser rendering, Arduino compile/upload, sensor calibration or physical rover test was performed.
 
+
+## Module 22: Wireless Communication and IoT Systems
+
+- Added standalone lesson stem-wireless-communication-iot.html, responsive stylesheet assets/css/stem-iot.css and client-side telemetry teaching model js/stem-iot.js.
+- Covers IoT architecture and device roles; Wi-Fi, Bluetooth Classic/BLE, Zigbee, Thread, LoRa/LoRaWAN and cellular trade-offs; access points, IP addressing, DHCP, DNS, routing and local-versus-internet connectivity; HTTP, MQTT publish/subscribe, WebSocket and telemetry payloads.
+- Includes labelled SVG diagrams for the IoT data path, local Wi-Fi network and ESP32 potentiometer wiring; interactive telemetry payload/data-rate estimator; and a practical ESP32 local HTTP sensor dashboard with Arduino sketch, staged test plan, troubleshooting and extension challenges.
+- Practical uses a 10 kΩ potentiometer between 3.3 V and GND, wiper to an ADC-capable ESP32 input (GPIO34 on common original ESP32 boards). ADC scaling is explicitly approximate and board-specific.
+- Security guidance covers credential handling, authentication, encryption, permissions, network isolation, stale telemetry, offline behaviour and safe command validation. The unauthenticated example is restricted to a trusted isolated learning network and must not be exposed publicly.
+- Connected Module 21 previous/next lesson navigation, added Module 22 to the Electronics Fundamentals directory and XML sitemap.
+- Source-level checks required: unique IDs, local CSS/JS links, JavaScript DOM references, SVG/section/anchor balance, quiz markup, navigation, directory entry and sitemap XML. No browser rendering, Arduino compilation/upload, Wi-Fi network test or physical ESP32 test has been performed.
+
+- Final Module 22 cross-check: Module 21 next-lesson button now links to Module 22. Module 22 JavaScript parses successfully; no duplicate IDs or missing JavaScript element references; three SVGs, ten sections and anchors are balanced; four shared-format quiz cards with twelve answer buttons are present; directory and sitemap each contain one entry; sitemap URL tags are balanced. These are source-level checks only.
+
+
+## Electronics Fundamentals directory: search and category filters
+
+- Updated stem-electronics-fundamentals.html with a live search field, category selector, clear-filters action, live result count and accessible no-results message.
+- Categorised all 22 module cards into Circuit foundations (Modules 01–10), Power and workshop (11–14), Sensors and embedded systems (15–18), Control and robotics (19–21), and Wireless and IoT (22).
+- Added responsive styling in assets/css/stem-directory.css and client-side filtering in js/stem-directory.js. Search matches module card text, including module number, title and lesson description; category and text filters combine.
+- Source validation: 22 module cards categorised, expected category counts 10/4/4/3/1, no invalid categories or duplicate IDs, JavaScript parses, stylesheet braces balance, CSS and JS assets are linked. Browser/device rendering has not been independently tested.
+
+
+## Module 23: Integrated Circuits and Logic Gates
+
+- Added standalone lesson `stem-integrated-circuits-logic-gates.html`, responsive stylesheet `assets/css/stem-logic.css` and client-side truth-table teaching model `js/stem-logic.js`.
+- Covers IC construction and package orientation; DIP pin numbering; logic HIGH/LOW voltage ranges; floating CMOS inputs and bypass capacitors; AND, OR, NOT, NAND, NOR, XOR and XNOR; Boolean expressions; truth tables; common 74HC logic ICs; combining conditions; troubleshooting and safe low-voltage practice.
+- Includes labelled SVG diagrams for an IC package, DIP-14 pin numbering, conceptual logic-level bands, pull-down input wiring, six logic-gate symbols, a 74HC08 pin map, a practical two-button AND-gate circuit and a combined logic example.
+- Practical build uses a 74HC08 at regulated 5 V, two normally-open pushbuttons, 10 kΩ pull-down resistors, 1 kΩ LED resistor and 100 nF supply bypass capacitor. The first AND gate uses pins 1 and 2 as inputs and pin 3 as output; pin 14 is VCC and pin 7 is GND. Exact device datasheet verification is required.
+- Interactive model lets learners select AND, OR, NOT, NAND, NOR, XOR or XNOR, toggle input states and inspect the corresponding truth table. It is explicitly a Boolean teaching model, not an electrical IC emulator.
+- Safety boundaries: use regulated, current-limited extra-low-voltage supply; disconnect power before rewiring; define all CMOS inputs; do not drive external loads directly from logic outputs or use hobby logic for safety-critical systems.
+- Connected Module 22 next-lesson navigation, added Module 23 to the Electronics Fundamentals directory and XML sitemap. Directory counts now reflect 23 lessons, with Module 23 in Circuit foundations.
+- Source-level checks required: unique IDs, JavaScript DOM references and syntax, SVG/section/anchor balance, quiz structure, local asset links, previous/next navigation, directory filters/count and sitemap XML. No browser rendering, IC bench test or hardware validation has been performed.
+
+
+
+## Module 24: Combinational Logic Design
+
+- Added standalone lesson `stem-combinational-logic-design.html`, responsive stylesheet `assets/css/stem-combinational.css` and interactive truth-table teaching model `js/stem-combinational.js`.
+- Covers combinational versus sequential logic, design workflow, Boolean identities, De Morgan's theorems, expression simplification, two-variable Karnaugh-map introduction, NAND/NOR universal-gate constructions, multiplexers, decoders, encoders and half/full-adder concepts.
+- Interactive design bench allows learners to select AND, OR, XOR, NAND, NOR, XNOR or a defined 2:1 multiplexer example, toggle inputs and inspect a generated truth table. It is labelled as a logic teaching model, not an electrical IC emulator.
+- Practical build implements a one-bit half adder using a 74HC86 XOR gate for SUM and a 74HC08 AND gate for CARRY. Both ICs use their first gate (pins 1 and 2 inputs, pin 3 output), pins 14/7 for supply/ground, local 100 nF bypass capacitors, two button inputs with 10 kΩ pull-down resistors and two LED indicators with 1 kΩ series resistors.
+- Includes labelled SVGs for design workflow, De Morgan equivalences, a Boolean gate combination, universal-gate examples, MUX/decoder/encoder/half-adder blocks, half-adder logic and DIP-14 pin connections; includes wiring instructions, expected observations, test procedure, troubleshooting and four knowledge-check questions.
+- Safety: use regulated current-limited extra-low-voltage supply, verify exact manufacturer pinouts and voltage limits, define all CMOS inputs, disconnect power before rewiring and do not drive motors/relays directly from logic outputs.
+- Connected Module 23 next-lesson navigation, added Module 24 to the Circuit foundations directory category and XML sitemap.
+- Source-level checks: verify unique IDs, all JS DOM references, JS syntax, SVG/section/anchor balance, quiz structure, responsive CSS, navigation, directory category/search and sitemap XML. No browser rendering, breadboard assembly, IC bench test or physical hardware validation has been performed.
+
+
+## Module 25: Sequential Logic, Flip-Flops and Digital Memory
+
+- Added standalone lesson `stem-sequential-logic-flip-flops-memory.html`, responsive stylesheet `assets/css/stem-sequential.css` and interactive teaching models in `js/stem-sequential.js`.
+- Covers combinational versus sequential systems, state, active-HIGH NOR SR latch behaviour and forbidden input combination, D/JK/T/SR flip-flops, positive-edge triggering, asynchronous preset/clear concepts, setup/hold time, propagation delay, clock skew, metastability, debouncing, ripple/synchronous counters, clock division, shift registers and registers.
+- Interactive flip-flop bench supports D, JK, T and active-HIGH SR teaching models with selectable inputs, manual rising-edge action, reset and generated next-state tables. It explicitly does not model analogue timing, metastability or a specific IC.
+- Interactive modulo-4 counter visualises two-bit binary state, clock steps, reset and LED indicators.
+- Practical build: synchronous two-bit counter using a 74HC74 dual positive-edge D flip-flop and 74HC86 XOR gate. Next-state logic is D0 = Qbar0 and D1 = Q1 XOR Q0, with both flip-flops sharing a clock. Includes DIP-14 pin-level wiring, active-LOW asynchronous clear/preset handling, 100 nF local bypass capacitors, LED outputs, optional slow 555 clock, expected 00→01→10→11→00 sequence, test procedure and troubleshooting.
+- Safety/implementation notes: use regulated current-limited extra-low-voltage supply; verify exact device pinout, voltage and timing ratings; never float CMOS inputs; keep active-LOW asynchronous control pins at valid inactive HIGH; do not assert preset and clear simultaneously; do not use a raw bouncing button as a clock without debouncing.
+- Connected Module 24 next-lesson navigation, added Module 25 to the Circuit foundations directory category and XML sitemap.
+- Source-level checks: duplicate IDs, JavaScript DOM references and syntax, SVG/section/anchor balance, quiz structure, CSS braces, directory count/category, sitemap XML, previous/next navigation. No browser rendering, breadboard assembly, IC bench test or physical timing verification has been performed.
+
+
+## Module 26: Digital Displays, Keypads and Human Interfaces
+
+- Added standalone lesson `stem-digital-displays-keypads-interfaces.html`, responsive stylesheet `assets/css/stem-interface.css` and interactive models in `js/stem-interface.js`.
+- Covers human-machine interface roles; seven-segment LED anatomy and segment labels; common-anode/common-cathode operation; segment patterns; current limiting; multiplexing and ghosting; 4511, 74HC595 and integrated display-driver roles; matrix keypad scanning, pull-ups, debouncing and ghosting; character LCD and graphical OLED selection; usability and accessibility principles.
+- Interactive seven-segment model selects digits 0–9 and displays the active segments and common-cathode hexadecimal pattern, with common-anode logic convention explained. Interactive keypad/LCD model accepts up to 16 key characters, supports backspace/clear/send and displays simulated feedback. Both are conceptual teaching models, not electrical hardware emulators.
+- Practical build: Arduino Uno-compatible 5 V board, 4×4 matrix keypad and 16×2 I²C LCD. Includes row/column-to-pin mapping, I²C wiring, Keypad and LiquidCrystal_I2C library notes, editable example sketch, demo-code validation, test procedure, expected behaviour and troubleshooting.
+- Security note: the hard-coded demonstration code is educational only, not secure access control. Real systems require secure credential handling and an appropriate security design. Board voltage, I²C pins/address, LCD backpack compatibility and library API must be verified for actual hardware.
+- Connected Module 25 next-lesson navigation, added Module 26 to the Circuit foundations directory category and XML sitemap.
+- Source-level checks: unique HTML IDs, JS element references and syntax, SVG/section/article/anchor balance, quiz structure, responsive CSS braces, directory count/category, sitemap XML and previous/next navigation. No browser rendering, Arduino compilation/upload, keypad scan test or LCD hardware test has been performed.
+
+
+## Confirmed closing curriculum sequence (Modules 24–29)
+
+The user reconfirmed the agreed finite ending sequence. This is the authoritative roadmap; do not replace Module 27 with a separate serial-communications module or extend the sequence without explicit user agreement.
+
+- **24. Combinational Logic Design:** Design useful logic circuits.
+- **25. Sequential Logic and Digital Memory:** Understand state, timing and memory.
+- **26. Digital Displays and Human Interfaces:** Build practical input/output interfaces. The implemented lesson includes keypad scanning, seven-segment displays, LCDs and OLEDs.
+- **27. DAC and Signal Generation:** Connect digital and analogue systems. This is the next module to implement.
+- **28. Electronics Product Design:** Integrate circuits into usable products.
+- **29. Applied Electronics Projects:** Apply the curriculum through practical project briefs, build stages, test evidence and optional project-specific guidance.
+
+Module 26's upcoming navigation now points to Module 27: DAC and Signal Generation. Modules 27–29 are planned, not yet implemented.
+
+
+## Module 27: DAC and Signal Generation
+
+- Added standalone lesson \`stem-dac-signal-generation.html\`, responsive stylesheet \`assets/css/stem-dac.css\` and interactive teaching models in \`js/stem-dac.js\`.
+- Covers DAC operation, digital codes and quantisation, ideal resolution, R-2R resistor ladders, PWM versus true DAC output, RC low-pass filtering, waveform properties, sampling, microcontroller DAC availability, oscilloscope measurement and troubleshooting.
+- Interactive tools: configurable ideal DAC resolution/code-to-voltage explorer; four-bit R-2R code explorer; PWM/RC average, time-constant and cutoff estimator; sine, square, triangle and sawtooth waveform model with sample-rate and clipping feedback.
+- Practical A: original ESP32 DAC1 sine-wave output on GPIO25 using a 64-sample lookup table and nominal 2 kHz sample rate. The page distinguishes original ESP32 and ESP32-S2 DAC support from ESP32-S3/C3/C6 variants without the same general-purpose DAC peripheral. Verify the exact SoC and board pinout.
+- Practical B: Arduino Uno R3 PWM output through a passive RC low-pass filter, explicitly labelled as a smoothed PWM approximation rather than a true DAC.
+- Includes labelled SVGs, component lists, wiring guidance, Arduino sketches, oscilloscope test procedure, expected observations, troubleshooting and four shared-format knowledge-check questions.
+- Safety: extra-low-voltage only; scope ground clip only to verified circuit ground; no household mains, inverter output or unknown floating circuits; do not exceed GPIO ratings or drive low-impedance loads directly.
+- Connected Module 26 next navigation to Module 27, added Module 27 to the Circuit foundations directory category and XML sitemap. Directory count now reflects 27 modules.
+- Official Espressif Arduino-ESP32 documentation checked for DAC availability and pin mapping: original ESP32 uses GPIO25/26; ESP32-S2 uses GPIO17/18; availability differs across SoC variants. Sources: https://docs.espressif.com/projects/arduino-esp32/en/latest/api/dac.html and https://docs.espressif.com/projects/arduino-esp32/en/latest/libraries.html
+- Source-level checks passed: JavaScript syntax; 38 unique HTML IDs with no duplicates; no missing JavaScript DOM references; 12/12 sections, 6/6 SVGs and 18/18 articles balanced; four quiz cards with twelve answer buttons; CSS braces balanced; local CSS/JS references present; Module 26 next and Module 27 previous/Module 28 preview navigation correct; 27 directory module cards with the displayed 27/27 count; Module 27 appears once in the directory and once in the sitemap; sitemap URL tags balanced. No browser rendering, Arduino compilation/upload, oscilloscope measurement or physical DAC/PWM hardware test has been performed.
+
+## Confirmed finite ending and Module 29 presentation direction
+
+The user reconfirmed that the learning series ends at Module 29, with no Module 30 or additional lessons. Module 29 should not read like an obvious advertisement. It should contain useful project-based training direction and practical next-step examples, then close the series naturally. Any optional EazyLife guidance/training invitation should be subtle and secondary to the learning content. The final lesson navigation and final paragraph should communicate that the published series is complete; no next lesson button or further lesson teaser should appear after Module 29.
+
+
+## Module 28: Electronics Product Design
+
+- Added standalone lesson \`stem-electronics-product-design.html\`, responsive stylesheet \`assets/css/stem-product-design.css\` and interactive helpers in \`js/stem-product-design.js\`.
+- Covers problem definition, user needs, measurable requirements, system block architecture, interfaces, component/datasheet selection, power budgeting, thermal considerations, staged prototyping, PCB and enclosure design, serviceability, verification, validation, engineering documentation and responsible product readiness.
+- Interactive tools: requirement-statement builder; four-load nominal power budget and headroom estimator with explicit rail-current caveats; eight-point design-review checklist with live completion count.
+- Practical design exercise: low-voltage tank-level monitor, beginning with indication only. Includes subsystem suggestions, sensor/controller compatibility checks, fault behaviour, enclosure and verification prompts. Automatic pump control is explicitly outside the initial exercise because it introduces overflow, dry-run and electrical hazards requiring independent protection.
+- Includes labelled SVGs for system architecture and exploded enclosure concept, comparison tables, four knowledge-check questions and links to the previous and final modules.
+- Safety: extra-low-voltage prototype scope; check absolute maximum ratings and recommended operating conditions; do not infer protection ratings; no mains or hazardous actuator instructions; distinguish educational prototypes from certified or safety-critical products.
+- Connected Module 27 next navigation to Module 28, added Module 28 to the Circuit foundations directory category and XML sitemap. Directory count now reflects 28 lessons.
+- Source-level checks passed: JavaScript syntax; 32 unique HTML IDs with no duplicates; all eight referenced DOM elements exist; 13/13 sections, 2/2 SVGs, 20/20 articles and 15/15 anchors balanced; four quiz cards with twelve answer buttons; eight design checklist items; CSS braces balanced; local CSS/JS references present; Module 27 next and Module 28 previous/Module 29 next navigation correct; 28 directory module cards with the displayed 28/28 count; Module 28 appears once in the directory and once in the sitemap; sitemap URL tags balanced. The example power-budget totals were checked against the four default loads. No browser rendering, physical prototype, PCB fabrication or environmental testing has been performed.
+
+## Confirmed Module 29 closing presentation
+
+Module 29 is the final lesson in the series. It should offer project-based practical training directions and a useful sense of what learners can build next, then end naturally. Do not make it an obvious advertisement, do not withhold free learning content, do not add a Module 30, and do not show a next-lesson button or further lesson teaser after Module 29. Its final paragraph and lesson navigation should clearly communicate that the published learning series is complete.
+
+
+## Module 29: Applied Electronics Projects
+
+- Added standalone lesson `stem-applied-electronics-projects.html`, responsive stylesheet `assets/css/stem-applied-projects.css` and interactive project-brief selector/checklist in `js/stem-applied-projects.js`.
+- Presents six adaptable project briefs: smart room environment monitor; tank-level monitor; line-following and obstacle-aware rover; closed-loop DC motor controller; local IoT monitoring dashboard; programmable extra-low-voltage test station.
+- Each selectable brief provides a summary, skills demonstrated, suggested system blocks, build milestones, test evidence and an extension challenge. A project selector and matching project-card actions update the displayed brief.
+- Covers a repeatable engineering workflow from problem definition and requirements through architecture, component selection, subsystem tests, integration, verification, revision and handover. Includes an eight-point interactive project evidence checklist and portfolio guidance.
+- Safety boundaries keep activities within appropriately designed extra-low-voltage learning prototypes. Tank monitoring begins with indication only; no mains, hazardous battery, high-voltage or safety-critical build instructions. The test-station project explicitly excludes mains measurement.
+- Added four knowledge-check questions, links to the learning directory, project playground, resistor calculator and component shop. Optional EazyLife project guidance is secondary to the open learning content.
+- Module 28 next navigation now points to Module 29: Applied Electronics Projects. Module 29 has only a previous-lesson button, no next-lesson button or Module 30 teaser. Added Module 29 to the directory and XML sitemap; directory count now reflects 29 modules.
+- Source-level validation: check unique IDs, JavaScript syntax and DOM references, all project selector data keys, quiz markup, CSS braces, responsive styles, previous/next navigation, directory search/filter count and sitemap XML. No browser rendering, microcontroller compilation, physical project build or hardware testing has been performed.
+- This is the final module. No Module 30 or further lesson is planned.
+
+
+## Website-wide navigation and theme consistency audit · 20 November 2026
+
+### Navigation corrections
+
+- Standardised the lesson navigation on all 29 standalone modules. Previous/next buttons now use consistent labels with the module number and exact destination title. Module 01 uses an `ALL MODULES` return link; Module 29 has only its Module 28 previous button.
+- Corrected the Module 25 next-button title to the approved Module 26 title, **Digital Displays and Human Interfaces**.
+- Standardised the main STEM navigation across STEM Lab, Project Playground, Electronics Fundamentals, the resistor calculator and all 29 lesson pages. Shared destinations are STEM Lab, Lessons, Tools, Project Playground, Project Gallery, Shop, Track Order and Reviews. Current-section states are retained.
+- Added `assets/css/site-navigation.css` after each STEM page's local styles. At narrow widths, navigation labels remain visible in a horizontally scrollable row instead of being reduced to icon-only links. The theme toggle remains visible at the end of the row.
+- Aligned the public navigation destinations on the homepage, project gallery, reviews, shop and order-tracking pages. Shop and tracking use the same expanded menu destinations, with a bounded, scrollable menu panel. The project-kit order page now also exposes a theme toggle and clear return-to-gallery/shop links.
+- Standardised navigation label capitalization, including Project Playground, Project Gallery and Track Order.
+- The homepage now links directly to Lessons, Project Playground, Project Gallery, Tools and Reviews, in addition to the existing engineering, STEM Lab, shop and tracking destinations.
+- Corrected the homepage CAC identifier from `RC-9462420` to the user's registered `BN-9462420`.
+
+### Dark/light theme corrections
+
+- Improved shared dark-theme contrast in `assets/css/site-theme.css`, including muted text, metadata, review summaries, empty states, project labels, quotes and teal links.
+- Added shared dark-theme safeguards for lesson cards, tables, forms, highlighted callouts and lesson navigation in `assets/css/site-navigation.css`.
+- Removed the Module 14 instrumentation rule that forcibly changed every SVG text label to `currentColor` in dark mode. It could turn labels white even where the SVG used a white or pale instrument display, making the text disappear.
+- Removed the Module 28 product-design rule that forced all SVG labels to the light theme text colour. Its diagrams use pale engineering blocks, so white labels could lose contrast. Diagram labels now retain their dark ink on pale blocks.
+- Reviewed the theme handling on the homepage, project gallery, reviews, shop, order tracking, project-kit order page, STEM Lab, Project Playground, learning directory, resistor calculator and lesson pages. The homepage retains its own theme implementation; the shop and tracking pages retain their Tailwind `dark` class implementation; pages using the shared theme layer use the common theme script.
+
+### Pending and navigation-state checks
+
+- Checked all 29 module pages for disabled/upcoming/coming-soon lesson navigation markers. None remain in the lesson navigation.
+- Confirmed each module's previous and next links follow the 01–29 sequence. Module 29 has no next button, no Module 30 link and no further-lesson teaser.
+- Confirmed the Electronics Fundamentals directory contains 29 module cards and the final module is represented in the sitemap.
+- The word "pending" remains in an internal homepage code comment describing moderation of user-submitted reviews; it is not a pending lesson or a visible navigation state.
+
+### Validation limits
+
+- Performed source-level checks on navigation markup, destination paths, module sequence, pending/upcoming markers, stylesheet references and dark-theme overrides.
+- No live-browser visual regression pass, automated screenshot comparison, real-device layout test or runtime JavaScript console test has been performed. The branch preview should still be reviewed in light and dark modes at desktop and phone widths before merge/deployment.
+- All changes remain on `feature/stem-learning-platform`. No production merge or deployment was performed.
+
+- Refined the Electronics Fundamentals category taxonomy: Modules 28 (Electronics Product Design) and 29 (Applied Electronics Projects) now use a dedicated **Product design and applied projects** filter category rather than being grouped under Circuit foundations. The directory now has six categories while retaining all 29 module cards and combined search/filter behaviour.
+
+
+## Website-wide consistency pass
+
+Date: 2026-11-20  
+Target branch: `feature/stem-learning-platform`
+
+### Corrections made
+
+- Changed the homepage logo link from the placeholder fragment `#` to the explicit `index.html` route, so it behaves as a predictable home link.
+- Updated `Retailer.html`: the EazyLife logo now links back to the homepage, a visible theme toggle is provided in the header, and the page loads the shared `js/site-theme.js` controller. This makes the saved light/dark preference, toggle icon/accessible label and theme-aware logo behave consistently with the shared site theme.
+- Verified that the project gallery already has page-specific dark-mode overrides for its project-kit section, kit rows, manual notes and text. No duplicate override was added.
+
+### Navigation review
+
+- The STEM Lab, lesson directory and standalone lesson pages use the shared STEM navigation pattern and load `assets/css/site-navigation.css`.
+- The homepage, project gallery and reviews page use a compact horizontal navigation. The shop and order-tracking pages use a collapsible menu with the same core destinations; this is a responsive presentation difference rather than a missing destination.
+- The project-kit order page intentionally keeps a contextual header with a home logo, project-gallery return link, shop link and theme control.
+- The Retailer Price Finder was the clearest navigation omission: it previously had a non-clickable logo and no visible theme control. Both are now corrected.
+- Page-specific actions such as cart access, order tracking, WhatsApp and the project-kit return link remain in their relevant contexts rather than being removed to force identical headers.
+
+### Lesson navigation review
+
+- Reviewed the final sequence, Modules 24–29. The previous/next links progress in order through Modules 24, 25, 26, 27, 28 and 29.
+- Module 29 correctly has a previous-lesson link only. It is the agreed final module, so it must not show a pending, coming-soon or broken next-lesson control.
+- The earlier apparent `pending` match in Module 23 was ordinary lesson prose (“Depending on its purpose”), not a pending navigation state.
+- The project-kit dark-mode row correction was already present in `projects.html`; this audit did not mistake that existing fix for a new change.
+
+### Verification and limits
+
+- Re-fetched the changed files from the target branch after committing and confirmed the updated source is present.
+- Confirmed the shared theme script and stylesheet paths referenced by the Retailer Price Finder exist in the repository tree.
+- Checked the source markup for the final lesson sequence and confirmed the Module 29 navigation contains no next-lesson link.
+- These are repository/source-level checks. No live-site deployment, Firebase/Firestore changes, browser automation, or physical-device rendering test was performed. The branch remains separate from `main`; deployment and merge are not authorised by this audit.
+
+
+## Website-wide consistency pass: 2026-11-20
+
+A follow-up source audit was performed on the active learning-platform branch after the 29-module curriculum was completed.
+
+### Changes applied
+
+- Extended `assets/css/site-theme.css` with shared dark-mode contrast safeguards for common Tailwind text/background/border utilities and teal links, plus visible keyboard-focus outlines.
+- Added explicit dark-mode menu-link colours and hover surfaces for the hamburger navigation used by the shop and order-tracking pages.
+- The update is additive and does not alter page structure, Firebase configuration, Firestore data or security rules.
+
+### Findings and decisions
+
+- The project gallery already contains a page-specific dark-mode correction for its project-kit line items and manual component panel. This was present in the current branch source, so it was not duplicated.
+- STEM learning pages already share a navigation stylesheet and a consistent set of core destinations. Their horizontal, scrollable navigation is retained because it preserves quick access to learning tools on small screens.
+- The homepage, gallery/reviews pages, shop/order-tracking pages and kit-order page use different header layouts and page-specific actions. A forced one-size-fits-all header rewrite would risk breaking cart, tracking, WhatsApp and contextual kit-order flows. Those specialised layouts are retained for this pass; navigation consistency remains a targeted follow-up rather than an unsafe global markup replacement.
+- The final lesson (Module 29) intentionally has no next-lesson destination. It is the approved end of the current finite curriculum, not a missing or pending module.
+- A source-level search for the word "pending" is not sufficient to identify a pending navigation control because it also occurs in ordinary lesson prose (for example, "depending"). No new Module 30 or placeholder destination has been introduced.
+
+### Verification limits
+
+- The stylesheet change was committed to `feature/stem-learning-platform` only.
+- Source inspection confirms the shared theme file contains the new rules. No live-browser rendering, automated accessibility scan, mobile-device test or production deployment was performed as part of this source-only pass.
+- The branch remains separate from `main`; no merge or deployment was performed.
+
+
+## Follow-up navigation and contrast refinements: 2026-11-20
+
+### Changes applied
+
+- Updated `assets/css/site-theme.css` additively so the main horizontal navigation and STEM learning navigation use a shared compact pill treatment, consistent spacing, link sizing, hover states and horizontal scrolling on narrow screens.
+- Added shared dark-mode safeguards for custom project-kit rows, secondary text and item links. The project gallery already has local overrides for these elements; the shared rules also protect the same component pattern if it appears on another page.
+- Kept each page's contextual actions and responsive layout. The shop and tracking pages retain their collapsible menu; STEM pages retain their dedicated learning navigation; kit ordering retains its return-to-gallery context.
+
+### Source checks
+
+- Reviewed the navigation markup on the homepage, project gallery, reviews, shop, tracking, kit-order, Retailer Price Finder, STEM Lab, lesson directory and representative standalone lessons.
+- Reviewed the final module navigation sequence and sampled earlier lesson navigation links. The visible next-lesson links examined point to named lesson pages; Module 29 remains the intentional endpoint with no next lesson.
+- Searches for `pending` and `disabled` also match ordinary lesson prose and interactive teaching-code variables. Those matches were not treated as pending navigation controls without corresponding UI evidence.
+- The project gallery's own dark-mode rules already cover `.kit-line` and `.kit-manual`; the shared safeguards are additive protection, not a claim that the gallery-specific fix was newly introduced.
+
+### Remaining verification
+
+- These changes are committed to `feature/stem-learning-platform` only. No merge to `main`, production deployment, Firestore modification or Firebase configuration change was made.
+- This was a source-level review. Live browser rendering, screen-reader testing, automated contrast measurements and real-device responsive testing remain outstanding.
+
+- A second SVG contrast check found Module 24's dark-theme rule changed pale gate-diagram blocks to dark green while retaining dark green label text. Added a matching dark-mode text override for those label groups. Also brightened shared dark-mode error, success and teal action text used by the kit-order flow, and the shop's dark-mode error state.
+
+- Standardised the footer navigation on STEM Lab, Project Playground, the learning directory, resistor calculator and all 29 lesson pages. Each now provides the same eight core destinations, with responsive wrapping rather than page-specific link sets or missing footer links.
+
+
+## Additional main-site and utility-page pass: 2026-11-20
+
+### Corrections applied
+
+- Added an explicit current-page Reviews destination to the Reviews page's horizontal navigation. Previously, the page linked to the other main destinations but omitted Reviews itself.
+- Removed the duplicate second inclusion of `js/site-theme.js` from `kit-order.html`. The shared theme controller was already loaded earlier on that page; the second load was redundant.
+
+### Additional observations
+
+- The shop and order-tracking pages use a separate Tailwind `.dark` class theme controller rather than the shared `data-theme` controller. Both initialise from the same `eazylife-theme` local-storage key and update the logo and toggle icon. Their separate implementation is retained to avoid binding a second theme toggle or disturbing their cart and tracking interactions.
+- The Reviews and project-gallery pages use the shared theme stylesheet/controller. Their horizontal navigation now receives the shared link treatment.
+- The Retailer Price Finder and admin pages load the shared theme layer. The Retailer tool has a working home link and theme control; admin pages retain their dedicated admin workflow.
+- The MAYTECH microsite and receipt generator under `maytechng/` and `r/` have their own distinct visual systems and workflows. They were not forced into EazyLife's customer-site navigation or theme.
+- The kit-order page intentionally retains its focused project-order header.
+
+### Verification limits
+
+- Re-fetched the updated Reviews and kit-order files after committing and confirmed the source changes.
+- No Firebase, Firestore, pricing, order, customer, admin, or receipt-generation logic was changed.
+- Live browser checks, visual comparison at multiple viewport widths, automated contrast calculations, and end-to-end order/review workflows remain unperformed.
+
 - Follow-up presentation correction: Module 21 knowledge-check cards now use the same `.ael-quiz` / `.ael-q` button-and-feedback markup and shared `stem-advanced.js` interaction used by Module 20. Confirmed four quiz cards, twelve answer buttons, four live feedback areas, balanced section tags and shared script inclusion. This corrects the earlier incompatible radio-input quiz markup.

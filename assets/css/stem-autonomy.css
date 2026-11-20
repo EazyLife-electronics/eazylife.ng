@@ -1,0 +1,19 @@
+/* Module 21: robotics sensors, navigation and autonomy */
+.aut-card{background:var(--el-card,var(--el-bg,#fff));border:1px solid var(--el-border,rgba(120,130,140,.24));border-radius:14px;padding:20px;margin:16px 0;min-width:0}
+.aut-card h3{margin-top:0}
+.aut-card svg{display:block;width:100%;height:auto;max-height:390px}
+.aut-caption,.aut-note{font-size:.9rem;opacity:.82;line-height:1.6}
+.aut-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch}
+.aut-grid>.aut-card{margin:0}
+.aut-input-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}
+.aut-input-grid label{display:grid;gap:6px;font-weight:600}
+.aut-input-grid input{width:100%;min-width:0;padding:10px;border:1px solid var(--el-border,rgba(120,130,140,.35));border-radius:8px;background:var(--el-card,var(--el-bg,#fff));color:inherit}
+.aut-results{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:18px}
+.aut-results>div{padding:12px;border-radius:9px;background:var(--el-soft,rgba(22,134,110,.07));display:grid;gap:7px;min-width:0}
+.aut-results span{font-size:.82rem;opacity:.8}
+.aut-results strong{font-size:1.05rem;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.aut-card pre{overflow-x:auto;white-space:pre}
+.aut-card pre code{font-size:.82rem;line-height:1.6}
+.aut-card li{margin:7px 0}
+@media(max-width:760px){.aut-grid{grid-template-columns:1fr}.aut-results{grid-template-columns:1fr}.aut-card{padding:15px}}
+@media(max-width:420px){.aut-input-grid{grid-template-columns:1fr}}

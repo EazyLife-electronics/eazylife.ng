@@ -1,0 +1,92 @@
+/* Module 04: Resistors in Practical Circuits */
+.rpc-hero{padding:58px 0;background:linear-gradient(125deg,#e8faf4,#f2f9e8 60%,#eaf5f4);color:#17382f}
+.rpc-hero-inner{display:grid;grid-template-columns:1.15fr .85fr;align-items:center;gap:35px}
+.rpc-hero h1{font:800 clamp(2.5rem,5.5vw,4.4rem)/1.05 Poppins,sans-serif;letter-spacing:-.045em;margin:14px 0}
+.rpc-hero h1 em{font-style:normal;color:#009d88}.rpc-hero p{max-width:700px;color:#587168;line-height:1.8;font-size:.94rem}
+.rpc-hero-art{height:270px;position:relative;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:22px;color:#31594e;font:800 .7rem Poppins,sans-serif;letter-spacing:.14em;text-align:center}
+.rpc-orbit{position:absolute;width:220px;height:220px;border:1px dashed #00a99070;border-radius:50%;box-shadow:0 0 0 22px #00a9900b,0 0 0 44px #00a99008}
+.rpc-resistor{position:relative;z-index:1;width:190px;height:55px;border:2px solid #8a693e;border-radius:12px;background:#ead5ad;display:flex;align-items:center;justify-content:space-evenly;box-shadow:0 14px 35px #17382f20}
+.rpc-resistor:before,.rpc-resistor:after{content:"";position:absolute;left:-48px;right:-48px;height:3px;background:#9b9b91;z-index:-1}
+.rpc-resistor span{height:100%;width:7px;background:#b68b47}.rpc-resistor i{height:100%;width:9px;background:#6b3b25}.rpc-resistor i:nth-of-type(2){background:#2e4d8a}.rpc-resistor i:nth-of-type(3){background:#bd8730}
+.rpc-purpose-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}
+.rpc-purpose{padding:19px;border:1px solid var(--el-border);border-radius:14px;background:var(--el-surface)}
+.rpc-purpose>span{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--el-soft);color:var(--el-teal);font:800 .8rem Poppins,sans-serif}
+.rpc-purpose h3{font:700 .96rem Poppins,sans-serif;margin:13px 0 7px}.rpc-purpose p{font-size:.75rem;line-height:1.7;color:var(--el-muted);min-height:112px}.rpc-purpose>b{font-size:.67rem;color:var(--el-teal)}
+.rpc-soft{background:var(--el-soft)}
+.rpc-note{display:flex;gap:12px;margin-top:17px;padding:14px 16px;border:1px solid var(--el-border);border-radius:12px;background:var(--el-soft);color:var(--el-muted)}
+.rpc-note>i{color:var(--el-teal);margin-top:3px}.rpc-note p{font-size:.76rem;line-height:1.7;margin:0}.rpc-note a{color:var(--el-teal);font-weight:800}
+.rpc-calculator-grid,.rpc-divider-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:15px}
+.rpc-panel,.rpc-result-panel,.rpc-divider-results{padding:22px;border:1px solid var(--el-border);border-radius:15px;background:var(--el-surface)}
+.rpc-field{display:grid;gap:6px;margin-bottom:13px}.rpc-field label{font-size:.75rem;font-weight:800}
+.rpc-field input{width:100%;padding:11px 12px;border:1px solid var(--el-border);border-radius:9px;background:var(--el-surface);color:var(--el-text);font:600 .86rem 'DM Sans',sans-serif}
+.rpc-field input:focus{outline:2px solid var(--el-teal);outline-offset:2px}
+.rpc-feedback{font-size:.72rem;line-height:1.6;color:var(--el-muted);min-height:22px;margin:12px 0 0}
+.rpc-result-panel{background:#153e35;color:#eef8f1;border-color:#153e35}
+.rpc-result-panel>span{font-size:.63rem;font-weight:900;letter-spacing:.13em;color:#a8d9bc}
+.rpc-result-panel>strong{display:block;font:800 clamp(2rem,4vw,3rem)/1.2 Poppins,sans-serif;margin:12px 0 18px;overflow-wrap:anywhere}
+.rpc-result-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.rpc-result-grid>div{padding:11px;border-radius:9px;background:#ffffff12}
+.rpc-result-grid small{display:block;font-size:.64rem;color:#c4dbce}.rpc-result-grid b{display:block;margin-top:5px;font:700 .83rem Poppins,sans-serif;color:#fff}
+.rpc-equation{margin-top:15px;padding:12px;border-radius:9px;background:#ffffff12;color:inherit;font:600 .73rem/1.6 'DM Sans',sans-serif;overflow-wrap:anywhere}
+.rpc-power-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.rpc-power-card,.rpc-combine-card,.rpc-build-card{padding:21px;border:1px solid var(--el-border);border-radius:14px;background:var(--el-surface)}
+.rpc-power-card h3,.rpc-combine-card h3,.rpc-build-card h3{font:700 1rem Poppins,sans-serif;margin:0 0 9px}
+.rpc-power-card p,.rpc-combine-card p,.rpc-build-card li{font-size:.76rem;line-height:1.7;color:var(--el-muted)}
+.rpc-formulas{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}.rpc-formulas b{padding:10px 12px;border-radius:9px;background:var(--el-soft);color:var(--el-teal);font:800 .9rem Poppins,sans-serif}
+.rpc-rating-list{display:grid;gap:8px;margin:13px 0}.rpc-rating-list span{padding:9px 11px;border-radius:8px;background:var(--el-soft);font-size:.72rem;color:var(--el-muted)}.rpc-rating-list b{color:var(--el-teal)}
+.rpc-small{font-size:.7rem!important;color:var(--el-muted)!important;line-height:1.65}
+.rpc-warning{display:flex;gap:12px;margin-top:15px;padding:14px;border:1px solid #d9770640;border-radius:12px;background:#d9770610;color:var(--el-text)}
+.rpc-warning>i{color:#d97706;margin-top:3px}.rpc-warning strong{font-size:.8rem}.rpc-warning p{margin:5px 0 0;font-size:.74rem;line-height:1.7;color:var(--el-muted)}
+.rpc-divider-results{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-content:start}
+.rpc-divider-results>div:not(.rpc-equation){padding:13px;border-radius:10px;background:var(--el-soft)}
+.rpc-divider-results span{display:block;font-size:.66rem;color:var(--el-muted)}.rpc-divider-results strong{display:block;margin-top:5px;color:var(--el-teal);font:800 1rem Poppins,sans-serif;overflow-wrap:anywhere}
+.rpc-divider-results .rpc-equation{grid-column:1/-1;background:var(--el-soft);color:var(--el-muted)}
+.rpc-combine-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.rpc-mini-circuit{height:70px;margin:10px 0;display:flex;align-items:center;justify-content:center;gap:12px;background:var(--el-soft);border-radius:10px}
+.rpc-mini-circuit span{padding:9px 14px;border:2px solid #b68b47;border-radius:6px;background:#f1dfbd;color:#553c1d;font-size:.7rem;font-weight:900}
+.rpc-mini-circuit i{width:35px;height:2px;background:var(--el-muted)}.rpc-mini-circuit.parallel{gap:25px}.rpc-mini-circuit.parallel i{width:2px;height:32px;box-shadow:10px 0 var(--el-muted),-10px 0 var(--el-muted)}
+.rpc-combine-card>b{font:800 .82rem Poppins,sans-serif;color:var(--el-teal)}
+.rpc-pot-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:25px;align-items:center}
+.rpc-pot-art{min-height:170px;padding:20px;display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;border:1px solid var(--el-border);border-radius:14px;background:var(--el-surface);font-size:.65rem;font-weight:900;color:var(--el-muted)}
+.rpc-track{position:relative;width:65%;height:18px;border:3px solid #9b794c;border-radius:99px;background:linear-gradient(90deg,#d5b77d,#f0e0bf)}
+.rpc-track i{position:absolute;top:-12px;left:48%;width:3px;height:36px;background:var(--el-teal)}.rpc-track b{position:absolute;top:-17px;left:calc(48% - 6px);width:15px;height:12px;border-radius:4px;background:var(--el-teal)}
+.rpc-pot-art small{width:100%;text-align:center;letter-spacing:.1em}
+.rpc-pot-grid h3{font:700 1rem Poppins,sans-serif}.rpc-list{padding-left:19px}.rpc-list li{margin:9px 0;font-size:.77rem;line-height:1.7;color:var(--el-muted)}
+.rpc-build-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:14px}
+.rpc-build-card h3 i{color:var(--el-teal);margin-right:6px}.rpc-build-card ul,.rpc-build-card ol{padding-left:20px}.rpc-build-card li{margin:6px 0}
+.rpc-observation{margin-top:15px;padding:17px;border:1px solid var(--el-border);border-radius:13px;background:var(--el-soft);display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.rpc-observation h3{grid-column:1/-1;margin:0;font:700 .9rem Poppins,sans-serif}.rpc-observation>div{display:grid;gap:4px}.rpc-observation span{font-size:.66rem;color:var(--el-muted)}.rpc-observation b{font:800 .95rem Poppins,sans-serif;color:var(--el-teal)}.rpc-observation p{grid-column:1/-1;margin:0;font-size:.7rem;color:var(--el-muted);line-height:1.6}
+.rpc-mistakes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rpc-mistakes article{padding:17px;border:1px solid var(--el-border);border-radius:12px;background:var(--el-surface)}
+.rpc-mistakes b{font:700 .82rem Poppins,sans-serif}.rpc-mistakes p{margin:7px 0 0;font-size:.73rem;line-height:1.65;color:var(--el-muted)}
+.rpc-quiz{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rpc-question{padding:17px;border:1px solid var(--el-border);border-radius:13px;background:var(--el-surface)}
+.rpc-question h3{font:700 .82rem/1.5 Poppins,sans-serif;min-height:64px;margin:0 0 12px}
+.rpc-question button{display:block;width:100%;margin:7px 0;padding:9px 10px;text-align:left;border:1px solid var(--el-border);border-radius:8px;background:var(--el-soft);color:var(--el-text);font-size:.7rem;cursor:pointer}
+.rpc-question button:focus-visible{outline:2px solid var(--el-teal);outline-offset:2px}.rpc-question button:disabled{cursor:default;opacity:.78}
+.rpc-question button.correct{border-color:#15966e;background:#15966e18}.rpc-question button.incorrect{border-color:#c65a50;background:#c65a5018}
+.rpc-question>p{min-height:34px;margin:9px 0 0;font-size:.69rem;line-height:1.5;color:var(--el-muted)}
+:root[data-theme="dark"] .rpc-hero{background:var(--el-surface);color:var(--el-text)}
+:root[data-theme="dark"] .rpc-hero p{color:var(--el-muted)}
+:root[data-theme="dark"] .rpc-hero h1{color:var(--el-text)}
+:root[data-theme="dark"] .rpc-resistor{border-color:#9a835e;background:#d8c39e}
+@media(max-width:900px){.rpc-purpose-grid{grid-template-columns:repeat(2,1fr)}.rpc-mistakes{grid-template-columns:repeat(2,1fr)}.rpc-quiz{grid-template-columns:1fr}.rpc-question h3{min-height:0}}
+@media(max-width:720px){.rpc-hero-inner,.rpc-calculator-grid,.rpc-divider-grid,.rpc-power-grid,.rpc-combine-grid,.rpc-pot-grid,.rpc-build-grid{grid-template-columns:1fr}.rpc-hero-art{height:190px}.rpc-observation{grid-template-columns:repeat(2,1fr)}.rpc-divider-results{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.rpc-purpose-grid,.rpc-mistakes{grid-template-columns:1fr}.rpc-purpose p{min-height:0}.rpc-result-grid{grid-template-columns:1fr 1fr}.rpc-observation{grid-template-columns:1fr 1fr}.rpc-divider-results{grid-template-columns:1fr}}
+
+
+/* Voltage-divider teaching diagram */
+.rpc-divider-diagram{margin:0 0 18px;padding:18px 20px;border:1px solid var(--el-border);border-radius:16px;background:var(--el-surface);color:var(--el-text)}
+.rpc-divider-diagram-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:8px}
+.rpc-divider-diagram-heading strong{font:700 .95rem Poppins,sans-serif}
+.rpc-divider-diagram-heading span{font-size:.68rem;color:var(--el-muted)}
+.rpc-divider-diagram svg{display:block;width:100%;height:auto;max-height:390px;color:var(--el-text)}
+.rpc-divider-diagram figcaption{margin-top:8px;padding:12px 14px;border-radius:10px;background:var(--el-soft);font-size:.74rem;line-height:1.7;color:var(--el-muted)}
+.rpc-divider-diagram figcaption b{color:var(--el-text)}
+.rpc-divider-key{display:flex;flex-wrap:wrap;gap:16px;margin-top:12px;font-size:.67rem;color:var(--el-muted)}
+.rpc-divider-key span{display:inline-flex;align-items:center;gap:7px}
+.rpc-key-node{width:9px;height:9px;border-radius:50%;background:#079b86}
+.rpc-key-resistor{width:17px;height:9px;border:2px solid #b27a2d;border-radius:2px}
+.rpc-key-ground{width:15px;height:2px;background:#079b86;position:relative}
+.rpc-key-ground:after{content:"";position:absolute;left:4px;top:3px;width:7px;height:2px;background:#079b86}
+@media(max-width:520px){.rpc-divider-diagram{padding:13px 10px}.rpc-divider-diagram-heading{display:grid;gap:3px}.rpc-divider-diagram svg{min-width:0}.rpc-divider-key{gap:9px}}

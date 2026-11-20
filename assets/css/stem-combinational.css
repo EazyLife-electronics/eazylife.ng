@@ -1,0 +1,27 @@
+/* Module 24: Combinational Logic Design */
+.combo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;margin:18px 0}
+.combo-grid>.ael-card,.combo-blocks>.ael-card{min-width:0}
+.combo-grid svg,.combo-blocks svg{display:block;width:100%;height:auto}
+.combo-identities p{padding:9px 11px;margin:7px 0;border-radius:7px;background:var(--el-soft)}
+.combo-kmap,.combo-table{width:100%;border-collapse:collapse;background:var(--el-surface);color:var(--el-text);font-size:.88rem}
+.combo-kmap th,.combo-kmap td,.combo-table th,.combo-table td{padding:10px 13px;border:1px solid var(--el-border);text-align:center}
+.combo-kmap th,.combo-table th{background:var(--el-soft);font-weight:800}
+.combo-blocks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;margin:18px 0}
+.combo-table-wrap{width:100%;overflow-x:auto;margin:14px 0}
+.combo-table tbody tr.active{background:#00a99022;outline:2px solid var(--el-teal);outline-offset:-2px}
+.combo-sim{display:grid;grid-template-columns:.9fr 1.1fr;gap:15px;margin:18px 0}
+.combo-inputs{display:flex;gap:12px;flex-wrap:wrap;margin:18px 0}
+.combo-inputs>div{display:grid;gap:8px;min-width:130px;flex:1}
+.combo-inputs span,.combo-result small{font-size:.72rem;font-weight:800;letter-spacing:.08em;color:var(--el-muted)}
+.combo-inputs button{padding:12px;border:1px solid var(--el-border);border-radius:9px;background:var(--el-soft);color:var(--el-text);font-weight:800;cursor:pointer}
+.combo-inputs button[aria-pressed="true"]{background:#159b83;color:#fff;border-color:#159b83}
+.combo-result{padding:16px;border-radius:11px;background:var(--el-soft);margin-top:12px}
+.combo-result small{display:block}
+.combo-result strong{display:block;font:800 1.7rem Poppins,sans-serif;color:var(--el-teal);margin:5px 0}
+.combo-result p{font-size:.82rem;margin:0}
+.combo-steps{padding-left:22px}
+.combo-steps li{margin:8px 0}
+:root[data-theme="dark"] .combo-grid svg [fill="#dff3eb"],:root[data-theme="dark"] .combo-blocks svg [fill="#dff3eb"]{fill:#21463e}
+@media(max-width:760px){.combo-grid,.combo-sim,.combo-blocks{grid-template-columns:1fr}}
+
+:root[data-theme="dark"] .combo-grid svg g[fill="#153b34"],:root[data-theme="dark"] .combo-blocks svg g[fill="#153b34"]{fill:#eef2f0}

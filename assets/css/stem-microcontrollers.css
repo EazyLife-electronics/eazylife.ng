@@ -1,0 +1,9 @@
+/* Module 17: microcontrollers and embedded programming */
+.ael-card pre{overflow-x:auto;white-space:pre}
+.ael-card pre code{font-size:.82rem;line-height:1.6}
+.ael-card svg{max-width:100%;height:auto}
+.ael-table-wrap{overflow-x:auto}
+.ael-table-wrap table{width:100%;border-collapse:collapse;min-width:620px}
+.ael-table-wrap th,.ael-table-wrap td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--el-border,rgba(120,130,140,.25));vertical-align:top}
+.ael-table-wrap th{font-weight:700}
+@media(max-width:600px){.ael-card pre code{font-size:.74rem}.ael-card{overflow:hidden}}
