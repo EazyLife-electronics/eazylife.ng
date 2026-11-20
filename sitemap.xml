@@ -108,6 +108,14 @@
     <priority>0.82</priority>
   </url>
 
+  <!-- Module 11: Power Supplies and Voltage Regulation -->
+  <url>
+    <loc>https://eazylife.ng/stem-power-supplies-regulation.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
   <!-- Resistor colour-code calculator -->
   <url>
     <loc>https://eazylife.ng/stem-resistor-colour-code.html</loc>
