@@ -1,0 +1,19 @@
+/* Search and category controls for the Electronics Fundamentals directory. */
+.sl-directory-tools{display:grid;grid-template-columns:minmax(220px,1fr) minmax(190px,.55fr) auto;gap:12px;align-items:end;margin:24px 0 10px;padding:16px;border:1px solid var(--el-border);border-radius:15px;background:var(--el-surface)}
+.sl-directory-search{position:relative;min-width:0}
+.sl-directory-search>i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--el-muted);pointer-events:none}
+.sl-directory-search input,.sl-directory-filter select{width:100%;min-height:45px;border:1px solid var(--el-border);border-radius:9px;background:var(--el-bg);color:var(--el-text);font:500 .82rem 'DM Sans',sans-serif;outline:none}
+.sl-directory-search input{padding:10px 13px 10px 40px}
+.sl-directory-filter{display:grid;gap:5px}
+.sl-directory-filter label{font-size:.68rem;font-weight:800;color:var(--el-muted)}
+.sl-directory-filter select{padding:9px 12px}
+.sl-directory-search input:focus,.sl-directory-filter select:focus{border-color:var(--el-teal);box-shadow:0 0 0 3px color-mix(in srgb,var(--el-teal) 16%,transparent)}
+.sl-directory-clear{min-height:45px;padding:0 15px;border:1px solid var(--el-border);border-radius:9px;background:var(--el-soft);color:var(--el-text);font-size:.75rem;font-weight:800;cursor:pointer}
+.sl-directory-clear:hover{border-color:var(--el-teal);color:var(--el-teal)}
+.sl-directory-status{display:flex;justify-content:space-between;gap:12px;margin:0 2px 16px;color:var(--el-muted);font-size:.7rem}
+.sl-directory-status #sl-module-count{font-weight:900;color:var(--el-teal)}
+.sl-no-results{padding:25px;border:1px dashed var(--el-border);border-radius:12px;text-align:center;color:var(--el-muted);font-size:.85rem}
+.sl-path-card[hidden]{display:none!important}
+.sl-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:700px){.sl-directory-tools{grid-template-columns:1fr 1fr}.sl-directory-search{grid-column:1/-1}.sl-directory-clear{width:100%}}
+@media(max-width:420px){.sl-directory-tools{grid-template-columns:1fr}.sl-directory-search{grid-column:auto}.sl-directory-status{flex-direction:column;gap:3px}}
