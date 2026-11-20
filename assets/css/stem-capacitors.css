@@ -1,0 +1,75 @@
+/* Module 06: capacitors and energy storage */
+.cel-hero{padding:62px 0 54px;background:linear-gradient(125deg,#e8faf3,#f4fbe9 58%,#eef8f7);color:#183b31;overflow:hidden}
+.cel-hero-inner{display:grid;grid-template-columns:1.15fr .85fr;align-items:center;gap:40px}
+.cel-hero h1{font:800 clamp(2.7rem,5vw,4.5rem)/1.08 Poppins,sans-serif;letter-spacing:-.055em;margin:17px 0;color:#17382f}
+.cel-hero h1 em{font-style:normal;color:#00a990}.cel-hero p{max-width:650px;color:#59736a;line-height:1.85;margin:0 0 22px}
+.cel-hero-art{height:230px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+.cel-hero-art strong{font:800 .7rem Poppins,sans-serif;letter-spacing:.14em;color:#008d79}.cel-hero-art small{font-size:.6rem;letter-spacing:.12em;color:#70958a}
+.cel-cap-symbol{height:100px;width:180px;display:flex;align-items:center;justify-content:center;gap:12px;position:relative}
+.cel-cap-symbol:before,.cel-cap-symbol:after{content:"";height:3px;width:56px;background:#168b77}
+.cel-cap-symbol i,.cel-cap-symbol b{height:85px;width:8px;border-radius:4px;background:#168b77;display:block;box-shadow:0 10px 25px #168b7730}
+.cel-cap-symbol b{background:#9bbd48}
+.cel-two-col{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.cel-card{padding:21px;border:1px solid var(--el-border);border-radius:15px;background:var(--el-surface);min-width:0}
+.cel-card h3{font:700 .98rem Poppins,sans-serif;margin:0 0 11px;color:var(--el-text)}
+.cel-card p,.cel-card li{font-size:.79rem;line-height:1.7;color:var(--el-muted)}
+.cel-card p:last-child{margin-bottom:0}.cel-card svg{width:100%;height:auto;max-height:200px;display:block;margin:5px 0 13px}
+.cel-equation{padding:12px 14px;border-radius:10px;background:var(--el-soft);color:var(--el-teal);font:800 1.1rem Poppins,sans-serif;margin:12px 0}
+.cel-list{padding-left:20px;margin:8px 0}
+.cel-note{display:flex;gap:11px;padding:14px 16px;border-radius:12px;background:#00a99012;margin-top:17px;color:var(--el-text);font-size:.78rem}
+.cel-note i{color:var(--el-teal);margin-top:3px}.cel-note p{margin:0;line-height:1.65}
+.cel-note.warning{background:#f59e0b15}.cel-note.warning i{color:#d97706}
+.cel-soft{background:var(--el-soft)}
+.cel-types-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}
+.cel-type-visual{height:100px;border-radius:11px;background:var(--el-soft);display:flex;align-items:center;justify-content:center;margin-bottom:14px;font:800 1.2rem Poppins,sans-serif;color:var(--el-teal);letter-spacing:.08em}
+.cel-type-visual.ceramic{width:100%;background:linear-gradient(135deg,#e9d9b8,#b9a17c);color:#493d2d}
+.cel-type-visual.film{background:linear-gradient(135deg,#dce9df,#b6d2bd);color:#315c48}
+.cel-type-visual.electrolytic{width:70px;height:95px;margin:2px auto 17px;border-radius:14px 14px 9px 9px;background:linear-gradient(90deg,#68717a,#222a31);color:#fff;display:flex;flex-direction:column;gap:18px}
+.cel-type-visual.electrolytic span{color:#a6e8ad}.cel-type-visual.electrolytic b{font-size:.8rem;color:#fff}
+.cel-type-visual.tantalum{width:105px;height:70px;margin:15px auto 29px;border-radius:10px;background:linear-gradient(135deg,#c9a44c,#806127);color:#fff}
+.cel-types-grid .cel-card h3{text-align:center}.cel-types-grid .cel-card p{margin-bottom:0}
+.cel-symbol-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.cel-symbol-grid svg{max-height:120px}
+.cel-lab-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:15px;align-items:start}
+.cel-field{display:grid;gap:6px;margin:0 0 14px}.cel-field label{font-size:.75rem;font-weight:800;color:var(--el-text)}
+.cel-field input,.cel-field select{width:100%;min-height:42px;border:1px solid var(--el-border);border-radius:9px;background:var(--el-bg);color:var(--el-text);padding:9px 11px;font:600 .82rem 'DM Sans',sans-serif}
+.cel-field input[type=range]{accent-color:var(--el-teal);padding:0}
+.cel-field input:focus,.cel-field select:focus{outline:2px solid var(--el-teal);outline-offset:2px}
+.cel-lab-actions{display:flex;flex-wrap:wrap;gap:8px;margin:7px 0 12px}.cel-lab-actions .sl-button{font-size:.7rem;padding:10px 13px}
+.cel-feedback{font-size:.74rem;line-height:1.6;color:var(--el-muted);min-height:40px;margin:8px 0 0}
+.cel-output{border:1px solid var(--el-border);border-radius:15px;background:var(--el-surface);padding:18px;min-width:0}
+.cel-circuit{border-radius:11px;background:var(--el-soft);padding:8px}.cel-circuit svg{width:100%;height:auto;max-height:160px}
+.cel-readings{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:13px 0}
+.cel-readings>div,.cel-energy-grid>div{padding:11px;border-radius:9px;background:var(--el-soft);min-width:0}
+.cel-readings span,.cel-energy-grid small{display:block;color:var(--el-muted);font-size:.62rem;line-height:1.4}
+.cel-readings strong,.cel-energy-grid b{display:block;font:800 .9rem Poppins,sans-serif;color:var(--el-text);margin-top:5px;overflow-wrap:anywhere}
+.cel-progress-label{display:flex;justify-content:space-between;gap:8px;font-size:.68rem;color:var(--el-muted);margin-bottom:6px}.cel-progress-label b{color:var(--el-teal)}
+.cel-progress{height:9px;border-radius:99px;background:var(--el-soft);overflow:hidden}.cel-progress span{display:block;width:63.2%;height:100%;background:linear-gradient(90deg,#00a990,#9bc64a);border-radius:99px;transition:width .2s}
+.cel-chart-wrap{margin-top:15px;padding:12px;border:1px solid var(--el-border);border-radius:11px}
+.cel-chart-title{display:flex;justify-content:space-between;gap:10px;align-items:center}.cel-chart-title b{font:700 .75rem Poppins,sans-serif}.cel-chart-title small{font-size:.62rem;color:var(--el-muted)}
+.cel-chart-wrap svg{width:100%;height:auto;display:block;margin-top:8px}
+.cel-energy-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+.cel-model-note,.cel-small{font-size:.68rem!important;color:var(--el-muted);line-height:1.6;margin:12px 0 0}
+.cel-calc-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:15px}
+.cel-calc-result{padding:14px;border-radius:11px;background:var(--el-soft);margin-top:8px}
+.cel-calc-result span{display:block;color:var(--el-muted);font-size:.68rem}.cel-calc-result strong{display:block;color:var(--el-teal);font:800 1.35rem Poppins,sans-serif;margin-top:5px}
+.cel-uses-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}
+.cel-use-icon{width:40px;height:40px;border-radius:12px;background:#00a99015;color:var(--el-teal);display:grid;place-items:center;margin-bottom:12px}
+.cel-ripple{margin-top:15px}.cel-ripple svg{max-height:145px}.cel-spec-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.cel-spec-grid>div{padding:15px;border:1px solid var(--el-border);border-radius:11px;background:var(--el-surface)}
+.cel-spec-grid b{display:block;font:800 .95rem Poppins,sans-serif;color:var(--el-teal)}.cel-spec-grid span{display:block;font-size:.68rem;font-weight:800;margin-top:3px}.cel-spec-grid p{font-size:.68rem;color:var(--el-muted);line-height:1.6;margin:7px 0 0}
+.cel-card ol{padding-left:20px;margin:9px 0 0}.cel-card ol li{padding:3px 0}
+.cel-mistakes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.cel-mistakes article{padding:18px;border:1px solid var(--el-border);border-radius:12px;background:var(--el-surface)}
+.cel-mistakes h3{font:700 .83rem Poppins,sans-serif;margin:0 0 7px}.cel-mistakes p{font-size:.75rem;line-height:1.6;color:var(--el-muted);margin:0}
+.cel-quiz{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.cel-question{padding:17px;border:1px solid var(--el-border);border-radius:13px;background:var(--el-surface)}
+.cel-question h3{font:700 .82rem/1.5 Poppins,sans-serif;min-height:62px;margin:0 0 10px}
+.cel-question button{display:block;width:100%;margin:7px 0;padding:9px 10px;text-align:left;border:1px solid var(--el-border);border-radius:8px;background:var(--el-soft);color:var(--el-text);font-size:.7rem;cursor:pointer}
+.cel-question button:focus-visible{outline:2px solid var(--el-teal);outline-offset:2px}.cel-question button:disabled{cursor:default;opacity:.8}
+.cel-question button.correct{border-color:#15966e;background:#15966e18}.cel-question button.incorrect{border-color:#c65a50;background:#c65a5018}
+.cel-question p{min-height:30px;margin:8px 0 0;font-size:.68rem;line-height:1.5;color:var(--el-muted)}
+:root[data-theme="dark"] .cel-hero{background:var(--el-surface);color:var(--el-text)}
+:root[data-theme="dark"] .cel-hero h1{color:var(--el-text)}:root[data-theme="dark"] .cel-hero p{color:var(--el-muted)}
+@media(max-width:900px){.cel-types-grid,.cel-uses-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.cel-quiz{grid-template-columns:1fr}.cel-question h3{min-height:0}}
+@media(max-width:720px){.cel-hero-inner,.cel-two-col,.cel-lab-grid,.cel-calc-grid{grid-template-columns:1fr}.cel-hero-art{height:170px}.cel-symbol-grid{grid-template-columns:1fr}}
+@media(max-width:520px){.cel-types-grid,.cel-uses-grid,.cel-spec-grid,.cel-mistakes{grid-template-columns:1fr}.cel-readings{gap:5px}.cel-readings>div{padding:8px}.cel-readings strong{font-size:.76rem}.cel-output,.cel-card{padding:15px}.cel-chart-title{align-items:flex-start;flex-direction:column}}
