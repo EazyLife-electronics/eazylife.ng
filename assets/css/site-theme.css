@@ -53,3 +53,79 @@ body{transition:background-color .18s ease,color .18s ease}
 :root[data-theme="dark"] textarea:focus-visible{outline:2px solid #69d9c4;outline-offset:3px}
 :root[data-theme="dark"] .nav-menu-panel a{color:var(--el-text)!important}
 :root[data-theme="dark"] .nav-menu-panel a:hover{background:var(--el-soft)!important}
+
+
+/* Shared navigation rhythm across the main site and STEM learning pages. */
+:root .nav-actions,
+:root .stem-nav-links,
+:root .sl-nav-links {
+  align-items:center;
+  gap:8px;
+  min-width:0;
+  scrollbar-width:none;
+}
+:root .nav-actions::-webkit-scrollbar,
+:root .stem-nav-links::-webkit-scrollbar,
+:root .sl-nav-links::-webkit-scrollbar { display:none; }
+:root .stem-nav-links a,
+:root .sl-nav-links a {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  flex:0 0 auto;
+  min-height:38px;
+  padding:9px 13px;
+  border:1px solid var(--el-border);
+  border-radius:999px;
+  background:var(--el-surface);
+  color:var(--el-text);
+  font-size:.78rem;
+  font-weight:700;
+  line-height:1.2;
+  white-space:nowrap;
+  text-decoration:none;
+}
+:root .stem-nav-links a:hover,
+:root .sl-nav-links a:hover,
+:root .stem-nav-links a.active,
+:root .sl-nav-links a.active {
+  border-color:var(--el-teal);
+  background:var(--el-soft);
+  color:var(--el-text);
+}
+:root .stem-nav-links .el-theme-toggle,
+:root .sl-nav-links .el-theme-toggle {
+  flex:0 0 38px;
+  width:38px;
+  height:38px;
+}
+@media(max-width:760px) {
+  :root .nav-actions,
+  :root .stem-nav-links,
+  :root .sl-nav-links {
+    overflow-x:auto;
+    overflow-y:hidden;
+    -webkit-overflow-scrolling:touch;
+  }
+}
+
+/* Dark-theme safeguards for custom project-kit rows and common white surfaces. */
+:root[data-theme="dark"] .kit-line,
+:root[data-theme="dark"] .kit-manual {
+  background:var(--el-surface)!important;
+  border-color:var(--el-border)!important;
+  color:var(--el-text)!important;
+}
+:root[data-theme="dark"] .kit-line strong,
+:root[data-theme="dark"] .kit-line-side,
+:root[data-theme="dark"] .kit-manual strong {
+  color:var(--el-text)!important;
+}
+:root[data-theme="dark"] .kit-line small,
+:root[data-theme="dark"] .kit-manual p {
+  color:var(--el-muted)!important;
+}
+:root[data-theme="dark"] .kit-line-side a {
+  color:#69d9c4!important;
+}
