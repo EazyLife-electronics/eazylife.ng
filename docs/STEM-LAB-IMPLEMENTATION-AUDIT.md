@@ -308,3 +308,15 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - Adds conceptual coverage of bistable latch, Schmitt-trigger hysteresis, control-voltage operation, PWM, VCO, missing-pulse detection, delay, debounce and tone generation.
 - Device caveats distinguish bipolar NE555 from CMOS 555 variants. The lesson warns that output drive and operating limits are device-dependent; inductive or motor loads require a suitable external driver and protection.
 - Source-level checks should confirm SVG integrity, IDs, calculator references, navigation, directory and sitemap. No browser QA or physical circuit build/measurement has been performed.
+
+
+## Module 11: Power Supplies and Voltage Regulation
+
+- Added `stem-power-supplies-regulation.html` as a standalone lesson after Module 10, with its own calculator script `js/stem-power.js`.
+- Covers the power-supply chain, full-wave bridge rectification, reservoir-capacitor smoothing, ripple frequency, linear regulation, 7805 pinout and bypassing, regulator thermal dissipation, buck-converter operation, line/load regulation, ripple/noise, supply selection and protection considerations.
+- Practical 1: regulated 5 V using a 7805 supplied from a current-limited extra-low-voltage DC bench source, with input/output bypass capacitors, load measurement and thermal observation.
+- Practical 2: configure and test a commercial adjustable buck module using a current-limited extra-low-voltage DC source; verify output before connecting a load.
+- Practical 3: compare regulated supply output under no-load and known resistive load; measure output change and observe temperature.
+- Interactive calculators estimate full-wave reservoir capacitance for a target ripple and illustrative 7805 power dissipation/junction temperature. Both disclose simplifying assumptions and the need to check exact component datasheets.
+- Safety boundary: no exposed mains construction or direct household-mains experiments. Use certified isolated extra-low-voltage AC sources or current-limited DC bench supplies only; no short-circuit testing by deliberate output shorting.
+- Module 10 next navigation, learning directory and sitemap updated. Source-level checks required for SVG integrity, IDs, JS references, page links, and XML structure. No browser rendering or physical hardware testing has been performed.
