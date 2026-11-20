@@ -170,3 +170,13 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - Each button uses a clear arrow, a small PREVIOUS LESSON / NEXT LESSON label and a short destination title. This makes navigation easier to notice and tap, especially on mobile.
 - Upcoming Module 04 is shown as a visually subdued, non-clickable button until its page is available.
 - Module 02 now links forward to the published Module 03 page.
+
+
+## Ohm's law calculator flexibility update
+
+- Updated Module 03's Ohm's law workbench to calculate any one of voltage, current or resistance from the other two values.
+- The example/reset state is now 2 V, blank current and 1,000 Ω, so current is the initially missing quantity.
+- The calculator requires exactly two entered values. If all three are filled, it asks the learner to clear the quantity they want calculated; if fewer than two are entered, it explains that two known values are required.
+- The calculated answer is written into the previously blank input field as well as shown in the result panel.
+- Validation allows zero voltage, but requires supplied current and resistance to be positive. Invalid inputs receive specific guidance.
+- Source-level validation should confirm all three calculation paths, default/reset values, and feedback states. This is not a substitute for interactive browser testing.
