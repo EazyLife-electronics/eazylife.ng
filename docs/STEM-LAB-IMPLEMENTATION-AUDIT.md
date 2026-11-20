@@ -297,3 +297,14 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - Device-specific statements use the original TI LM358 datasheet and distinguish it from LM358B/BA variants. The standard LM358 is not rail-to-rail; its input common-mode range does not extend to the positive rail and its output high level remains below that rail.
 - Safety boundary: extra-low-voltage 5 V only, current-limited supply recommended, no mains or safety-critical applications. The comparator activity is educational only; use a dedicated comparator and designed hysteresis for robust switching.
 - Source-level checks are required for SVG count, unique IDs, JavaScript references, asset links, directory/sitemap integration and calculator behaviour. Browser rendering, hardware build and measurement verification have not been performed.
+
+
+## Module 10: The 555 Timer, Timing, Oscillators and Control
+
+- Added `stem-555-timer-timing-oscillators.html` as a standalone lesson following Module 09. The new module replaces the previously planned immediate transition to Power Supplies and Regulation; power supplies remain a later topic.
+- Explains the simplified internal architecture: reference divider, trigger and threshold comparators, SR latch, output driver and discharge transistor; includes DIP-8 pinout and the nominal 1/3 VCC and 2/3 VCC thresholds.
+- Practical 1: NE555 astable LED flasher with RA = 10 kΩ, RB = 47 kΩ and C = 10 µF; includes timing equations, component list, connection instructions, expected capacitor/output behaviour and an interactive ideal timing calculator.
+- Practical 2: NE555 monostable one-shot using R = 100 kΩ and C = 10 µF for an approximately 1.1 s pulse; includes trigger pull-up and momentary active-low trigger arrangement.
+- Adds conceptual coverage of bistable latch, Schmitt-trigger hysteresis, control-voltage operation, PWM, VCO, missing-pulse detection, delay, debounce and tone generation.
+- Device caveats distinguish bipolar NE555 from CMOS 555 variants. The lesson warns that output drive and operating limits are device-dependent; inductive or motor loads require a suitable external driver and protection.
+- Source-level checks should confirm SVG integrity, IDs, calculator references, navigation, directory and sitemap. No browser QA or physical circuit build/measurement has been performed.
