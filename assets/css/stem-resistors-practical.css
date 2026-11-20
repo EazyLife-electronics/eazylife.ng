@@ -73,3 +73,20 @@
 @media(max-width:900px){.rpc-purpose-grid{grid-template-columns:repeat(2,1fr)}.rpc-mistakes{grid-template-columns:repeat(2,1fr)}.rpc-quiz{grid-template-columns:1fr}.rpc-question h3{min-height:0}}
 @media(max-width:720px){.rpc-hero-inner,.rpc-calculator-grid,.rpc-divider-grid,.rpc-power-grid,.rpc-combine-grid,.rpc-pot-grid,.rpc-build-grid{grid-template-columns:1fr}.rpc-hero-art{height:190px}.rpc-observation{grid-template-columns:repeat(2,1fr)}.rpc-divider-results{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.rpc-purpose-grid,.rpc-mistakes{grid-template-columns:1fr}.rpc-purpose p{min-height:0}.rpc-result-grid{grid-template-columns:1fr 1fr}.rpc-observation{grid-template-columns:1fr 1fr}.rpc-divider-results{grid-template-columns:1fr}}
+
+
+/* Voltage-divider teaching diagram */
+.rpc-divider-diagram{margin:0 0 18px;padding:18px 20px;border:1px solid var(--el-border);border-radius:16px;background:var(--el-surface);color:var(--el-text)}
+.rpc-divider-diagram-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:8px}
+.rpc-divider-diagram-heading strong{font:700 .95rem Poppins,sans-serif}
+.rpc-divider-diagram-heading span{font-size:.68rem;color:var(--el-muted)}
+.rpc-divider-diagram svg{display:block;width:100%;height:auto;max-height:390px;color:var(--el-text)}
+.rpc-divider-diagram figcaption{margin-top:8px;padding:12px 14px;border-radius:10px;background:var(--el-soft);font-size:.74rem;line-height:1.7;color:var(--el-muted)}
+.rpc-divider-diagram figcaption b{color:var(--el-text)}
+.rpc-divider-key{display:flex;flex-wrap:wrap;gap:16px;margin-top:12px;font-size:.67rem;color:var(--el-muted)}
+.rpc-divider-key span{display:inline-flex;align-items:center;gap:7px}
+.rpc-key-node{width:9px;height:9px;border-radius:50%;background:#079b86}
+.rpc-key-resistor{width:17px;height:9px;border:2px solid #b27a2d;border-radius:2px}
+.rpc-key-ground{width:15px;height:2px;background:#079b86;position:relative}
+.rpc-key-ground:after{content:"";position:absolute;left:4px;top:3px;width:7px;height:2px;background:#079b86}
+@media(max-width:520px){.rpc-divider-diagram{padding:13px 10px}.rpc-divider-diagram-heading{display:grid;gap:3px}.rpc-divider-diagram svg{min-width:0}.rpc-divider-key{gap:9px}}
