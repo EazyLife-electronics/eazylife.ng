@@ -148,6 +148,14 @@
     <priority>0.82</priority>
   </url>
 
+  <!-- Module 16: Digital Sensors and Communication Interfaces -->
+  <url>
+    <loc>https://eazylife.ng/stem-digital-sensors-communication-interfaces.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
   <!-- Resistor colour-code calculator -->
   <url>
     <loc>https://eazylife.ng/stem-resistor-colour-code.html</loc>
