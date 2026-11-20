@@ -285,3 +285,15 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - Retained the forced-beta BJT base-resistor estimator. Its displayed assumptions and controller output-current warnings remain important; the calculator is not a substitute for checking the actual GPIO output characteristics and transistor datasheet.
 - Safety boundary: the BJT activity is limited to a small LED load. The MOSFET activity uses a small extra-low-voltage brushed motor, separate suitably rated supply, current limiting, correctly oriented flyback diode and a verified logic-level MOSFET. Learners are warned about motor stall current and moving parts. No mains or high-energy switching is included.
 - Source-level checks and browser rendering should be completed before considering the lesson fully QA-approved. No physical build, motor-current measurement or hardware verification has been performed as part of this source update.
+
+
+## Module 09: Operational Amplifiers and Basic Analog Circuits — practical rebuild
+
+- Rebuilt `stem-op-amps-analog-circuits.html` as a standalone practical lesson with labelled SVG illustrations for the op-amp symbol, LM358 8-pin top-view pinout, negative-feedback concept, comparator circuit and non-inverting amplifier feedback circuit.
+- Added Practical 1: an LM358 threshold indicator using two 10 kΩ potentiometers, feed resistors that constrain both wiper voltages to approximately 0–2.5 V, a 2.2 kΩ LED current-limiting resistor and an active-low LED output. Includes a component list, pin-specific wiring sequence, measurement/observation tasks and explicit warning that LM358 is not a dedicated comparator.
+- Added Practical 2: a single-supply LM358 non-inverting DC amplifier using Rf = Rg = 10 kΩ for ideal gain 2. Includes a labelled feedback schematic, component list, pin-specific wiring steps and multimeter input/output observation task. The initial input is kept conservative to avoid driving the output into its upper swing limit.
+- Covers differential operation, negative feedback and virtual-short limitations, inverting/non-inverting gain, comparator and voltage-follower concepts, LM358 pin assignment, supply bypassing, common-mode range, output swing, gain-bandwidth, slew rate, device selection and troubleshooting.
+- Retained an interactive ideal gain calculator with a clearly labelled illustrative output limit; it is not a device-level emulator.
+- Device-specific statements use the original TI LM358 datasheet and distinguish it from LM358B/BA variants. The standard LM358 is not rail-to-rail; its input common-mode range does not extend to the positive rail and its output high level remains below that rail.
+- Safety boundary: extra-low-voltage 5 V only, current-limited supply recommended, no mains or safety-critical applications. The comparator activity is educational only; use a dedicated comparator and designed hysteresis for robust switching.
+- Source-level checks are required for SVG count, unique IDs, JavaScript references, asset links, directory/sitemap integration and calculator behaviour. Browser rendering, hardware build and measurement verification have not been performed.
