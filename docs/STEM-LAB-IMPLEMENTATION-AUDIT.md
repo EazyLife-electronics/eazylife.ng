@@ -424,3 +424,16 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - Safety boundaries: no direct motor connection to GPIO; use current-limited extra-low-voltage supplies; check motor stall current and driver continuous/peak/thermal ratings; secure the motor and keep clear of moving parts; no deliberate stall or short-circuit testing; no use in safety-critical machinery or vehicles.
 - Connected Module 18's next-lesson button, added Module 19 to the Electronics Fundamentals directory and XML sitemap.
 - Source-level checks are required for unique IDs, JavaScript references, SVG/section/anchor balance, page navigation, directory and sitemap integrity, and calculator edge cases. No browser rendering, Arduino upload, motor/encoder measurement or physical hardware verification has been performed.
+
+
+## Module 20: Robotics and Mechatronic Systems
+
+- Added standalone lesson `stem-robotics-mechatronic-systems.html`, responsive stylesheet `assets/css/stem-robotics.css` and client-side differential-drive calculator `js/stem-robotics.js`.
+- Covers mechatronic system architecture; mechanical, electrical, sensing, control and integration responsibilities; differential-drive, car-like, tracked and articulated robot configurations; wheel kinematics; encoders and odometry; IMU and proximity/reflectance sensing; layered robot software and state-machine behaviour.
+- Includes labelled SVG diagrams for robot system architecture, differential-drive geometry, layered robot software, rover sensor/chassis layout and practical subsystem wiring.
+- Interactive kinematics calculator estimates centre-line speed, yaw rate, turning radius and motion direction from wheel diameter, track width and signed left/right wheel RPM. It explicitly assumes ideal no-slip rolling and warns that real systems differ.
+- Practical project: extra-low-voltage three-sensor line-following differential-drive rover. Includes component list, wiring map for an Arduino Uno-compatible board and TB6612FNG-style driver, sensor polarity assumptions, example firmware, staged testing/calibration and extension challenges for encoder odometry, obstacle-aware behaviour and wheel-speed balancing.
+- Firmware stops when the line is lost or sensor pattern is ambiguous rather than driving blindly. Learners are instructed to verify sensor polarity, motor direction, driver compatibility and current/thermal ratings on their actual hardware.
+- Safety boundaries: protected extra-low-voltage supplies, no direct motor-to-GPIO connection, secure chassis and lifted-wheel initial tests, moving-part precautions, no deliberate stall/short-circuit testing and no safety-critical use.
+- Connected Module 19's next-lesson button, added Module 20 to the Electronics Fundamentals directory and XML sitemap.
+- Source-level validation is required for unique IDs, JavaScript references and syntax, SVG/section/anchor balance, calculator edge cases, previous/next navigation, directory and sitemap integrity. No browser rendering, robot assembly, line-sensor calibration or physical hardware testing has been performed.
