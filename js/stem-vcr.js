@@ -14,7 +14,7 @@
       result.textContent="Check inputs";caption.textContent="Two known quantities are required.";equation.textContent="V = I × R";return;
     }
     let [v,i,r]=vals,answer,label,eq;
-    if(v===null){if(i===0||r===null){feedback.textContent="To calculate voltage, current and resistance must both be non-zero/valid.";return;}v=i*r;answer=fmt(v)+" V";label="Voltage across the component";eq="V = I × R = "+fmt(i)+" × "+prettyResistance(r)+" = "+fmt(v)+" V";}
+    if(v===null){if(r===null){feedback.textContent="Enter a resistance value.";return;}v=i*r;answer=fmt(v)+" V";label="Voltage across the component";eq="V = I × R = "+fmt(i)+" × "+prettyResistance(r)+" = "+fmt(v)+" V";}
     else if(i===null){if(r===0){feedback.textContent="Resistance cannot be zero when calculating current.";return;}i=v/r;answer=prettyCurrent(i);label="Current through the component";eq="I = V ÷ R = "+fmt(v)+" ÷ "+prettyResistance(r)+" = "+fmt(i)+" A";}
     else{if(i===0){feedback.textContent="Current must be greater than zero when calculating resistance.";return;}r=v/i;answer=prettyResistance(r);label="Resistance of the component";eq="R = V ÷ I = "+fmt(v)+" ÷ "+fmt(i)+" = "+prettyResistance(r);}
     result.textContent=answer;caption.textContent=label;equation.textContent=eq;feedback.textContent="Calculation complete. Compare this ideal value with a real measurement when you build the circuit.";
@@ -45,7 +45,6 @@
     else{button.classList.add("incorrect");question.querySelector(".vcr-quiz-feedback").textContent="Not quite. The correct answer is highlighted. Review the explanation and try the next question.";}
   }
   byId("vcr-quiz").addEventListener("click",quizHandler);
-  document.querySelectorAll(".vcr-question").forEach(q=>q.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{})));
   calculateOhms();updateNetworks();
   const year=byId("sl-year");if(year)year.textContent=new Date().getFullYear();
 })();
