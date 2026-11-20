@@ -552,3 +552,19 @@ Module 26's upcoming navigation now points to Module 27: DAC and Signal Generati
 ## Confirmed finite ending and Module 29 presentation direction
 
 The user reconfirmed that the learning series ends at Module 29, with no Module 30 or additional lessons. Module 29 should not read like an obvious advertisement. It should contain useful project-based training direction and practical next-step examples, then close the series naturally. Any optional EazyLife guidance/training invitation should be subtle and secondary to the learning content. The final lesson navigation and final paragraph should communicate that the published series is complete; no next lesson button or further lesson teaser should appear after Module 29.
+
+
+## Module 28: Electronics Product Design
+
+- Added standalone lesson \`stem-electronics-product-design.html\`, responsive stylesheet \`assets/css/stem-product-design.css\` and interactive helpers in \`js/stem-product-design.js\`.
+- Covers problem definition, user needs, measurable requirements, system block architecture, interfaces, component/datasheet selection, power budgeting, thermal considerations, staged prototyping, PCB and enclosure design, serviceability, verification, validation, engineering documentation and responsible product readiness.
+- Interactive tools: requirement-statement builder; four-load nominal power budget and headroom estimator with explicit rail-current caveats; eight-point design-review checklist with live completion count.
+- Practical design exercise: low-voltage tank-level monitor, beginning with indication only. Includes subsystem suggestions, sensor/controller compatibility checks, fault behaviour, enclosure and verification prompts. Automatic pump control is explicitly outside the initial exercise because it introduces overflow, dry-run and electrical hazards requiring independent protection.
+- Includes labelled SVGs for system architecture and exploded enclosure concept, comparison tables, four knowledge-check questions and links to the previous and final modules.
+- Safety: extra-low-voltage prototype scope; check absolute maximum ratings and recommended operating conditions; do not infer protection ratings; no mains or hazardous actuator instructions; distinguish educational prototypes from certified or safety-critical products.
+- Connected Module 27 next navigation to Module 28, added Module 28 to the Circuit foundations directory category and XML sitemap. Directory count now reflects 28 lessons.
+- Source-level checks to complete: JavaScript syntax, unique IDs and DOM references, SVG/section/article/anchor balance, quiz structure, local assets, previous/next navigation, directory search/filter count and sitemap XML. No browser rendering, physical prototype, PCB fabrication or environmental testing has been performed.
+
+## Confirmed Module 29 closing presentation
+
+Module 29 is the final lesson in the series. It should offer project-based practical training directions and a useful sense of what learners can build next, then end naturally. Do not make it an obvious advertisement, do not withhold free learning content, do not add a Module 30, and do not show a next-lesson button or further lesson teaser after Module 29. Its final paragraph and lesson navigation should clearly communicate that the published learning series is complete.
