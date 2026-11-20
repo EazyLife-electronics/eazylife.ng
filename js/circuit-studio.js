@@ -49,7 +49,7 @@ function exportSvg(){const copy=canvas.cloneNode(true);copy.querySelector('#grid
 function download(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 function saveDraft(){localStorage.setItem('eazylife-circuit-draft',JSON.stringify(project));$('saveStatus').textContent='Saved in this browser';toast('Draft saved on this device')}
 function exportJson(){download(new Blob([JSON.stringify(project,null,2)],{type:'application/json'}),(project.title||'circuit').replace(/[^a-z0-9]+/gi,'-')+'.json')}
-function loadProject(data){if(!data||data.schemaVersion!==1||!Array.isArray(data.components)||!Array.isArray(data.wires))throw Error('This is not a supported Circuit Studio project');snapshot();project=clone(data);selected=null;changed();toast('Project imported')}
+function loadProject(data){if(!data||data.schemaVersion!==1||!Array.isArray(data.components)||!Array.isArray(data.wires))throw Error('This is not a supported Circuit Studio project');snapshot();project=clone(data);selected=null;selectedItems=[];changed();toast('Project imported')}
 function undo(){if(!history.length)return;future.push(JSON.stringify(project));project=JSON.parse(history.pop());selected=null;changed()}
 function redo(){if(!future.length)return;history.push(JSON.stringify(project));project=JSON.parse(future.pop());selected=null;changed()}
 function applyView(){const w=1200/scale,h=800/scale;canvas.setAttribute('viewBox',`${viewX} ${viewY} ${w} ${h}`);$('zoomReadout').textContent=Math.round(scale*100)+'%'}
@@ -73,7 +73,7 @@ $('delete').onclick=deleteSelection;
 $('undo').onclick=undo;$('redo').onclick=redo;$('saveProject').onclick=saveDraft;$('exportSvg').onclick=exportSvg;$('exportJson').onclick=exportJson;$('addText').onclick=addText;$('clearSelection').onclick=()=>{selected=null;selectedItems=[];wireStart=null;render()};$('zoomIn').onclick=()=>zoom(1.2);$('zoomOut').onclick=()=>zoom(.83);$('fitCanvas').onclick=()=>{scale=1;viewX=0;viewY=0;applyView()};
 $('toggleGrid').onclick=()=>{showGrid=!showGrid;$('gridRect').style.display=showGrid?'':'none';$('toggleGrid').classList.toggle('active',showGrid)};
 $('symbolStyle').onchange=e=>{snapshot();project.style=e.target.value;changed();toast(e.target.value==='educational'?'Educational presentation enabled':'Engineering presentation enabled')};
-$('newProject').onclick=()=>{if(project.components.length&&!confirm('Start a new circuit? Download or save your current work first.'))return;snapshot();project={schemaVersion:1,title:'Untitled circuit',style:'engineering',components:[],wires:[],annotations:[]};$('symbolStyle').value='engineering';selected=null;changed()};
+$('newProject').onclick=()=>{if(project.components.length&&!confirm('Start a new circuit? Download or save your current work first.'))return;snapshot();project={schemaVersion:1,title:'Untitled circuit',style:'engineering',components:[],wires:[],annotations:[]};$('symbolStyle').value='engineering';selected=null;selectedItems=[];changed()};
 $('renameProject').onclick=()=>{const title=prompt('Name this circuit:',project.title);if(title&&title.trim()){snapshot();project.title=title.trim();changed()}};
 $('importProject').onclick=()=>$('projectFile').click();$('projectFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{loadProject(JSON.parse(await f.text()))}catch(err){toast(err.message)}e.target.value=''};
 $('svgSource').oninput=previewArtwork;
