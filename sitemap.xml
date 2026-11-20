@@ -20,7 +20,23 @@
     <priority>0.9</priority>
   </url>
 
-  <!-- Public Electronics Fundamentals learning module -->\n  <url>\n    <loc>https://eazylife.ng/stem-electronics-fundamentals.html</loc>\n    <lastmod>2026-11-19</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.85</priority>\n  </url>\n\n  <!-- Expanded Arduino Project Playground -->
+  <!-- Public Electronics Fundamentals learning module -->
+  <url>
+    <loc>https://eazylife.ng/stem-electronics-fundamentals.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- Resistor colour-code calculator -->
+  <url>
+    <loc>https://eazylife.ng/stem-resistor-colour-code.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Expanded Arduino Project Playground -->
   <url>
     <loc>https://eazylife.ng/stem-projects.html</loc>
     <lastmod>2026-11-13</lastmod>
