@@ -359,3 +359,16 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - Corrected malformed nested anchor markup around the Module 12 and Module 13 directory cards so each card is a separate link.
 - Source-level checks should verify unique IDs, JavaScript element references, SVG/section/anchor balance, navigation, directory and sitemap entries. These checks do not constitute browser QA or physical instrument testing.
 - No browser rendering, oscilloscope operation, DMM calibration, or physical workshop testing has been performed.
+
+
+## Module 15: Analog Sensors and Signal Conditioning
+
+- Added standalone lesson `stem-analog-sensors-signal-conditioning.html`, stylesheet `assets/css/stem-sensors.css` and interactive script `js/stem-sensors.js`.
+- Covers sensor families and output types; LDR and NTC thermistor behaviour; resistive sensor voltage dividers; divider orientation and output polarity; ADC conversion, resolution and input constraints; RC low-pass filtering; buffering, amplification, protection, calibration and linearisation.
+- Includes labelled SVG diagrams for the sensing/control chain, LDR and NTC symbols, resistive divider, ADC quantisation, RC low-pass filter, Arduino LDR input and Arduino-controlled indicator LED.
+- Interactive tools calculate divider output/current/power for either sensor orientation, ideal ADC code estimates and first-order RC time constant/cutoff frequency.
+- Practical activities: measure an LDR divider and compare illumination readings; build an Arduino automatic night light with software hysteresis; measure an NTC thermistor response; compare filtered and unfiltered sensor signals.
+- Includes Arduino sketches, component lists, connection instructions, expected observations, troubleshooting and a knowledge check.
+- Safety boundaries: use extra-low-voltage circuits; check sensor dissipation and board ADC limits; use current-limited LED indicators; no use of hobby LDR/thermistor sensors as sole life-safety detectors; no hazardous heat/flame or mains activities.
+- Connected Module 14's next-lesson navigation, added Module 15 to the Electronics Fundamentals directory and XML sitemap.
+- Source-level validation should check unique IDs, JS references, SVG/section/anchor balance, directory and sitemap links. No browser rendering, sensor calibration or physical Arduino test has been performed.
