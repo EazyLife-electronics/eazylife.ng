@@ -220,3 +220,15 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - All four diode symbols are drawn with the cathode bar toward the positive DC rail and the anode toward the negative DC rail, making the intended bridge orientation easier to read.
 - The caption continues to identify this as a functional concept drawing, not a construction or breadboard layout.
 - Source markup was updated on the learning branch only. Browser rendering and mobile legibility still need manual QA.
+
+## Module 06: Capacitors and Energy Storage
+
+- Added standalone lesson page `stem-capacitors-energy-storage.html` with dedicated responsive styles and client-side interactions. It follows the one-module-per-page architecture and reuses the shared EazyLife navigation, theme, guidance section and compact previous/next lesson buttons.
+- Covers capacitor construction and electric-field energy storage; capacitance, charge and units; ceramic, film, aluminium electrolytic and tantalum capacitor families; polarised and non-polarised symbols; polarity identification; RC timing; series and parallel capacitance; filtering, smoothing, decoupling, bypassing and AC coupling; and capacitor selection criteria including voltage rating, tolerance, ESR, ripple current, temperature and lifetime.
+- Added an interactive ideal RC charge/discharge behavioural model. Learners can change supply voltage, series resistance, capacitance, operating mode and elapsed time. It displays the time constant, capacitor voltage, charge, stored energy, progress and an exponential response chart. The model explicitly discloses its ideal assumptions, including zero leakage and no ESR.
+- Added a two-capacitor equivalent-capacitance calculator for series and parallel combinations.
+- Includes conceptual circuit illustrations, safe low-voltage inspection and measurement steps, resistor-based discharge guidance, a multimeter verification step, common mistakes and a three-question knowledge check.
+- Safety boundary: no mains, inverter DC-link, microwave, camera-flash or other high-energy capacitor work. The lesson warns against shorting capacitor terminals with tools, handling unknown charged capacitors, guessing polarity or using damaged components.
+- Added Module 06 to the Electronics Fundamentals directory, connected Module 05's next-lesson button, linked Module 06 back to Module 05, and added the page to the XML sitemap.
+- Source-level checks completed: no duplicate HTML IDs; all direct JavaScript element references match page IDs; CSS and JS assets are referenced; directory and previous/next navigation links are present; sitemap entry exists and URL tags are balanced; three quiz questions are present; RC exponential expressions and series/parallel capacitance calculation paths are included.
+- These are source-level checks only. Browser rendering, keyboard/accessibility behaviour, real-device mobile layout and practical capacitor measurements still require separate verification.
