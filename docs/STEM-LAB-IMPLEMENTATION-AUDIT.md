@@ -652,3 +652,28 @@ Target branch: `feature/stem-learning-platform`
 - Confirmed the shared theme script and stylesheet paths referenced by the Retailer Price Finder exist in the repository tree.
 - Checked the source markup for the final lesson sequence and confirmed the Module 29 navigation contains no next-lesson link.
 - These are repository/source-level checks. No live-site deployment, Firebase/Firestore changes, browser automation, or physical-device rendering test was performed. The branch remains separate from `main`; deployment and merge are not authorised by this audit.
+
+
+## Website-wide consistency pass: 2026-11-20
+
+A follow-up source audit was performed on the active learning-platform branch after the 29-module curriculum was completed.
+
+### Changes applied
+
+- Extended `assets/css/site-theme.css` with shared dark-mode contrast safeguards for common Tailwind text/background/border utilities and teal links, plus visible keyboard-focus outlines.
+- Added explicit dark-mode menu-link colours and hover surfaces for the hamburger navigation used by the shop and order-tracking pages.
+- The update is additive and does not alter page structure, Firebase configuration, Firestore data or security rules.
+
+### Findings and decisions
+
+- The project gallery already contains a page-specific dark-mode correction for its project-kit line items and manual component panel. This was present in the current branch source, so it was not duplicated.
+- STEM learning pages already share a navigation stylesheet and a consistent set of core destinations. Their horizontal, scrollable navigation is retained because it preserves quick access to learning tools on small screens.
+- The homepage, gallery/reviews pages, shop/order-tracking pages and kit-order page use different header layouts and page-specific actions. A forced one-size-fits-all header rewrite would risk breaking cart, tracking, WhatsApp and contextual kit-order flows. Those specialised layouts are retained for this pass; navigation consistency remains a targeted follow-up rather than an unsafe global markup replacement.
+- The final lesson (Module 29) intentionally has no next-lesson destination. It is the approved end of the current finite curriculum, not a missing or pending module.
+- A source-level search for the word "pending" is not sufficient to identify a pending navigation control because it also occurs in ordinary lesson prose (for example, "depending"). No new Module 30 or placeholder destination has been introduced.
+
+### Verification limits
+
+- The stylesheet change was committed to `feature/stem-learning-platform` only.
+- Source inspection confirms the shared theme file contains the new rules. No live-browser rendering, automated accessibility scan, mobile-device test or production deployment was performed as part of this source-only pass.
+- The branch remains separate from `main`; no merge or deployment was performed.
