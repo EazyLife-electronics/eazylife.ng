@@ -472,3 +472,16 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - Categorised all 22 module cards into Circuit foundations (Modules 01–10), Power and workshop (11–14), Sensors and embedded systems (15–18), Control and robotics (19–21), and Wireless and IoT (22).
 - Added responsive styling in assets/css/stem-directory.css and client-side filtering in js/stem-directory.js. Search matches module card text, including module number, title and lesson description; category and text filters combine.
 - Source validation: 22 module cards categorised, expected category counts 10/4/4/3/1, no invalid categories or duplicate IDs, JavaScript parses, stylesheet braces balance, CSS and JS assets are linked. Browser/device rendering has not been independently tested.
+
+
+## Module 23: Integrated Circuits and Logic Gates
+
+- Added standalone lesson `stem-integrated-circuits-logic-gates.html`, responsive stylesheet `assets/css/stem-logic.css` and client-side truth-table teaching model `js/stem-logic.js`.
+- Covers IC construction and package orientation; DIP pin numbering; logic HIGH/LOW voltage ranges; floating CMOS inputs and bypass capacitors; AND, OR, NOT, NAND, NOR, XOR and XNOR; Boolean expressions; truth tables; common 74HC logic ICs; combining conditions; troubleshooting and safe low-voltage practice.
+- Includes labelled SVG diagrams for an IC package, DIP-14 pin numbering, conceptual logic-level bands, pull-down input wiring, six logic-gate symbols, a 74HC08 pin map, a practical two-button AND-gate circuit and a combined logic example.
+- Practical build uses a 74HC08 at regulated 5 V, two normally-open pushbuttons, 10 kΩ pull-down resistors, 1 kΩ LED resistor and 100 nF supply bypass capacitor. The first AND gate uses pins 1 and 2 as inputs and pin 3 as output; pin 14 is VCC and pin 7 is GND. Exact device datasheet verification is required.
+- Interactive model lets learners select AND, OR, NOT, NAND, NOR, XOR or XNOR, toggle input states and inspect the corresponding truth table. It is explicitly a Boolean teaching model, not an electrical IC emulator.
+- Safety boundaries: use regulated, current-limited extra-low-voltage supply; disconnect power before rewiring; define all CMOS inputs; do not drive external loads directly from logic outputs or use hobby logic for safety-critical systems.
+- Connected Module 22 next-lesson navigation, added Module 23 to the Electronics Fundamentals directory and XML sitemap. Directory counts now reflect 23 lessons, with Module 23 in Circuit foundations.
+- Source-level checks required: unique IDs, JavaScript DOM references and syntax, SVG/section/anchor balance, quiz structure, local asset links, previous/next navigation, directory filters/count and sitemap XML. No browser rendering, IC bench test or hardware validation has been performed.
+
