@@ -156,6 +156,14 @@
     <priority>0.82</priority>
   </url>
 
+  <!-- Module 17: Microcontrollers and Embedded Programming -->
+  <url>
+    <loc>https://eazylife.ng/stem-microcontrollers-embedded-programming.html</loc>
+    <lastmod>2026-11-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+
   <!-- Resistor colour-code calculator -->
   <url>
     <loc>https://eazylife.ng/stem-resistor-colour-code.html</loc>
