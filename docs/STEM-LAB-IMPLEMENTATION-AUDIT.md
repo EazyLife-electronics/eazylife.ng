@@ -320,3 +320,15 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - Interactive calculators estimate full-wave reservoir capacitance for a target ripple and illustrative 7805 power dissipation/junction temperature. Both disclose simplifying assumptions and the need to check exact component datasheets.
 - Safety boundary: no exposed mains construction or direct household-mains experiments. Use certified isolated extra-low-voltage AC sources or current-limited DC bench supplies only; no short-circuit testing by deliberate output shorting.
 - Module 10 next navigation, learning directory and sitemap updated. Source-level checks required for SVG integrity, IDs, JS references, page links, and XML structure. No browser rendering or physical hardware testing has been performed.
+
+
+## Module 12: Power Supply Protection and Battery Systems
+
+- Added standalone lesson page `stem-power-protection-battery-systems.html` and calculator script `js/stem-battery-protection.js`.
+- Covers overcurrent and short-circuit protection concepts, fuse coordination, reverse-polarity protection, overvoltage/undervoltage and thermal protection, battery chemistry and ratings, BMS roles and limitations, and series/parallel pack arithmetic.
+- Includes labelled functional SVG diagrams for a protected DC power path, series fuse placement, conceptual series-diode polarity protection, and series/parallel battery configurations.
+- Added an interactive ideal battery pack calculator for nominal voltage, capacity, energy and cell count, plus an estimated runtime calculator that exposes usable-energy and conversion-efficiency assumptions.
+- Practical activities: measure a matching AA-cell series holder, investigate a fused resistive load using a current-limited bench source without deliberate shorting, and inspect a commercial USB power bank with an external USB meter without opening it.
+- Safety boundary: no loose lithium-cell parallel experiments, no learner-built lithium pack, no charging/repair/modification of lithium packs, no battery short-circuit tests. Use intact protected commercial packs with their specified chargers, or matched AA cells in a holder for the simple series demonstration.
+- Connected Module 11's next-lesson button, added Module 12 to the Electronics Fundamentals directory, corrected malformed nested anchor markup in the Module 10/11 directory sequence, and added the page to the XML sitemap.
+- Source-level checks should verify unique IDs, all calculator references, SVG integrity, navigation, directory structure and sitemap XML. No browser rendering, battery-pack validation or physical testing has been performed.
