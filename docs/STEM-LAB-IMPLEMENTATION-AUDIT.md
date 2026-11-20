@@ -95,6 +95,12 @@ Recommended next sequence:
 5. Standardise experiment documentation and limitations before migrating or adding more models.
 6. Review the four additional experiments on `feature/stem-lab` individually for technical accuracy and compatibility before selectively porting any of them.
 
+## Additional curriculum input
+
+A curriculum and engineering portfolio reference has been added at `docs/STEM-LEARNING-CURRICULUM-SEED.md`. It maps the supplied 20-session syllabus and project portfolio into independent learning domains, records safety and scope boundaries for hazardous/high-energy and biomedical examples, and specifies a proposed 4-band/5-band resistor colour-code calculator.
+
+The syllabus is a content seed rather than a mandatory learner sequence. The next useful utility after testing the first physical/interactive module is the resistor colour-code calculator, followed by additional foundational modules. The project portfolio should be used for grounded engineering case studies and carefully scoped subassemblies, not as a promise that every advanced project will be simulated or reproduced in the browser.
+
 ## Non-goals for this first implementation
 
 - No compulsory learner accounts or payment gate.
