@@ -74,4 +74,4 @@ defs.push(...extraDefs);
 
 export let COMPONENTS=defs.map((d,i)=>{const [id,name,category,designator,pinsA,pinsB,art]=d;let pins=Array.isArray(pinsA?.[0])?pinsA:(pinsB?[pinsA,pinsB]:[pinsA]);return {id,name,category,designator,pins:pins.map((p,n)=>({id:`p${n+1}`,name:p[2]|| (pins.length===2?(n===0?"A":"B"):`Pin ${n+1}`),x:p[0],y:p[1]})),artwork:art,version:1,style:"engineering"};});
 export function getComponent(id){return COMPONENTS.find(c=>c.id===id);}
-export function replaceComponents(items){if(Array.isArray(items)&&items.length)COMPONENTS=items;}
+export function replaceComponents(items){if(Array.isArray(items)&&items.length){const merged=new Map(COMPONENTS.map(c=>[c.id,c]));items.forEach(c=>{if(c&&c.id)merged.set(c.id,c)});COMPONENTS=[...merged.values()];}}
