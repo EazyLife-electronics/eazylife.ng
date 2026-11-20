@@ -29,7 +29,7 @@
       <button id="exportJson" class="cs-btn">Download JSON</button>
     </div>
     <div class="cs-tool-group">
-      <button id="toolSelect" class="cs-btn active" type="button">Select / Move</button><button id="toolConnect" class="cs-btn" type="button">Connect wires</button><button id="toolPins" class="cs-btn" type="button">Edit pins</button><button id="toolPan" class="cs-btn" type="button">Pan</button>
+      <button id="toolSelect" class="cs-btn active" type="button">Select / Move</button><button id="toolConnect" class="cs-btn" type="button">Connect wires</button><button id="toolPins" class="cs-btn" type="button">Edit pins</button><button id="toolPan" class="cs-btn" type="button">Pan</button><button id="toolCapture" class="cs-btn" type="button" title="Draw the SVG export boundary">Capture area</button>
     </div>
     <div class="cs-tool-group">
       <button id="undo" class="cs-btn" title="Undo (Ctrl+Z)">↶</button><button id="redo" class="cs-btn" title="Redo (Ctrl+Y)">↷</button>
@@ -37,7 +37,7 @@
     </div>
     <div class="cs-tool-group cs-view-tools">
       <label class="cs-style-label">Diagram style <select id="symbolStyle"><option value="engineering">Engineering</option><option value="educational">Educational</option></select></label>
-      <button id="zoomOut" class="cs-btn" aria-label="Zoom out">−</button><span id="zoomReadout">100%</span><button id="zoomIn" class="cs-btn" aria-label="Zoom in">+</button><button id="fitCanvas" class="cs-btn">Fit</button><span class="cs-zoom-help">Wheel / pinch to zoom · Pan tool or Space + drag</span>
+      <button id="zoomOut" class="cs-btn" aria-label="Zoom out">−</button><span id="zoomReadout">100%</span><button id="zoomIn" class="cs-btn" aria-label="Zoom in">+</button><button id="fitCanvas" class="cs-btn">Fit content</button><button id="clearCapture" class="cs-btn">Clear frame</button><span class="cs-zoom-help">Open canvas · Wheel / pinch to zoom · Pan tool or Space + drag</span>
     </div>
   </section>
   <div class="cs-workspace">
@@ -55,7 +55,7 @@
         <svg id="circuitCanvas" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-label="Circuit drawing workspace">
           <defs><pattern id="csGrid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="currentColor" stroke-opacity=".12" stroke-width="1"/></pattern></defs>
           <rect id="gridRect" x="0" y="0" width="1200" height="800" fill="url(#csGrid)"/>
-          <g id="wireLayer"></g><g id="componentLayer"></g><g id="annotationLayer"></g><g id="interactionLayer"></g>
+          <g id="wireLayer"></g><g id="componentLayer"></g><g id="annotationLayer"></g><g id="captureLayer"></g><g id="interactionLayer"></g>
         </svg>
         <div class="cs-canvas-empty" id="emptyHint"><span>＋</span><strong>Your circuit starts here</strong><p>Choose a component from the library to place it on the canvas.</p></div>
       </div>
