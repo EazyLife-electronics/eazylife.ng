@@ -260,3 +260,16 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - Updated this audit.
 - The interactive models are idealised teaching models, not exact device emulators. No mains/high-energy practical build instructions are included.
 - Source-level checks are required before review. Browser rendering, device-specific verification and physical experiments have not been performed as part of this source update.
+
+
+## Module 07: Inductors and Magnetic Fields — practical rebuild
+
+- Rebuilt `stem-inductors-magnetic-fields.html` as a practical lesson rather than a concept summary with only an abstract graph.
+- Added labelled SVG illustrations of the magnetic field around a straight conductor and a coil/solenoid.
+- Added Practical 1: a low-voltage electromagnet activity using insulated wire, an optional iron core, a current-limiting resistor, a switch and a compass/paper clips. Includes a connection schematic, materials, numbered build steps, observation prompts and heat/current safety guidance.
+- Added Practical 2: a protected series RL investigation using a 5 V supply, series resistor, inductor, switch and flyback diode. The circuit schematic identifies the diode polarity and recirculation path; the learner measures voltage across the series resistor and calculates current using I = V_R/R. Includes build/measurement steps and expected observations.
+- Expanded the explanation of Lenz's law, the inductor voltage relationship, magnetic energy, the RL time constant, real inductor ratings and common wiring errors.
+- Retained the ideal RL current-rise model and improved its feedback so the selected time constant is translated into a percentage of ideal steady-state current. Invalid input now produces a visible prompt rather than leaving unexplained stale output.
+- Added responsive styling for numbered practical steps, circuit captions and diagrams in `assets/css/stem-advanced.css`.
+- Safety boundary: both practicals use extra-low-voltage DC only. The RL circuit includes a flyback diode; learners are explicitly warned not to remove it for an uncontrolled switching demonstration. No mains, automotive ignition or high-energy coil work is included.
+- Source-level validation and browser rendering should be completed before treating the module as fully QA-approved. No physical build or measurement has been performed by EazyLife as part of this source update.
