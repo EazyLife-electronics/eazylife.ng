@@ -129,3 +129,7 @@ body{transition:background-color .18s ease,color .18s ease}
 :root[data-theme="dark"] .kit-line-side a {
   color:#69d9c4!important;
 }
+
+:root[data-theme="dark"] .text-red-600{color:#f87171!important}
+:root[data-theme="dark"] .text-green-700{color:#4ade80!important}
+:root[data-theme="dark"] .text-teal-600{color:#5eead4!important}
