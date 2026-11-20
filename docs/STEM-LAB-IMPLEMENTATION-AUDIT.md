@@ -497,3 +497,15 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - Safety: use regulated current-limited extra-low-voltage supply, verify exact manufacturer pinouts and voltage limits, define all CMOS inputs, disconnect power before rewiring and do not drive motors/relays directly from logic outputs.
 - Connected Module 23 next-lesson navigation, added Module 24 to the Circuit foundations directory category and XML sitemap.
 - Source-level checks: verify unique IDs, all JS DOM references, JS syntax, SVG/section/anchor balance, quiz structure, responsive CSS, navigation, directory category/search and sitemap XML. No browser rendering, breadboard assembly, IC bench test or physical hardware validation has been performed.
+
+
+## Module 25: Sequential Logic, Flip-Flops and Digital Memory
+
+- Added standalone lesson `stem-sequential-logic-flip-flops-memory.html`, responsive stylesheet `assets/css/stem-sequential.css` and interactive teaching models in `js/stem-sequential.js`.
+- Covers combinational versus sequential systems, state, active-HIGH NOR SR latch behaviour and forbidden input combination, D/JK/T/SR flip-flops, positive-edge triggering, asynchronous preset/clear concepts, setup/hold time, propagation delay, clock skew, metastability, debouncing, ripple/synchronous counters, clock division, shift registers and registers.
+- Interactive flip-flop bench supports D, JK, T and active-HIGH SR teaching models with selectable inputs, manual rising-edge action, reset and generated next-state tables. It explicitly does not model analogue timing, metastability or a specific IC.
+- Interactive modulo-4 counter visualises two-bit binary state, clock steps, reset and LED indicators.
+- Practical build: synchronous two-bit counter using a 74HC74 dual positive-edge D flip-flop and 74HC86 XOR gate. Next-state logic is D0 = Qbar0 and D1 = Q1 XOR Q0, with both flip-flops sharing a clock. Includes DIP-14 pin-level wiring, active-LOW asynchronous clear/preset handling, 100 nF local bypass capacitors, LED outputs, optional slow 555 clock, expected 00→01→10→11→00 sequence, test procedure and troubleshooting.
+- Safety/implementation notes: use regulated current-limited extra-low-voltage supply; verify exact device pinout, voltage and timing ratings; never float CMOS inputs; keep active-LOW asynchronous control pins at valid inactive HIGH; do not assert preset and clear simultaneously; do not use a raw bouncing button as a clock without debouncing.
+- Connected Module 24 next-lesson navigation, added Module 25 to the Circuit foundations directory category and XML sitemap.
+- Source-level checks: duplicate IDs, JavaScript DOM references and syntax, SVG/section/anchor balance, quiz structure, CSS braces, directory count/category, sitemap XML, previous/next navigation. No browser rendering, breadboard assembly, IC bench test or physical timing verification has been performed.
