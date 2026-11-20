@@ -509,3 +509,14 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - Safety/implementation notes: use regulated current-limited extra-low-voltage supply; verify exact device pinout, voltage and timing ratings; never float CMOS inputs; keep active-LOW asynchronous control pins at valid inactive HIGH; do not assert preset and clear simultaneously; do not use a raw bouncing button as a clock without debouncing.
 - Connected Module 24 next-lesson navigation, added Module 25 to the Circuit foundations directory category and XML sitemap.
 - Source-level checks: duplicate IDs, JavaScript DOM references and syntax, SVG/section/anchor balance, quiz structure, CSS braces, directory count/category, sitemap XML, previous/next navigation. No browser rendering, breadboard assembly, IC bench test or physical timing verification has been performed.
+
+
+## Module 26: Digital Displays, Keypads and Human Interfaces
+
+- Added standalone lesson `stem-digital-displays-keypads-interfaces.html`, responsive stylesheet `assets/css/stem-interface.css` and interactive models in `js/stem-interface.js`.
+- Covers human-machine interface roles; seven-segment LED anatomy and segment labels; common-anode/common-cathode operation; segment patterns; current limiting; multiplexing and ghosting; 4511, 74HC595 and integrated display-driver roles; matrix keypad scanning, pull-ups, debouncing and ghosting; character LCD and graphical OLED selection; usability and accessibility principles.
+- Interactive seven-segment model selects digits 0–9 and displays the active segments and common-cathode hexadecimal pattern, with common-anode logic convention explained. Interactive keypad/LCD model accepts up to 16 key characters, supports backspace/clear/send and displays simulated feedback. Both are conceptual teaching models, not electrical hardware emulators.
+- Practical build: Arduino Uno-compatible 5 V board, 4×4 matrix keypad and 16×2 I²C LCD. Includes row/column-to-pin mapping, I²C wiring, Keypad and LiquidCrystal_I2C library notes, editable example sketch, demo-code validation, test procedure, expected behaviour and troubleshooting.
+- Security note: the hard-coded demonstration code is educational only, not secure access control. Real systems require secure credential handling and an appropriate security design. Board voltage, I²C pins/address, LCD backpack compatibility and library API must be verified for actual hardware.
+- Connected Module 25 next-lesson navigation, added Module 26 to the Circuit foundations directory category and XML sitemap.
+- Source-level checks: unique HTML IDs, JS element references and syntax, SVG/section/article/anchor balance, quiz structure, responsive CSS braces, directory count/category, sitemap XML and previous/next navigation. No browser rendering, Arduino compilation/upload, keypad scan test or LCD hardware test has been performed.
