@@ -162,3 +162,11 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - Source-level checks completed: no duplicate IDs; every direct JavaScript element lookup has a matching HTML ID; expected local stylesheet/script references are present; module directory and previous/next links are present; sitemap entry and URL element balance are valid; mobile CSS rules are present; Ohm's law and series/parallel calculation paths are present; current-mode short-circuit and live resistance-measurement warnings are included.
 - These checks do not replace browser testing on desktop/mobile or practical verification with a physical multimeter and circuit.
 
+
+
+## Lesson navigation presentation refinement
+
+- Replaced the large descriptive previous/next lesson cards on Modules 01, 02 and 03 with compact, high-contrast button-style navigation controls.
+- Each button uses a clear arrow, a small PREVIOUS LESSON / NEXT LESSON label and a short destination title. This makes navigation easier to notice and tap, especially on mobile.
+- Upcoming Module 04 is shown as a visually subdued, non-clickable button until its page is available.
+- Module 02 now links forward to the published Module 03 page.
