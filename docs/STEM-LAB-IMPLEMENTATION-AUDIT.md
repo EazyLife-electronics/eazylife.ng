@@ -212,3 +212,11 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - Safety boundary: no mains rectifier or non-isolated power-supply construction instructions. Rectification is taught conceptually; any practical AC investigation is limited to isolated, current-limited extra-low-voltage equipment under suitable supervision.
 - Linked Module 05 from the Electronics Fundamentals directory, connected Module 04's next-lesson button to the new page and added the new URL to the XML sitemap.
 - Source-level checks completed: page has unique IDs; JavaScript ID lookups match page IDs; CSS and JS paths exist; interactive model controls and quiz targets exist; Module 04 next navigation, directory card and sitemap entry are present; sitemap URL elements are balanced. These checks do not replace browser rendering/accessibility QA or physical diode testing.
+
+### Module 05 diagram refinement: bridge rectifier
+
+- Replaced the earlier diagonal four-diode illustration with a straight-line, orthogonal bridge layout based on the supplied visual reference.
+- The diagram now has two AC inputs at the left and right midpoints, a positive DC rail at the top and a negative DC rail at the bottom. Each AC midpoint connects to one upper and one lower diode branch.
+- All four diode symbols are drawn with the cathode bar toward the positive DC rail and the anode toward the negative DC rail, making the intended bridge orientation easier to read.
+- The caption continues to identify this as a functional concept drawing, not a construction or breadboard layout.
+- Source markup was updated on the learning branch only. Browser rendering and mobile legibility still need manual QA.
