@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Create, edit and export electronic circuit diagrams with EazyLife Circuit Studio.">
+<meta name="theme-color" content="#00B09B">
+<title>Circuit Studio | EazyLife</title>
+<script>(function(){var t=null;try{t=localStorage.getItem('eazylife-theme')}catch(e){}t=t||(matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);document.documentElement.classList.toggle('dark',t==='dark')})();</script>
+<link rel="stylesheet" href="assets/css/site-theme.css">
+<link rel="stylesheet" href="assets/css/circuit-studio.css">
+</head>
+<body class="cs-page">
+<header class="cs-topbar">
+  <a class="cs-brand" href="index.html"><img data-theme-logo data-theme-logo-light="assets/pictures/logo_black_transparent.png" data-theme-logo-dark="assets/pictures/logo_white_transparent.png" src="assets/pictures/logo_black_transparent.png" alt="EazyLife"><span>Circuit Studio</span></a>
+  <div class="cs-top-actions">
+    <button class="cs-icon-btn" id="themeToggle" type="button" aria-label="Toggle colour theme" title="Toggle theme">◐</button>
+    <a class="cs-home-link" href="stem-electronics-fundamentals.html">Lessons</a>
+    <a class="cs-home-link" href="index.html">EazyLife home</a>
+  </div>
+</header>
+<main class="cs-app">
+  <section class="cs-toolbar" aria-label="Drawing tools">
+    <div class="cs-tool-group">
+      <button id="newProject" class="cs-btn">New</button>
+      <button id="saveProject" class="cs-btn">Save draft</button>
+      <button id="importProject" class="cs-btn">Import</button><input id="projectFile" type="file" accept=".json,application/json" hidden>
+      <button id="exportSvg" class="cs-btn cs-primary">Export SVG</button>
+      <button id="exportJson" class="cs-btn">Download JSON</button>
+    </div>
+    <div class="cs-tool-group">
+      <button id="undo" class="cs-btn" title="Undo (Ctrl+Z)">↶</button><button id="redo" class="cs-btn" title="Redo (Ctrl+Y)">↷</button>
+      <button id="rotate" class="cs-btn" title="Rotate selected 90°">Rotate ↻</button><button id="mirror" class="cs-btn" title="Mirror selected">Mirror ↔</button><button id="delete" class="cs-btn cs-danger" title="Delete selected">Delete</button>
+    </div>
+    <div class="cs-tool-group cs-view-tools">
+      <label class="cs-style-label">Symbols <select id="symbolStyle"><option value="engineering">Engineering</option><option value="educational">Educational</option></select></label>
+      <button id="zoomOut" class="cs-btn" aria-label="Zoom out">−</button><span id="zoomReadout">100%</span><button id="zoomIn" class="cs-btn" aria-label="Zoom in">+</button><button id="fitCanvas" class="cs-btn">Fit</button>
+    </div>
+  </section>
+  <div class="cs-workspace">
+    <aside class="cs-library-panel">
+      <div class="cs-panel-heading"><div><span class="cs-eyebrow">LIBRARY</span><h2>Components</h2></div><span id="componentCount" class="cs-count">0</span></div>
+      <input id="componentSearch" class="cs-search" type="search" placeholder="Search components…" aria-label="Search components">
+      <div id="categoryFilters" class="cs-categories"></div>
+      <div id="componentLibrary" class="cs-component-list"></div>
+      <p class="cs-hint">Drag a symbol onto the canvas, or tap it to place it.</p>
+    </aside>
+    <section class="cs-canvas-panel" aria-label="Circuit drawing canvas">
+      <div class="cs-canvas-head"><div><strong id="projectTitle">Untitled circuit</strong><span id="saveStatus">Not saved</span></div><div class="cs-canvas-actions"><button id="addText" class="cs-small-btn">＋ Text</button><button id="toggleGrid" class="cs-small-btn active">Grid</button><button id="clearSelection" class="cs-small-btn">Deselect</button></div></div>
+      <div class="cs-canvas-wrap" id="canvasWrap">
+        <svg id="circuitCanvas" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-label="Circuit drawing workspace">
+          <defs><pattern id="csGrid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="currentColor" stroke-opacity=".12" stroke-width="1"/></pattern></defs>
+          <rect id="gridRect" x="0" y="0" width="1200" height="800" fill="url(#csGrid)"/>
+          <g id="wireLayer"></g><g id="componentLayer"></g><g id="annotationLayer"></g><g id="interactionLayer"></g>
+        </svg>
+        <div class="cs-canvas-empty" id="emptyHint"><span>＋</span><strong>Your circuit starts here</strong><p>Choose a component from the library to place it on the canvas.</p></div>
+      </div>
+      <div class="cs-statusbar"><span id="selectionStatus">Nothing selected</span><span>Click a pin, then another pin to connect</span><span id="coordinateStatus">x: 0 · y: 0</span></div>
+    </section>
+    <aside class="cs-properties-panel">
+      <div class="cs-panel-heading"><div><span class="cs-eyebrow">INSPECTOR</span><h2>Properties</h2></div></div>
+      <div id="propertiesContent" class="cs-properties-content"><div class="cs-empty-property">Select a component, wire or label to edit its properties.</div></div>
+      <div class="cs-inspector-note"><strong>Component artwork</strong><p>Each symbol is independent of its pin definitions. Admin artwork editing and publishing will be added in the library-management stage.</p></div>
+    </aside>
+  </div>
+</main>
+<dialog id="svgEditorDialog" class="cs-dialog">
+  <form method="dialog" class="cs-dialog-head"><div><span class="cs-eyebrow">COMPONENT ARTWORK</span><h2 id="svgEditorTitle">Edit SVG artwork</h2></div><button class="cs-icon-btn" value="cancel" aria-label="Close">✕</button></form>
+  <div class="cs-editor-grid"><label>SVG markup<textarea id="svgSource" spellcheck="false"></textarea></label><div class="cs-live-preview"><strong>Live preview</strong><div id="svgPreview"></div><p class="cs-hint">Edit paths, lines, shapes and strokes. Pin definitions remain separate from artwork.</p></div></div>
+  <div class="cs-dialog-actions"><button id="resetArtwork" class="cs-btn" type="button">Reset artwork</button><button id="applyArtwork" class="cs-btn cs-primary" type="button">Apply to this project</button></div>
+</dialog>
+<div id="toast" class="cs-toast" role="status" aria-live="polite"></div>
+<script type="module" src="js/circuit-studio.js"></script>
+<script src="js/site-theme.js"></script>
+</body></html>
