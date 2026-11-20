@@ -29,6 +29,9 @@
       <button id="exportJson" class="cs-btn">Download JSON</button>
     </div>
     <div class="cs-tool-group">
+      <button id="toolSelect" class="cs-btn active" type="button">Select / Move</button><button id="toolConnect" class="cs-btn" type="button">Connect wires</button><button id="toolPins" class="cs-btn" type="button">Edit pins</button><button id="toolPan" class="cs-btn" type="button">Pan</button>
+    </div>
+    <div class="cs-tool-group">
       <button id="undo" class="cs-btn" title="Undo (Ctrl+Z)">↶</button><button id="redo" class="cs-btn" title="Redo (Ctrl+Y)">↷</button>
       <button id="rotate" class="cs-btn" title="Rotate selected 90°">Rotate ↻</button><button id="mirror" class="cs-btn" title="Mirror selected">Mirror ↔</button><button id="delete" class="cs-btn cs-danger" title="Delete selected">Delete</button>
     </div>
@@ -56,7 +59,7 @@
         </svg>
         <div class="cs-canvas-empty" id="emptyHint"><span>＋</span><strong>Your circuit starts here</strong><p>Choose a component from the library to place it on the canvas.</p></div>
       </div>
-      <div class="cs-statusbar"><span id="selectionStatus">Nothing selected</span><span>Click a pin, then another pin to connect</span><span id="coordinateStatus">x: 0 · y: 0</span></div>
+      <div class="cs-statusbar"><span id="selectionStatus">Nothing selected</span><span>Connect wires: choose Connect wires, then tap two pins. Pan: choose Pan or use Space + drag.</span><span id="coordinateStatus">x: 0 · y: 0</span></div>
     </section>
     <aside class="cs-properties-panel">
       <div class="cs-panel-heading"><div><span class="cs-eyebrow">INSPECTOR</span><h2>Properties</h2></div></div>
