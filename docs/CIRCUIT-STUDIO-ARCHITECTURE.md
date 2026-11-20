@@ -7,7 +7,7 @@ A public, browser-based schematic illustration editor for creating, refining and
 ## Product decisions
 
 - Public visitors can draw and export without an account.
-- Anonymous drafts are stored locally in IndexedDB/local browser storage; portable JSON import/export is the cross-device workflow for the first release.
+- Anonymous drafts are stored locally in browser localStorage (with an IndexedDB upgrade planned); portable JSON import/export is the cross-device workflow for the first release.
 - Published component assets and curated diagrams are managed through the existing EazyLife admin and Firebase project.
 - Both engineering schematic conventions (IEC/ANSI variants) and educational presentation styles are supported.
 - Circuit data is structured JSON. SVG is a generated output, never the sole editable source.
