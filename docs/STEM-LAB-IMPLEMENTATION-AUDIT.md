@@ -534,3 +534,21 @@ The user reconfirmed the agreed finite ending sequence. This is the authoritativ
 - **29. Continue Your Journey with EazyLife:** Transition from free learning to guided training, clearly presenting optional paid guidance, masterclasses and project-specific support without withholding useful free learning.
 
 Module 26's upcoming navigation now points to Module 27: DAC and Signal Generation. Modules 27–29 are planned, not yet implemented.
+
+
+## Module 27: DAC and Signal Generation
+
+- Added standalone lesson \`stem-dac-signal-generation.html\`, responsive stylesheet \`assets/css/stem-dac.css\` and interactive teaching models in \`js/stem-dac.js\`.
+- Covers DAC operation, digital codes and quantisation, ideal resolution, R-2R resistor ladders, PWM versus true DAC output, RC low-pass filtering, waveform properties, sampling, microcontroller DAC availability, oscilloscope measurement and troubleshooting.
+- Interactive tools: configurable ideal DAC resolution/code-to-voltage explorer; four-bit R-2R code explorer; PWM/RC average, time-constant and cutoff estimator; sine, square, triangle and sawtooth waveform model with sample-rate and clipping feedback.
+- Practical A: original ESP32 DAC1 sine-wave output on GPIO25 using a 64-sample lookup table and nominal 2 kHz sample rate. The page distinguishes original ESP32 and ESP32-S2 DAC support from ESP32-S3/C3/C6 variants without the same general-purpose DAC peripheral. Verify the exact SoC and board pinout.
+- Practical B: Arduino Uno R3 PWM output through a passive RC low-pass filter, explicitly labelled as a smoothed PWM approximation rather than a true DAC.
+- Includes labelled SVGs, component lists, wiring guidance, Arduino sketches, oscilloscope test procedure, expected observations, troubleshooting and four shared-format knowledge-check questions.
+- Safety: extra-low-voltage only; scope ground clip only to verified circuit ground; no household mains, inverter output or unknown floating circuits; do not exceed GPIO ratings or drive low-impedance loads directly.
+- Connected Module 26 next navigation to Module 27, added Module 27 to the Circuit foundations directory category and XML sitemap. Directory count now reflects 27 modules.
+- Official Espressif Arduino-ESP32 documentation checked for DAC availability and pin mapping: original ESP32 uses GPIO25/26; ESP32-S2 uses GPIO17/18; availability differs across SoC variants. Sources: https://docs.espressif.com/projects/arduino-esp32/en/latest/api/dac.html and https://docs.espressif.com/projects/arduino-esp32/en/latest/libraries.html
+- Source-level checks to complete: JavaScript syntax, unique IDs and DOM references, SVG/section/anchor balance, quiz structure, local assets, Module 26/27 navigation, directory search/filter count and sitemap XML. No browser rendering, Arduino compilation/upload, oscilloscope measurement or physical DAC/PWM hardware test has been performed.
+
+## Confirmed finite ending and Module 29 presentation direction
+
+The user reconfirmed that the learning series ends at Module 29, with no Module 30 or additional lessons. Module 29 should not read like an obvious advertisement. It should contain useful project-based training direction and practical next-step examples, then close the series naturally. Any optional EazyLife guidance/training invitation should be subtle and secondary to the learning content. The final lesson navigation and final paragraph should communicate that the published series is complete; no next lesson button or further lesson teaser should appear after Module 29.
