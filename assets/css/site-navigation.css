@@ -1,0 +1,47 @@
+/* Shared STEM and learning-site navigation polish. Loaded after each page's own styles. */
+.sl-nav-inner,.stem-nav-inner,.sp-nav-inner{gap:12px;min-width:0}
+.sl-nav-links,.stem-nav-links,.sp-nav-links{display:flex;flex:1 1 auto;min-width:0;max-width:calc(100% - 150px);align-items:center;justify-content:flex-end;gap:clamp(5px,1vw,12px);overflow-x:auto;overflow-y:hidden;white-space:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.sl-nav-links::-webkit-scrollbar,.stem-nav-links::-webkit-scrollbar,.sp-nav-links::-webkit-scrollbar{display:none}
+.sl-nav-links>a,.stem-nav-link,.sp-nav-links>a{flex:0 0 auto;white-space:nowrap}
+.sl-nav-links .el-theme-toggle,.stem-nav-links .el-theme-toggle,.sp-nav-links .el-theme-toggle{flex:0 0 38px;position:sticky;right:0;z-index:2;background:var(--el-surface);box-shadow:-8px 0 10px var(--el-surface)}
+.sl-nav-links>a:focus-visible,.stem-nav-link:focus-visible,.sp-nav-links>a:focus-visible{outline:2px solid var(--el-teal);outline-offset:3px;border-radius:6px}
+@media(max-width:760px){
+ .sl-nav-inner,.stem-nav-inner,.sp-nav-inner{gap:8px}
+ .sl-nav-links,.stem-nav-links,.sp-nav-links{gap:7px}
+ .sl-nav-links>a,.stem-nav-link,.sp-nav-links>a{font-size:.68rem!important;padding:6px 5px}
+ .sl-nav-links>a i,.stem-nav-link i,.sp-nav-links>a i{font-size:.78rem;margin-right:4px}
+}
+@media(max-width:520px){
+ .sl-nav-links,.stem-nav-links,.sp-nav-links{max-width:calc(100% - 112px);gap:5px}
+ .sl-nav-links>a,.stem-nav-link,.sp-nav-links>a{font-size:.64rem!important;padding:6px 4px}
+ .sl-nav-links>a i,.stem-nav-link i,.sp-nav-links>a i{font-size:.72rem;margin-right:3px}
+ .sl-nav-links .el-theme-toggle,.stem-nav-links .el-theme-toggle,.sp-nav-links .el-theme-toggle{width:35px;height:35px;flex-basis:35px}
+}
+/* Shared dark-mode contrast safeguards for lesson content and common cards. */
+:root[data-theme="dark"] .sl-page .sl-section h2,
+:root[data-theme="dark"] .sl-page .sl-section h3,
+:root[data-theme="dark"] .sl-page .sl-section h4{color:var(--el-text)}
+:root[data-theme="dark"] .sl-page .sl-section p,
+:root[data-theme="dark"] .sl-page .sl-section li{color:var(--el-muted)}
+:root[data-theme="dark"] .sl-page .ael-card,
+:root[data-theme="dark"] .sl-page .sl-path-card,
+:root[data-theme="dark"] .sl-page .sl-theory,
+:root[data-theme="dark"] .sl-page .sl-glossary,
+:root[data-theme="dark"] .sl-page .sl-build-card,
+:root[data-theme="dark"] .sl-page .sl-results,
+:root[data-theme="dark"] .sl-page .sl-sim-panel,
+:root[data-theme="dark"] .sl-page .sl-trouble-grid article{background:var(--el-surface);border-color:var(--el-border);color:var(--el-text)}
+:root[data-theme="dark"] .sl-page .ael-card p,
+:root[data-theme="dark"] .sl-page .ael-card li,
+:root[data-theme="dark"] .sl-page .ael-caption,
+:root[data-theme="dark"] .sl-page .sl-small-note,
+:root[data-theme="dark"] .sl-page .sl-model-caveat{color:var(--el-muted)}
+:root[data-theme="dark"] .sl-page .ael-q button{background:var(--el-soft);border-color:var(--el-border);color:var(--el-text)}
+:root[data-theme="dark"] .sl-page table th{background:var(--el-soft);color:var(--el-text);border-color:var(--el-border)}
+:root[data-theme="dark"] .sl-page table td{background:var(--el-surface);color:var(--el-muted);border-color:var(--el-border)}
+:root[data-theme="dark"] .sl-page input:not([type="checkbox"]):not([type="radio"]),
+:root[data-theme="dark"] .sl-page select,
+:root[data-theme="dark"] .sl-page textarea{background:var(--el-bg);color:var(--el-text);border-color:var(--el-border)}
+:root[data-theme="dark"] .sl-page input::placeholder,
+:root[data-theme="dark"] .sl-page textarea::placeholder{color:#9aa9a3}
+:root[data-theme="dark"] .sl-page .sl-lesson-nav-button.is-upcoming{background:var(--el-soft);color:var(--el-muted);border-color:var(--el-border)}
