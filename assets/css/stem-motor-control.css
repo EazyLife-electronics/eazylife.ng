@@ -1,0 +1,23 @@
+/* Module 19: digital control, motor control and feedback systems */
+.mctl-card{background:var(--el-card,var(--el-bg,#fff));border:1px solid var(--el-border,rgba(120,130,140,.24));border-radius:14px;padding:20px;margin:16px 0;min-width:0}
+.mctl-card h3{margin-top:0}
+.mctl-card svg{display:block;width:100%;height:auto;max-height:430px}
+.mctl-caption,.mctl-note{font-size:.9rem;opacity:.82;line-height:1.6}
+.mctl-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch}
+.mctl-grid>.mctl-card{margin:0}
+.mctl-control{display:grid;gap:7px;margin:14px 0}
+.mctl-control label{font-weight:600}
+.mctl-control input{max-width:260px;width:100%;padding:10px;border:1px solid var(--el-border,rgba(120,130,140,.35));border-radius:8px;background:var(--el-card,var(--el-bg,#fff));color:inherit}
+.mctl-stat{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--el-border,rgba(120,130,140,.2))}
+.mctl-stat strong{font-variant-numeric:tabular-nums}
+.mctl-equation{font-weight:700;font-size:1.08rem;padding:10px 12px;border-left:3px solid #16866e;background:var(--el-soft,rgba(22,134,110,.07));overflow-wrap:anywhere}
+.mctl-table-wrap{overflow-x:auto;margin:18px 0}
+.mctl-table-wrap table{width:100%;border-collapse:collapse;min-width:560px}
+.mctl-table-wrap th,.mctl-table-wrap td{padding:10px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--el-border,rgba(120,130,140,.25))}
+.mctl-table-wrap th{font-weight:700}
+.mctl-steps li{margin:10px 0}
+.mctl-card pre{overflow-x:auto;white-space:pre}
+.mctl-card pre code{font-size:.82rem;line-height:1.6}
+.mctl-card code{overflow-wrap:anywhere}
+@media(max-width:720px){.mctl-grid{grid-template-columns:1fr}.mctl-card{padding:15px}.mctl-stat{align-items:flex-start}.mctl-stat strong{text-align:right}}
+@media(prefers-reduced-motion:reduce){.mctl-card *{scroll-behavior:auto}}
