@@ -5,3 +5,27 @@
 @media(max-width:620px){.cs-topbar{padding:0 12px}.cs-home-link{display:none}.cs-toolbar{padding:8px;gap:7px}.cs-tool-group{flex-wrap:wrap}.cs-btn{padding:7px 8px;font-size:10px}.cs-workspace{display:flex;flex-direction:column}.cs-library-panel{order:2;max-height:250px;border-right:0;border-top:1px solid var(--cs-border)}.cs-canvas-panel{order:1;min-height:55vh}.cs-properties-panel{order:3;max-height:none}.cs-component-list{grid-template-columns:repeat(4,minmax(0,1fr))}.cs-canvas-head{padding:0 8px}.cs-statusbar span:nth-child(2){display:none}.cs-editor-grid{grid-template-columns:1fr}.cs-dialog{padding:12px}.cs-top-actions{gap:6px}}
 
 .cs-pin-editor{display:grid;grid-template-columns:1.1fr .8fr .8fr;gap:5px;padding:7px 0;border-bottom:1px solid var(--cs-border)}.cs-pin-editor .cs-field{font-size:9px}.cs-pin-editor input{padding:6px 5px;font-size:10px;min-width:0}
+
+/* Direct-manipulation editor improvements */
+.cs-editable-label{cursor:text;user-select:none}.cs-editable-label:hover{filter:drop-shadow(0 0 3px var(--cs-accent));text-decoration:underline;text-decoration-style:dotted}
+.cs-canvas-wrap{overscroll-behavior:contain;touch-action:none}
+.cs-component-card{touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.cs-text-dialog{width:min(420px,calc(100vw - 24px))}
+.cs-text-dialog .cs-field{margin:10px 0}
+.cs-text-dialog input{font-size:16px;padding:12px}
+.cs-properties-content input,.cs-properties-content textarea{font-size:16px;min-height:42px}
+.cs-properties-content .cs-pin-btn,.cs-small-btn,.cs-btn{min-height:38px;touch-action:manipulation}
+@media(max-width:620px){
+ .cs-app{height:auto;min-height:calc(100dvh - 64px)}
+ .cs-toolbar{overflow-x:auto;flex-wrap:nowrap;justify-content:flex-start;scrollbar-width:thin}
+ .cs-tool-group{flex:0 0 auto;flex-wrap:nowrap}
+ .cs-canvas-panel{min-height:62dvh}
+ .cs-canvas-wrap{min-height:52dvh}
+ .cs-library-panel{max-height:none;padding:12px}
+ .cs-component-list{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .cs-properties-panel{max-height:none;padding:12px}
+ .cs-canvas-head{height:auto;min-height:48px;gap:8px;flex-wrap:wrap;padding:8px}
+ .cs-canvas-actions{flex-wrap:wrap}
+ .cs-statusbar{min-height:30px}
+ .cs-pin-editor{grid-template-columns:1fr 1fr 1fr}
+}
