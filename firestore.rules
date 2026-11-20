@@ -13,7 +13,9 @@ service cloud.firestore {
       // include status == 'published'. Admins can read drafts and manage all.
       allow get, list: if isAdmin() || resource.data.status == 'published';
       allow create, update, delete: if isAdmin();
-    }\n\n    match /products/{productId} {
+    }
+
+    match /products/{productId} {
       allow read: if true;
       allow write: if isAdmin();
     }
