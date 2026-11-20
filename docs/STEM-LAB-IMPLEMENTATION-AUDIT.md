@@ -45,6 +45,16 @@ Source-level checks completed for this milestone:
 
 These are source-level checks, not browser rendering or real-device testing. The calculator and guidance sections still need manual testing in mobile and desktop browsers, including dark mode, keyboard operation and actual WhatsApp link behaviour.
 
+### Learning page architecture update: one module per page
+
+- Converted `stem-electronics-fundamentals.html` into a concise learning-domain directory rather than a long page containing the full first lesson.
+- Extracted the original Potentiometer-to-LED lesson, including its explanations, interactive ADC/PWM model, wiring, sketch, troubleshooting and quiz, into `stem-potentiometer-led.html`.
+- The directory now links independently to Potentiometer-to-LED and Component Identification and Polarity; Voltage, Current and Resistance remains clearly marked as in development.
+- Added module navigation from the Potentiometer-to-LED lesson back to the directory and across to the component-identification lesson.
+- Added the standalone lesson to the sitemap. Shared theme, guidance styling and existing client-side lesson logic are retained. No Firebase or production changes were made.
+
+This establishes the page architecture for future work: each learning module is a standalone URL; domain pages are directories, not containers for multiple full lessons.
+
 ## Current implementation on `main`
 
 ### Public pages and assets
