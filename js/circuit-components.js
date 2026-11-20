@@ -31,5 +31,6 @@ const defs=[
 ["relay","Relay","Output","K",[[-65,0],[65,-25],[65,25]],null,line("M-70 0H-40 M-40 -18V18 M-40 0L15 -28 M15 -28H35 M35 -28H65 M35 28H65 M35 28V-8 M35 -8H65")],
 ["transformer","Transformer","Passive","T",[[-70,-20],[-70,20],[70,-20],[70,20]],null,line("M-75 0H-45 M-45 -28C-20 -28 -20 28 -45 28 M-45 -28C-20 -28 -20 28 -45 28 M-10 -32V32 M10 -32V32 M45 -28C20 -28 20 28 45 28 M45 -28C20 -28 20 28 45 28 M45 0H75")]
 ];
-export const COMPONENTS=defs.map((d,i)=>{const [id,name,category,designator,pinsA,pinsB,art]=d;let pins=Array.isArray(pinsA?.[0])?pinsA:(pinsB?[pinsA,pinsB]:[pinsA]);return {id,name,category,designator,pins:pins.map((p,n)=>({id:`p${n+1}`,name:pins.length===2?(n===0?"A":"B"):`Pin ${n+1}`,x:p[0],y:p[1]})),artwork:art,version:1,style:"engineering"};});
+export let COMPONENTS=defs.map((d,i)=>{const [id,name,category,designator,pinsA,pinsB,art]=d;let pins=Array.isArray(pinsA?.[0])?pinsA:(pinsB?[pinsA,pinsB]:[pinsA]);return {id,name,category,designator,pins:pins.map((p,n)=>({id:`p${n+1}`,name:pins.length===2?(n===0?"A":"B"):`Pin ${n+1}`,x:p[0],y:p[1]})),artwork:art,version:1,style:"engineering"};});
 export function getComponent(id){return COMPONENTS.find(c=>c.id===id);}
+export function replaceComponents(items){if(Array.isArray(items)&&items.length)COMPONENTS=items;}
