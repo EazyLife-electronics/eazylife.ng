@@ -53,6 +53,6 @@
 .cs-wire{pointer-events:stroke;cursor:pointer;stroke-width:3.5}.cs-wire-selected{stroke:#1676d2;stroke-width:4.5}.cs-bend-handle{fill:#fff;stroke:#1676d2;stroke-width:2.5;cursor:move;touch-action:none}.cs-junction{fill:#168f80;stroke:#fff;stroke-width:1.5;pointer-events:none}.cs-wire-bends{margin-top:8px}.cs-wire-bends .cs-pin-editor{grid-template-columns:1fr 1fr auto;align-items:end}.cs-wire-bends .cs-pin-btn{min-width:36px;min-height:38px}
 
 /* Open-world canvas and explicit SVG capture frame */
-.cs-canvas-wrap{background-color:var(--cs-panel);background-image:radial-gradient(var(--cs-border) .8px,transparent .8px);background-size:20px 20px}
+.cs-canvas-wrap{background-color:var(--cs-panel);background-image:none}.cs-canvas-wrap.cs-grid-dots{background-image:radial-gradient(color-mix(in srgb,var(--cs-muted) 48%,transparent) 1.15px,transparent 1.15px);background-size:18px 18px}.cs-canvas-wrap.cs-grid-plain{background-image:none}
 .cs-capture-frame{fill:rgba(0,176,155,.035);stroke:#00a88f;stroke-width:3;stroke-dasharray:14 8;vector-effect:non-scaling-stroke;pointer-events:none}
 #toolCapture.active{background:var(--cs-accent);border-color:var(--cs-accent);color:#fff}
