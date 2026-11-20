@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#00B09B">
+<title>Resistors in Practical Circuits | EazyLife STEM Lab</title>
+<meta name="description" content="Learn how to select and use resistors in LED current limiting, voltage dividers, pull-up and pull-down circuits, and practical low-voltage builds.">
+<link rel="canonical" href="https://eazylife.ng/stem-resistors-practical-circuits.html">
+<link rel="icon" type="image/png" href="assets/pictures/icon_dark.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="assets/css/site-theme.css"><link rel="stylesheet" href="assets/css/stem-learning.css"><link rel="stylesheet" href="assets/css/stem-guidance.css"><link rel="stylesheet" href="assets/css/stem-resistors-practical.css">
+</head>
+<body class="sl-page">
+<nav class="sl-nav" aria-label="Main navigation"><div class="sl-wrap sl-nav-inner">
+<a class="sl-brand" href="index.html" aria-label="EazyLife home"><img data-theme-logo data-theme-logo-light="assets/pictures/logo_black_transparent.png" data-theme-logo-dark="assets/pictures/logo_white_transparent.png" src="assets/pictures/logo_black_transparent.png" alt="EazyLife"></a>
+<div class="sl-nav-links"><a href="stem-lab.html"><i class="fas fa-flask"></i> STEM Lab</a><a class="active" href="stem-electronics-fundamentals.html"><i class="fas fa-book-open"></i> Learn</a><a href="stem-resistor-colour-code.html"><i class="fas fa-palette"></i> Tools</a><a href="stem-projects.html"><i class="fas fa-microchip"></i> Experiments</a><button class="el-theme-toggle" type="button" aria-label="Switch colour theme"><i class="fas fa-moon"></i></button></div>
+</div></nav>
+<header class="rpc-hero"><div class="sl-wrap rpc-hero-inner"><div>
+<div class="sl-kicker"><span></span> EAZYLife STEM LAB · MODULE 04</div><h1>Resistors in<br><em>practical circuits.</em></h1>
+<p>Move beyond resistor values and learn how to choose, combine and apply resistors in real circuits. Explore LED current limiting, voltage dividers, signal biasing and power dissipation with practical calculations.</p>
+<div class="sl-hero-actions"><a class="sl-button primary" href="#led-calculator">Start experimenting <i class="fas fa-arrow-down"></i></a><a class="sl-button quiet" href="stem-resistor-colour-code.html">Resistor colour calculator</a></div>
+<div class="sl-meta"><span><i class="fas fa-unlock"></i> Free open lesson</span><span><i class="fas fa-calculator"></i> Interactive tools</span><span><i class="fas fa-shield-halved"></i> Low-voltage practice</span>
+</div></div><div class="rpc-hero-art" aria-hidden="true"><div class="rpc-orbit"></div><div class="rpc-resistor"><span></span><i></i><i></i><i></i><i></i><span></span></div><b>RESISTANCE<br>· APPLICATIONS</b></div></div></header>
+<main>
+<section class="sl-section"><div class="sl-wrap">
+<div class="sl-section-head"><div><div class="sl-eyebrow">01 · WHY RESISTORS MATTER</div><h2>One component, many jobs</h2><p>A resistor does not simply “reduce voltage”. Its role depends on where it is connected and what the circuit needs.</p></div><span class="sl-level">FOUNDATION</span></div>
+<div class="rpc-purpose-grid">
+<article class="rpc-purpose"><span>01</span><h3>Limit current</h3><p>In series with an LED, a resistor helps set the current and protects the LED from excessive current under the intended operating conditions.</p><b>Example: LED series resistor</b></article>
+<article class="rpc-purpose"><span>02</span><h3>Divide voltage</h3><p>Two resistors can create a lower voltage at their junction. The output changes when a load draws current, so divider loading matters.</p><b>Example: sensor signal scaling</b></article>
+<article class="rpc-purpose"><span>03</span><h3>Set logic states</h3><p>Pull-up and pull-down resistors give an input a defined default HIGH or LOW state when a switch or open-collector output is not actively driving it.</p><b>Example: push-button input</b></article>
+<article class="rpc-purpose"><span>04</span><h3>Set operating points</h3><p>Resistors can establish bias currents and voltages for transistor stages. The correct values depend on the device, topology and required operating point.</p><b>Example: transistor bias network</b></article>
+</div>
+<div class="rpc-note"><i class="fas fa-circle-info"></i><p><strong>Important distinction:</strong> a resistor dissipates electrical energy as heat. It is not a voltage regulator. A divider may be suitable for a high-impedance signal input, but it is usually a poor substitute for a regulated power supply.</p></div>
+</div></section>
+<section class="sl-section rpc-soft" id="led-calculator"><div class="sl-wrap">
+<div class="sl-section-head"><div><div class="sl-eyebrow">02 · LED CURRENT LIMITING</div><h2>Choose a resistor for an LED</h2><p>Enter the supply voltage, LED forward voltage and desired current. The calculator estimates the required series resistance and resistor power.</p></div><span class="sl-model-label"><i class="fas fa-calculator"></i> Ideal calculation</span></div>
+<div class="rpc-calculator-grid">
+<div class="rpc-panel">
+<div class="rpc-field"><label for="rpc-supply">Supply voltage (V)</label><input id="rpc-supply" type="number" min="0" step="any" value="5"></div>
+<div class="rpc-field"><label for="rpc-forward">LED forward voltage (V)</label><input id="rpc-forward" type="number" min="0" step="any" value="2"></div>
+<div class="rpc-field"><label for="rpc-current">Target LED current (mA)</label><input id="rpc-current" type="number" min="0.1" step="any" value="10"></div>
+<button class="sl-button primary" type="button" id="rpc-led-calculate"><i class="fas fa-equals"></i> Calculate resistor</button>
+<p class="rpc-feedback" id="rpc-led-feedback" aria-live="polite">Example: 5 V supply, 2 V LED and 10 mA target.</p>
+</div>
+<div class="rpc-result-panel">
+<span>CALCULATED SERIES RESISTOR</span><strong id="rpc-led-resistance">300 Ω</strong>
+<div class="rpc-result-grid"><div><small>Resistor power</small><b id="rpc-led-power">0.03 W</b></div><div><small>Suggested rating</small><b id="rpc-led-rating">0.125 W or higher</b></div><div><small>Nearest common value</small><b id="rpc-led-standard">330 Ω (E12)</b></div><div><small>Current with standard value</small><b id="rpc-led-actual">9.09 mA</b></div></div>
+<div class="rpc-equation" id="rpc-led-equation">R = (Vs − Vf) ÷ I = (5 − 2) ÷ 0.01 = 300 Ω</div>
+</div></div>
+<div class="rpc-note"><i class="fas fa-lightbulb"></i><p>Use the LED's datasheet for its forward-voltage range and permitted current. A common resistor value may produce a current slightly different from the target. Check the actual current and resistor dissipation in the real circuit.</p></div>
+</div></section>
+<section class="sl-section"><div class="sl-wrap">
+<div class="sl-section-head"><div><div class="sl-eyebrow">03 · RESISTOR POWER AND HEAT</div><h2>Will the resistor run safely?</h2><p>Resistance alone is not enough. A resistor also has a power rating, commonly expressed in watts.</p></div></div>
+<div class="rpc-power-grid">
+<div class="rpc-power-card"><h3>Power in a resistor</h3><p>For a resistor with voltage across it and current through it, power can be calculated using any of these equivalent relationships:</p><div class="rpc-formulas"><b>P = V × I</b><b>P = I² × R</b><b>P = V² ÷ R</b></div><p>Power is converted mainly into heat. If the resistor dissipates more than its permitted rating, it may overheat, drift in value, become damaged or fail.</p></div>
+<div class="rpc-power-card"><h3>Choose with margin</h3><p>Do not select a resistor whose nominal rating is barely equal to the calculated dissipation. Consider ambient temperature, ventilation, enclosure, pulse conditions and the manufacturer's derating curve.</p><div class="rpc-rating-list"><span><b>0.125 W</b> · common small signal use</span><span><b>0.25 W</b> · common through-hole resistor</span><span><b>0.5 W and above</b> · higher dissipation where appropriate</span></div><p class="rpc-small">These are common ratings, not automatic approvals for every circuit.</p></div>
+</div>
+<div class="rpc-warning"><i class="fas fa-temperature-high"></i><div><strong>Heat is a design condition.</strong><p>A resistor can become hot even when it is operating within its rating. Keep heat-producing components away from plastics, wires and heat-sensitive parts. Use the manufacturer's power-derating guidance.</p></div></div>
+</div></section>
+<section class="sl-section rpc-soft" id="divider"><div class="sl-wrap">
+<div class="sl-section-head"><div><div class="sl-eyebrow">04 · VOLTAGE DIVIDERS</div><h2>Calculate the output, then add a load</h2><p>A divider's output is taken across the lower resistor. A connected load sits in parallel with that lower resistor and changes the output voltage.</p></div><span class="sl-model-label"><i class="fas fa-wave-square"></i> Ideal resistor model</span></div>
+<div class="rpc-divider-grid">
+<div class="rpc-panel">
+<div class="rpc-field"><label for="rpc-divider-input">Input voltage (V)</label><input id="rpc-divider-input" type="number" min="0" step="any" value="5"></div>
+<div class="rpc-field"><label for="rpc-r1">Upper resistor R1 (Ω)</label><input id="rpc-r1" type="number" min="0.001" step="any" value="10000"></div>
+<div class="rpc-field"><label for="rpc-r2">Lower resistor R2 (Ω)</label><input id="rpc-r2" type="number" min="0.001" step="any" value="10000"></div>
+<div class="rpc-field"><label for="rpc-load">Load resistance (Ω), optional</label><input id="rpc-load" type="number" min="0.001" step="any" placeholder="Leave blank for no load"></div>
+<button class="sl-button primary" type="button" id="rpc-divider-calculate">Calculate divider</button>
+<p class="rpc-feedback" id="rpc-divider-feedback" aria-live="polite">Compare the unloaded output with the loaded output.</p>
+</div>
+<div class="rpc-divider-results">
+<div><span>Unloaded output</span><strong id="rpc-unloaded">2.50 V</strong></div>
+<div><span>Loaded output</span><strong id="rpc-loaded">2.50 V</strong></div>
+<div><span>Divider current, unloaded</span><strong id="rpc-divider-current">0.25 mA</strong></div>
+<div><span>Effective lower resistance with load</span><strong id="rpc-effective">10 kΩ</strong></div>
+<div class="rpc-equation" id="rpc-divider-equation">Vout = Vin × R2 ÷ (R1 + R2)</div>
+</div></div>
+<div class="rpc-note"><i class="fas fa-lightbulb"></i><p><strong>Practical rule:</strong> a divider is most predictable when the load resistance is much larger than the lower divider resistor. If the load is comparable to or smaller than R2, loading can significantly reduce the output. For powering a device, consider a suitable regulator instead.</p></div>
+</div></section>
+<section class="sl-section"><div class="sl-wrap">
+<div class="sl-section-head"><div><div class="sl-eyebrow">05 · COMBINING RESISTORS</div><h2>Series, parallel and standard values</h2><p>Combine available resistors to obtain a useful equivalent value, but remember that each resistor still has its own power and tolerance limits.</p></div></div>
+<div class="rpc-combine-grid">
+<article class="rpc-combine-card"><h3>Series combination</h3><div class="rpc-mini-circuit"><span>R1</span><i></i><span>R2</span></div><b>Rtotal = R1 + R2</b><p>Resistances add. The same current flows through each resistor, while the supply voltage is divided between them.</p></article>
+<article class="rpc-combine-card"><h3>Parallel combination</h3><div class="rpc-mini-circuit parallel"><span>R1</span><i></i><span>R2</span></div><b>1/Rtotal = 1/R1 + 1/R2</b><p>The equivalent resistance is lower than the smallest branch resistance. Each branch has the same voltage.</p></article>
+</div>
+<div class="rpc-note"><i class="fas fa-palette"></i><p>Use the <a href="stem-resistor-colour-code.html">resistor colour-code calculator</a> to identify a physical resistor's nominal value and tolerance. Standard E-series values mean the exact calculated resistance may not be available as a single component.</p></div>
+</div></section>
+<section class="sl-section rpc-soft"><div class="sl-wrap">
+<div class="sl-section-head"><div><div class="sl-eyebrow">06 · POTENTIOMETERS</div><h2>A resistor you can adjust</h2><p>A potentiometer contains a resistive track and a movable wiper. Its three terminals can be used as an adjustable voltage divider, or two terminals can be used as a variable resistance.</p></div></div>
+<div class="rpc-pot-grid">
+<div class="rpc-pot-art" aria-label="Conceptual potentiometer showing two track ends and a movable wiper"><span>END 1</span><div class="rpc-track"><i></i><b></b></div><span>END 2</span><small>WIPER · ADJUSTABLE POSITION</small></div>
+<div><h3>Two common connections</h3><ul class="rpc-list"><li><b>Voltage divider:</b> connect both ends of the track across a supply and take the variable output from the wiper.</li><li><b>Variable resistor:</b> use the wiper and one end terminal. Some designs connect the wiper to the unused end for improved continuity if the wiper momentarily loses contact.</li></ul><p class="rpc-small">A potentiometer's total resistance and power rating must suit the circuit. Do not assume every potentiometer can carry motor or lamp current.</p><a class="sl-button primary" href="stem-potentiometer-led.html">Explore Module 01: Potentiometer to LED <i class="fas fa-arrow-right"></i></a></div>
+</div></div></section>
+<section class="sl-section" id="build"><div class="sl-wrap">
+<div class="sl-section-head"><div><div class="sl-eyebrow">07 · PRACTICAL LOW-VOLTAGE BUILD</div><h2>Build a current-limited LED circuit</h2><p>Use a low-voltage DC source and compare the calculated current with a real measurement.</p></div><span class="sl-level">WORKBENCH ACTIVITY</span></div>
+<div class="rpc-build-grid">
+<article class="rpc-build-card"><h3><i class="fas fa-toolbox"></i> Components and tools</h3><ul><li>Regulated 5 V DC supply or current-limited bench supply.</li><li>One standard LED with known forward-voltage information.</li><li>One 330 Ω resistor, preferably ¼ W or higher.</li><li>Breadboard and jumper wires.</li><li>Digital multimeter with intact probes.</li></ul><div class="rpc-note"><i class="fas fa-shield-halved"></i><p>Never connect this activity to mains electricity. Use a low-voltage, current-limited supply.</p></div></article>
+<article class="rpc-build-card"><h3><i class="fas fa-list-check"></i> Build and investigate</h3><ol><li>Identify the LED anode and cathode. Check the component datasheet if the markings are unclear.</li><li>With power disconnected, connect the LED and 330 Ω resistor in series.</li><li>Connect the series path to the 5 V supply with correct LED polarity.</li><li>Check the wiring for shorts before applying power.</li><li>Power the circuit and observe the LED. If it does not light, disconnect power before troubleshooting.</li><li>Measure the voltage across the resistor with the meter in DC voltage mode.</li><li>Calculate current using the measured resistor voltage divided by 330 Ω. Do not put the meter in current mode directly across the supply.</li><li>Compare the measured current with the calculator estimate. Explain differences using LED forward voltage, resistor tolerance and supply variation.</li></ol></article>
+</div>
+<div class="rpc-observation"><h3>Expected ideal estimate</h3><div><span>Supply</span><b>5 V</b></div><div><span>LED forward voltage assumption</span><b>2 V</b></div><div><span>Series resistor</span><b>330 Ω</b></div><div><span>Estimated current</span><b>9.09 mA</b></div><p>This estimate assumes a 2 V LED drop. The actual LED forward voltage depends on its type, current and temperature.</p></div>
+</div></section>
+<section class="sl-section rpc-soft"><div class="sl-wrap">
+<div class="sl-section-head"><div><div class="sl-eyebrow">08 · COMMON MISTAKES</div><h2>What can go wrong?</h2></div></div>
+<div class="rpc-mistakes">
+<article><b>LED connected without a current-limiting method</b><p>An LED connected directly to a stiff voltage source can draw excessive current and fail. Use a correctly designed driver or series resistor.</p></article>
+<article><b>Resistor wattage ignored</b><p>A resistance value may be correct while the selected component's power rating is inadequate.</p></article>
+<article><b>Divider used to power a load</b><p>A load changes the divider ratio. Use a regulator or suitable driver when the load needs a stable supply.</p></article>
+<article><b>Pull-up or pull-down omitted</b><p>A digital input can float when nothing drives it. Provide a defined logic state using an appropriate resistor or a correctly configured internal pull-up.</p></article>
+<article><b>Resistor measured in a live circuit</b><p>Switch off and safely discharge stored energy before measuring resistance. In-circuit parallel paths can also affect the reading.</p></article>
+<article><b>Assuming colour bands are always obvious</b><p>Check band orientation, tolerance and the component's markings. Confirm uncertain values with a meter when safe and appropriate.</p></article>
+</div></div></section>
+<section class="sl-section"><div class="sl-wrap">
+<div class="sl-section-head"><div><div class="sl-eyebrow">09 · KNOWLEDGE CHECK</div><h2>Test your circuit judgement</h2><p>Choose the best answer for each question.</p></div></div>
+<div class="rpc-quiz" id="rpc-quiz">
+<div class="rpc-question" data-question="0"><h3>1. Why is a resistor commonly connected in series with an LED?</h3><button data-correct="true">To limit the LED current</button><button data-correct="false">To make the LED generate its own voltage</button><button data-correct="false">To convert DC into AC</button><p aria-live="polite"></p></div>
+<div class="rpc-question" data-question="1"><h3>2. What happens when a low-resistance load is connected across the lower resistor of a divider?</h3><button data-correct="false">The output always remains unchanged</button><button data-correct="true">The effective lower resistance falls and output voltage usually falls</button><button data-correct="false">The input voltage automatically doubles</button><p aria-live="polite"></p></div>
+<div class="rpc-question" data-question="2"><h3>3. What should guide the choice of a resistor's wattage rating?</h3><button data-correct="false">Only its physical length</button><button data-correct="false">The colour of its body</button><button data-correct="true">Dissipated power, derating and operating conditions</button><p aria-live="polite"></p></div>
+</div></div></section>
+<section class="sl-section sl-lesson-nav-section"><div class="sl-wrap"><div class="sl-section-head"><div><div class="sl-eyebrow">YOUR LEARNING JOURNEY</div><h2>Where would you like to go next?</h2><p>Return to the previous lesson or explore the module directory.</p></div></div>
+<nav class="sl-lesson-nav" aria-label="Previous and next lessons"><a class="sl-lesson-nav-button previous" href="stem-voltage-current-resistance.html"><i class="fas fa-arrow-left" aria-hidden="true"></i><span class="sl-lesson-nav-button-copy"><small>PREVIOUS LESSON</small><strong>Voltage, Current and Resistance</strong></span></a><span class="sl-lesson-nav-button next is-upcoming" aria-disabled="true"><i class="fas fa-lock" aria-hidden="true"></i><span class="sl-lesson-nav-button-copy"><small>NEXT LESSON · COMING SOON</small><strong>Diodes and LED Circuits</strong></span></span></nav></div></section>
+<section class="sl-guidance"><div class="sl-wrap sl-guidance-inner"><div><span class="sl-guidance-kicker">KEEP LEARNING · GO FURTHER</span><h2>Free to learn. More support when you need it.</h2><p>Use the open lessons and experiments at your own pace. For personalised explanations, project-specific troubleshooting, guided practical training or masterclasses, EazyLife offers paid support tailored to your learning goals.</p><p class="sl-guidance-note">Free or sponsored lesson referrals may be available through active programmes; they are not guaranteed.</p></div><a class="sl-button primary" href="https://wa.me/2347051548082?text=Hello%20EazyLife%2C%20I%20would%20like%20to%20enquire%20about%20personalised%20guidance%20or%20a%20masterclass."><i class="fas fa-comments"></i> Enquire about guidance</a></div></section>
+</main>
+<footer class="sl-footer"><div class="sl-wrap"><a href="index.html" class="sl-footer-brand">EazyLife <span>Robotics & Electronics Solutions</span></a><p>Explore boldly. Build thoughtfully. Make useful things.</p><div><a href="stem-electronics-fundamentals.html">Electronics Fundamentals</a><a href="stem-voltage-current-resistance.html">Previous lesson</a><a href="stem-resistor-colour-code.html">Resistor calculator</a><a href="stem-projects.html">Project playground</a><a href="shop.html">Components</a></div><small>© <span id="sl-year"></span> EazyLife Robotics & Electronics Solutions · Ibadan, Nigeria</small></div></footer>
+<script src="js/site-theme.js"></script><script src="js/stem-resistors-practical.js"></script>
+</body></html>
