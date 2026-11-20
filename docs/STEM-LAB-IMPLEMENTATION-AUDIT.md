@@ -332,3 +332,14 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - Safety boundary: no loose lithium-cell parallel experiments, no learner-built lithium pack, no charging/repair/modification of lithium packs, no battery short-circuit tests. Use intact protected commercial packs with their specified chargers, or matched AA cells in a holder for the simple series demonstration.
 - Connected Module 11's next-lesson button, added Module 12 to the Electronics Fundamentals directory, corrected malformed nested anchor markup in the Module 10/11 directory sequence, and added the page to the XML sitemap.
 - Source-level checks should verify unique IDs, all calculator references, SVG integrity, navigation, directory structure and sitemap XML. No browser rendering, battery-pack validation or physical testing has been performed.
+
+
+## Module 13: Workshop Practice, Soldering and PCB Fundamentals
+
+- Added standalone lesson page `stem-workshop-soldering-pcb.html` using shared lesson styles and the shared advanced knowledge-check interactions.
+- Covers workshop tool selection and setup, bench safety, solderless breadboard versus perfboard/stripboard versus custom PCB, through-hole soldering process, solder-joint quality and defects, unpowered continuity/resistance testing, PCB vocabulary and schematic-to-layout workflow.
+- Includes labelled SVG diagrams for workbench setup, breadboard/perfboard/PCB construction, through-hole solder joint cross-section, good/poor/bridged joints, continuity testing and schematic-to-PCB representation.
+- Practical activities: solder a low-voltage LED/resistor test board, diagnose a prepared unpowered practice-board fault, and lay out a simple LED/resistor PCB in design software.
+- Safety boundaries: effective local fume extraction, eye protection, hot-iron stand and supervision; no live-circuit continuity testing; no mains/high-voltage/high-energy battery/safety-critical PCB design in this beginner lesson. No deliberate shorting of powered circuits.
+- Connected Module 12's next-lesson button, added Module 13 to the Electronics Fundamentals directory and XML sitemap.
+- Source-level validation should check unique IDs, SVG integrity, balanced section/anchor tags, navigation, directory links and sitemap XML. No browser rendering, soldering process test or PCB fabrication has been performed.
