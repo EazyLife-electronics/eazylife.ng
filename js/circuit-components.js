@@ -15,7 +15,7 @@ const defs=[
 ["npn","NPN transistor","Semiconductors","Q",[[-65,0],[0,-55],[0,55]],null,line("M-65 0H-20 M-20 -38V38 M-20 -25L35 -55 M-20 25L35 55 M35 -55H65 M35 55H65 M15 40L35 55L12 58")],
 ["pnp","PNP transistor","Semiconductors","Q",[[-65,0],[0,-55],[0,55]],null,line("M-65 0H-20 M-20 -38V38 M-20 -25L35 -55 M-20 25L35 55 M35 -55H65 M35 55H65 M35 55L15 40L12 58")],
 ["mosfet","N-channel MOSFET","Semiconductors","Q",[[-65,0],[0,-55],[0,55]],null,line("M-65 0H-30 M-18 -42V42 M-8 -42V42 M-8 -28L35 -55 M-8 28L35 55 M35 -55H65 M35 55H65")],
-["opamp","Operational amplifier","Integrated circuits",[[-65,0],[55,-28],[55,28]],null,"U",line("M-45 -48L45 0L-45 48Z M-65 -22H-45 M-65 22H-45 M45 0H65 M-38 -22H-28 M-33 -27V-17 M-38 22H-28")],
+["opamp","Operational amplifier","Integrated circuits","U",[[-65,-22],[-65,22],[55,0]],null,line("M-45 -48L45 0L-45 48Z M-65 -22H-45 M-65 22H-45 M45 0H65 M-38 -22H-28 M-33 -27V-17 M-38 22H-28")],
 ["timer555","555 timer IC","Integrated circuits","U",[[-65,-35],[-65,-12],[-65,12],[-65,35],[65,-35],[65,-12],[65,12],[65,35]],null,`<rect x="-48" y="-58" width="96" height="116" rx="3" fill="none" stroke="currentColor" stroke-width="3"/><text x="0" y="6" text-anchor="middle" font-size="25" fill="currentColor" font-weight="700">555</text>`],
 ["ground","Ground","Power","GND",[[0,-35]],null,line("M0 -35V-10 M-28 -10H28 M-19 0H19 M-9 10H9")],
 ["battery","Battery","Power","BT",[-65,0],[65,0],line("M-70 0H-12 M-12 -28V28 M8 -15V15 M8 0H70")],
@@ -29,7 +29,7 @@ const defs=[
 ["and-gate","AND gate","Logic","U",[[-65,-22],[-65,22],[55,0]],null,`<path d="M-40 -40H0A40 40 0 0 1 0 40H-40Z" fill="none" stroke="currentColor" stroke-width="3"/><path d="M-65 -22H-40M-65 22H-40M40 0H65" fill="none" stroke="currentColor" stroke-width="3"/>`],
 ["buzzer","Buzzer","Output","BZ",[-65,0],[65,0],line("M-70 0H-30L15 -28V28L-30 0 M15 -18Q42 0 15 18 M28 -28Q68 0 28 28")],
 ["relay","Relay","Output","K",[[-65,0],[65,-25],[65,25]],null,line("M-70 0H-40 M-40 -18V18 M-40 0L15 -28 M15 -28H35 M35 -28H65 M35 28H65 M35 28V-8 M35 -8H65")],
-["transformer","Transformer","Passive",[[-70,0],[70,0]],null,"T",line("M-75 0H-45 M-45 -28C-20 -28 -20 28 -45 28 M-45 -28C-20 -28 -20 28 -45 28 M-10 -32V32 M10 -32V32 M45 -28C20 -28 20 28 45 28 M45 -28C20 -28 20 28 45 28 M45 0H75")]
+["transformer","Transformer","Passive","T",[[-70,-20],[-70,20],[70,-20],[70,20]],null,line("M-75 0H-45 M-45 -28C-20 -28 -20 28 -45 28 M-45 -28C-20 -28 -20 28 -45 28 M-10 -32V32 M10 -32V32 M45 -28C20 -28 20 28 45 28 M45 -28C20 -28 20 28 45 28 M45 0H75")]
 ];
 export const COMPONENTS=defs.map((d,i)=>{const [id,name,category,designator,pinsA,pinsB,art]=d;let pins=Array.isArray(pinsA?.[0])?pinsA:(pinsB?[pinsA,pinsB]:[pinsA]);return {id,name,category,designator,pins:pins.map((p,n)=>({id:`p${n+1}`,name:pins.length===2?(n===0?"A":"B"):`Pin ${n+1}`,x:p[0],y:p[1]})),artwork:art,version:1,style:"engineering"};});
 export function getComponent(id){return COMPONENTS.find(c=>c.id===id);}
