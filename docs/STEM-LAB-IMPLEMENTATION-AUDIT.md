@@ -180,3 +180,15 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - The calculated answer is written into the previously blank input field as well as shown in the result panel.
 - Validation allows zero voltage, but requires supplied current and resistance to be positive. Invalid inputs receive specific guidance.
 - Source-level validation should confirm all three calculation paths, default/reset values, and feedback states. This is not a substitute for interactive browser testing.
+
+
+
+## Module 04: Resistors in Practical Circuits
+
+- Added standalone lesson page `stem-resistors-practical-circuits.html`, with separate CSS and JavaScript assets. The page follows the one-module-per-page structure and reuses the shared EazyLife navigation, theme, guidance section and compact previous/next lesson buttons.
+- Covers resistor roles in current limiting, voltage division, pull-up/pull-down logic bias and transistor operating-point bias; resistor power dissipation, thermal conditions and derating; series/parallel combinations; standard E-series selection; and potentiometer use, with a link back to Module 01 and the resistor colour-code tool.
+- Added an interactive LED series-resistor calculator. It estimates resistance, resistor dissipation, a conservative suggested common wattage rating, nearest E12 value and the resulting current when that standard value is used. Inputs are validated, and results are explicitly presented as ideal estimates requiring datasheet and derating checks.
+- Added an interactive voltage-divider calculator that compares unloaded and loaded output, calculates the effective lower resistance when a load is connected, and shows divider current. This demonstrates why dividers are sensitive to loading and are not substitutes for regulated supplies.
+- Added a low-voltage LED practical build, measurement guidance, common mistakes and a three-question knowledge check. No mains build or high-energy activity is included.
+- Linked Module 04 from the Electronics Fundamentals directory, updated Module 03's next-lesson button, and added the new page to the XML sitemap.
+- Source-level checks should verify unique IDs, all JavaScript element references, valid JS syntax, expected local assets, correct module navigation, sitemap structure and calculator edge cases. Browser/mobile testing and physical build verification remain separate tasks.
