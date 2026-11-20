@@ -108,3 +108,11 @@ The current routing stage uses a generated orthogonal route between endpoints. M
 - Bend handles can be dragged directly on the canvas with mouse or touch.
 - Explicit junction markers can be toggled at route bends. Ordinary wire crossings remain non-connected; the editor does not infer electrical connection from visual intersection.
 - Wire selection and deletion are supported. Junctions are route-bend markers in this milestone; shared multi-wire electrical node modelling and automatic intersection detection remain future work.
+
+## Open-world canvas and capture bounds (2026-11-20)
+
+- The SVG viewport is now a movable window into an unbounded coordinate plane. Panning can move into positive or negative coordinates; the grid follows the viewport instead of ending at the former 1200 × 800 edge.
+- New components and annotations are placed at the current visible workspace centre. Existing project coordinates remain valid.
+- Capture Area mode lets the user draw a rectangular export boundary anywhere in the open workspace. The dashed frame is an editor guide and is not included in the exported artwork.
+- SVG export uses the capture rectangle exactly when one is defined. Without a capture rectangle, export bounds are calculated from placed components, annotations and wire routes with a small margin.
+- Fit content frames the current drawing rather than resetting to the original fixed canvas.
