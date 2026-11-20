@@ -1,0 +1,38 @@
+/* Module 27: DAC and Signal Generation */
+.dac-flow{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;margin:24px 0}
+.dac-flow>div{padding:17px 20px;border:1px solid var(--el-border);border-radius:12px;background:var(--el-surface);text-align:center}
+.dac-flow strong{display:block;margin-top:6px;color:var(--el-teal)}
+.dac-flow .dac-chip{background:var(--el-soft);font-size:1.25rem;font-weight:900;letter-spacing:.12em}
+.dac-flow>i{color:var(--el-teal)}
+.dac-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;margin:18px 0}
+.dac-grid>.ael-card{min-width:0}
+.dac-figure{margin:20px 0;padding:16px;border:1px solid var(--el-border);border-radius:12px;background:var(--el-surface)}
+.dac-figure svg{display:block;width:100%;height:auto;max-height:320px}
+.dac-figure figcaption,.dac-figure+figcaption{display:block;margin-top:9px;color:var(--el-muted);font-size:.82rem}
+.dac-formula{margin:18px 0;padding:17px;border-left:4px solid var(--el-teal);border-radius:8px;background:var(--el-soft);font-weight:800;text-align:center;line-height:1.9}
+.dac-demo{max-width:900px;margin:22px auto;padding:20px;border:1px solid var(--el-border);border-radius:14px;background:var(--el-surface)}
+.dac-controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin:14px 0}
+.dac-controls label{display:grid;align-content:start;gap:7px;min-width:0;font-size:.82rem;font-weight:800}
+.dac-controls input,.dac-controls select{width:100%;min-width:0;padding:10px;border:1px solid var(--el-border);border-radius:8px;background:var(--el-surface);color:var(--el-text)}
+.dac-controls input[type=range]{padding:8px 0;accent-color:var(--el-teal)}
+.dac-readouts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:16px 0}
+.dac-readouts>div{padding:12px;border:1px solid var(--el-border);border-radius:9px;background:var(--el-soft);min-width:0}
+.dac-readouts small{display:block;color:var(--el-muted);font-size:.72rem}
+.dac-readouts strong{display:block;margin-top:5px;color:var(--el-teal);font:800 1.05rem Poppins,sans-serif;overflow-wrap:anywhere}
+.dac-level-track{height:13px;border-radius:99px;background:var(--el-soft);overflow:hidden}
+.dac-level-track span{display:block;width:50%;height:100%;background:var(--el-teal);transition:width .15s}
+.dac-caption,.dac-demo .ael-caption{font-size:.8rem;color:var(--el-muted)}
+.dac-table-wrap{overflow-x:auto;margin:16px 0}
+.dac-table{width:100%;border-collapse:collapse;background:var(--el-surface);color:var(--el-text);font-size:.86rem}
+.dac-table th,.dac-table td{padding:11px;border:1px solid var(--el-border);text-align:left;vertical-align:top}
+.dac-table th{background:var(--el-soft);font-weight:800}
+.dac-code{display:block;max-width:100%;overflow-x:auto;padding:15px;border-radius:10px;background:#17212b;color:#e5f5ef;font-size:.78rem;line-height:1.55;white-space:pre}
+.dac-code code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+.dac-wiring{display:grid;justify-items:center;gap:7px;margin:16px 0}
+.dac-wiring span{padding:9px 12px;border:1px solid var(--el-border);border-radius:8px;background:var(--el-soft);font-weight:700;text-align:center}
+.dac-wiring i{color:var(--el-teal)}
+#dac-wave-svg{display:block;width:100%;height:auto;margin:12px 0}
+@media(max-width:760px){.dac-grid{grid-template-columns:1fr}.dac-controls{grid-template-columns:repeat(2,minmax(0,1fr))}.dac-readouts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:430px){.dac-flow{gap:8px}.dac-flow>div{padding:11px;font-size:.82rem}.dac-flow>i{font-size:.8rem}.dac-controls{grid-template-columns:1fr}.dac-demo{padding:14px}.dac-readouts strong{font-size:.94rem}.dac-table{font-size:.77rem}.dac-table th,.dac-table td{padding:8px}}
+:root[data-theme="dark"] .dac-figure svg [fill="#dff3eb"]{fill:#21463e}
+:root[data-theme="dark"] .dac-grid svg [fill="#dff3eb"]{fill:#21463e}
