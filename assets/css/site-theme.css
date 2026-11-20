@@ -32,3 +32,24 @@ body{transition:background-color .18s ease,color .18s ease}
 :root[data-theme="dark"] .card,:root[data-theme="dark"] .project{color:var(--el-text)}
 :root[data-theme="dark"] .card h1,:root[data-theme="dark"] .card h2,:root[data-theme="dark"] .card h3,:root[data-theme="dark"] .project h2{color:var(--el-text)}
 :root[data-theme="dark"] .card p,:root[data-theme="dark"] .project p{color:var(--el-muted)}
+
+
+/* Site-wide dark-theme contrast and keyboard-navigation safeguards. */
+:root[data-theme="dark"] .text-teal-700,
+:root[data-theme="dark"] .text-teal-800,
+:root[data-theme="dark"] .text-teal-900{color:#69d9c4!important}
+:root[data-theme="dark"] .text-gray-700,
+:root[data-theme="dark"] .text-gray-800,
+:root[data-theme="dark"] .text-gray-900{color:var(--el-text)!important}
+:root[data-theme="dark"] .text-gray-500,
+:root[data-theme="dark"] .text-gray-600{color:var(--el-muted)!important}
+:root[data-theme="dark"] .bg-white{background-color:var(--el-surface)!important}
+:root[data-theme="dark"] .border-gray-100,
+:root[data-theme="dark"] .border-gray-200{border-color:var(--el-border)!important}
+:root[data-theme="dark"] button:focus-visible,
+:root[data-theme="dark"] a:focus-visible,
+:root[data-theme="dark"] input:focus-visible,
+:root[data-theme="dark"] select:focus-visible,
+:root[data-theme="dark"] textarea:focus-visible{outline:2px solid #69d9c4;outline-offset:3px}
+:root[data-theme="dark"] .nav-menu-panel a{color:var(--el-text)!important}
+:root[data-theme="dark"] .nav-menu-panel a:hover{background:var(--el-soft)!important}
