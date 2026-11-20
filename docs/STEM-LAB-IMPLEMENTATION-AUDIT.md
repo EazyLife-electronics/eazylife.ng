@@ -372,3 +372,17 @@ The syllabus is a content seed rather than a mandatory learner sequence. The nex
 - Safety boundaries: use extra-low-voltage circuits; check sensor dissipation and board ADC limits; use current-limited LED indicators; no use of hobby LDR/thermistor sensors as sole life-safety detectors; no hazardous heat/flame or mains activities.
 - Connected Module 14's next-lesson navigation, added Module 15 to the Electronics Fundamentals directory and XML sitemap.
 - Source-level validation should check unique IDs, JS references, SVG/section/anchor balance, directory and sitemap links. No browser rendering, sensor calibration or physical Arduino test has been performed.
+
+
+## Module 16: Digital Sensors and Communication Interfaces
+
+- Added standalone lesson `stem-digital-sensors-communication-interfaces.html`, responsive stylesheet `assets/css/stem-digital.css` and interactive UART estimator `js/stem-digital.js`.
+- Covers digital switching, pulse/timing and serial data outputs; logic voltage thresholds; push-pull and open-drain outputs; pull-up/pull-down concepts; and voltage-level compatibility.
+- Explains I²C START/address/ACK/data/STOP concepts, shared SDA/SCL topology, addressing, pull-up selection and bus capacitance; SPI SCLK/MOSI/MISO/chip-select; and asynchronous UART framing, crossed TX/RX wiring and baud agreement.
+- Includes labelled SVG diagrams for digital waveforms, pull-up button input, shared I²C bus, SPI topology, UART wiring and Arduino Uno-to-I²C-breakout example.
+- Practical activities include an Arduino I²C scanner, an example BME280 I²C sensor read sketch with explicit breakout/address caveats, UART serial communication examples, and a datasheet-led sensor interface inspection.
+- Interactive UART frame-time estimator calculates ideal wire time and throughput from baud rate, frame bits and byte count.
+- Troubleshooting covers missing I²C acknowledgements, address conflicts, bus capacitance, UART framing, SPI mode/chip-select and floating inputs.
+- Safety boundaries: verify exact module pinout, supply and logic voltage; use level shifting where required; never apply unchecked 5 V to 3.3 V-only pins; do not connect RS-232 directly to logic UART; keep practicals extra-low voltage and use ESD precautions.
+- Connected Module 15's next-lesson navigation, added Module 16 to the Electronics Fundamentals directory and XML sitemap.
+- Source-level validation should check unique IDs, JavaScript references, SVG/section/anchor balance, links and sitemap XML. No browser rendering, sensor hardware test, I²C bus measurement or physical Arduino test has been performed.
