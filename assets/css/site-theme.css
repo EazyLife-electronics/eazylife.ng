@@ -133,3 +133,27 @@ body{transition:background-color .18s ease,color .18s ease}
 :root[data-theme="dark"] .text-red-600{color:#f87171!important}
 :root[data-theme="dark"] .text-green-700{color:#4ade80!important}
 :root[data-theme="dark"] .text-teal-600{color:#5eead4!important}
+
+/* Main-site horizontal navigation uses the same compact pill treatment. */
+:root .nav-actions a:not(.btn-wa) {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  flex:0 0 auto;
+  min-height:38px;
+  padding:9px 13px;
+  border:1px solid var(--el-border);
+  border-radius:999px;
+  background:var(--el-surface);
+  color:var(--el-text);
+  font-size:.78rem;
+  font-weight:700;
+  line-height:1.2;
+  white-space:nowrap;
+  text-decoration:none;
+}
+:root .nav-actions a:not(.btn-wa):hover {
+  border-color:var(--el-teal);
+  background:var(--el-soft);
+}
