@@ -581,3 +581,38 @@ Module 29 is the final lesson in the series. It should offer project-based pract
 - Module 28 next navigation now points to Module 29: Applied Electronics Projects. Module 29 has only a previous-lesson button, no next-lesson button or Module 30 teaser. Added Module 29 to the directory and XML sitemap; directory count now reflects 29 modules.
 - Source-level validation: check unique IDs, JavaScript syntax and DOM references, all project selector data keys, quiz markup, CSS braces, responsive styles, previous/next navigation, directory search/filter count and sitemap XML. No browser rendering, microcontroller compilation, physical project build or hardware testing has been performed.
 - This is the final module. No Module 30 or further lesson is planned.
+
+
+## Website-wide navigation and theme consistency audit · 20 November 2026
+
+### Navigation corrections
+
+- Standardised the lesson navigation on all 29 standalone modules. Previous/next buttons now use consistent labels with the module number and exact destination title. Module 01 uses an `ALL MODULES` return link; Module 29 has only its Module 28 previous button.
+- Corrected the Module 25 next-button title to the approved Module 26 title, **Digital Displays and Human Interfaces**.
+- Standardised the main STEM navigation across STEM Lab, Project Playground, Electronics Fundamentals, the resistor calculator and all 29 lesson pages. Shared destinations are STEM Lab, Lessons, Tools, Project Playground, Project Gallery, Shop, Track Order and Reviews. Current-section states are retained.
+- Added `assets/css/site-navigation.css` after each STEM page's local styles. At narrow widths, navigation labels remain visible in a horizontally scrollable row instead of being reduced to icon-only links. The theme toggle remains visible at the end of the row.
+- Aligned the public navigation destinations on the homepage, project gallery, reviews, shop and order-tracking pages. Shop and tracking use the same expanded menu destinations, with a bounded, scrollable menu panel. The project-kit order page now also exposes a theme toggle and clear return-to-gallery/shop links.
+- Standardised navigation label capitalization, including Project Playground, Project Gallery and Track Order.
+- The homepage now links directly to Lessons, Project Playground, Project Gallery, Tools and Reviews, in addition to the existing engineering, STEM Lab, shop and tracking destinations.
+- Corrected the homepage CAC identifier from `RC-9462420` to the user's registered `BN-9462420`.
+
+### Dark/light theme corrections
+
+- Improved shared dark-theme contrast in `assets/css/site-theme.css`, including muted text, metadata, review summaries, empty states, project labels, quotes and teal links.
+- Added shared dark-theme safeguards for lesson cards, tables, forms, highlighted callouts and lesson navigation in `assets/css/site-navigation.css`.
+- Removed the Module 14 instrumentation rule that forcibly changed every SVG text label to `currentColor` in dark mode. It could turn labels white even where the SVG used a white or pale instrument display, making the text disappear.
+- Removed the Module 28 product-design rule that forced all SVG labels to the light theme text colour. Its diagrams use pale engineering blocks, so white labels could lose contrast. Diagram labels now retain their dark ink on pale blocks.
+- Reviewed the theme handling on the homepage, project gallery, reviews, shop, order tracking, project-kit order page, STEM Lab, Project Playground, learning directory, resistor calculator and lesson pages. The homepage retains its own theme implementation; the shop and tracking pages retain their Tailwind `dark` class implementation; pages using the shared theme layer use the common theme script.
+
+### Pending and navigation-state checks
+
+- Checked all 29 module pages for disabled/upcoming/coming-soon lesson navigation markers. None remain in the lesson navigation.
+- Confirmed each module's previous and next links follow the 01–29 sequence. Module 29 has no next button, no Module 30 link and no further-lesson teaser.
+- Confirmed the Electronics Fundamentals directory contains 29 module cards and the final module is represented in the sitemap.
+- The word "pending" remains in an internal homepage code comment describing moderation of user-submitted reviews; it is not a pending lesson or a visible navigation state.
+
+### Validation limits
+
+- Performed source-level checks on navigation markup, destination paths, module sequence, pending/upcoming markers, stylesheet references and dark-theme overrides.
+- No live-browser visual regression pass, automated screenshot comparison, real-device layout test or runtime JavaScript console test has been performed. The branch preview should still be reviewed in light and dark modes at desktop and phone widths before merge/deployment.
+- All changes remain on `feature/stem-learning-platform`. No production merge or deployment was performed.
