@@ -45,3 +45,9 @@
 :root[data-theme="dark"] .sl-page input::placeholder,
 :root[data-theme="dark"] .sl-page textarea::placeholder{color:#9aa9a3}
 :root[data-theme="dark"] .sl-page .sl-lesson-nav-button.is-upcoming{background:var(--el-soft);color:var(--el-muted);border-color:var(--el-border)}
+
+:root[data-theme="dark"] .sl-page .pd-callout p,
+:root[data-theme="dark"] .sl-page .pd-result p,
+:root[data-theme="dark"] .sl-page .logic-output p,
+:root[data-theme="dark"] .sl-page .ap-callout p,
+:root[data-theme="dark"] .sl-page .ap-ending p{color:var(--el-text)!important}
