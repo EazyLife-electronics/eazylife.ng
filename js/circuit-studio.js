@@ -24,7 +24,38 @@ function routeAroundComponents(a,b,startKey,endKey){
  if(path[path.length-1]!==nodes[0])return[];path.reverse();const compact=path.filter((p,i)=>i===0||i===path.length-1||Math.abs((p.x-path[i-1].x)*(path[i+1].y-p.y)-(p.y-path[i-1].y)*(path[i+1].x-p.x))>0.01);
  return compact.slice(1,-1);
 }
-function rerouteAffectedWires(movedIds){if(!movedIds?.size)return;for(const w of project.wires){if((project.junctions||[]).some(j=>j.wireId===w.id))continue;const a=findPin(w.from),b=findPin(w.to);if(!a||!b)continue;const endpointMoved=[w.from,w.to].some(key=>movedIds.has(key.split(':')[0]));let blocked=false;if(!endpointMoved){const pts=[pinPosition(a.item,a.pin),...(w.route||[]),pinPosition(b.item,b.pin)];for(const id of movedIds){const item=project.components.find(c=>c.id===id);if(!item)continue;const corners=componentCorners(item),xs=corners.map(p=>p.x),ys=corners.map(p=>p.y),rect={x:Math.min(...xs)-26,y:Math.min(...ys)-26,right:Math.max(...xs)+26,bottom:Math.max(...ys)+26};if(pts.slice(1).some((p,i)=>segmentTouchesRect(pts[i],p,rect))){blocked=true;break}}}if(endpointMoved||blocked)w.route=routeAroundComponents(pinPosition(a.item,a.pin),pinPosition(b.item,b.pin),w.from,w.to)}}
+function rerouteWirePreservingJunctions(w,a,b){
+ const anchors=(project.junctions||[]).filter(j=>j.wireId===w.id&&Number.isInteger(j.index)&&w.route?.[j.index]).map(j=>({j,p:{x:w.route[j.index].x,y:w.route[j.index].y},oldIndex:j.index})).sort((x,y)=>x.oldIndex-y.oldIndex);
+ if(!anchors.length){w.route=routeAroundComponents(pinPosition(a.item,a.pin),pinPosition(b.item,b.pin),w.from,w.to);return}
+ const route=[];let cursor=pinPosition(a.item,a.pin),cursorKey=w.from;
+ for(const anchor of anchors){
+  const bends=routeAroundComponents(cursor,anchor.p,cursorKey,'junction:'+anchor.j.id);
+  route.push(...bends);
+  const last=route[route.length-1];
+  if(!last||Math.hypot(last.x-anchor.p.x,last.y-anchor.p.y)>0.5)route.push({x:anchor.p.x,y:anchor.p.y});
+  anchor.j.index=route.length-1;
+  cursor=anchor.p;cursorKey='junction:'+anchor.j.id;
+ }
+ route.push(...routeAroundComponents(cursor,pinPosition(b.item,b.pin),cursorKey,w.to));
+ w.route=route;
+ w.junctions=anchors.map(x=>x.j.index);
+}
+function rerouteAffectedWires(movedIds){
+ if(!movedIds?.size)return;
+ for(const w of project.wires){
+  const a=findPin(w.from),b=findPin(w.to);if(!a||!b)continue;
+  const endpointMoved=[w.from,w.to].some(key=>!key.startsWith('junction:')&&movedIds.has(key.split(':')[0]));
+  let blocked=false;
+  const pts=[pinPosition(a.item,a.pin),...(w.route||[]),pinPosition(b.item,b.pin)];
+  for(const id of movedIds){
+   const item=project.components.find(c=>c.id===id);if(!item)continue;
+   const corners=componentCorners(item),xs=corners.map(p=>p.x),ys=corners.map(p=>p.y);
+   const rect={x:Math.min(...xs)-26,y:Math.min(...ys)-26,right:Math.max(...xs)+26,bottom:Math.max(...ys)+26};
+   if(pts.slice(1).some((p,i)=>segmentTouchesRect(pts[i],p,rect))){blocked=true;break}
+  }
+  if(endpointMoved||blocked)rerouteWirePreservingJunctions(w,a,b);
+ }
+}
 function buildWireRoute(startPoint,endPoint,startKey,endKey,waypoints=[]){if(!startPoint||!endPoint)return clone(waypoints);const route=[];let cursor=startPoint;for(const waypoint of waypoints){route.push(...routeAroundComponents(cursor,waypoint,startKey,null));if(Math.hypot(waypoint.x-cursor.x,waypoint.y-cursor.y)>0.5)route.push(waypoint);cursor=waypoint}route.push(...routeAroundComponents(cursor,endPoint,startKey,endKey));return route}
 function rectsTouch(a,b){return a.x<=b.right&&a.right>=b.x&&a.y<=b.bottom&&a.bottom>=b.y}
 function segmentTouchesRect(a,b,r){if(pointInRect(a,r)||pointInRect(b,r))return true;const edges=[[{x:r.x,y:r.y},{x:r.right,y:r.y}],[{x:r.right,y:r.y},{x:r.right,y:r.bottom}],[{x:r.right,y:r.bottom},{x:r.x,y:r.bottom}],[{x:r.x,y:r.bottom},{x:r.x,y:r.y}]];const cross=(p1,p2,p3)=>(p2.x-p1.x)*(p3.y-p1.y)-(p2.y-p1.y)*(p3.x-p1.x);return edges.some(([c,d])=>{const x1=cross(a,b,c),x2=cross(a,b,d),x3=cross(c,d,a),x4=cross(c,d,b);return x1*x2<=0&&x3*x4<=0})}
