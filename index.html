@@ -833,7 +833,7 @@
           const image = p.coverImage || (Array.isArray(p.images) ? p.images[0] : '') || 'assets/pictures/placeholder.svg';
           return `<article class="project-gallery-card">
             <a href="projects.html?id=${encodeURIComponent(p.id)}" aria-label="View ${escapeHtml(p.title || 'engineering project')} details">
-              <img src="${escapeHtml(image)}" alt="${escapeHtml(p.title || 'EazyLife engineering project')}" loading="lazy">
+              <img src="${escapeHtml(image)}" alt="${escapeHtml(p.title || 'EazyLife engineering project')}" loading="lazy" decoding="async" width="640" height="420">
             </a>
             <div class="project-card-body">
               <span class="project-category">${escapeHtml(p.category || 'Engineering project')}</span>
@@ -867,7 +867,7 @@
           const summary = r.summary || r.text || '';
           const image = r.coverImage || (Array.isArray(r.images) ? r.images[0] : '');
           return `<article class="review-card">
-            ${image ? `<a href="reviews.html?id=${encodeURIComponent(r.id)}"><img src="${escapeHtml(image)}" alt="Project photograph associated with review by ${escapeHtml(r.name)}" loading="lazy" style="width:100%;height:170px;object-fit:cover;border-radius:12px;margin-bottom:14px;"></a>` : ''}
+            ${image ? `<a href="reviews.html?id=${encodeURIComponent(r.id)}"><img src="${escapeHtml(image)}" alt="Project photograph associated with review by ${escapeHtml(r.name)}" loading="lazy" decoding="async" width="640" height="420" style="width:100%;height:170px;object-fit:cover;border-radius:12px;margin-bottom:14px;"></a>` : ''}
             <div class="stars">${'★'.repeat(stars)}${'☆'.repeat(5-stars)}</div>
             <p class="text">"${escapeHtml(summary.length > 210 ? summary.slice(0,207).trim() + '…' : summary)}"</p>
             <div class="who">${escapeHtml(r.name)}<span>${escapeHtml(r.title || '')}</span></div>
