@@ -155,6 +155,7 @@
   <footer><div class="container">EazyLife Robotics &amp; Electronics Solutions · Ibadan, Nigeria · <a href="https://wa.me/2347051548082">Contact us</a></div></footer>
   <script type="module">
     import { getPublishedProjects, getProducts } from './js/store.mjs';
+    import { optimizedImageUrl, responsiveImageAttrs } from './js/image-delivery.mjs';
     const content = document.getElementById('content');
     const params = new URLSearchParams(location.search);
     const selectedId = params.get('id');
@@ -171,7 +172,7 @@
       const hasVideo = /^https?:\/\//i.test(String(p.videoUrl || '').trim());
       const link = 'projects.html?id=' + encodeURIComponent(p.id);
       return '<article class="card">' +
-        '<a class="card-media" href="' + link + '"><img src="' + esc(image) + '" alt="' + esc(p.title || 'EazyLife project') + '" loading="lazy" decoding="async" width="640" height="460">' +
+        '<a class="card-media" href="' + link + '"><img src="' + esc(optimizedImageUrl(image, 640)) + '" ' + responsiveImageAttrs(image, [320, 480, 640, 960], '(max-width: 700px) 100vw, 33vw') + ' alt="' + esc(p.title || 'EazyLife project') + '" loading="lazy" decoding="async" width="640" height="460">' +
         (imageCount > 1 ? '<span class="media-badge"><i class="fas fa-images"></i> ' + imageCount + ' photos</span>' : (hasVideo ? '<span class="media-badge"><i class="fas fa-play"></i> Video available</span>' : '')) +
         '</a><div class="body"><span class="category">' + esc(p.category || 'Engineering project') + '</span>' +
         '<h2><a href="' + link + '">' + esc(p.title || 'Engineering project') + '</a></h2>' +
