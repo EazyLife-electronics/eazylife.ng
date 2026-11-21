@@ -24,6 +24,29 @@ function routeAroundComponents(a,b,startKey,endKey){
  if(path[path.length-1]!==nodes[0])return[];path.reverse();const compact=path.filter((p,i)=>i===0||i===path.length-1||Math.abs((p.x-path[i-1].x)*(path[i+1].y-p.y)-(p.y-path[i-1].y)*(path[i+1].x-p.x))>0.01);
  return compact.slice(1,-1);
 }
+function simplifyWireRoute(w){
+ const a=findPin(w.from),b=findPin(w.to);if(!a||!b||!Array.isArray(w.route))return;
+ const junctions=(project.junctions||[]).filter(j=>j.wireId===w.id&&Number.isInteger(j.index));
+ const protectedIndices=new Set(junctions.map(j=>j.index));
+ const entries=w.route.map((p,i)=>({old:i,p:{x:p.x,y:p.y}}));
+ const start=pinPosition(a.item,a.pin),end=pinPosition(b.item,b.pin);
+ let changed=true;
+ while(changed){
+  changed=false;
+  for(let i=0;i<entries.length;i++){
+   const entry=entries[i];if(protectedIndices.has(entry.old))continue;
+   const prev=i===0?start:entries[i-1].p,next=i===entries.length-1?end:entries[i+1].p,p=entry.p;
+   const duplicatePrev=Math.hypot(p.x-prev.x,p.y-prev.y)<0.5;
+   const duplicateNext=Math.hypot(p.x-next.x,p.y-next.y)<0.5;
+   const cross=(p.x-prev.x)*(next.y-p.y)-(p.y-prev.y)*(next.x-p.x);
+   const forward=(p.x-prev.x)*(next.x-p.x)+(p.y-prev.y)*(next.y-p.y)>=-0.01;
+   if(duplicatePrev||duplicateNext||(Math.abs(cross)<0.01&&forward)){entries.splice(i,1);changed=true;break}
+  }
+ }
+ w.route=entries.map(x=>x.p);
+ for(const j of junctions){const nextIndex=entries.findIndex(x=>x.old===j.index);if(nextIndex>=0)j.index=nextIndex}
+ w.junctions=junctions.map(j=>j.index);
+}
 function rerouteWirePreservingJunctions(w,a,b){
  const anchors=(project.junctions||[]).filter(j=>j.wireId===w.id&&Number.isInteger(j.index)&&w.route?.[j.index]).map(j=>({j,p:{x:w.route[j.index].x,y:w.route[j.index].y},oldIndex:j.index})).sort((x,y)=>x.oldIndex-y.oldIndex);
  if(!anchors.length){w.route=routeAroundComponents(pinPosition(a.item,a.pin),pinPosition(b.item,b.pin),w.from,w.to);return}
@@ -39,6 +62,7 @@ function rerouteWirePreservingJunctions(w,a,b){
  route.push(...routeAroundComponents(cursor,pinPosition(b.item,b.pin),cursorKey,w.to));
  w.route=route;
  w.junctions=anchors.map(x=>x.j.index);
+ simplifyWireRoute(w);
 }
 function rerouteAffectedWires(movedIds){
  if(!movedIds?.size)return;
