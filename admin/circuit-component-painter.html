@@ -55,5 +55,5 @@ body.component-access-denied .top:after{content:'Admin sign-in required';font-si
 <script>
 (()=>{const key='eazylife-painter-theme',root=document.documentElement,btn=document.getElementById('themeToggle');const apply=dark=>{root.dataset.theme=dark?'dark':'light';btn.textContent=dark?'☀️ Light theme':'🌙 Dark theme';btn.setAttribute('aria-pressed',String(dark));try{localStorage.setItem(key,dark?'dark':'light')}catch(_){}};let saved='light';try{saved=localStorage.getItem(key)||'light'}catch(_){}apply(saved==='dark');btn.addEventListener('click',()=>apply(root.dataset.theme!=='dark'));})();
 </script>
-<script type="module" src="./js/circuit-painter.mjs?v=556becd"></script>
+<script type="module" src="./js/circuit-painter.mjs?v=admin-shared-component-1"></script>
 </body></html>
