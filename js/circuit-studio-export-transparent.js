@@ -229,8 +229,9 @@ renderLibrary();$('symbolStyle').value=project.style||'engineering';render();app
   cloudFirestore={db,collection,doc,setDoc,getDocs,query,orderBy,deleteDoc,serverTimestamp};
   onAuthStateChanged(auth,user=>{
    cloudUser=user||null;isCircuitAdmin=!!user&&user.email==='damzyeazy@gmail.com';
-   $('saveProject').hidden=!isCircuitAdmin;$('importProject').hidden=!isCircuitAdmin;$('exportJson').hidden=!isCircuitAdmin;
-   $('saveCloudProject').hidden=!isCircuitAdmin;$('openCloudProjects').hidden=!isCircuitAdmin;
+   const adminTools=$('adminProjectTools'),adminExportTools=$('adminProjectExportTools');
+   if(adminTools)adminTools.hidden=!isCircuitAdmin;
+   if(adminExportTools)adminExportTools.hidden=!isCircuitAdmin;
    if(!isCircuitAdmin){cloudProjectId=null;cloudUser=null}
    if(selected?.type==='component')renderProperties();
   });
