@@ -278,7 +278,7 @@
         '<div class="detail-top"><a class="btn" href="projects.html"><i class="fas fa-arrow-left"></i> All projects</a><span class="category">' + esc(p.category || 'Engineering project') + '</span></div>' +
         '<h1>' + esc(p.title || 'Engineering project') + '</h1>' +
         '<p class="detail-copy">' + esc(p.summary || '') + '</p>' +
-        (cover ? '<img class="detail-cover" data-project-image="' + esc(cover) + '" src="' + esc(cover) + '" alt="' + esc(p.title || 'Project cover') + '" decoding="async" width="1200" height="800">' : '') +
+        (cover ? '<img class="detail-cover" data-project-image="' + esc(cover) + '" src="' + esc(optimizedImageUrl(cover, 1200)) + '" ' + responsiveImageAttrs(cover, [640, 960, 1200, 1600], '(max-width: 700px) 100vw, 850px') + ' alt="' + esc(p.title || 'Project cover') + '" decoding="async" width="1200" height="800">' : '') +
         (p.description ? '<div class="detail-block"><h2>About this project</h2><p class="detail-copy">' + esc(p.description) + '</p></div>' : '') +
         (galleryImages.length ? '<div class="detail-block"><h2>Project photos</h2><p class="detail-copy">Select any image to view it larger.</p><div class="detail-images">' +
           galleryImages.map((src,i) => '<button class="detail-image-button" type="button" data-project-image="' + esc(src) + '" aria-label="View project photo ' + (i+1) + '"><img src="' + esc(src) + '" alt="' + esc(p.title || 'Project') + ' photo ' + (i+1) + '" loading="lazy" decoding="async" width="640" height="460"></button>').join('') +
