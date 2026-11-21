@@ -24,8 +24,8 @@ const tag=selected.tagName.toLowerCase();
 if(tag==='line'){add('x1',+selected.getAttribute('x1'),+selected.getAttribute('y1'));add('x2',+selected.getAttribute('x2'),+selected.getAttribute('y2'))}
 else if(tag==='rect'){const x=+selected.getAttribute('x'),y=+selected.getAttribute('y'),w=+selected.getAttribute('width'),h=+selected.getAttribute('height');add('nw',x,y);add('ne',x+w,y);add('se',x+w,y+h);add('sw',x,y+h)}
 else if(tag==='ellipse'){const x=+selected.getAttribute('cx'),y=+selected.getAttribute('cy'),rx=+selected.getAttribute('rx'),ry=+selected.getAttribute('ry');add('left',x-rx,y);add('right',x+rx,y);add('top',x,y-ry);add('bottom',x,y+ry)}
-else if(tag==='path'){const p=curvePoints(selected);if(p){add('start',p.x1,p.y1);add('control',p.cx,p.cy);add('end',p.x2,p.y2)}}
-else if(tag==='text'||(tag==='path'&&!curvePoints(selected))){const b=selected.getBBox();[['nw',b.x,b.y],['ne',b.x+b.width,b.y],['se',b.x+b.width,b.y+b.height],['sw',b.x,b.y+b.height]].forEach(v=>add('scale-'+v[0],v[1],v[2]))}
+else if(tag==='path'){const p=curvePoints(selected);if(p){add('start',p.x1,p.y1);add('control',p.cx,p.cy);add('end',p.x2,p.y2)}else{const b=selected.getBBox();[['nw',b.x,b.y],['ne',b.x+b.width,b.y],['se',b.x+b.width,b.y+b.height],['sw',b.x,b.y+b.height]].forEach(v=>add('scale-'+v[0],v[1],v[2]))}}
+else if(tag==='text'){const b=selected.getBBox();[['nw',b.x,b.y],['ne',b.x+b.width,b.y],['se',b.x+b.width,b.y+b.height],['sw',b.x,b.y+b.height]].forEach(v=>add('scale-'+v[0],v[1],v[2]))}
 }
 function select(o){selected=o;refreshSelected();renderHandles()}
 function editHandle(key,p){if(!selected)return;const m=selected.getCTM();if(m){const pt=canvas.createSVGPoint();pt.x=p.x;pt.y=p.y;const q=pt.matrixTransform(m.inverse());p={x:q.x,y:q.y}}const tag=selected.tagName.toLowerCase();if(tag==='line'){selected.setAttribute(key,p.x);selected.setAttribute(key==='x1'?'y1':'y2',p.y)}
