@@ -145,6 +145,8 @@ if(componentPanel&&!document.getElementById('clPainterLaunchCard')){
   });
 }
 
+}
+
 // Order workflow UI is loaded here so we can enhance the existing Orders panel
 // without changing the stable admin-app renderer.
 import('./order-workflow-ui.mjs').catch(err => console.error('Order workflow UI failed to load:', err));
