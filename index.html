@@ -183,6 +183,10 @@
     }
     :root[data-theme="dark"] .nav-actions .btn-stem-lab i { color: #5ee0c4; }
 
+    .nav-actions .btn-circuit-studio{color:var(--teal-dark);background:linear-gradient(135deg,rgba(0,176,155,.08),rgba(141,198,63,.08));border:1.5px solid rgba(0,176,155,.28)}
+    .nav-actions .btn-circuit-studio i{color:var(--teal)}
+    :root[data-theme="dark"] .nav-actions .btn-circuit-studio{color:#a9f0df;border-color:rgba(0,176,155,.42);background:rgba(0,176,155,.12)}
+
     /* HERO */
     .hero { padding: 36px 0 28px; background: linear-gradient(180deg, var(--teal-light) 0%, #fff 100%); }
     .hero-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
@@ -417,6 +421,7 @@
         </a>
         <a href="projects.html" class="btn btn-outline"><i class="fas fa-diagram-project"></i> Project Gallery</a>
         <a href="stem-lab.html" class="btn btn-outline btn-stem-lab" aria-label="Explore the interactive STEM Lab"><i class="fas fa-flask"></i> STEM Lab</a>
+        <a href="circuit-studio.html" class="btn btn-outline btn-circuit-studio" aria-label="Open EazyLife Circuit Studio"><i class="fas fa-draw-polygon"></i> Circuit Studio</a>
         <a href="stem-electronics-fundamentals.html" class="btn btn-outline"><i class="fas fa-book-open"></i> Lessons</a>
         <a href="stem-projects.html" class="btn btn-outline"><i class="fas fa-microchip"></i> Project Playground</a>
         <a href="stem-resistor-colour-code.html" class="btn btn-outline"><i class="fas fa-calculator"></i> Tools</a>
@@ -481,6 +486,20 @@
           <p>Step into the EazyLife STEM Lab. Experiment with circuits, control a virtual motor and discover how sensors measure the world.</p>
         </div>
         <a href="stem-lab.html" class="btn btn-primary"><i class="fas fa-flask"></i> Enter the STEM Lab <i class="fas fa-arrow-right"></i></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CIRCUIT STUDIO FEATURE -->
+  <section class="stem-teaser circuit-studio-teaser" aria-label="Design electronic circuits with Circuit Studio">
+    <div class="container">
+      <div class="stem-teaser-inner">
+        <div>
+          <div class="section-label">Plan · Connect · Create</div>
+          <h2>Design your circuit before you build it.</h2>
+          <p>Use EazyLife Circuit Studio to arrange electronic components, connect pins, route wires around obstacles and create clean circuit diagrams. Export your work as SVG or JSON.</p>
+        </div>
+        <a href="circuit-studio.html" class="btn btn-primary"><i class="fas fa-draw-polygon"></i> Open Circuit Studio <i class="fas fa-arrow-right"></i></a>
       </div>
     </div>
   </section>
