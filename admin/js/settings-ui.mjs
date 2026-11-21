@@ -111,6 +111,20 @@ if (typeof document !== 'undefined' &&
   }
 }
 
+// Place the visual symbol painter directly inside the Circuit Components tab.
+// It stays part of the normal admin workflow instead of appearing as a separate dashboard destination.
+const componentPanel=document.getElementById('panel-circuit-components');
+if(componentPanel&&!document.getElementById('clPainterLaunchCard')){
+  const launch=document.createElement('section');
+  launch.id='clPainterLaunchCard';
+  launch.className='rounded-3xl border border-teal-100 bg-gradient-to-r from-teal-50 to-lime-50 p-4 sm:p-5 mb-5';
+  launch.innerHTML='<div class="flex flex-wrap items-center justify-between gap-3"><div class="min-w-0"><h2 class="font-black text-base text-gray-900">Visual Component Painter</h2><p class="text-xs text-gray-600 mt-1">Draw and edit component symbols with familiar shapes, lines, curves and pin tools. No SVG or JSON hand-coding.</p></div><button type="button" id="clOpenPainter" class="shrink-0 rounded-xl bg-teal-700 text-white px-4 py-3 text-xs font-black shadow-sm"><i class="fas fa-paintbrush mr-2"></i>Open Painter</button></div><div id="clPainterFrameWrap" class="hidden mt-4"><div class="flex items-center justify-between gap-2 mb-2"><p class="text-[11px] text-gray-500">Painter workspace · save your symbol, then close this workspace to return to the component library.</p><button type="button" id="clClosePainter" class="rounded-lg border bg-white px-3 py-2 text-xs font-bold text-gray-700">Close Painter</button></div><iframe id="clPainterFrame" title="Visual Component Painter" src="./circuit-component-painter.html" class="w-full rounded-2xl border border-gray-200 bg-white" style="height:min(82vh,1000px);min-height:640px" loading="lazy"></iframe></div>';
+  componentPanel.prepend(launch);
+  const frameWrap=document.getElementById('clPainterFrameWrap');
+  document.getElementById('clOpenPainter').addEventListener('click',()=>{frameWrap.classList.remove('hidden');document.getElementById('clOpenPainter').classList.add('hidden');frameWrap.scrollIntoView({behavior:'smooth',block:'start'});});
+  document.getElementById('clClosePainter').addEventListener('click',()=>{frameWrap.classList.add('hidden');document.getElementById('clOpenPainter').classList.remove('hidden');});
+}
+
 // Circuit Studio shared symbol library, authored once and reused by every diagram.
 if (typeof document !== 'undefined' &&
     (location.pathname.endsWith('/admin/') || location.pathname.endsWith('/admin/index.html'))) {
