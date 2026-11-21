@@ -284,33 +284,28 @@
     <priority>0.9</priority>
   </url>
 
-  <!-- Sections (anchor links for reference) -->
+  <!-- Electronics components and laptops -->
   <url>
-    <loc>https://eazylife.ng/#services</loc>
-    <lastmod>2026-05-03</lastmod>
+    <loc>https://eazylife.ng/shop.html</loc>
+    <lastmod>2026-11-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
+  <!-- Robotics and electronics project gallery -->
   <url>
-    <loc>https://eazylife.ng/#about</loc>
-    <lastmod>2026-05-03</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.6</priority>
+    <loc>https://eazylife.ng/projects.html</loc>
+    <lastmod>2026-11-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 
+  <!-- Customer reviews and engineering project stories -->
   <url>
-    <loc>https://eazylife.ng/#testimonials</loc>
-    <lastmod>2026-05-03</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <url>
-    <loc>https://eazylife.ng/#contact</loc>
-    <lastmod>2026-05-03</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.6</priority>
+    <loc>https://eazylife.ng/reviews.html</loc>
+    <lastmod>2026-11-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 
 </urlset>

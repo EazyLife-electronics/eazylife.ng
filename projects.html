@@ -4,8 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#00B09B">
-  <title>Engineering Project Gallery | EazyLife</title>
-  <meta name="description" content="Explore practical robotics, electronics, embedded systems and prototyping projects by EazyLife Robotics and Electronics Solutions.">
+  <title>Robotics & Electronics Projects | EazyLife Ibadan</title>
+  <meta name="description" content="Explore EazyLife builds in robotics, electronics, embedded systems and custom prototyping, with project photos, design details and practical engineering.">
+  <link rel="canonical" href="https://eazylife.ng/projects.html">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -94,6 +95,52 @@
   </style>
 <script>(function(){var t=null;try{t=localStorage.getItem('eazylife-theme')}catch(e){}t=t||(matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);document.documentElement.classList.toggle('dark',t==='dark')})();</script>
 <link rel="stylesheet" href="assets/css/site-theme.css">
+
+  <meta property="og:title" content="Robotics & Electronics Projects | EazyLife Ibadan">
+  <meta property="og:description" content="Explore EazyLife builds in robotics, electronics, embedded systems and custom prototyping, with project photos, design details and practical engineering.">
+  <meta property="og:url" content="https://eazylife.ng/projects.html">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://eazylife.ng/assets/pictures/og-image.png">
+  <meta property="og:site_name" content="EazyLife Robotics &amp; Electronics Solutions">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Robotics & Electronics Projects | EazyLife Ibadan">
+  <meta name="twitter:description" content="Explore EazyLife builds in robotics, electronics, embedded systems and custom prototyping, with project photos, design details and practical engineering.">
+  <meta name="twitter:image" content="https://eazylife.ng/assets/pictures/og-image.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "@id": "https://eazylife.ng/projects.html#collection",
+  "name": "EazyLife Robotics and Electronics Project Gallery",
+  "url": "https://eazylife.ng/projects.html",
+  "description": "A gallery of EazyLife engineering work in robotics, electronics, embedded systems and custom prototyping, with project images and technical details.",
+  "inLanguage": "en",
+  "publisher": {
+    "@id": "https://eazylife.ng/#organization",
+    "@type": "Organization",
+    "name": "EazyLife Robotics & Electronics Solutions",
+    "url": "https://eazylife.ng/"
+  },
+  "about": [
+    {
+      "@type": "Thing",
+      "name": "Robotics projects"
+    },
+    {
+      "@type": "Thing",
+      "name": "Electronics engineering"
+    },
+    {
+      "@type": "Thing",
+      "name": "Embedded systems"
+    },
+    {
+      "@type": "Thing",
+      "name": "Custom prototyping"
+    }
+  ]
+}
+</script>
 </head>
 <body>
   <nav class="nav"><div class="container nav-inner">
@@ -108,6 +155,7 @@
   <footer><div class="container">EazyLife Robotics &amp; Electronics Solutions · Ibadan, Nigeria · <a href="https://wa.me/2347051548082">Contact us</a></div></footer>
   <script type="module">
     import { getPublishedProjects, getProducts } from './js/store.mjs';
+    import { optimizedImageUrl, responsiveImageAttrs } from './js/image-delivery.mjs';
     const content = document.getElementById('content');
     const params = new URLSearchParams(location.search);
     const selectedId = params.get('id');
@@ -124,7 +172,7 @@
       const hasVideo = /^https?:\/\//i.test(String(p.videoUrl || '').trim());
       const link = 'projects.html?id=' + encodeURIComponent(p.id);
       return '<article class="card">' +
-        '<a class="card-media" href="' + link + '"><img src="' + esc(image) + '" alt="' + esc(p.title || 'EazyLife project') + '" loading="lazy">' +
+        '<a class="card-media" href="' + link + '"><img src="' + esc(optimizedImageUrl(image, 640)) + '" ' + responsiveImageAttrs(image, [320, 480, 640, 960], '(max-width: 700px) 100vw, 33vw') + ' alt="' + esc(p.title || 'EazyLife project') + '" loading="lazy" decoding="async" width="640" height="460">' +
         (imageCount > 1 ? '<span class="media-badge"><i class="fas fa-images"></i> ' + imageCount + ' photos</span>' : (hasVideo ? '<span class="media-badge"><i class="fas fa-play"></i> Video available</span>' : '')) +
         '</a><div class="body"><span class="category">' + esc(p.category || 'Engineering project') + '</span>' +
         '<h2><a href="' + link + '">' + esc(p.title || 'Engineering project') + '</a></h2>' +
@@ -230,10 +278,10 @@
         '<div class="detail-top"><a class="btn" href="projects.html"><i class="fas fa-arrow-left"></i> All projects</a><span class="category">' + esc(p.category || 'Engineering project') + '</span></div>' +
         '<h1>' + esc(p.title || 'Engineering project') + '</h1>' +
         '<p class="detail-copy">' + esc(p.summary || '') + '</p>' +
-        (cover ? '<img class="detail-cover" data-project-image="' + esc(cover) + '" src="' + esc(cover) + '" alt="' + esc(p.title || 'Project cover') + '">' : '') +
+        (cover ? '<img class="detail-cover" data-project-image="' + esc(cover) + '" src="' + esc(optimizedImageUrl(cover, 1200)) + '" ' + responsiveImageAttrs(cover, [640, 960, 1200, 1600], '(max-width: 700px) 100vw, 850px') + ' alt="' + esc(p.title || 'Project cover') + '" decoding="async" width="1200" height="800">' : '') +
         (p.description ? '<div class="detail-block"><h2>About this project</h2><p class="detail-copy">' + esc(p.description) + '</p></div>' : '') +
         (galleryImages.length ? '<div class="detail-block"><h2>Project photos</h2><p class="detail-copy">Select any image to view it larger.</p><div class="detail-images">' +
-          galleryImages.map((src,i) => '<button class="detail-image-button" type="button" data-project-image="' + esc(src) + '" aria-label="View project photo ' + (i+1) + '"><img src="' + esc(src) + '" alt="' + esc(p.title || 'Project') + ' photo ' + (i+1) + '" loading="lazy"></button>').join('') +
+          galleryImages.map((src,i) => '<button class="detail-image-button" type="button" data-project-image="' + esc(src) + '" aria-label="View project photo ' + (i+1) + '"><img src="' + esc(src) + '" alt="' + esc(p.title || 'Project') + ' photo ' + (i+1) + '" loading="lazy" decoding="async" width="640" height="460"></button>').join('') +
         '</div></div>' : '') +
         (videoMarkup(p.videoUrl) ? '<div class="detail-block"><h2>Project video</h2>' + videoMarkup(p.videoUrl) + '</div>' : '') +
         (materials.length ? '<div class="detail-block"><h2>Materials and components</h2><div class="materials">' + materials.map(m => '<span class="chip">' + esc(m) + '</span>').join('') + '</div></div>' : '') + 

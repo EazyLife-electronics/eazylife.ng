@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EazyLife | Official Catalog</title>
+    <title>Electronics Components &amp; Laptops in Nigeria | EazyLife</title>
+    <meta name="description" content="Shop Arduino boards, sensors, modules and electronics components, plus developer-ready laptops from EazyLife in Ibadan, Nigeria. Request items not listed.">
+    <link rel="canonical" href="https://eazylife.ng/shop.html">
     <link rel="icon" type="image/png" href="assets/pictures/icon_dark.png" />
     <link rel="apple-touch-icon" href="assets/pictures/icon_dark.png" />
     <script>
@@ -45,6 +47,48 @@
         .dark .request-tile h3 { color: #eef2f0; }
         .dark .text-red-500 { color: #f87171 !important; }
     </style>
+
+  <meta property="og:title" content="Electronics Components & Laptops in Nigeria | EazyLife">
+  <meta property="og:description" content="Shop Arduino boards, sensors, modules and electronics components, plus developer-ready laptops from EazyLife in Ibadan, Nigeria. Request items not listed.">
+  <meta property="og:url" content="https://eazylife.ng/shop.html">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://eazylife.ng/assets/pictures/og-image.png">
+  <meta property="og:site_name" content="EazyLife Robotics &amp; Electronics Solutions">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Electronics Components & Laptops in Nigeria | EazyLife">
+  <meta name="twitter:description" content="Shop Arduino boards, sensors, modules and electronics components, plus developer-ready laptops from EazyLife in Ibadan, Nigeria. Request items not listed.">
+  <meta name="twitter:image" content="https://eazylife.ng/assets/pictures/og-image.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "@id": "https://eazylife.ng/shop.html#collection",
+  "name": "EazyLife Electronics Components and Developer Workstations",
+  "url": "https://eazylife.ng/shop.html",
+  "description": "Browse electronics components, Arduino boards, sensors, modules and developer-ready laptops from EazyLife in Ibadan, Nigeria. Product availability and prices are provided by the live catalogue.",
+  "inLanguage": "en",
+  "publisher": {
+    "@id": "https://eazylife.ng/#organization",
+    "@type": "Organization",
+    "name": "EazyLife Robotics & Electronics Solutions",
+    "url": "https://eazylife.ng/"
+  },
+  "about": [
+    {
+      "@type": "Thing",
+      "name": "Electronics components"
+    },
+    {
+      "@type": "Thing",
+      "name": "Arduino boards and sensors"
+    },
+    {
+      "@type": "Thing",
+      "name": "Developer-ready laptops"
+    }
+  ]
+}
+</script>
 </head>
 <body class="bg-gray-50 dark:bg-[#0f1715] pb-24">
 
@@ -163,7 +207,7 @@
             </div>
             <button onclick="hideProductModal()" class="text-gray-400 p-1 text-3xl">&times;</button>
         </div>
-        <img id="pmImage" class="w-full h-40 object-contain rounded-xl bg-gray-50 dark:bg-[#1c2925] mb-4">
+        <img id="pmImage" alt="Selected product image" class="w-full h-40 object-contain rounded-xl bg-gray-50 dark:bg-[#1c2925] mb-4">
         <p id="pmDesc" class="text-sm text-gray-500 dark:text-gray-400 mb-4"></p>
 
         <div class="mb-4">
@@ -455,6 +499,7 @@
 
 <script type="module">
     import { getProducts, placeOrder, placeRequest, getSettings } from './js/store.mjs';
+    import { optimizedImageUrl, responsiveImageAttrs } from './js/image-delivery.mjs';
     import { calcGroupedDeliveryFee, buildDeliveryFeeSummary, resolveDeliveryFee, variantUnitPrice, productPriceRange, productOriginalPriceRange, hasPromo, variantDiscountPercent, productHasPromo, buildPriceSavingsSummary, variantLabel, resolveBulkSavings, calcBulkSavingsForLine, buildBulkSavingsSummary } from './js/pricing.mjs';
 
     const CKEY = "eazylife_cart_v2";
@@ -915,7 +960,7 @@
             grid.innerHTML += `
                 <div class="product-card bg-white dark:bg-[#182420] dark:border-[#2a3835] p-3 rounded-[24px] shadow-sm flex flex-col">
                     <div class="relative mb-3">
-                        <img src="${thumb ? escapeHtml(thumb) : 'assets/pictures/placeholder.svg'}" loading="lazy" class="h-32 md:h-40 w-full object-contain rounded-xl bg-gray-50 dark:bg-[#1c2925]">
+                        <img src="${thumb ? escapeHtml(optimizedImageUrl(thumb,480)) : 'assets/pictures/placeholder.svg'}" ${responsiveImageAttrs(thumb,[240,360,480,640],"(max-width: 700px) 50vw, 25vw")} alt="Electronics product image" loading="lazy" decoding="async" width="300" height="220" class="h-32 md:h-40 w-full object-contain rounded-xl bg-gray-50 dark:bg-[#1c2925]">
                         ${promo ? `<span class="absolute top-1.5 left-1.5 bg-[#00B09B] text-white text-[9px] font-black px-1.5 py-0.5 rounded-md shadow">-${Math.round(maxDiscountPercent)}%</span>` : ''}
                     </div>
                     <span class="text-[9px] font-black uppercase text-teal tracking-wider mb-1">${p.brand ? escapeHtml(p.brand) + ' · ' : ''}${escapeHtml(p.category || '')}</span>
@@ -1032,7 +1077,8 @@
     function updateProductModalPrice() {
         const v = getSelectedVariant();
         const img = document.getElementById('pmImage');
-        img.src = (v && v.image) || (pmProduct.variants[0] && pmProduct.variants[0].image) || 'assets/pictures/placeholder.svg';
+        const selectedImage = (v && v.image) || (pmProduct.variants[0] && pmProduct.variants[0].image) || 'assets/pictures/placeholder.svg';
+        img.src = optimizedImageUrl(selectedImage, 1000);
 
         const base = variantUnitPrice(v);
         const selectedUpgrades = getSelectedUpgrades();
