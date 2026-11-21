@@ -8,6 +8,11 @@ service cloud.firestore {
         && request.auth.token.email == 'damzyeazy@gmail.com';
     }
 
+    // Private named Circuit Studio projects; public visitors cannot read or write these records.
+    match /circuitStudioProjects/{projectId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
     match /circuitComponents/{componentId} {
       // Public clients may list only published components; the query must
       // include status == 'published'. Admins can read drafts and manage all.
