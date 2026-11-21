@@ -116,3 +116,13 @@ The current routing stage uses a generated orthogonal route between endpoints. M
 - Capture Area mode lets the user draw a rectangular export boundary anywhere in the open workspace. The dashed frame is an editor guide and is not included in the exported artwork.
 - SVG export uses the capture rectangle exactly when one is defined. Without a capture rectangle, export bounds are calculated from placed components, annotations and wire routes with a small margin.
 - Fit content frames the current drawing rather than resetting to the original fixed canvas.
+
+
+## Private named project library (2026-11-21)
+
+- The public editor remains open to visitors. Anonymous users retain local browser drafts and portable JSON import/export.
+- When the authorized EazyLife admin account (damzyeazy@gmail.com) is signed in, the toolbar exposes **Save to my circuits** and **Open saved**.
+- Named designs are stored as structured project JSON in the additive Firestore collection `circuitStudioProjects`; the collection is admin-read/write only in Firestore rules. Public component and published-diagram access is unchanged.
+- Admin can save/update the currently opened project, save a named copy, reopen saved work and delete private records. Save timestamps and title are stored with the project.
+- SVG remains a clean visual export and is not the native editable project interchange. Use JSON or the private project library to preserve component instances, wire endpoints/routes, junctions, labels, style and capture bounds. Exported SVG intentionally excludes selection/hit-area overlays and editor controls.
+- Deploy the additive `circuitStudioProjects` rule to Firebase before testing cloud save/open. Never make this collection publicly readable.
