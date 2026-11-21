@@ -138,3 +138,6 @@
 /* Generous component body hit target for touch and pointer dragging */
 .cs-component-hit{fill:transparent;stroke:none;pointer-events:all;touch-action:none;cursor:move}
 .cs-component-layer [data-component]{touch-action:none;cursor:move}
+
+/* Private named project library */
+.cs-project-dialog{width:min(720px,94vw)}.cs-project-actions{justify-content:flex-start;margin:8px 0 14px}.cs-project-list{display:grid;gap:8px;max-height:55vh;overflow:auto}.cs-project-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px;border:1px solid var(--cs-border);border-radius:10px;background:var(--cs-work)}.cs-project-info{display:grid;gap:4px;min-width:0}.cs-project-info strong{overflow-wrap:anywhere}.cs-project-info small{font-size:11px;color:var(--cs-muted)}.cs-project-row-actions{display:flex;gap:6px;flex-shrink:0}.cs-project-row-actions .cs-btn{padding:6px 10px}@media(max-width:520px){.cs-project-row{align-items:flex-start;flex-direction:column}.cs-project-row-actions{width:100%}.cs-project-row-actions .cs-btn{flex:1}}
