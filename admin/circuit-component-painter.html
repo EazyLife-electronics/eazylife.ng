@@ -5,8 +5,9 @@
 <title>EazyLife Component Painter</title>
 <link rel="stylesheet" href="../assets/css/site-theme.css">
 <style>
-body.component-focus-mode .left{display:none!important}
-body.component-focus-mode .layout{grid-template-columns:minmax(0,1fr) 260px}
+body.component-focus-mode .left>h2:first-child,
+body.component-focus-mode .left>h2:first-child+.field,
+body.component-focus-mode .left>#list{display:none!important}
 body.component-access-denied .layout{display:none!important}
 body.component-access-denied .top:after{content:'Admin sign-in required';font-size:12px;font-weight:700;color:#b42318}
 
