@@ -131,3 +131,6 @@
 .cs-pin-type-row select{width:100%;min-width:0;padding:7px 8px;border:1px solid var(--cs-border);border-radius:7px;background:var(--cs-panel);color:var(--cs-text);font:inherit;font-size:.8rem}
 
 @media(max-width:760px){.cs-topbar{padding:0 12px;gap:8px}.cs-top-actions{gap:10px}.cs-home-link{font-size:12px}}
+
+/* Independently positioned component reference and value labels */
+.cs-component-label-group{cursor:move;touch-action:none;user-select:none}.cs-component-label-group .cs-editable-label{cursor:move;pointer-events:all}.cs-label-override-active{border-color:var(--cs-accent)!important;background:var(--cs-soft)!important;color:var(--cs-accent)!important}
