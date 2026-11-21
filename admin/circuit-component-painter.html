@@ -6,6 +6,34 @@
 <link rel="stylesheet" href="../assets/css/site-theme.css">
 <style>
 :root{--teal:#00b09b}*{box-sizing:border-box}body{margin:0;background:#f3f5f7;color:#17202a;font:14px system-ui,-apple-system,sans-serif}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;background:#fff;border-bottom:1px solid #ddd;position:sticky;top:0;z-index:5}.top h1{font-size:17px;margin:0}.layout{display:grid;grid-template-columns:260px minmax(0,1fr) 260px;gap:12px;padding:12px;max-width:1600px;margin:auto}.panel{background:white;border:1px solid #e0e5e8;border-radius:14px;padding:14px;min-width:0}.panel h2{font-size:13px;margin:0 0 12px}.field{display:grid;gap:5px;margin-bottom:10px}.field label{font-size:11px;font-weight:700;color:#65717b}.field input,.field select,.field textarea{width:100%;border:1px solid #d9e0e4;border-radius:8px;padding:9px;font:inherit;background:white}.tools{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin-bottom:12px}.tool,.btn{border:1px solid #d9e0e4;background:#fff;border-radius:8px;padding:8px 6px;font-size:11px;font-weight:700;cursor:pointer}.tool.active,.btn.primary{background:#087f70;color:white;border-color:#087f70}.btn.danger{color:#c22}.btnrow{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.canvas-shell{background:#fff;border:1px solid #dbe1e5;border-radius:14px;overflow:hidden}.canvasbar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:10px;border-bottom:1px solid #e5e9ec}.drawing{width:100%;height:min(65vh,680px);min-height:360px;display:block;touch-action:none;cursor:crosshair;background-color:white;background-image:radial-gradient(#cbd3d8 1px,transparent 1px);background-size:20px 20px}.drawing .art{stroke:#202a32;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}.drawing .selected{outline:none;filter:drop-shadow(0 0 2px #00b09b)}.drawing [data-object]{cursor:pointer}.drawing .pinmark{fill:#00b09b;stroke:white;stroke-width:2;cursor:move}.drawing text{fill:#202a32;stroke:none;font-family:Arial,sans-serif}.hint{font-size:11px;color:#78848e;line-height:1.5}.list{display:grid;gap:7px;max-height:45vh;overflow:auto}.item{display:flex;align-items:center;gap:7px;border:1px solid #e2e7ea;border-radius:9px;padding:8px}.item .meta{flex:1;min-width:0}.item strong{font-size:12px;display:block;overflow:hidden;text-overflow:ellipsis}.item small{color:#77838b;font-size:10px}.status{min-height:20px;font-size:11px;color:#087f70;font-weight:700}.pins{display:grid;gap:6px}.pinrow{display:grid;grid-template-columns:1fr 50px 50px 24px;gap:4px}.pinrow input{min-width:0;width:100%;padding:5px;border:1px solid #ddd;border-radius:6px;font-size:11px}.footer{padding:8px 12px;background:#f8fafb;border-top:1px solid #e4e8eb;font-size:11px;color:#64717a;display:flex;justify-content:space-between}.small{font-size:10px;color:#71808a}@media(max-width:1000px){.layout{grid-template-columns:220px minmax(0,1fr)}.right{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px}}@media(max-width:650px){.layout{grid-template-columns:1fr;padding:8px}.left,.right{grid-column:auto;display:block}.drawing{height:48vh;min-height:300px}.list{max-height:230px}.top{padding:10px}}
+
+/* Keep painter controls readable when the shared site theme is in dark mode. */
+:root[data-theme="dark"] body{background:#0f1715;color:#eef2f0}
+:root[data-theme="dark"] .top,
+:root[data-theme="dark"] .panel,
+:root[data-theme="dark"] .canvas-shell,
+:root[data-theme="dark"] .canvasbar{background:#182420;color:#eef2f0;border-color:#2a3835}
+:root[data-theme="dark"] .top{border-bottom-color:#2a3835}
+:root[data-theme="dark"] .field label,
+:root[data-theme="dark"] .hint,
+:root[data-theme="dark"] .small,
+:root[data-theme="dark"] .footer{color:#a0ada8}
+:root[data-theme="dark"] .footer{background:#14201c;border-color:#2a3835}
+:root[data-theme="dark"] .tool,
+:root[data-theme="dark"] .btn{background:#182420;color:#eef2f0;border-color:#344640}
+:root[data-theme="dark"] .tool.active,
+:root[data-theme="dark"] .btn.primary{background:#087f70;color:#fff;border-color:#087f70}
+:root[data-theme="dark"] .btn.danger{color:#f87171}
+:root[data-theme="dark"] .field input,
+:root[data-theme="dark"] .field select,
+:root[data-theme="dark"] .field textarea,
+:root[data-theme="dark"] .pinrow input{background:#14201c;color:#eef2f0;border-color:#344640}
+:root[data-theme="dark"] .field input::placeholder{color:#8b9a94}
+:root[data-theme="dark"] .item{background:#14201c;border-color:#2a3835}
+:root[data-theme="dark"] .item strong{color:#eef2f0}
+:root[data-theme="dark"] .item small{color:#a0ada8}
+:root[data-theme="dark"] hr{border-top-color:#2a3835!important}
+/* Drawing canvas intentionally stays white for accurate symbol contrast. */
 </style></head>
 <body>
 <header class="top"><div><h1>EazyLife · Component Painter</h1><div class="small">Draw symbols visually, add pins, save directly to the Circuit Studio library.</div></div><div class="btnrow"><a class="btn" href="../circuit-studio.html">Open Circuit Studio</a><a class="btn" href="./index.html">Admin</a></div></header>
