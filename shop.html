@@ -207,7 +207,7 @@
             </div>
             <button onclick="hideProductModal()" class="text-gray-400 p-1 text-3xl">&times;</button>
         </div>
-        <img id="pmImage" class="w-full h-40 object-contain rounded-xl bg-gray-50 dark:bg-[#1c2925] mb-4">
+        <img id="pmImage" alt="Selected product image" class="w-full h-40 object-contain rounded-xl bg-gray-50 dark:bg-[#1c2925] mb-4">
         <p id="pmDesc" class="text-sm text-gray-500 dark:text-gray-400 mb-4"></p>
 
         <div class="mb-4">
@@ -959,7 +959,7 @@
             grid.innerHTML += `
                 <div class="product-card bg-white dark:bg-[#182420] dark:border-[#2a3835] p-3 rounded-[24px] shadow-sm flex flex-col">
                     <div class="relative mb-3">
-                        <img src="${thumb ? escapeHtml(thumb) : 'assets/pictures/placeholder.svg'}" loading="lazy" class="h-32 md:h-40 w-full object-contain rounded-xl bg-gray-50 dark:bg-[#1c2925]">
+                        <img src="${thumb ? escapeHtml(thumb) : 'assets/pictures/placeholder.svg'}" alt="Electronics product image" loading="lazy" class="h-32 md:h-40 w-full object-contain rounded-xl bg-gray-50 dark:bg-[#1c2925]">
                         ${promo ? `<span class="absolute top-1.5 left-1.5 bg-[#00B09B] text-white text-[9px] font-black px-1.5 py-0.5 rounded-md shadow">-${Math.round(maxDiscountPercent)}%</span>` : ''}
                     </div>
                     <span class="text-[9px] font-black uppercase text-teal tracking-wider mb-1">${p.brand ? escapeHtml(p.brand) + ' · ' : ''}${escapeHtml(p.category || '')}</span>
