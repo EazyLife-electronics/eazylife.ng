@@ -122,3 +122,10 @@
 .cs-marquee{pointer-events:none;stroke-width:1.5;vector-effect:non-scaling-stroke}
 .cs-marquee-window{fill:#168f80;fill-opacity:.12;stroke:#168f80;stroke-dasharray:5 3}
 .cs-marquee-crossing{fill:#1676d2;fill-opacity:.13;stroke:#1676d2;stroke-dasharray:2 2}
+
+/* Electrical pin metadata in component properties */
+.cs-property-section-title{display:block;margin:18px 0 4px;font-size:.9rem}
+.cs-pin-type-list{display:grid;gap:7px;margin:8px 0 12px}
+.cs-pin-type-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(112px,48%);align-items:center;gap:10px;font-size:.82rem}
+.cs-pin-type-row span{overflow-wrap:anywhere}
+.cs-pin-type-row select{width:100%;min-width:0;padding:7px 8px;border:1px solid var(--cs-border);border-radius:7px;background:var(--cs-panel);color:var(--cs-text);font:inherit;font-size:.8rem}
