@@ -137,16 +137,35 @@ document.querySelectorAll('[data-notification-tab]').forEach(button => {
 
 /* ---------------- AUTH ---------------- */
 
-document.getElementById('loginBtn').addEventListener('click', async () => {
+const loginButton = document.getElementById('loginBtn');
+loginButton.dataset.authHandlerReady = 'yes';
+loginButton.addEventListener('click', async () => {
   const email = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value;
   const errorEl = document.getElementById('loginError');
-  errorEl.classList.add('hidden');
+  errorEl.style.color = '#087f70';
+  errorEl.textContent = 'Connecting to Firebase…';
+  errorEl.classList.remove('hidden');
+  loginButton.disabled = true;
+  loginButton.textContent = 'Signing in…';
   try {
+    if (!email || !password) throw new Error('Enter both your admin email and password.');
     await signInWithEmailAndPassword(auth, email, password);
+    errorEl.textContent = 'Sign-in successful. Opening dashboard…';
   } catch (err) {
-    errorEl.textContent = 'Login failed — check email and password.';
-    errorEl.classList.remove('hidden');
+    console.error('EazyLife admin sign-in failed:', err);
+    const messages = {
+      'auth/unauthorized-domain': 'This preview domain is not authorized in Firebase Authentication. Add raw.githack.com under Authentication → Settings → Authorized domains.',
+      'auth/invalid-credential': 'Email or password is incorrect.',
+      'auth/invalid-email': 'The email address is not valid.',
+      'auth/too-many-requests': 'Too many attempts. Wait a while before trying again.',
+      'auth/network-request-failed': 'Network request failed. Check your connection or browser extensions.'
+    };
+    errorEl.style.color = '#c22';
+    errorEl.textContent = messages[err.code] || ('Login failed: ' + (err.code || err.message || 'Unknown Firebase error'));
+  } finally {
+    loginButton.disabled = false;
+    loginButton.textContent = 'Log In';
   }
 });
 
