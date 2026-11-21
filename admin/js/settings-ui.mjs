@@ -136,12 +136,13 @@ if(componentPanel&&!document.getElementById('clPainterLaunchCard')){
   const launch=document.createElement('section');
   launch.id='clPainterLaunchCard';
   launch.className='rounded-3xl border border-teal-100 bg-gradient-to-r from-teal-50 to-lime-50 p-4 sm:p-5 mb-5';
-  launch.innerHTML=`<div class="flex flex-wrap items-center justify-between gap-3"><div class="min-w-0"><h2 class="font-black text-base text-gray-900">Visual Component Painter</h2><p class="text-xs text-gray-600 mt-1">Create and edit component symbols visually, without writing SVG or JSON.</p></div><button type="button" id="clOpenPainter" class="shrink-0 rounded-xl bg-teal-700 text-white px-4 py-3 text-xs font-black">Open Painter</button></div><div id="clPainterFrameWrap" class="hidden mt-4"><div class="flex items-center justify-between gap-2 mb-2"><p class="text-[11px] text-gray-500">Painter workspace</p><button type="button" id="clClosePainter" class="rounded-lg border bg-white px-3 py-2 text-xs font-bold">Close Painter</button></div><iframe id="clPainterFrame" title="Visual Component Painter" src="./circuit-component-painter.html" class="w-full rounded-2xl border bg-white" style="height:82vh;min-height:640px" loading="lazy"></iframe></div>`;
+  launch.innerHTML=`<div class="flex flex-wrap items-center justify-between gap-3"><div class="min-w-0"><h2 class="font-black text-base text-gray-900">Visual Component Painter</h2><p class="text-xs text-gray-600 mt-1">Create and edit component symbols visually, without writing SVG or JSON.</p></div><button type="button" id="clOpenPainter" class="shrink-0 rounded-xl bg-teal-700 text-white px-4 py-3 text-xs font-black">Open Painter ↗</button></div>`;
   componentPanel.prepend(launch);
-  const open=document.getElementById('clOpenPainter'),wrap=document.getElementById('clPainterFrameWrap');
-  open.addEventListener('click',()=>{wrap.classList.remove('hidden');open.classList.add('hidden');document.getElementById('clPainterFrame').src='./circuit-component-painter.html?embedded=1&build=2';wrap.scrollIntoView({behavior:'smooth',block:'start'});});
-  document.getElementById('clClosePainter').addEventListener('click',()=>{wrap.classList.add('hidden');open.classList.remove('hidden');});
-}
+  const open=document.getElementById('clOpenPainter');
+  open.addEventListener('click',()=>{
+    const url=new URL('./circuit-component-painter.html',location.href);
+    window.open(url.href,'_blank','noopener');
+  });
 }
 
 // Order workflow UI is loaded here so we can enhance the existing Orders panel
