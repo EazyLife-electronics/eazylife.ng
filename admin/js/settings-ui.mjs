@@ -130,7 +130,7 @@ if (typeof document !== 'undefined' &&
   }
 
 // Painter launcher: robustly attach after the component library panel is constructed.
-if(!document.getElementById('clPainterLaunchThemeFix')){const style=document.createElement('style');style.id='clPainterLaunchThemeFix';style.textContent=':root[data-theme="dark"] #clPainterLaunchCard h2{color:#f3f4f6!important}:root[data-theme="dark"] #clPainterLaunchCard p{color:#d1d5db!important}';document.head.append(style);}
+if(!document.getElementById('clPainterLaunchThemeFix')){const style=document.createElement('style');style.id='clPainterLaunchThemeFix';style.textContent='#clPainterLaunchCard h2{color:#172b28!important}#clPainterLaunchCard p{color:#52635f!important}';document.head.append(style);}
 const componentPanel=document.getElementById('panel-circuit-components');
 if(componentPanel&&!document.getElementById('clPainterLaunchCard')){
   const launch=document.createElement('section');
