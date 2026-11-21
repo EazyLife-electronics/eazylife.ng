@@ -104,3 +104,7 @@
 .cs-pin .cs-pin-hit{fill:transparent;stroke:transparent;stroke-width:0;pointer-events:all}
 .cs-pin .cs-pin-node{r:2.5px;fill:#168f80;stroke:var(--cs-canvas);stroke-width:1;pointer-events:none}
 .cs-pin.cs-pin-start .cs-pin-node{r:4px;fill:#1676d2;stroke-width:1.25}
+
+/* Selected wire endpoint handles for direct reconnection */
+.cs-wire-endpoint{fill:var(--cs-panel);stroke:#1676d2;stroke-width:2.5;cursor:crosshair;pointer-events:all}
+.cs-wire-endpoint:hover{fill:#d9edff;stroke-width:3.5}
