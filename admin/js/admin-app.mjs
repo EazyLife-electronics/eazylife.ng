@@ -173,6 +173,19 @@ document.getElementById('logoutBtn').addEventListener('click', () => signOut(aut
 
 onAuthStateChanged(auth, (user) => {
   if (user) {
+    const returnTo = new URLSearchParams(location.search).get('returnTo');
+    if (user.email === 'damzyeazy@gmail.com' && returnTo) {
+      try {
+        const target = new URL(returnTo, location.origin);
+        if (target.origin === location.origin &&
+            target.pathname.endsWith('/admin/circuit-component-painter.html')) {
+          location.replace(target.href);
+          return;
+        }
+      } catch (error) {
+        console.warn('Ignoring invalid admin return destination:', error);
+      }
+    }
     checkMediaService(user);
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('dashboard').classList.remove('hidden');
