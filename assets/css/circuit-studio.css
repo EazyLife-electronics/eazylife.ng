@@ -145,3 +145,6 @@
 #saveCloudProject[hidden],#openCloudProjects[hidden]{display:none!important}
 
 #saveProject[hidden],#importProject[hidden],#exportJson[hidden],#saveCloudProject[hidden],#openCloudProjects[hidden]{display:none!important}
+
+/* Keep grouped admin-only controls hidden until the authorized account is confirmed. */
+.cs-admin-project-tools[hidden]{display:none!important}
