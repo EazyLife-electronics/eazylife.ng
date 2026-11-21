@@ -1,7 +1,7 @@
 import { COMPONENTS, getComponent, replaceComponents } from './circuit-components.js';
 const $=id=>document.getElementById(id), svgNS='http://www.w3.org/2000/svg';
 const canvas=$('circuitCanvas'),wireLayer=$('wireLayer'),componentLayer=$('componentLayer'),annotationLayer=$('annotationLayer'),interactionLayer=$('interactionLayer');
-let isCircuitAdmin=false;
+let isCircuitAdmin=false,cloudProjectId=null,cloudUser=null,cloudFirestore=null;
 let project={schemaVersion:1,title:'Untitled circuit',style:'engineering',components:[],wires:[],junctions:[],annotations:[],capture:null};
 let wireRoute=[],wirePreviewPoint=null,wirePreviewTarget=null;
 let marquee=null,labelDrag=null;
@@ -141,7 +141,38 @@ function buildExportSvg(){const copy=canvas.cloneNode(true);copy.querySelector('
 function download(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 function saveDraft(){localStorage.setItem('eazylife-circuit-draft',JSON.stringify(project));$('saveStatus').textContent='Saved in this browser';toast('Draft saved on this device')}
 function exportJson(){download(new Blob([JSON.stringify(project,null,2)],{type:'application/json'}),(project.title||'circuit').replace(/[^a-z0-9]+/gi,'-')+'.json')}
-function loadProject(data){if(!data||data.schemaVersion!==1||!Array.isArray(data.components)||!Array.isArray(data.wires))throw Error('This is not a supported Circuit Studio project');snapshot();project=clone(data);project.junctions=project.junctions||[];selected=null;selectedItems=[];changed();toast('Project imported')}
+async function saveCloudProject(saveAs=false){
+ if(!isCircuitAdmin||!cloudFirestore||!cloudUser){toast('Sign in with the authorized EazyLife admin account to save private circuits.');return}
+ try{
+  let id=saveAs?null:cloudProjectId,title=String(project.title||'Untitled circuit').trim()||'Untitled circuit';
+  if(!id){const entered=prompt(saveAs?'Save a copy as:':'Save circuit as:',title);if(entered===null)return;title=entered.trim();if(!title){toast('Please enter a circuit name.');return}project.title=title;id=cloudFirestore.doc(cloudFirestore.collection(cloudFirestore.db,'circuitStudioProjects')).id}
+  else title=String(project.title||title).trim()||title;
+  const ref=cloudFirestore.doc(cloudFirestore.db,'circuitStudioProjects',id);
+  const payload={title,projectData:clone(project),schemaVersion:1,ownerEmail:cloudUser.email,updatedAt:cloudFirestore.serverTimestamp()};
+  if(saveAs||!cloudProjectId)payload.createdAt=cloudFirestore.serverTimestamp();
+  await cloudFirestore.setDoc(ref,payload,{merge:true});cloudProjectId=id;$('projectTitle').textContent=project.title=title;$('saveStatus').textContent='Saved to private library';toast('Circuit saved to your private admin library.');
+ }catch(error){console.error('Private Circuit Studio save failed:',error);toast('Could not save circuit: '+(error.message||'Firestore error'))}
+}
+async function showSavedProjects(){
+ if(!isCircuitAdmin||!cloudFirestore||!cloudUser){toast('Admin sign-in is required to open private circuits.');return}
+ const dialog=$('savedProjectsDialog'),list=$('savedProjectsList');list.replaceChildren();list.textContent='Loading saved circuits…';
+ try{
+  const snap=await cloudFirestore.getDocs(cloudFirestore.query(cloudFirestore.collection(cloudFirestore.db,'circuitStudioProjects'),cloudFirestore.orderBy('updatedAt','desc')));
+  list.replaceChildren();
+  if(snap.empty){const empty=document.createElement('p');empty.className='cs-empty-property';empty.textContent='No saved circuits yet. Use “Save to my circuits” to create your first named design.';list.append(empty)}
+  snap.forEach(record=>{
+   const data=record.data(),row=document.createElement('div');row.className='cs-project-row';
+   const info=document.createElement('div'),name=document.createElement('strong'),meta=document.createElement('small');info.className='cs-project-info';name.textContent=data.title||data.projectData?.title||'Untitled circuit';meta.textContent=data.updatedAt?.toDate?('Updated '+data.updatedAt.toDate().toLocaleString()):'Saved circuit';info.append(name,meta);
+   const actions=document.createElement('div');actions.className='cs-project-row-actions';
+   const open=document.createElement('button');open.type='button';open.className='cs-btn cs-primary';open.textContent='Open';open.onclick=()=>{try{if(!data.projectData)throw Error('This saved record has no circuit data.');loadProject(data.projectData);cloudProjectId=record.id;project.title=data.title||project.title;$('projectTitle').textContent=project.title;$('saveStatus').textContent='Opened from private library';dialog.close();toast('Saved circuit opened.')}catch(error){toast('Could not open circuit: '+error.message)}};
+   const remove=document.createElement('button');remove.type='button';remove.className='cs-btn cs-danger';remove.textContent='Delete';remove.onclick=async()=>{if(!confirm('Permanently delete “'+(data.title||'Untitled circuit')+'” from your private library?'))return;try{await cloudFirestore.deleteDoc(cloudFirestore.doc(cloudFirestore.db,'circuitStudioProjects',record.id));if(cloudProjectId===record.id)cloudProjectId=null;row.remove();toast('Saved circuit deleted.')}catch(error){toast('Delete failed: '+error.message)}};
+   actions.append(open,remove);row.append(info,actions);list.append(row)
+  });
+  dialog.showModal()
+ }catch(error){console.error('Private Circuit Studio list failed:',error);list.textContent='Could not load saved circuits: '+(error.message||'Firestore error');dialog.showModal()}
+}
+
+function loadProject(data){if(!data||data.schemaVersion!==1||!Array.isArray(data.components)||!Array.isArray(data.wires))throw Error('Please import a Circuit Studio project JSON (.json). SVG exports are clean drawing files, not editable project files; use Download JSON or Save to my circuits to preserve components, wires and labels.');snapshot();project=clone(data);project.junctions=project.junctions||[];selected=null;selectedItems=[];changed();toast('Project imported')}
 function undo(){if(!history.length)return;future.push(JSON.stringify(project));project=JSON.parse(history.pop());selected=null;changed()}
 function redo(){if(!future.length)return;history.push(JSON.stringify(project));project=JSON.parse(future.pop());selected=null;changed()}
 function updateAdaptiveGrid(){const base=20,target=26,raw=target/Math.max(.0001,scale)/base,power=Math.round(Math.log2(raw)),interval=base*Math.pow(2,power),pattern=$('csGrid'),major=$('csMajorGrid'),dots=$('csDotGrid');pattern.setAttribute('width',interval);pattern.setAttribute('height',interval);pattern.querySelector('path').setAttribute('d',`M${interval} 0H0V${interval}`);pattern.querySelector('path').setAttribute('stroke-width',String(1/scale));pattern.querySelector('path').setAttribute('stroke-opacity','.22');major.setAttribute('width',interval*5);major.setAttribute('height',interval*5);major.querySelector('path').setAttribute('d',`M${interval*5} 0H0V${interval*5}`);major.querySelector('path').setAttribute('stroke-width',String(1.15/scale));major.querySelector('path').setAttribute('stroke-opacity','.34');dots.setAttribute('width',interval);dots.setAttribute('height',interval);dots.querySelector('circle').setAttribute('r',String(2.2/scale))}
@@ -168,7 +199,7 @@ $('cancelWire').onclick=()=>{if(!wireStart)return;wireStart=null;wireRoute=[];wi
 $('toolSelect').onclick=()=>setToolMode('select');$('toolConnect').onclick=()=>setToolMode('connect');$('toolPan').onclick=()=>setToolMode('pan');$('toolCapture').onclick=()=>setToolMode('capture');$('clearCapture').onclick=()=>{if(project.capture){snapshot();project.capture=null;render();$('saveStatus').textContent='Unsaved changes';toast('Capture area cleared')}};$('rotate').onclick=rotateSelection;$('toolbarRotate').onclick=rotateSelection;$('toolbarDuplicate').onclick=duplicateSelection;$('toolbarCopy').onclick=()=>{clipboard=cloneSelection();toast(clipboard?'Selection copied':'Nothing to copy')};$('toolbarPaste').onclick=()=>pasteClipboard();$('toolbarDelete').onclick=deleteSelection();
 $('mirror').onclick=()=>{if(selected?.type!=='component')return;const item=project.components.find(c=>c.id===selected.id);snapshot();item.mirrorX=!item.mirrorX;changed()};
 $('delete').onclick=deleteSelection;
-$('undo').onclick=undo;$('redo').onclick=redo;$('saveProject').onclick=saveDraft;$('exportSvg').onclick=exportSvg;$('exportPng').onclick=()=>exportRaster('png');$('exportJpg').onclick=()=>exportRaster('jpeg');$('exportPdf').onclick=exportPdf;$('printDiagram').onclick=()=>printDiagram(false);$('exportJson').onclick=exportJson;$('addText').onclick=addText;$('clearSelection').onclick=()=>{selected=null;selectedItems=[];wireStart=null;wireRoute=[];wirePreviewPoint=null;wirePreviewTarget=null;render()};$('zoomIn').onclick=()=>zoom(1.2);$('zoomOut').onclick=()=>zoom(.83);$('fitCanvas').onclick=()=>{const b=project.components.length||project.annotations.length?contentBounds():{x:0,y:0,width:1200,height:800};const pad=100;const w=b.width+pad*2,h=b.height+pad*2,rect=canvas.getBoundingClientRect();scale=Math.max(.25,Math.min(4,Math.min(rect.width/w,rect.height/h)));viewX=b.x-pad;viewY=b.y-pad;applyView()};
+$('undo').onclick=undo;$('redo').onclick=redo;$('saveProject').onclick=saveDraft;$('saveCloudProject').onclick=()=>saveCloudProject(false);$('openCloudProjects').onclick=showSavedProjects;$('closeSavedProjects').onclick=()=>$('savedProjectsDialog').close();$('refreshSavedProjects').onclick=showSavedProjects;$('saveProjectCopy').onclick=()=>saveCloudProject(true);$('exportSvg').onclick=exportSvg;$('exportPng').onclick=()=>exportRaster('png');$('exportJpg').onclick=()=>exportRaster('jpeg');$('exportPdf').onclick=exportPdf;$('printDiagram').onclick=()=>printDiagram(false);$('exportJson').onclick=exportJson;$('addText').onclick=addText;$('clearSelection').onclick=()=>{selected=null;selectedItems=[];wireStart=null;wireRoute=[];wirePreviewPoint=null;wirePreviewTarget=null;render()};$('zoomIn').onclick=()=>zoom(1.2);$('zoomOut').onclick=()=>zoom(.83);$('fitCanvas').onclick=()=>{const b=project.components.length||project.annotations.length?contentBounds():{x:0,y:0,width:1200,height:800};const pad=100;const w=b.width+pad*2,h=b.height+pad*2,rect=canvas.getBoundingClientRect();scale=Math.max(.25,Math.min(4,Math.min(rect.width/w,rect.height/h)));viewX=b.x-pad;viewY=b.y-pad;applyView()};
 $('toggleGrid').onclick=()=>{gridMode=gridMode==='grid'?'dot':gridMode==='dot'?'plain':'grid';const gridOn=gridMode==='grid';$('gridRect').style.display=gridOn?'':'none';$('majorGridRect').style.display=gridOn?'':'none';$('dotGridRect').style.display=gridMode==='dot'?'':'none';$('canvasWrap').classList.toggle('cs-grid-dots',false);$('canvasWrap').classList.toggle('cs-grid-plain',gridMode==='plain');$('toggleGrid').textContent=gridMode==='grid'?'Grid':gridMode==='dot'?'Dot':'Plain';$('toggleGrid').title='Grid display: '+(gridMode==='grid'?'visible grid':gridMode==='dot'?'dot guide':'plain canvas')+' · tap to change';$('toggleGrid').setAttribute('aria-label',$('toggleGrid').title);$('toggleGrid').classList.toggle('active',gridMode!=='plain')};
 $('symbolStyle').value=project.style||'engineering';$('symbolStyle').onchange=e=>{snapshot();project.style=e.target.value;changed();toast(e.target.value==='educational'?'Educational style: labelled pins, soft symbol plates and coloured artwork':'Engineering style: clean monochrome schematic symbols')};
 $('newProject').onclick=()=>{const hasWork=project.components.length||project.wires.length||project.annotations.length||project.capture;if(hasWork&&!confirm('Start a new circuit? Save or export your current work first.'))return;snapshot();project={schemaVersion:1,title:'Untitled circuit',style:'engineering',components:[],wires:[],junctions:[],annotations:[],capture:null};$('symbolStyle').value='engineering';selected=null;selectedItems=[];wireStart=null;changed()};
@@ -188,13 +219,17 @@ renderLibrary();$('symbolStyle').value=project.style||'engineering';render();app
 // temporary project instance.
 (async()=>{
  try{
-  const [{initFirebase},{onAuthStateChanged}]=await Promise.all([
+  const [{initFirebase},{onAuthStateChanged},{collection,doc,setDoc,getDocs,query,orderBy,deleteDoc,serverTimestamp}]=await Promise.all([
    import('./firebase.mjs'),
-   import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js')
+   import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js'),
+   import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js')
   ]);
-  const {auth}=initFirebase();
+  const {auth,db}=initFirebase();
+  cloudFirestore={db,collection,doc,setDoc,getDocs,query,orderBy,deleteDoc,serverTimestamp};
   onAuthStateChanged(auth,user=>{
-   isCircuitAdmin=!!user&&user.email==='damzyeazy@gmail.com';
+   cloudUser=user||null;isCircuitAdmin=!!user&&user.email==='damzyeazy@gmail.com';
+   $('saveCloudProject').hidden=!isCircuitAdmin;$('openCloudProjects').hidden=!isCircuitAdmin;
+   if(!isCircuitAdmin){cloudProjectId=null;cloudUser=null}
    if(selected?.type==='component')renderProperties();
   });
  }catch(error){console.warn('Admin artwork access could not be checked:',error)}
