@@ -112,3 +112,11 @@
 
 /* Live wire-drawing feedback */
 .cs-wire-preview{fill:none;stroke:#168f80;stroke-width:2.5;stroke-dasharray:7 5;stroke-linecap:round;stroke-linejoin:round;opacity:.9;pointer-events:none}
+
+
+/* AutoCAD-style selection windows: left-to-right contains, right-to-left crosses */
+.cs-wire{pointer-events:none}
+.cs-wire-hit{fill:none;stroke:transparent;stroke-width:18;pointer-events:stroke;cursor:pointer;stroke-linecap:round;stroke-linejoin:round}
+.cs-marquee{pointer-events:none;stroke-width:1.5;vector-effect:non-scaling-stroke}
+.cs-marquee-window{fill:#168f80;fill-opacity:.12;stroke:#168f80;stroke-dasharray:5 3}
+.cs-marquee-crossing{fill:#1676d2;fill-opacity:.13;stroke:#1676d2;stroke-dasharray:2 2}
