@@ -1077,7 +1077,8 @@
     function updateProductModalPrice() {
         const v = getSelectedVariant();
         const img = document.getElementById('pmImage');
-        img.src = (v && v.image) || (pmProduct.variants[0] && pmProduct.variants[0].image) || 'assets/pictures/placeholder.svg';
+        const selectedImage = (v && v.image) || (pmProduct.variants[0] && pmProduct.variants[0].image) || 'assets/pictures/placeholder.svg';
+        img.src = optimizedImageUrl(selectedImage, 1000);
 
         const base = variantUnitPrice(v);
         const selectedUpgrades = getSelectedUpgrades();
