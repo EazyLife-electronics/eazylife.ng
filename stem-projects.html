@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#00B09B">
   <title>Arduino Projects Playground | EazyLife STEM Lab</title>
-  <meta name="description" content="Explore 24 interactive Arduino projects covering sensors, alarms, robotics, feedback control, motors, displays and automation.">
+  <meta name="description" content="Explore 28 interactive Arduino projects covering sensors, alarms, robotics, feedback control, motors, displays and automation.">
   <link rel="canonical" href="https://eazylife.ng/stem-projects.html">
   <link rel="icon" type="image/png" href="assets/pictures/icon_dark.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -32,7 +32,7 @@
   </div></header>
 
   <main class="sp-wrap">
-    <section class="sp-intro"><div><div class="sp-eyebrow">YOUR VIRTUAL WORKBENCH</div><h2>Choose a project to run</h2><p>These are simplified educational models, not safety-certified alarm systems or exact hardware emulators. Each project explains what its sensor, controller and output are doing.</p></div><div class="sp-count"><strong>24</strong><span>interactive projects</span></div></section>
+    <section class="sp-intro"><div><div class="sp-eyebrow">YOUR VIRTUAL WORKBENCH</div><h2>Choose a project to run</h2><p>These are simplified educational models, not safety-certified alarm systems or exact hardware emulators. Each project explains what its sensor, controller and output are doing.</p></div><div class="sp-count"><strong>28</strong><span>interactive projects</span></div></section>
 
     <div class="sp-filter" role="group" aria-label="Filter projects">
       <button class="filter active" data-filter="all">All projects</button><button class="filter" data-filter="basics">Arduino basics</button><button class="filter" data-filter="sensors">Sensors & alarms</button><button class="filter" data-filter="automation">Automation</button><button class="filter" data-filter="display">Displays</button><button class="filter" data-filter="robotics">Robotics</button><button class="filter" data-filter="control">Control systems</button>
@@ -227,9 +227,77 @@ analogWrite(9, pwm);</code></pre><small>Measure RPM from encoder pulses over a k
 // Short brake: IN1 HIGH, IN2 HIGH, PWM HIGH</code></pre></details>
       </article>
 
+
+      <article class="sp-project" data-category="robotics" id="differential-drive-project">
+        <div class="sp-project-head"><span class="sp-icon blue"><i class="fas fa-robot"></i></span><span class="sp-tag">25 · MOBILE ROBOT</span></div>
+        <h3>Differential-drive robot</h3><p>Command the left and right wheels independently. Compare forward motion, reverse, pivots and turning as the two motor speeds change.</p>
+        <div class="sim-scene drive-scene"><div class="drive-floor"><div class="drive-grid"></div><div class="drive-robot" id="drive-robot"><span class="drive-wheel left"></span><span class="drive-wheel right"></span><span class="drive-nose"></span><i class="fas fa-robot"></i></div></div><div class="drive-readout"><small>DRIVE COMMAND</small><strong id="drive-action">STOP</strong><span id="drive-turn">NO TURN</span></div><div class="scene-status" id="drive-status">MOTORS STOPPED</div></div>
+        <div class="sp-controls"><div class="control-row"><label for="drive-speed">Base motor command</label><output id="drive-speed-value">65%</output></div><input id="drive-speed" type="range" min="0" max="100" value="65"><div class="button-row drive-buttons"><button class="sp-btn soft" data-drive-mode="forward">Forward</button><button class="sp-btn soft" data-drive-mode="reverse">Reverse</button><button class="sp-btn soft" data-drive-mode="left">Pivot left</button><button class="sp-btn soft" data-drive-mode="right">Pivot right</button><button class="sp-btn soft" data-drive-mode="stop">Stop</button></div><div class="metric-pair"><div><small>Left motor</small><strong id="drive-left">0%</strong></div><div><small>Average command</small><strong id="drive-average">0%</strong></div><div><small>Right motor</small><strong id="drive-right">0%</strong></div></div></div>
+        <div class="sp-explain"><b>What to notice</b><p id="drive-explain">Equal wheel speeds move the robot straight. Different speeds create a curve; opposite directions rotate it around its centre.</p><small>This is a kinematic command model. It does not simulate traction, wheel slip, battery sag or exact distance travelled.</small></div>
+        <details class="sp-guide"><summary>Components, wiring & Arduino example</summary><ul><li>Arduino, dual H-bridge such as TB6612FNG, two geared DC motors and a suitable battery</li><li>Connect each motor to its own driver output; use separate PWM and direction pins for left and right channels</li><li>Join logic and motor-supply grounds. Check the driver board's pinout and motor-current rating</li></ul><pre><code>void motor(int pwmPin, int in1, int in2, int command) {
+  command = constrain(command, -255, 255);
+  digitalWrite(in1, command &gt; 0);
+  digitalWrite(in2, command &lt; 0);
+  analogWrite(pwmPin, abs(command));
+}
+void forward(int speed) {
+  motor(5, 7, 8, speed);
+  motor(6, 9, 10, speed);
+}</code></pre></details>
+      </article>
+
+      <article class="sp-project" data-category="robotics" id="avoidance-project">
+        <div class="sp-project-head"><span class="sp-icon amber"><i class="fas fa-radar"></i></span><span class="sp-tag">26 · AUTONOMOUS ROBOT</span></div>
+        <h3>Three-direction obstacle avoidance</h3><p>Adjust front, left and right ultrasonic readings. The robot chooses to drive forward, turn toward the clearer side, or reverse when boxed in.</p>
+        <div class="sim-scene avoid-scene"><div class="avoid-arena"><div class="avoid-obstacle front" id="avoid-front-obstacle"></div><div class="avoid-obstacle left" id="avoid-left-obstacle"></div><div class="avoid-obstacle right" id="avoid-right-obstacle"></div><div class="avoid-robot" id="avoid-robot"><i class="fas fa-robot"></i><span class="avoid-beam front"></span><span class="avoid-beam left"></span><span class="avoid-beam right"></span></div></div><div class="scene-status" id="avoid-status">PATH CLEAR · MOVING FORWARD</div></div>
+        <div class="sp-controls"><div class="control-row"><label for="avoid-front">Front distance</label><output id="avoid-front-value">60 cm</output></div><input id="avoid-front" type="range" min="5" max="150" value="60"><div class="control-row"><label for="avoid-left">Left distance</label><output id="avoid-left-value">45 cm</output></div><input id="avoid-left" type="range" min="5" max="150" value="45"><div class="control-row"><label for="avoid-right">Right distance</label><output id="avoid-right-value">30 cm</output></div><input id="avoid-right" type="range" min="5" max="150" value="30"><div class="control-row"><label for="avoid-threshold">Obstacle threshold</label><output id="avoid-threshold-value">25 cm</output></div><input id="avoid-threshold" type="range" min="10" max="60" value="25"><div class="metric-pair"><div><small>Decision</small><strong id="avoid-decision">FORWARD</strong></div><div><small>Chosen side</small><strong id="avoid-side">NONE</strong></div><div><small>Motor state</small><strong id="avoid-motors">FWD / FWD</strong></div></div></div>
+        <div class="sp-explain"><b>What to notice</b><p id="avoid-explain">If the front path is clear, both motors drive forward. When blocked, the controller compares side distances and turns toward the larger opening.</p><small>Readings are simulated distances. Real ultrasonic sensors have blind zones, beam spread, cross-talk and unreliable returns on some surfaces.</small></div>
+        <details class="sp-guide"><summary>Components, wiring & Arduino example</summary><ul><li>Arduino, three ultrasonic modules or a servo-scanned sensor, motor driver and two geared motors</li><li>For three HC-SR04 modules, use separate trigger/echo pins or trigger them sequentially to reduce cross-talk</li><li>Mount sensors with overlapping but distinct fields of view; common ground is required</li></ul><pre><code>if (frontCm &gt; safeDistance) {
+  driveForward();
+} else if (leftCm &lt;= safeDistance &&
+           rightCm &lt;= safeDistance) {
+  reverseBriefly();
+} else if (leftCm &gt; rightCm) {
+  turnLeft();
+} else {
+  turnRight();
+}</code></pre></details>
+      </article>
+
+      <article class="sp-project" data-category="control" id="three-line-project">
+        <div class="sp-project-head"><span class="sp-icon green"><i class="fas fa-route"></i></span><span class="sp-tag">27 · LINE CONTROL</span></div>
+        <h3>Three-sensor proportional line follower</h3><p>Add a centre sensor and proportional steering. Move the detected line across the sensor array, then tune controller gain and base speed to see the wheel commands respond.</p>
+        <div class="sim-scene line3-scene"><div class="scene-label">SENSOR ARRAY · TOP VIEW</div><div class="line3-track"><div class="line3-path" id="line3-path"></div><div class="line3-bot" id="line3-bot"><span class="line3-sensor left" id="line3-left-eye"></span><span class="line3-sensor centre" id="line3-centre-eye"></span><span class="line3-sensor right" id="line3-right-eye"></span><i class="fas fa-robot"></i></div></div><div class="scene-status" id="line3-status">CENTRE SENSOR · STRAIGHT</div></div>
+        <div class="sp-controls"><div class="control-row"><span>Left sensor detects line</span><strong id="line3-left-state">NO</strong></div><div class="button-row"><button class="sp-btn soft" id="line3-left-toggle">Toggle left</button><button class="sp-btn soft" id="line3-centre-toggle">Toggle centre</button><button class="sp-btn soft" id="line3-right-toggle">Toggle right</button></div><div class="control-row"><span>Centre / right sensor</span><strong id="line3-other-state">YES / NO</strong></div><div class="control-row"><label for="line3-kp">Proportional gain</label><output id="line3-kp-value">25</output></div><input id="line3-kp" type="range" min="0" max="60" value="25"><div class="control-row"><label for="line3-base">Base speed</label><output id="line3-base-value">65%</output></div><input id="line3-base" type="range" min="20" max="100" value="65"><div class="metric-pair"><div><small>Position error</small><strong id="line3-error">0.00</strong></div><div><small>Steering correction</small><strong id="line3-correction">0</strong></div><div><small>Left / right PWM</small><strong id="line3-motors">65 / 65</strong></div></div><button class="sp-btn soft" id="line3-reset">Reset sensor array</button></div>
+        <div class="sp-explain"><b>What to notice</b><p id="line3-explain">The three sensors estimate whether the line is left, centred or right. Proportional gain determines how strongly the wheel speeds differ.</p><small>This is a simple weighted-position P controller, not a full PID line follower. Sensor polarity and threshold calibration depend on the module and surface.</small></div>
+        <details class="sp-guide"><summary>Components, wiring & Arduino example</summary><ul><li>Arduino, three IR reflectance sensors, dual motor driver and two DC gear motors</li><li>Sensor digital outputs to D2, D3 and D4; motor PWM to D5 and D6; direction pins to available digital pins</li><li>Calibrate each sensor over the actual track and confirm whether black produces HIGH or LOW</li></ul><pre><code>int error = leftOnLine ? -1 :
+            rightOnLine ? 1 : 0;
+int correction = kp * error;
+int leftPwm  = constrain(base + correction, 0, 255);
+int rightPwm = constrain(base - correction, 0, 255);
+setMotorSpeeds(leftPwm, rightPwm);</code></pre><small>For smoother tracking, calculate a weighted error from analogue sensor readings rather than only three digital states.</small></details>
+      </article>
+
+      <article class="sp-project" data-category="robotics" id="robot-arm-project">
+        <div class="sp-project-head"><span class="sp-icon purple"><i class="fas fa-robot"></i></span><span class="sp-tag">28 · ROBOTIC ARM</span></div>
+        <h3>Two-joint robotic arm</h3><p>Move shoulder and elbow servo joints independently. Watch the arm pose and calculate the approximate end-effector position using simple forward kinematics.</p>
+        <div class="sim-scene arm-scene"><div class="arm-base"><i class="fas fa-cog"></i></div><div class="arm-link one" id="arm-link-one"><span class="arm-joint"></span><div class="arm-link two" id="arm-link-two"><span class="arm-joint"></span><span class="arm-gripper"></span></div></div><div class="arm-readout"><small>TOOL POSITION</small><strong id="arm-position">X 142 · Y 0</strong><span id="arm-state">READY</span></div><div class="scene-status" id="arm-status">TWO JOINTS · MANUAL CONTROL</div></div>
+        <div class="sp-controls"><div class="control-row"><label for="arm-shoulder">Shoulder servo</label><output id="arm-shoulder-value">90°</output></div><input id="arm-shoulder" type="range" min="30" max="150" value="90"><div class="control-row"><label for="arm-elbow">Elbow servo</label><output id="arm-elbow-value">90°</output></div><input id="arm-elbow" type="range" min="30" max="150" value="90"><div class="metric-pair"><div><small>Horizontal X</small><strong id="arm-x">142 mm</strong></div><div><small>Vertical Y</small><strong id="arm-y">0 mm</strong></div><div><small>Reach</small><strong id="arm-reach">142 mm</strong></div></div><button class="sp-btn soft" id="arm-home">Home both joints</button></div>
+        <div class="sp-explain"><b>What to notice</b><p id="arm-explain">Forward kinematics adds the shoulder angle and elbow-relative angle to estimate where the tool tip sits. Joint limits and link lengths constrain the reachable workspace.</p><small>Ideal two-link planar model with 80 mm and 62 mm links. It omits servo backlash, load, collisions and mechanical flex.</small></div>
+        <details class="sp-guide"><summary>Components, wiring & Arduino example</summary><ul><li>Arduino, two positional servos, two arm links, external regulated servo supply and suitable mechanical brackets</li><li>Shoulder signal to D9, elbow signal to D10; connect servo supply ground to Arduino ground</li><li>Do not power loaded servos from the Arduino 5 V pin. Check stall current and mechanical travel before assembly</li></ul><pre><code>#include &lt;Servo.h&gt;
+Servo shoulder, elbow;
+void setup() {
+  shoulder.attach(9);
+  elbow.attach(10);
+}
+void loop() {
+  shoulder.write(90);
+  elbow.write(90);
+}</code></pre><small>Use gradual motion and physical joint stops. The allowed angle range depends on your linkage geometry.</small></details>
+      </article>
     </section>
 
-    <section class="sp-roadmap"><div><div class="sp-eyebrow">MORE IDEAS FOR THE WORKBENCH</div><h2>This is only the beginning.</h2><p>We can keep expanding into robotics, control systems, power electronics and practical home automation.</p></div><div class="idea-tags"><span>Four-wheel differential drive</span><span>Obstacle-avoidance robot</span><span>Robotic arm joint control</span><span>Quadrature encoder direction</span><span>Servo PID position control</span><span>Battery coulomb counter</span><span>Current sensing</span><span>I²C bus scanner</span><span>Wireless robot control</span><span>Relay sequencing</span></div></section>
+    <section class="sp-roadmap"><div><div class="sp-eyebrow">MORE IDEAS FOR THE WORKBENCH</div><h2>This is only the beginning.</h2><p>We can keep expanding into robotics, control systems, power electronics and practical home automation.</p></div><div class="idea-tags"><span>Mecanum wheel drive</span><span>Quadrature encoder direction</span><span>Battery coulomb counter</span><span>Current sensing and power monitoring</span><span>I²C bus scanner</span><span>Wireless robot control</span><span>Servo PID position control</span><span>Relay sequencing</span><span>IMU heading control</span></div></section>
   </main>
   <footer class="sp-footer"><div class="sp-wrap"><a href="index.html">EazyLife <span>Robotics & Electronics Solutions</span></a><p>Explore boldly. Build thoughtfully. Make useful things.</p><small>© <span id="sp-year"></span> EazyLife Robotics & Electronics Solutions · Ibadan, Nigeria</small></div></footer>
   <script src="js/site-theme.js"></script><script src="js/stem-projects.js"></script>
