@@ -130,23 +130,34 @@ if (typeof document !== 'undefined' &&
   }
 }
 
-// Painter launcher: robustly attach after the component library panel is constructed.
-if(!document.getElementById('clPainterLaunchThemeFix')){const style=document.createElement('style');style.id='clPainterLaunchThemeFix';style.textContent='#clPainterLaunchCard h2{color:#172b28!important}#clPainterLaunchCard p{color:#52635f!important}';document.head.append(style);}
-const componentPanel=document.getElementById('panel-circuit-components');
-if(componentPanel&&!document.getElementById('clPainterLaunchCard')){
-  const launch=document.createElement('section');
-  launch.id='clPainterLaunchCard';
-  launch.className='rounded-3xl border border-teal-100 bg-gradient-to-r from-teal-50 to-lime-50 p-4 sm:p-5 mb-5';
-  launch.innerHTML=`<div class="flex flex-wrap items-center justify-between gap-3"><div class="min-w-0"><h2 class="font-black text-base text-gray-900">Visual Component Painter</h2><p class="text-xs text-gray-600 mt-1">Create and edit component symbols visually, without writing SVG or JSON.</p></div><button type="button" id="clOpenPainter" class="shrink-0 rounded-xl bg-teal-700 text-white px-4 py-3 text-xs font-black">Open Painter ↗</button></div>`;
+// Painter launcher. Kept in a small, self-contained function so its
+// scope cannot interfere with the tab-construction blocks above.
+(() => {
+  if (typeof document === 'undefined') return;
+
+  const styleId = 'clPainterLaunchThemeFix';
+  if (!document.getElementById(styleId)) {
+    const style = document.createElement('style');
+    style.id = styleId;
+    style.textContent = '#clPainterLaunchCard h2{color:#172b28!important}#clPainterLaunchCard p{color:#52635f!important}';
+    document.head.append(style);
+  }
+
+  const componentPanel = document.getElementById('panel-circuit-components');
+  if (!componentPanel || document.getElementById('clPainterLaunchCard')) return;
+
+  const launch = document.createElement('section');
+  launch.id = 'clPainterLaunchCard';
+  launch.className = 'rounded-3xl border border-teal-100 bg-gradient-to-r from-teal-50 to-lime-50 p-4 sm:p-5 mb-5';
+  launch.innerHTML = '<div class="flex flex-wrap items-center justify-between gap-3"><div class="min-w-0"><h2 class="font-black text-base text-gray-900">Visual Component Painter</h2><p class="text-xs text-gray-600 mt-1">Create and edit component symbols visually, without writing SVG or JSON.</p></div><button type="button" id="clOpenPainter" class="shrink-0 rounded-xl bg-teal-700 text-white px-4 py-3 text-xs font-black">Open Painter ↗</button></div>';
   componentPanel.prepend(launch);
-  const open=document.getElementById('clOpenPainter');
-  open.addEventListener('click',()=>{
-    const url=new URL('./circuit-component-painter.html',location.href);
-    window.open(url.href,'_blank','noopener');
+
+  document.getElementById('clOpenPainter').addEventListener('click', () => {
+    const url = new URL('./circuit-component-painter.html', location.href);
+    window.open(url.href, '_blank', 'noopener');
   });
-}
-
-
+})();
+ 
 // Order workflow UI is loaded here so we can enhance the existing Orders panel
 // without changing the stable admin-app renderer.
 import('./order-workflow-ui.mjs').catch(err => console.error('Order workflow UI failed to load:', err));
