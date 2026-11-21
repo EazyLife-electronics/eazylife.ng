@@ -499,6 +499,7 @@
 
 <script type="module">
     import { getProducts, placeOrder, placeRequest, getSettings } from './js/store.mjs';
+    import { optimizedImageUrl, responsiveImageAttrs } from './js/image-delivery.mjs';
     import { calcGroupedDeliveryFee, buildDeliveryFeeSummary, resolveDeliveryFee, variantUnitPrice, productPriceRange, productOriginalPriceRange, hasPromo, variantDiscountPercent, productHasPromo, buildPriceSavingsSummary, variantLabel, resolveBulkSavings, calcBulkSavingsForLine, buildBulkSavingsSummary } from './js/pricing.mjs';
 
     const CKEY = "eazylife_cart_v2";
@@ -959,7 +960,7 @@
             grid.innerHTML += `
                 <div class="product-card bg-white dark:bg-[#182420] dark:border-[#2a3835] p-3 rounded-[24px] shadow-sm flex flex-col">
                     <div class="relative mb-3">
-                        <img src="${thumb ? escapeHtml(thumb) : 'assets/pictures/placeholder.svg'}" alt="Electronics product image" loading="lazy" decoding="async" width="300" height="220" class="h-32 md:h-40 w-full object-contain rounded-xl bg-gray-50 dark:bg-[#1c2925]">
+                        <img src="${thumb ? escapeHtml(optimizedImageUrl(thumb,480)) : 'assets/pictures/placeholder.svg'}" ${responsiveImageAttrs(thumb,[240,360,480,640],"(max-width: 700px) 50vw, 25vw")} alt="Electronics product image" loading="lazy" decoding="async" width="300" height="220" class="h-32 md:h-40 w-full object-contain rounded-xl bg-gray-50 dark:bg-[#1c2925]">
                         ${promo ? `<span class="absolute top-1.5 left-1.5 bg-[#00B09B] text-white text-[9px] font-black px-1.5 py-0.5 rounded-md shadow">-${Math.round(maxDiscountPercent)}%</span>` : ''}
                     </div>
                     <span class="text-[9px] font-black uppercase text-teal tracking-wider mb-1">${p.brand ? escapeHtml(p.brand) + ' · ' : ''}${escapeHtml(p.category || '')}</span>
