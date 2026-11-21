@@ -99,3 +99,8 @@
  .cs-statusbar span:nth-child(2){display:none}
  .cs-selection-toolbar{top:190px}
 }
+
+/* Compact visible connection nodes with a larger invisible hit area for touch and wire selection */
+.cs-pin .cs-pin-hit{fill:transparent;stroke:transparent;stroke-width:0;pointer-events:all}
+.cs-pin .cs-pin-node{r:2.5px;fill:#168f80;stroke:var(--cs-canvas);stroke-width:1;pointer-events:none}
+.cs-pin.cs-pin-start .cs-pin-node{r:4px;fill:#1676d2;stroke-width:1.25}
