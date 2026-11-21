@@ -895,7 +895,7 @@
     function heroSlideHTML(h, decorative) {
       return `
         <a href="${escapeHtml(linkFor(h))}" class="hero-slide"${decorative ? ' aria-hidden="true" tabindex="-1"' : ''}>
-          <img src="${h.image ? escapeHtml(h.image) : 'assets/pictures/placeholder.svg'}" alt="${decorative ? '' : escapeHtml(h.title || '')}" loading="lazy" width="280" height="160">
+          <img src="${h.image ? escapeHtml(optimizedImageUrl(h.image,960)) : 'assets/pictures/placeholder.svg'}" ${responsiveImageAttrs(h.image,[480,720,960,1200],"(max-width: 720px) 100vw, 280px")} alt="${decorative ? '' : escapeHtml(h.title || '')}" loading="lazy" width="280" height="160">
           <div class="slide-body">
             <h4>${escapeHtml(h.title || '')}</h4>
             <p>${escapeHtml(h.subtitle || '')}</p>
