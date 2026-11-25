@@ -16,7 +16,7 @@ let upgradeRowCounter = 0;
 
 function variantRowHTML(rowId, v = {}) {
   return `
-    <div class="variant-row bg-white border border-gray-200 rounded-xl p-3" data-row-id="${rowId}">
+    <div class="variant-row bg-white border border-gray-200 rounded-xl p-3" data-row-id="${rowId}" data-variant-id="${escapeHtml(v.id || '')}">
       <div class="grid grid-cols-2 gap-2 mb-2">
         <input id="v${rowId}_color" placeholder="Color" value="${escapeHtml(v.color || '')}" class="p-2 bg-gray-50 rounded-lg border border-gray-200 text-xs outline-none">
         <input id="v${rowId}_processor" placeholder="Processor" value="${escapeHtml(v.processor || '')}" class="p-2 bg-gray-50 rounded-lg border border-gray-200 text-xs outline-none">
@@ -81,6 +81,7 @@ function upgradeRowHTML(rowId, u = {}) {
 function addVariantRow(data) {
   variantRowCounter++;
   const rowId = variantRowCounter;
+  if (!data?.id) data = { ...data, id: 'v' + Date.now() + '_' + rowId + '_' + Math.random().toString(36).slice(2, 7) };
   document.getElementById('variantRows').insertAdjacentHTML('beforeend', variantRowHTML(rowId, data));
   document.getElementById(`v${rowId}_image`).addEventListener('input', () => updateImagePreview(`v${rowId}_image`, `v${rowId}_preview`));
   document.querySelector(`.remove-variant-btn[data-row-id="${rowId}"]`).addEventListener('click', () => {
@@ -112,7 +113,7 @@ function collectVariants() {
     const bulkEnabled = document.getElementById(`v${rowId}_bulkEnabled`).checked;
     const bulkModeOwn = document.querySelector(`input[name="v${rowId}_bulkMode"][value="own"]`).checked;
     return {
-      id: 'v' + Date.now() + '_' + rowId,
+      id: row.dataset.variantId || ('v' + Date.now() + '_' + rowId + '_' + Math.random().toString(36).slice(2, 7)),
       color: document.getElementById(`v${rowId}_color`).value.trim(),
       processor: document.getElementById(`v${rowId}_processor`).value.trim(),
       ram: document.getElementById(`v${rowId}_ram`).value.trim(),
