@@ -52,22 +52,30 @@ let project=null,products=[],settings={},lines=[];
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 function variantLabel(v,i){const a=[v?.processor,v?.ram,v?.rom,v?.color].filter(Boolean);return a.length?a.join(' / '):'Variant '+(i+1)}
+function norm(v){return String(v??'').trim().toLowerCase().replace(/\s+/g,' ')}
 function unitPrice(v){return Number(v?.promoPrice>0?v.promoPrice:v?.price||0)}
 function selected(){return lines.filter(x=>x.checked)}
 function render(){
  $('title').textContent=project.title+' Kit';
- const linked=(project.kitComponents||[]).filter(x=>x.productId&&x.variantId);
+ const configured=(project.kitComponents||[]).filter(x=>x.productId||x.productName||x.name);
+ const linked=configured.filter(x=>x.productId||x.productName);
  lines=linked.map((x,i)=>{
-  const p=products.find(z=>z.id===x.productId), variants=p?.variants||[], v=variants.find(z=>z.id===x.variantId) || (x.variant ? variants.find((z,i)=>variantLabel(z,i)===x.variant) : null);
+  const p=products.find(z=>String(z.id)===String(x.productId)) || products.find(z=>norm(z.name)===norm(x.productName));
+  const variants=p?.variants||[];
+  const v=variants.find(z=>String(z.id)===String(x.variantId)) || (x.variant ? variants.find((z,j)=>norm(variantLabel(z,j))===norm(x.variant)) : null);
   return {...x,key:i,product:p,variantData:v,checked:x.required!==false,quantity:Math.max(1,Number(x.quantity)||1)};
- }).filter(x=>x.product&&x.variantData);
- $('count').textContent=lines.length+' listed component'+(lines.length===1?'':'s');
+ });
+ const unresolved=lines.filter(x=>!x.product||!x.variantData);
+ lines=lines.filter(x=>x.product&&x.variantData);
+ $('count').textContent=lines.length+' orderable component'+(lines.length===1?'':'s')+(unresolved.length?' · '+unresolved.length+' need repair':'');
  $('noItems').classList.toggle('hidden',lines.length>0);
+ $('noItems').textContent=configured.length?'Components are saved on this project, but their store links no longer resolve. Please contact EazyLife to repair the kit before submitting.':'This project does not currently have store-linked components for online kit ordering.';
  $('items').innerHTML=lines.map(x=>{
-  const price=unitPrice(x.variantData), available=x.product.inStock!==false&&x.variantData.inStock!==false;
-  const vIndex=x.product.variants.findIndex(v=>v.id===x.variantData.id);
-  return '<article class="kit-item"><div class="flex items-start gap-3"><input data-check="'+x.key+'" type="checkbox" class="mt-1 w-4 h-4 accent-teal-600" '+(x.checked?'checked':'')+'><div class="min-w-0 flex-1"><div class="font-bold text-sm">'+esc(x.product.name)+'</div><p class="text-xs muted mt-1">'+esc(variantLabel(x.variantData,vIndex))+' · '+(x.required===false?'Optional':'Required')+'</p><div class="flex flex-wrap items-center gap-2 mt-2"><span class="pill '+(available?'in':'out')+'">'+(available?'Listed as in stock':'Availability to be confirmed')+'</span><a class="text-xs font-bold text-teal-700" href="shop.html?product='+encodeURIComponent(x.product.id)+'">View store item</a></div></div><div class="text-right shrink-0"><strong class="text-sm">₦'+price.toLocaleString()+'</strong><div class="text-[10px] muted">per unit</div><div class="flex items-center gap-2 justify-end mt-2"><button type="button" data-qty="'+x.key+'" data-delta="-1" class="w-7 h-7 rounded-lg bg-gray-100 font-bold">−</button><span class="text-sm font-bold w-4 text-center">'+x.quantity+'</span><button type="button" data-qty="'+x.key+'" data-delta="1" class="w-7 h-7 rounded-lg bg-gray-100 font-bold">+</button></div></div></div></article>';
+  const price=unitPrice(x.variantData),available=x.product.inStock!==false&&x.variantData.inStock!==false;
+  const vIndex=x.product.variants.findIndex(v=>String(v.id)===String(x.variantData.id));
+  return '<article class="kit-item"><div class="flex items-start gap-3"><input data-check="'+x.key+'" type="checkbox" class="mt-1 w-5 h-5 accent-teal-600" '+(x.checked?'checked':'')+' aria-label="Include '+esc(x.product.name)+'"><div class="min-w-0 flex-1"><div class="font-bold text-sm">'+esc(x.product.name)+'</div><p class="text-xs muted mt-1">'+esc(variantLabel(x.variantData,vIndex))+' · '+(x.required===false?'Optional':'Required')+'</p><div class="flex flex-wrap items-center gap-2 mt-2"><span class="pill '+(available?'in':'out')+'">'+(available?'Listed as in stock':'Availability to be confirmed')+'</span><a class="text-xs font-bold text-teal-700" href="shop.html?product='+encodeURIComponent(x.product.id)+'">View store item</a></div></div><div class="text-right shrink-0"><strong class="text-sm">₦'+price.toLocaleString()+'</strong><div class="text-[10px] muted">per unit</div><div class="flex items-center gap-2 justify-end mt-2"><button type="button" data-qty="'+x.key+'" data-delta="-1" aria-label="Decrease quantity" class="w-9 h-9 rounded-lg bg-gray-100 font-bold">−</button><span class="text-sm font-bold w-4 text-center">'+x.quantity+'</span><button type="button" data-qty="'+x.key+'" data-delta="1" aria-label="Increase quantity" class="w-9 h-9 rounded-lg bg-gray-100 font-bold">+</button></div></div></div></article>';
  }).join('');
+ if(unresolved.length)$('items').insertAdjacentHTML('beforeend','<div class="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900" role="status"><strong>'+unresolved.length+' component link'+(unresolved.length===1?'':'s')+' need attention.</strong><p class="mt-1">These will not be silently removed from your request. Contact EazyLife to restore the saved catalogue links.</p></div>');
  $('items').querySelectorAll('[data-check]').forEach(el=>el.addEventListener('change',()=>{lines.find(x=>x.key===Number(el.dataset.check)).checked=el.checked;updateTotal()}));
  $('items').querySelectorAll('[data-qty]').forEach(el=>el.addEventListener('click',()=>{const x=lines.find(z=>z.key===Number(el.dataset.qty));x.quantity=Math.max(1,x.quantity+Number(el.dataset.delta));render()}));
  updateTotal();
@@ -75,7 +83,7 @@ function render(){
 function updateTotal(){const sum=selected().reduce((n,x)=>n+unitPrice(x.variantData)*x.quantity,0);$('subtotal').textContent='₦'+sum.toLocaleString();$('submit').disabled=!selected().length}
 async function init(){
  try{
-  const [ps,allProjects,site]=await Promise.all([getProducts(),getPublishedProjects(),getSettings()]);
+  const [ps,allProjects,site]=await Promise.all([getProducts({forceRefresh:true}),getPublishedProjects(),getSettings()]);
   products=ps;settings=site;project=allProjects.find(x=>x.id===projectId);
   if(!project)throw new Error('This project is not available for kit ordering. Please return to the project gallery.');
   render();$('loading').classList.add('hidden');$('page').classList.remove('hidden');
