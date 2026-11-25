@@ -52,6 +52,12 @@
     .card .body .btn{margin-top:4px}
     .detail-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
     .detail-cover{cursor:zoom-in;display:block}
+    .detail-cover-button{display:block;width:100%;border:0;padding:0;background:transparent;text-align:left;border-radius:18px;overflow:hidden;cursor:zoom-in;margin:22px 0}
+    .detail-cover-button:focus-visible,.detail-image-button:focus-visible{outline:3px solid var(--teal);outline-offset:4px}
+    .detail-cover-button .detail-cover{margin:0;border-radius:0;width:100%}
+    body.project-lightbox-open{overflow:hidden}
+    .lightbox{overscroll-behavior:contain}
+    .lightbox img{outline:none}
     .detail-images{grid-template-columns:repeat(2,minmax(0,1fr))}
     .detail-image-button{border:0;padding:0;background:#f4f6f6;border-radius:12px;overflow:hidden;cursor:zoom-in;display:block}
     .detail-images img{width:100%;height:190px;object-fit:cover;display:block;transition:transform .25s ease}
@@ -96,7 +102,13 @@
     .nav-actions a:focus-visible,.nav-actions button:focus-visible{outline:3px solid #00B09B;outline-offset:3px}
     @media(max-width:760px){.nav .nav-actions .project-menu-toggle{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border:1px solid var(--border);border-radius:50%;background:#fff;color:var(--teal-dark);padding:0}.nav .nav-actions>a{display:none!important}.nav .nav-actions.menu-open{flex:1 0 100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;overflow:visible;white-space:normal;padding-top:8px}.nav .nav-actions.menu-open>a{display:flex!important;align-items:center;justify-content:center;text-align:center;white-space:normal;padding:11px 9px;font-size:.76rem;min-width:0}.nav .nav-actions.menu-open .btn-wa{grid-column:1/-1;justify-self:stretch;width:auto;border-radius:999px;padding:11px}.nav-inner:has(.nav-actions.menu-open){flex-wrap:wrap}}
     .project-skeleton{border:1px solid var(--border);border-radius:18px;overflow:hidden;background:#fff;box-shadow:0 3px 14px #00000008}.project-skeleton-media,.project-skeleton-line{position:relative;overflow:hidden;background:#e8eeec}.project-skeleton-media{height:230px}.project-skeleton-body{padding:18px}.project-skeleton-line{height:12px;border-radius:8px;margin:12px 0}.project-skeleton-line:first-child{height:9px}.project-skeleton-line:last-child{height:38px;border-radius:999px;margin-top:18px}.project-skeleton-media::after,.project-skeleton-line::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.72),transparent);animation:project-shimmer 1.35s infinite}@keyframes project-shimmer{to{transform:translateX(100%)}}:root[data-theme="dark"] .project-skeleton{background:#142522;border-color:#30413d}:root[data-theme="dark"] .project-skeleton-media,:root[data-theme="dark"] .project-skeleton-line{background:#263632}:root[data-theme="dark"] .project-skeleton-media::after,:root[data-theme="dark"] .project-skeleton-line::after{background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent)}@media(prefers-reduced-motion:reduce){.project-skeleton-media::after,.project-skeleton-line::after{animation:none;transform:none}}
-  </style>
+  
+    /* Keep project labels and technical copy legible in the shared dark theme. */
+    :root[data-theme="dark"] .category{color:#69d9c4}
+    :root[data-theme="dark"] .detail-copy{color:var(--el-muted)}
+    :root[data-theme="dark"] .chip{background:#1e3b34;color:#a5f3e2}
+    :root[data-theme="dark"] .gallery-meta{color:var(--el-muted)}
+</style>
 <script>(function(){var t=null;try{t=localStorage.getItem('eazylife-theme')}catch(e){}t=t||(matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);document.documentElement.classList.toggle('dark',t==='dark')})();</script>
 <link rel="stylesheet" href="assets/css/site-theme.css">
 
@@ -230,7 +242,7 @@
       return '<div class="actions"><a class="btn btn-primary" href="' + esc(raw) + '" target="_blank" rel="noopener"><i class="fas fa-play"></i> Watch project video</a></div>';
     }
 
-    function openLightbox(src, caption) {
+    function openLightbox(src, caption, trigger) {
       let box = document.getElementById('projectLightbox');
       if (!box) {
         box = document.createElement('div');
@@ -239,15 +251,36 @@
         box.setAttribute('role','dialog');
         box.setAttribute('aria-modal','true');
         box.setAttribute('aria-label','Project image viewer');
+        box.setAttribute('aria-hidden','true');
         box.innerHTML = '<button class="lightbox-close" type="button" aria-label="Close image">&times;</button><img alt=""><div class="lightbox-caption"></div>';
         document.body.appendChild(box);
-        box.addEventListener('click', event => { if (event.target === box || event.target.closest('.lightbox-close')) box.classList.remove('open'); });
-        document.addEventListener('keydown', event => { if (event.key === 'Escape') box.classList.remove('open'); });
+        const close = () => {
+          box.classList.remove('open');
+          box.setAttribute('aria-hidden','true');
+          document.body.classList.remove('project-lightbox-open');
+          if (box._returnFocus && box._returnFocus.isConnected) box._returnFocus.focus();
+        };
+        box._closeLightbox = close;
+        box.addEventListener('click', event => { if (event.target === box || event.target.closest('.lightbox-close')) close(); });
+        document.addEventListener('keydown', event => {
+          if (!box.classList.contains('open')) return;
+          if (event.key === 'Escape') { event.preventDefault(); close(); return; }
+          if (event.key === 'Tab') {
+            const closeButton = box.querySelector('.lightbox-close');
+            if (event.shiftKey) { event.preventDefault(); closeButton.focus(); }
+            else { event.preventDefault(); closeButton.focus(); }
+          }
+        });
       }
-      box.querySelector('img').src = src;
-      box.querySelector('img').alt = caption || 'Project image';
+      box._returnFocus = trigger || document.activeElement;
+      const image = box.querySelector('img');
+      image.src = src;
+      image.alt = caption || 'Project image';
       box.querySelector('.lightbox-caption').textContent = caption || '';
       box.classList.add('open');
+      box.setAttribute('aria-hidden','false');
+      document.body.classList.add('project-lightbox-open');
+      box.querySelector('.lightbox-close').focus();
     }
 
     function renderKitSection(p, products) {
@@ -285,10 +318,10 @@
         '<div class="detail-top"><a class="btn" href="projects.html"><i class="fas fa-arrow-left"></i> All projects</a><span class="category">' + esc(p.category || 'Engineering project') + '</span></div>' +
         '<h1>' + esc(p.title || 'Engineering project') + '</h1>' +
         '<p class="detail-copy">' + esc(p.summary || '') + '</p>' +
-        (cover ? '<img class="detail-cover" data-project-image="' + esc(cover) + '" src="' + esc(optimizedImageUrl(cover, 1200)) + '" ' + responsiveImageAttrs(cover, [640, 960, 1200, 1600], '(max-width: 700px) 100vw, 850px') + ' alt="' + esc(p.title || 'Project cover') + '" decoding="async" width="1200" height="800">' : '') +
+        (cover ? '<button class="detail-cover-button" type="button" data-project-image="' + esc(cover) + '" aria-label="View cover image for ' + esc(p.title || 'project') + '"><img class="detail-cover" src="' + esc(optimizedImageUrl(cover, 1200)) + '" ' + responsiveImageAttrs(cover, [640, 960, 1200, 1600], '(max-width: 700px) 100vw, 850px') + ' alt="' + esc(p.title || 'Project cover') + '" decoding="async" width="1200" height="800"></button>' : '') +
         (p.description ? '<div class="detail-block"><h2>About this project</h2><p class="detail-copy">' + esc(p.description) + '</p></div>' : '') +
         (galleryImages.length ? '<div class="detail-block"><h2>Project photos</h2><p class="detail-copy">Select any image to view it larger.</p><div class="detail-images">' +
-          galleryImages.map((src,i) => '<button class="detail-image-button" type="button" data-project-image="' + esc(src) + '" aria-label="View project photo ' + (i+1) + '"><img src="' + esc(src) + '" alt="' + esc(p.title || 'Project') + ' photo ' + (i+1) + '" loading="lazy" decoding="async" width="640" height="460"></button>').join('') +
+          galleryImages.map((src,i) => '<button class="detail-image-button" type="button" data-project-image="' + esc(src) + '" aria-label="View project photo ' + (i+1) + '"><img src="' + esc(optimizedImageUrl(src, 640)) + '" ' + responsiveImageAttrs(src, [320, 480, 640, 960], '(max-width: 700px) 50vw, 280px') + ' alt="' + esc(p.title || 'Project') + ' photo ' + (i+1) + '" loading="lazy" decoding="async" width="640" height="460"></button>').join('') +
         '</div></div>' : '') +
         (videoMarkup(p.videoUrl) ? '<div class="detail-block"><h2>Project video</h2>' + videoMarkup(p.videoUrl) + '</div>' : '') +
         (materials.length ? '<div class="detail-block"><h2>Materials and components</h2><div class="materials">' + materials.map(m => '<span class="chip">' + esc(m) + '</span>').join('') + '</div></div>' : '') + 
@@ -298,7 +331,7 @@
         '<div class="actions"><a class="btn btn-primary" href="https://wa.me/2347051548082?text=' + encodeURIComponent('Hello EazyLife, I would like to enquire about the project: ' + (p.title || '')) + '">Discuss a similar project</a><a class="btn" href="projects.html">Back to gallery</a></div>' +
       '</article>';
       content.querySelectorAll('[data-project-image]').forEach(el => {
-        el.addEventListener('click', () => openLightbox(el.dataset.projectImage, p.title || 'Project image'));
+        el.addEventListener('click', () => openLightbox(el.dataset.projectImage, p.title || 'Project image', el));
       });
     }
 
