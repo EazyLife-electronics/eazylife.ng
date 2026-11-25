@@ -20,7 +20,7 @@
 <title>Circuit Diagram Editor & Design Tool | EazyLife</title>
 <script>(function(){var t=null;try{t=localStorage.getItem('eazylife-theme')}catch(e){}t=t||(matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);document.documentElement.classList.toggle('dark',t==='dark')})();</script>
 <link rel="stylesheet" href="assets/css/site-theme.css">
-<link rel="stylesheet" href="assets/css/circuit-studio.css?v=toolbar-layout-repair-3">
+<link rel="stylesheet" href="assets/css/circuit-studio.css?v=status-toolbar-stability-1">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -66,13 +66,14 @@
   </div>
 </header>
 <main class="cs-app">
+  <div class="cs-toolbar-modebar" id="toolbarModeBar" role="group" aria-label="Toolbar layout">
+    <span class="cs-toolbar-mode-label">Toolbar</span>
+    <button id="toolbarModeMini" class="cs-small-btn" type="button" aria-pressed="false">Mini</button>
+    <button id="toolbarModeFull" class="cs-small-btn" type="button" aria-pressed="false">Full</button>
+    <button id="toolbarModeHide" class="cs-small-btn" type="button" aria-pressed="false">Hide</button>
+  </div>
   <section class="cs-toolbar" id="circuitToolbar" aria-label="Drawing tools">
-    <div class="cs-toolbar-modebar" role="group" aria-label="Toolbar layout">
-      <span class="cs-toolbar-mode-label">Toolbar</span>
-      <button id="toolbarModeMini" class="cs-small-btn" type="button" aria-pressed="false">Mini</button>
-      <button id="toolbarModeFull" class="cs-small-btn" type="button" aria-pressed="false">Full</button>
-      <button id="toolbarModeHide" class="cs-small-btn" type="button" aria-pressed="false">Hide</button>
-    </div>
+    
     <div class="cs-tool-group">
       <button id="newProject" class="cs-btn">New</button>
       <div id="adminProjectTools" class="cs-tool-group cs-admin-project-tools" hidden aria-label="Admin project tools">
@@ -119,7 +120,7 @@
         </svg>
         <div class="cs-canvas-empty" id="emptyHint"><span>＋</span><strong>Your circuit starts here</strong><p>Choose a component from the library to place it on the canvas.</p></div>
       </div>
-      <div class="cs-statusbar"><span id="selectionStatus">Nothing selected</span><span>Connect wires: choose Connect wires, then tap two pins. Pan: choose Pan or use Space + drag.</span><span id="coordinateStatus">x: 0 · y: 0</span></div>
+      
     </section>
     <aside id="propertiesPanel" class="cs-properties-panel">
       <div class="cs-panel-heading"><div><span class="cs-eyebrow">INSPECTOR</span><h2 id="propertiesHeading">Properties</h2></div><div class="cs-panel-controls"><button id="toggleInspector" class="cs-small-btn cs-inspector-toggle" type="button" aria-label="Hide properties inspector">Hide</button></div></div>
@@ -127,6 +128,7 @@
       <div class="cs-inspector-note"><strong>Shared component library</strong><p>Artwork and connection pins are maintained together in Admin → Circuit Components. The workspace edits diagram placement, labels, rotation and wires.</p></div>
     </aside>
   </div>
+  <div class="cs-statusbar"><span id="selectionStatus">Nothing selected</span><span>Connect wires: choose Connect wires, then tap two pins. Pan: choose Pan or use Space + drag.</span><span id="coordinateStatus">x: 0 · y: 0</span></div>
 </main>
 
 <dialog id="textEditDialog" class="cs-dialog cs-text-dialog"><form method="dialog" class="cs-dialog-head"><div><span class="cs-eyebrow">TEXT EDITOR</span><h2 id="textEditTitle">Edit text</h2></div><button class="cs-icon-btn" value="cancel" aria-label="Close">✕</button></form><label class="cs-field">Text<input id="canvasTextInput" type="text" autocomplete="off"></label><div class="cs-dialog-actions"><button id="applyCanvasText" class="cs-btn cs-primary" type="button">Apply</button></div></dialog>
