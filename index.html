@@ -749,6 +749,39 @@
       .project-gallery-card, .product-card, .review-form-disclosure { transition: none; }
       .project-gallery-card:hover, .product-card:hover { transform: none; }
     }
+
+    /* Final consistency pass: visible keyboard focus across every homepage control. */
+    :where(a, button, input, select, textarea, summary):focus-visible {
+      outline: 3px solid var(--teal);
+      outline-offset: 3px;
+    }
+    .form-group input:focus-visible,
+    .form-group select:focus-visible,
+    .form-group textarea:focus-visible {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(0,176,155,.14);
+    }
+    :root[data-theme="dark"] :where(a, button, input, select, textarea, summary):focus-visible {
+      outline-color: #5ee0c4;
+    }
+    :root[data-theme="dark"] .form-group input:focus-visible,
+    :root[data-theme="dark"] .form-group select:focus-visible,
+    :root[data-theme="dark"] .form-group textarea:focus-visible {
+      border-color: #5ee0c4;
+      box-shadow: 0 0 0 3px rgba(94,224,196,.18);
+    }
+
+    /* Keep in-page destinations visible below the sticky navigation. */
+    section[id] { scroll-margin-top: 88px; }
+
+    /* Respect reduced-motion preferences across scrolling and loading states too. */
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .skeleton { animation: none; }
+      .btn, .contact-item, .social-card, .nav-dropdown-item {
+        transition: none;
+      }
+    }
   </style>
 </head>
 <body>
