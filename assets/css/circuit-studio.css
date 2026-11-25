@@ -187,4 +187,3 @@
 .cs-wire-hit{vector-effect:non-scaling-stroke;stroke-width:20}
 .cs-wire-endpoint,.cs-bend-handle,.cs-junction{vector-effect:non-scaling-stroke}
 .cs-selected .cs-selection-box{vector-effect:non-scaling-stroke}
-.cs-wire-endpoint:focus-visible,.cs-bend-handle:focus-visible,.cs-junction:focus-visible{outline:none;filter:drop-shadow(0 0 3px var(--cs-accent))}
