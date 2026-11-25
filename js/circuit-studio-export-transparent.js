@@ -300,18 +300,19 @@ syncWorkspacePanels();
 // Persistent, draggable bubbles are the only way to reopen a hidden panel.
 function positionBubble(el,key,side){
  const saved=workspacePrefs.bubblePositions?.[key];el.style.position='fixed';el.style.zIndex='110';el.style.touchAction='none';
- const clamp=()=>{const r=el.getBoundingClientRect(),x=Math.max(6,Math.min(innerWidth-r.width-6,r.left)),y=Math.max(58,Math.min(innerHeight-r.height-10,r.top));el.style.left=x+'px';el.style.top=y+'px';el.style.right='auto'};
- if(saved&&Number.isFinite(saved.x)&&Number.isFinite(saved.y)){el.style.left=saved.x+'px';el.style.top=saved.y+'px';el.style.right='auto'}else{el.style.top='76px';el.style.left=side==='left'?'12px':'auto';el.style.right=side==='right'?'12px':'auto'}
+ const clamp=()=>{const r=el.getBoundingClientRect(),x=Math.max(6,Math.min(innerWidth-r.width-6,r.left)),safeTop=Math.max(72,(document.querySelector('.cs-topbar')?.getBoundingClientRect().bottom||64)+8),y=Math.max(safeTop,Math.min(innerHeight-r.height-10,r.top));el.style.left=x+'px';el.style.top=y+'px';el.style.right='auto'};
+ if(saved&&Number.isFinite(saved.x)&&Number.isFinite(saved.y)){el.style.left=saved.x+'px';el.style.top=saved.y+'px';el.style.right='auto'}else{el.style.top='76px';el.style.left=side==='left'?'12px':'auto';el.style.right=side==='right'?'12px':'auto'}clamp();
  let moved=false,sx=0,sy=0,ox=0,oy=0;
  el.addEventListener('pointerdown',e=>{if(e.button!==0)return;moved=false;sx=e.clientX;sy=e.clientY;const r=el.getBoundingClientRect();ox=r.left;oy=r.top;el.setPointerCapture?.(e.pointerId)});
  el.addEventListener('pointermove',e=>{if(!el.hasPointerCapture?.(e.pointerId))return;const dx=e.clientX-sx,dy=e.clientY-sy;if(Math.abs(dx)+Math.abs(dy)>6)moved=true;if(!moved)return;el.style.left=Math.max(6,Math.min(innerWidth-el.offsetWidth-6,ox+dx))+'px';el.style.top=Math.max(58,Math.min(innerHeight-el.offsetHeight-10,oy+dy))+'px';el.style.right='auto'});
  el.addEventListener('pointerup',()=>{if(moved){const r=el.getBoundingClientRect();workspacePrefs.bubblePositions=workspacePrefs.bubblePositions||{};workspacePrefs.bubblePositions[key]={x:r.left,y:r.top};saveWorkspacePrefs();el.dataset.dragged='1';requestAnimationFrame(()=>delete el.dataset.dragged)}});
+ window.addEventListener('resize',clamp);
  el.addEventListener('click',e=>{if(el.dataset.dragged==='1'){e.preventDefault();e.stopImmediatePropagation()}});
 }
 positionBubble(panelButtons.library.bubble,'library','left');positionBubble(panelButtons.inspector.bubble,'inspector','right');positionBubble(toolbarBubble,'toolbar','left');
 // Three toolbar states only: docked Full, one-line scrollable Mini, and Hide with a bubble.
 function setToolbarMode(mode){if(!['mini','full','hide'].includes(mode))mode='full';const previous=workspacePrefs.lastVisibleToolbarMode||'full';if(mode!=='hide')workspacePrefs.lastVisibleToolbarMode=mode;
- toolbar.hidden=mode==='hide';toolbarModebar.hidden=mode==='hide';toolbarBubble.hidden=mode!=='hide';
+ toolbar.hidden=mode==='hide';toolbarModebar.hidden=false;toolbarBubble.hidden=mode!=='hide';
  toolbar.classList.toggle('cs-toolbar-mini',mode==='mini');toolbar.classList.toggle('cs-toolbar-full',mode==='full');toolbar.classList.toggle('cs-toolbar-hidden',mode==='hide');toolbar.classList.remove('cs-toolbar-floating','cs-toolbar-expanded');
  for(const [key,button] of Object.entries(modeButtons))button.setAttribute('aria-pressed',String(key===mode));
  workspacePrefs.toolbarMode=mode;if(mode==='hide')workspacePrefs.lastVisibleToolbarMode=previous;saveWorkspacePrefs();
