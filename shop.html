@@ -106,19 +106,19 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <div id="navMenuPanel" class="nav-menu-panel hidden">
-<a href="index.html"><i class="fas fa-house fa-fw"></i> Home</a>
-<a href="projects.html"><i class="fas fa-diagram-project fa-fw"></i> Project Gallery</a>
-<a href="stem-lab.html"><i class="fas fa-flask fa-fw"></i> STEM Lab</a>
-<a href="circuit-studio.html"><i class="fas fa-draw-polygon fa-fw"></i> Circuit Studio</a>
-<a href="stem-electronics-fundamentals.html"><i class="fas fa-book-open fa-fw"></i> Lessons</a>
-<a href="stem-projects.html"><i class="fas fa-microchip fa-fw"></i> Project Playground</a>
-<a href="stem-resistor-colour-code.html"><i class="fas fa-calculator fa-fw"></i> Tools</a>
-<a href="shop.html"><i class="fas fa-store fa-fw"></i> Shop</a>
-<a href="track.html"><i class="fas fa-truck-fast fa-fw"></i> Track Order</a>
-<a href="reviews.html"><i class="fas fa-star fa-fw"></i> Reviews</a>
-<a href="index.html#services"><i class="fas fa-layer-group fa-fw"></i> Services</a>
-<a href="index.html#contact"><i class="fas fa-address-card fa-fw"></i> Contact</a>
-</div>
+                    <a href="index.html"><i class="fas fa-house fa-fw"></i> Home</a>
+                    <a href="projects.html"><i class="fas fa-diagram-project fa-fw"></i> Project Gallery</a>
+                    <a href="stem-lab.html"><i class="fas fa-flask fa-fw"></i> STEM Lab</a>
+                    <a href="circuit-studio.html"><i class="fas fa-draw-polygon fa-fw"></i> Circuit Studio</a>
+                    <a href="stem-electronics-fundamentals.html"><i class="fas fa-book-open fa-fw"></i> Lessons</a>
+                    <a href="stem-projects.html"><i class="fas fa-microchip fa-fw"></i> Project Playground</a>
+                    <a href="stem-resistor-colour-code.html"><i class="fas fa-calculator fa-fw"></i> Tools</a>
+                    <a href="shop.html"><i class="fas fa-store fa-fw"></i> Shop</a>
+                    <a href="track.html"><i class="fas fa-truck-fast fa-fw"></i> Track Order</a>
+                    <a href="reviews.html"><i class="fas fa-star fa-fw"></i> Reviews</a>
+                    <a href="index.html#services"><i class="fas fa-layer-group fa-fw"></i> Services</a>
+                    <a href="index.html#contact"><i class="fas fa-address-card fa-fw"></i> Contact</a>
+                </div>
             </div>
             <button onclick="showCart()" class="bg-eazylife text-white px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 shadow-lg hover:opacity-90 transition-all">
                 <i class="fas fa-shopping-basket"></i>
@@ -189,9 +189,64 @@
         <div id="activeFilterChips" class="hidden flex flex-wrap gap-1.5 mt-2"></div>
     </div>
 
-    <div id="loader" class="flex flex-col items-center justify-center py-20 text-gray-400">
-        <div class="animate-spin text-teal-500 text-3xl mb-3"><i class="fas fa-circle-notch"></i></div>
-        <p class="font-medium">Syncing Inventory...</p>
+    <!-- SKELETON LOADER: Shows instantly while Firestore fetches products -->
+    <div id="loader" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+        <div class="bg-white dark:bg-[#182420] dark:border-[#2a3835] p-3 rounded-[24px] border flex flex-col gap-3 animate-pulse">
+            <div class="h-32 md:h-40 w-full rounded-xl bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-3 w-1/3 rounded bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-4 w-3/4 rounded bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-4 w-1/2 rounded bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-9 w-full rounded-xl bg-gray-200 dark:bg-[#2a3835] mt-auto"></div>
+        </div>
+        <div class="bg-white dark:bg-[#182420] dark:border-[#2a3835] p-3 rounded-[24px] border flex flex-col gap-3 animate-pulse">
+            <div class="h-32 md:h-40 w-full rounded-xl bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-3 w-1/3 rounded bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-4 w-3/4 rounded bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-4 w-1/2 rounded bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-9 w-full rounded-xl bg-gray-200 dark:bg-[#2a3835] mt-auto"></div>
+        </div>
+        <div class="bg-white dark:bg-[#182420] dark:border-[#2a3835] p-3 rounded-[24px] border flex flex-col gap-3 animate-pulse">
+            <div class="h-32 md:h-40 w-full rounded-xl bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-3 w-1/3 rounded bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-4 w-3/4 rounded bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-4 w-1/2 rounded bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-9 w-full rounded-xl bg-gray-200 dark:bg-[#2a3835] mt-auto"></div>
+        </div>
+        <div class="bg-white dark:bg-[#182420] dark:border-[#2a3835] p-3 rounded-[24px] border flex flex-col gap-3 animate-pulse">
+            <div class="h-32 md:h-40 w-full rounded-xl bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-3 w-1/3 rounded bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-4 w-3/4 rounded bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-4 w-1/2 rounded bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-9 w-full rounded-xl bg-gray-200 dark:bg-[#2a3835] mt-auto"></div>
+        </div>
+        <div class="hidden md:block bg-white dark:bg-[#182420] dark:border-[#2a3835] p-3 rounded-[24px] border flex flex-col gap-3 animate-pulse">
+            <div class="h-32 md:h-40 w-full rounded-xl bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-3 w-1/3 rounded bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-4 w-3/4 rounded bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-4 w-1/2 rounded bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-9 w-full rounded-xl bg-gray-200 dark:bg-[#2a3835] mt-auto"></div>
+        </div>
+        <div class="hidden md:block bg-white dark:bg-[#182420] dark:border-[#2a3835] p-3 rounded-[24px] border flex flex-col gap-3 animate-pulse">
+            <div class="h-32 md:h-40 w-full rounded-xl bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-3 w-1/3 rounded bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-4 w-3/4 rounded bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-4 w-1/2 rounded bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-9 w-full rounded-xl bg-gray-200 dark:bg-[#2a3835] mt-auto"></div>
+        </div>
+        <div class="hidden md:block bg-white dark:bg-[#182420] dark:border-[#2a3835] p-3 rounded-[24px] border flex flex-col gap-3 animate-pulse">
+            <div class="h-32 md:h-40 w-full rounded-xl bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-3 w-1/3 rounded bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-4 w-3/4 rounded bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-4 w-1/2 rounded bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-9 w-full rounded-xl bg-gray-200 dark:bg-[#2a3835] mt-auto"></div>
+        </div>
+        <div class="hidden md:block bg-white dark:bg-[#182420] dark:border-[#2a3835] p-3 rounded-[24px] border flex flex-col gap-3 animate-pulse">
+            <div class="h-32 md:h-40 w-full rounded-xl bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-3 w-1/3 rounded bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-4 w-3/4 rounded bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-4 w-1/2 rounded bg-gray-200 dark:bg-[#2a3835]"></div>
+            <div class="h-9 w-full rounded-xl bg-gray-200 dark:bg-[#2a3835] mt-auto"></div>
+        </div>
     </div>
 
     <div id="grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"></div>
@@ -352,9 +407,12 @@
                 <span class="text-gray-500 dark:text-gray-400">Bulk Savings</span>
                 <span class="font-bold text-teal">-₦<span id="bulkSavingsAmount">0</span></span>
             </div>
-            <div class="flex justify-between items-center px-2 text-sm mt-1">
-                <span class="text-gray-500 dark:text-gray-400">Delivery Fee</span>
-                <span class="flex items-center gap-1.5">
+            <div class="flex justify-between items-start px-2 text-sm mt-1">
+                <div class="flex flex-col">
+                    <span class="text-gray-500 dark:text-gray-400">Delivery Fee</span>
+                    <span class="text-[10px] text-gray-400 italic mt-0.5">Calculated based on your address at checkout</span>
+                </div>
+                <span class="flex items-center gap-1.5 text-right">
                     <span id="deliveryNaive" class="hidden text-[11px] text-gray-400 line-through"></span>
                     <span id="deliverySavingsPercent" class="hidden text-[10px] font-black text-teal"></span>
                     <span class="font-bold text-gray-800 dark:text-gray-100">₦<span id="deliveryFeeDisplay">0</span></span>
@@ -409,9 +467,12 @@
                 <span class="text-gray-500 dark:text-gray-400">Bulk Savings</span>
                 <span class="font-bold text-teal">-₦<span id="bulkSavingsAmountCo">0</span></span>
             </div>
-            <div class="flex justify-between items-center px-2 text-sm mt-1">
-                <span class="text-gray-500 dark:text-gray-400">Delivery Fee</span>
-                <span class="flex items-center gap-1.5">
+            <div class="flex justify-between items-start px-2 text-sm mt-1">
+                <div class="flex flex-col">
+                    <span class="text-gray-500 dark:text-gray-400">Delivery Fee</span>
+                    <span class="text-[10px] text-gray-400 italic mt-0.5">Calculated based on your address at checkout</span>
+                </div>
+                <span class="flex items-center gap-1.5 text-right">
                     <span id="deliveryNaiveCo" class="hidden text-[11px] text-gray-400 line-through"></span>
                     <span id="deliverySavingsPercentCo" class="hidden text-[10px] font-black text-teal"></span>
                     <span class="font-bold text-gray-800 dark:text-gray-100">₦<span id="deliveryFeeDisplayCo">0</span></span>
@@ -437,7 +498,6 @@
         </div>
 
         <!-- Step 3: confirmation (shown after order is written to Firestore) -->
-
         <div id="confirmStep" class="hidden text-center py-6">
             <div class="text-5xl text-teal mb-4"><i class="fas fa-circle-check"></i></div>
             <h2 class="font-syne font-extrabold text-2xl text-gray-900 dark:text-gray-100 mb-2">Order Received!</h2>
