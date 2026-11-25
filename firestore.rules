@@ -26,9 +26,31 @@ service cloud.firestore {
     }
 
     match /orders/{orderId} {
-      allow create: if request.resource.data.keys().hasAll(['items', 'customerName', 'phone', 'total'])
+      // Public checkout. The document ID must equal its tracking code, and the
+      // server-controlled fields must start in their initial state so a crafted
+      // request cannot create an order that is already "delivered" or "paid".
+      allow create: if request.resource.data.keys().hasAll(['items', 'customerName', 'phone', 'total', 'trackingCode', 'status', 'createdAt'])
+                    && request.resource.data.keys().size() <= 25
+                    && orderId.matches('EZ-[A-Z0-9]{6,10}')
+                    && request.resource.data.trackingCode == orderId
+                    && request.resource.data.status == 'new'
+                    && request.resource.data.inventoryApplied == false
+                    && request.resource.data.get('inventoryReturned', false) == false
+                    && request.resource.data.createdAt == request.time
+                    && request.resource.data.items is list
+                    && request.resource.data.items.size() > 0
+                    && request.resource.data.items.size() <= 30
                     && request.resource.data.total is number
-                    && request.resource.data.items is list;
+                    && request.resource.data.total >= 0
+                    && request.resource.data.total < 100000000
+                    && request.resource.data.customerName is string
+                    && request.resource.data.customerName.size() > 0
+                    && request.resource.data.customerName.size() <= 120
+                    && request.resource.data.phone is string
+                    && request.resource.data.phone.size() >= 6
+                    && request.resource.data.phone.size() <= 30
+                    && request.resource.data.get('address', '') is string
+                    && request.resource.data.get('address', '').size() <= 500;
       allow get: if true;
       allow list: if isAdmin();
       allow update, delete: if isAdmin();
@@ -60,8 +82,13 @@ service cloud.firestore {
       allow read: if isAdmin() || resource.data.approved == true;
       allow create: if isAdmin() || (
                     request.resource.data.keys().hasAll(['name', 'text', 'approved'])
+                    && request.resource.data.keys().size() <= 15
                     && request.resource.data.name is string
+                    && request.resource.data.name.size() > 0
+                    && request.resource.data.name.size() <= 80
                     && request.resource.data.text is string
+                    && request.resource.data.text.size() > 0
+                    && request.resource.data.text.size() <= 1500
                     && request.resource.data.approved == false
                     );
       allow update, delete: if isAdmin();
@@ -69,8 +96,16 @@ service cloud.firestore {
 
     match /requests/{requestId} {
       allow create: if request.resource.data.keys().hasAll(['name', 'phone', 'need'])
+                    && request.resource.data.keys().size() <= 12
                     && request.resource.data.name is string
-                    && request.resource.data.phone is string;
+                    && request.resource.data.name.size() > 0
+                    && request.resource.data.name.size() <= 80
+                    && request.resource.data.phone is string
+                    && request.resource.data.phone.size() >= 6
+                    && request.resource.data.phone.size() <= 30
+                    && request.resource.data.need is string
+                    && request.resource.data.need.size() > 0
+                    && request.resource.data.need.size() <= 1000;
       allow read, update, delete: if isAdmin();
     }
 

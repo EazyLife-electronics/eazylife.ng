@@ -32,9 +32,25 @@ if (typeof window !== 'undefined' &&
 
 /* ---------------- PRODUCTS ---------------- */
 
+// Public pages share one short-lived cache so each page view does not re-read
+// the whole products collection (Firestore free tier allows 50k reads/day).
+const PRODUCTS_CACHE_KEY = 'eazylife_products_v1';
+const PRODUCTS_CACHE_MS = 5 * 60 * 1000;
+
 export async function getProducts() {
+  const isAdminPage = typeof location !== 'undefined' && location.pathname.includes('/admin/');
+  if (!isAdminPage) {
+    try {
+      const cached = JSON.parse(sessionStorage.getItem(PRODUCTS_CACHE_KEY) || 'null');
+      if (cached && Array.isArray(cached.items) && Date.now() - cached.at < PRODUCTS_CACHE_MS) return cached.items;
+    } catch (_) {}
+  }
   const snap = await getDocs(collection(db, 'products'));
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  if (!isAdminPage) {
+    try { sessionStorage.setItem(PRODUCTS_CACHE_KEY, JSON.stringify({ at: Date.now(), items })); } catch (_) {}
+  }
+  return items;
 }
 
 export function watchProducts(callback) {
@@ -58,9 +74,19 @@ export async function deleteProduct(id) {
 /* ---------------- ORDERS ---------------- */
 
 function generateTrackingCode() {
+  // 10 characters from a 31-symbol alphabet (~8e14 combinations), drawn from the
+  // browser's cryptographic RNG. Rejection sampling avoids modulo bias.
+  // Older 6-character codes (EZ-XXXXXX) still work for lookups.
   const alphabet = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  const limit = 256 - (256 % alphabet.length);
   let code = 'EZ-';
-  for (let i = 0; i < 6; i++) code += alphabet[Math.floor(Math.random() * alphabet.length)];
+  while (code.length < 13) {
+    const bytes = new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+    for (const b of bytes) {
+      if (b < limit && code.length < 13) code += alphabet[b % alphabet.length];
+    }
+  }
   return code;
 }
 
