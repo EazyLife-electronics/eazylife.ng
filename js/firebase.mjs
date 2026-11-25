@@ -5,7 +5,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check.js";
+import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check.js";
 // This module only injects markup on Admin pages. It is safe to load from the
 // shared Firebase module and, importantly, runs before admin-app.mjs starts.
 import "../admin/js/settings-ui.mjs";
@@ -41,7 +41,7 @@ export function initFirebase() {
   if (RECAPTCHA_V3_SITE_KEY) {
     try {
       initializeAppCheck(app, {
-        provider: new ReCaptchaV3Provider(RECAPTCHA_V3_SITE_KEY),
+        provider: new ReCaptchaEnterpriseProvider(RECAPTCHA_V3_SITE_KEY),
         isTokenAutoRefreshEnabled: true
       });
     } catch (err) {
