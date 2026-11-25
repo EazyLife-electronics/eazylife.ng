@@ -810,3 +810,37 @@
  .cs-toolbar.cs-toolbar-full,.cs-toolbar.cs-toolbar-mini{position:relative!important;top:auto!important;left:auto!important;right:auto!important;transform:none!important}
  .cs-toolbar-bubble{position:fixed!important;top:56px!important;right:10px!important;left:auto!important;z-index:1000!important}
 }
+
+
+/* Mobile-only final correction: reopen bubbles live outside the clipped workspace. */
+@media(max-width:620px){
+ .cs-app{display:flex!important;flex-direction:column!important;overflow:visible!important}
+ .cs-workspace{position:relative!important;display:flex!important;flex:1 1 0!important;
+  min-height:0!important;height:auto!important;max-height:none!important;overflow:hidden!important;
+  order:3!important}
+ .cs-canvas-panel{position:relative!important;order:1!important;flex:1 1 0!important;
+  min-height:0!important;height:auto!important;overflow:hidden!important}
+ .cs-canvas-wrap{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+  min-height:0!important;flex:1 1 0!important}
+ .cs-properties-panel:not(.cs-panel-hidden){order:2!important;flex:0 1 auto!important;
+  min-height:0!important;max-height:21dvh!important;overflow-y:auto!important}
+ .cs-library-panel:not(.cs-panel-hidden){order:3!important;flex:0 1 auto!important;
+  min-height:0!important;max-height:21dvh!important;overflow-y:auto!important}
+ .cs-statusbar{
+  position:relative!important;display:flex!important;order:10!important;
+  flex:0 0 auto!important;width:100%!important;min-height:34px!important;
+  margin:0!important;padding:5px 10px!important;inset:auto!important;
+  transform:none!important;z-index:3!important;align-items:center!important
+ }
+ .cs-statusbar #selectionStatus{flex:1 1 auto!important;min-width:0!important}
+ .cs-statusbar #coordinateStatus{flex:0 0 auto!important;white-space:nowrap!important}
+ .cs-panel-reopen{
+  position:fixed!important;display:grid!important;place-items:center!important;
+  z-index:1600!important;width:48px!important;height:48px!important;
+  min-width:48px!important;min-height:48px!important;border-radius:50%!important;
+  pointer-events:auto!important;touch-action:manipulation!important
+ }
+ .cs-panel-reopen[hidden]{display:none!important}
+ .cs-reopen-library{left:12px!important;right:auto!important}
+ .cs-reopen-inspector{left:auto!important;right:12px!important}
+}
