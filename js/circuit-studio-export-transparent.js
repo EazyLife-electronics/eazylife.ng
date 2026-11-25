@@ -271,7 +271,7 @@ if(workspacePrefs.toolbarMode==='float')workspacePrefs.toolbarMode='mini';
 if(workspacePrefs.panels){for(const key of ['library','inspector'])if(workspacePrefs.panels[key]){workspacePrefs.panels[key].floating=false;delete workspacePrefs.panels[key].collapsed}}
 function saveWorkspacePrefs(){try{localStorage.setItem(WORKSPACE_PREF_KEY,JSON.stringify(workspacePrefs))}catch(e){}}
 const workspace=$('circuitWorkspace'),libraryPanel=$('componentLibraryPanel'),propertiesPanel=$('propertiesPanel');
-const toolbar=$('circuitToolbar'),toolbarBubble=$('showToolbarBubble');
+const toolbar=$('circuitToolbar'),toolbarBubble=$('showToolbarBubble'),toolbarModebar=$('toolbarModeBar');
 const modeButtons={mini:$('toolbarModeMini'),full:$('toolbarModeFull'),hide:$('toolbarModeHide')};
 const panelButtons={library:{hide:$('toggleLibraryPanel'),show:$('showLibraryPanel'),bubble:$('showLibraryPanel')},inspector:{hide:$('toggleInspector'),show:$('showInspectorPanel'),bubble:$('showInspectorPanel')}};
 function syncWorkspacePanels(){
@@ -311,7 +311,7 @@ function positionBubble(el,key,side){
 positionBubble(panelButtons.library.bubble,'library','left');positionBubble(panelButtons.inspector.bubble,'inspector','right');positionBubble(toolbarBubble,'toolbar','left');
 // Three toolbar states only: docked Full, one-line scrollable Mini, and Hide with a bubble.
 function setToolbarMode(mode){if(!['mini','full','hide'].includes(mode))mode='full';const previous=workspacePrefs.lastVisibleToolbarMode||'full';if(mode!=='hide')workspacePrefs.lastVisibleToolbarMode=mode;
- toolbar.hidden=mode==='hide';toolbarBubble.hidden=mode!=='hide';
+ toolbar.hidden=mode==='hide';toolbarModebar.hidden=mode==='hide';toolbarBubble.hidden=mode!=='hide';
  toolbar.classList.toggle('cs-toolbar-mini',mode==='mini');toolbar.classList.toggle('cs-toolbar-full',mode==='full');toolbar.classList.toggle('cs-toolbar-hidden',mode==='hide');toolbar.classList.remove('cs-toolbar-floating','cs-toolbar-expanded');
  for(const [key,button] of Object.entries(modeButtons))button.setAttribute('aria-pressed',String(key===mode));
  workspacePrefs.toolbarMode=mode;if(mode==='hide')workspacePrefs.lastVisibleToolbarMode=previous;saveWorkspacePrefs();
