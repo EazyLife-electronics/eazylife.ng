@@ -458,3 +458,90 @@
  .cs-toolbar.cs-toolbar-floating{top:6px;left:6px;right:6px}
  .cs-toolbar.cs-toolbar-floating:not(.cs-toolbar-expanded){max-width:calc(100% - 12px)}
 }
+
+/* Bubble-first workspace controls: panels never occupy the entire phone. */
+.cs-workspace-bubble{
+ width:48px;height:48px;min-width:48px;min-height:48px;padding:0;border-radius:50%;
+ display:grid;place-items:center;background:var(--cs-panel);color:var(--cs-ink);
+ border:1px solid var(--cs-accent);box-shadow:0 5px 20px rgba(0,0,0,.28);
+ font-size:20px;font-weight:700;cursor:grab;touch-action:none
+}
+.cs-workspace-bubble:active{cursor:grabbing}
+.cs-workspace-bubble[hidden]{display:none!important}
+.cs-toolbar-bubble{position:fixed;left:12px;top:78px;z-index:101}
+.cs-panel-reopen{position:fixed;z-index:100;border-radius:50%;width:48px;height:48px;padding:0;font-size:19px}
+.cs-reopen-library{left:12px;right:auto}
+.cs-reopen-inspector{right:12px;left:auto}
+.cs-library-panel.cs-panel-floating,.cs-properties-panel.cs-panel-floating{
+ position:absolute;top:12px;bottom:auto;z-index:42;width:min(360px,calc(100% - 24px));
+ max-height:min(68dvh,620px);height:auto;min-height:0;overflow:auto;
+ border:1px solid var(--cs-border);border-radius:14px;
+ box-shadow:0 12px 36px rgba(0,0,0,.28);background:var(--cs-panel)
+}
+.cs-library-panel.cs-panel-floating{left:12px;right:auto}
+.cs-properties-panel.cs-panel-floating{right:12px;left:auto}
+@media(max-width:620px){
+ .cs-library-panel.cs-panel-floating,.cs-properties-panel.cs-panel-floating{
+  left:8px;right:8px;top:8px;bottom:auto;width:auto;
+  max-height:64dvh;height:auto;min-height:0
+ }
+ .cs-properties-panel.cs-inspector-collapsed.cs-panel-floating{height:48px;min-height:48px;max-height:48px}
+ .cs-workspace-bubble,.cs-panel-reopen{width:46px;height:46px;min-width:46px;min-height:46px}
+}
+/* Mode bar is part of the single scroll track in Mini/Float. */
+.cs-toolbar-mode-hide{display:none}
+.cs-toolbar.cs-toolbar-mini{
+ flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;overflow-y:hidden;
+ white-space:nowrap;scrollbar-width:thin;max-width:100%
+}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-modebar{
+ flex:0 0 auto;padding:0;border:0;white-space:nowrap
+}
+.cs-toolbar.cs-toolbar-mini .cs-tool-group{flex:0 0 auto;flex-wrap:nowrap;white-space:nowrap}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-mini-actions{display:none!important}
+.cs-toolbar.cs-toolbar-mini:not(.cs-toolbar-expanded)>.cs-tool-group{display:flex}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-modebar .cs-toolbar-mode-label{display:none}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-modebar .cs-small-btn{padding:5px 8px}
+.cs-toolbar.cs-toolbar-mini .cs-tool-group{overflow:visible}
+.cs-toolbar.cs-toolbar-mini .cs-view-tools{flex:0 0 auto}
+.cs-toolbar.cs-toolbar-mini .cs-zoom-help{display:none}
+.cs-toolbar.cs-toolbar-floating{
+ position:fixed;top:78px;left:12px;right:auto;width:max-content;max-width:calc(100vw - 24px);
+ z-index:98;max-height:min(58dvh,520px);overflow:auto;resize:none;
+ border:1px solid var(--cs-border);border-radius:14px;box-shadow:0 10px 32px rgba(0,0,0,.28);
+ touch-action:pan-y
+}
+.cs-toolbar.cs-toolbar-floating:not(.cs-toolbar-expanded){width:max-content;max-width:calc(100vw - 24px)}
+.cs-toolbar.cs-toolbar-floating.cs-toolbar-expanded{left:12px;right:12px;width:auto}
+.cs-toolbar.cs-toolbar-floating.cs-toolbar-expanded .cs-tool-group{flex-wrap:wrap}
+.cs-toolbar.cs-toolbar-floating .cs-toolbar-modebar{flex:0 0 auto}
+.cs-toolbar.cs-toolbar-floating .cs-toolbar-mini-actions{display:flex}
+.cs-toolbar.cs-toolbar-floating .cs-toolbar-mode-label{display:none}
+.cs-toolbar.cs-toolbar-hidden{display:none!important}
+.cs-toolbar-modebar{flex:0 0 auto}
+.cs-toolbar-mini-actions{flex:0 0 auto}
+.cs-toolbar-modebar .cs-small-btn[aria-pressed=true]{background:var(--cs-accent);color:#fff;border-color:var(--cs-accent)}
+.cs-toolbar.cs-toolbar-mini:not(.cs-toolbar-expanded)>.cs-tool-group{display:flex}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-modebar{display:flex}
+.cs-toolbar.cs-toolbar-mini:not(.cs-modebar-open) .cs-toolbar-modebar .cs-toolbar-mode-label,
+.cs-toolbar.cs-toolbar-mini:not(.cs-modebar-open) .cs-toolbar-modebar #toolbarModeMini,
+.cs-toolbar.cs-toolbar-mini:not(.cs-modebar-open) .cs-toolbar-modebar #toolbarModeFull,
+.cs-toolbar.cs-toolbar-mini:not(.cs-modebar-open) .cs-toolbar-modebar #toolbarModeFloat,
+.cs-toolbar.cs-toolbar-mini:not(.cs-modebar-open) .cs-toolbar-modebar #toolbarModeHide{display:none}
+.cs-toolbar.cs-toolbar-mini:not(.cs-modebar-open) .cs-toolbar-modebar{display:none}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-mini-actions{display:flex!important;flex:0 0 auto;order:-1}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-mini-actions #miniExpand{display:none}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-mini-actions #toolbarModeMenu{display:inline-flex}
+.cs-toolbar.cs-toolbar-floating:not(.cs-toolbar-expanded) .cs-toolbar-mini-actions #miniExpand{display:inline-flex}
+.cs-toolbar.cs-toolbar-floating:not(.cs-toolbar-expanded) .cs-toolbar-modebar{display:none}
+.cs-toolbar.cs-toolbar-floating .cs-toolbar-mini-actions{display:flex!important}
+.cs-toolbar.cs-toolbar-floating.cs-toolbar-expanded .cs-toolbar-modebar{display:flex}
+.cs-toolbar.cs-toolbar-floating .cs-toolbar-mini-actions #toolbarModeMenu{display:inline-flex}
+.cs-toolbar.cs-toolbar-floating:not(.cs-toolbar-expanded)>.cs-tool-group{display:none}
+.cs-toolbar.cs-toolbar-mini.cs-modebar-open .cs-toolbar-modebar{display:flex}
+.cs-toolbar.cs-toolbar-mini.cs-modebar-open .cs-toolbar-mini-actions{order:0}
+@media(min-width:621px){
+ .cs-toolbar.cs-toolbar-full{overflow:visible;flex-wrap:wrap}
+ .cs-toolbar.cs-toolbar-full .cs-tool-group{flex-wrap:wrap;min-width:0}
+ .cs-toolbar.cs-toolbar-full .cs-toolbar-modebar{flex:0 0 100%}
+}
