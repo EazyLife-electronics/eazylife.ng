@@ -39,6 +39,12 @@
         .step-dot { width: 32px; height: 32px; border-radius: 999px; display: flex; align-items: center; justify-content: center; background: #e5e7eb; color: #9ca3af; font-size: 0.8rem; }
         .dark .step-dot { background: #2a3835; color: #6b7a76; }
         .step-dot.done { background: var(--teal); color: #fff; }
+        .skeleton { position: relative; overflow: hidden; background: #e8eeec; }
+        .dark .skeleton { background: #263632; }
+        .skeleton::after { content: ""; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, rgba(255,255,255,.58), transparent); animation: skeleton-shimmer 1.35s infinite; }
+        .dark .skeleton::after { background: linear-gradient(90deg, transparent, rgba(255,255,255,.07), transparent); }
+        @keyframes skeleton-shimmer { 100% { transform: translateX(100%); } }
+        @media (prefers-reduced-motion: reduce) { .skeleton::after { animation: none; transform: none; } }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-[#0f1715] pb-16">
@@ -282,6 +288,23 @@
             </div>`;
     }
 
+    function orderSkeleton() {
+        return `
+            <div class="bg-white dark:bg-[#182420] border border-gray-100 dark:border-[#2a3835] rounded-2xl p-5 shadow-sm animate-pulse" role="status" aria-label="Loading order details">
+                <div class="flex justify-between mb-5"><div class="skeleton h-3 w-24 rounded"></div><div class="skeleton h-3 w-20 rounded"></div></div>
+                <div class="flex items-center justify-between gap-3 mb-6">${[1,2,3].map(() => '<div class="skeleton h-8 w-8 rounded-full shrink-0"></div>').join('<div class="skeleton h-1 flex-1 rounded"></div>')}</div>
+                <div class="space-y-3"><div class="skeleton h-3 w-full rounded"></div><div class="skeleton h-3 w-4/5 rounded"></div><div class="skeleton h-4 w-28 rounded mt-4"></div></div>
+            </div>`;
+    }
+
+    function savedOrdersSkeleton() {
+        return [1,2].map(() => `
+            <div class="bg-white dark:bg-[#182420] border border-gray-100 dark:border-[#2a3835] rounded-2xl p-4 animate-pulse" aria-hidden="true">
+                <div class="flex justify-between mb-3"><div class="skeleton h-3 w-28 rounded"></div><div class="skeleton h-4 w-16 rounded-full"></div></div>
+                <div class="skeleton h-3 w-32 rounded mb-2"></div><div class="skeleton h-3 w-3/4 rounded"></div>
+            </div>`).join('');
+    }
+
     window.trackOrder = async function () {
         const input = document.getElementById('trackInput');
         const code = input.value.trim();
@@ -290,8 +313,9 @@
 
         const btn = document.getElementById('trackBtn');
         btn.disabled = true;
-        btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
-        resultEl.innerHTML = '';
+        btn.setAttribute('aria-label', 'Looking up order');
+        btn.innerHTML = `<i class="fas fa-spinner fa-spin" aria-hidden="true"></i>`;
+        resultEl.innerHTML = orderSkeleton();
 
         try {
             const order = await getOrderByTrackingCode(code);
@@ -322,7 +346,8 @@
             console.error(err);
         } finally {
             btn.disabled = false;
-            btn.innerHTML = `<i class="fas fa-magnifying-glass"></i>`;
+            btn.setAttribute('aria-label', 'Track order');
+            btn.innerHTML = `<i class="fas fa-magnifying-glass" aria-hidden="true"></i>`;
         }
     };
 
@@ -333,7 +358,7 @@
 
         document.getElementById('myOrdersSection').classList.remove('hidden');
         const listEl = document.getElementById('myOrdersList');
-        listEl.innerHTML = `<p class="text-center text-gray-400 text-xs py-4">Loading...</p>`;
+        listEl.innerHTML = savedOrdersSkeleton();
 
         const results = await Promise.all(myOrders.map(code => getOrderByTrackingCode(code).catch(() => null)));
         const found = results.filter(Boolean);
