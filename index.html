@@ -954,6 +954,13 @@
           navToggleBtn.setAttribute('aria-expanded', 'false');
         }
       });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && navDropdown.classList.contains('open')) {
+          navDropdown.classList.remove('open');
+          navToggleBtn.setAttribute('aria-expanded', 'false');
+          navToggleBtn.focus();
+        }
+      });
     }
     // If the person hasn't manually chosen a theme, keep following the system preference live
     if (window.matchMedia && !localStorage.getItem('eazylife-theme')) {
