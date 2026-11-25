@@ -923,3 +923,14 @@
   grid-row:2!important
  }
 }
+
+
+/* Mobile selection actions: cancel the inherited half-width translate that pushed the bar off-screen. */
+@media(max-width:620px){
+ .cs-selection-toolbar{
+  left:50%!important;right:auto!important;transform:translateX(-50%)!important;
+  width:max-content!important;max-width:calc(100vw - 20px)!important;
+  box-sizing:border-box!important;justify-content:center!important;
+  overflow-x:auto!important;overflow-y:hidden!important
+ }
+}
