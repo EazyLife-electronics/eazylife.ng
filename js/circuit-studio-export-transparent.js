@@ -270,7 +270,7 @@ function saveWorkspacePrefs(){try{localStorage.setItem(WORKSPACE_PREF_KEY,JSON.s
 const workspace=$('circuitWorkspace'),libraryPanel=$('componentLibraryPanel'),propertiesPanel=$('propertiesPanel');
 const toolbar=$('circuitToolbar'),toolbarBubble=$('showToolbarBubble');
 const modeButtons={mini:$('toolbarModeMini'),full:$('toolbarModeFull'),float:$('toolbarModeFloat'),hide:$('toolbarModeHide')};
-const miniActions={new:$('miniNew'),select:$('miniSelect'),connect:$('miniConnect'),undo:$('miniUndo'),redo:$('miniRedo'),expand:$('miniExpand'),mode:$('toolbarModeMenu')};
+const miniActions={new:$('miniNew'),select:$('miniSelect'),connect:$('miniConnect'),undo:$('miniUndo'),redo:$('miniRedo'),expand:$('miniExpand'),mode:$('toolbarModeMenu'),drag:$('toolbarDragHandle')};
 const panelButtons={library:{hide:$('toggleLibraryPanel'),show:$('showLibraryPanel'),float:$('floatLibraryPanel'),bubble:$('showLibraryPanel')},inspector:{hide:$('toggleInspector'),show:$('showInspectorPanel'),float:$('floatInspectorPanel'),bubble:$('showInspectorPanel')}};
 function syncWorkspacePanels(){
  for(const [key,panel] of [['library',libraryPanel],['inspector',propertiesPanel]]){
@@ -353,3 +353,16 @@ miniActions.connect.addEventListener('click',()=>$('toolConnect').click());
 miniActions.undo.addEventListener('click',()=>$('undo').click());
 miniActions.redo.addEventListener('click',()=>$('redo').click());
 setToolbarMode(workspacePrefs.toolbarMode||'full',workspacePrefs.toolbarExpanded===true);
+
+// Floating toolbar drag grip and remembered position.
+function restoreToolbarPosition(){
+ const p=workspacePrefs.toolbarPosition;
+ if(p&&Number.isFinite(p.x)&&Number.isFinite(p.y)){toolbar.style.left=p.x+'px';toolbar.style.top=p.y+'px';toolbar.style.right='auto'}
+ else{toolbar.style.left='12px';toolbar.style.top='78px';toolbar.style.right='auto'}
+}
+let toolbarDrag=null;
+miniActions.drag.addEventListener('pointerdown',e=>{if(workspacePrefs.toolbarMode!=='float'||e.button!==0)return;e.preventDefault();const r=toolbar.getBoundingClientRect();toolbarDrag={id:e.pointerId,x:e.clientX,y:e.clientY,left:r.left,top:r.top};miniActions.drag.setPointerCapture?.(e.pointerId)});
+miniActions.drag.addEventListener('pointermove',e=>{if(!toolbarDrag||toolbarDrag.id!==e.pointerId||!miniActions.drag.hasPointerCapture?.(e.pointerId))return;const x=Math.max(6,Math.min(innerWidth-toolbar.offsetWidth-6,toolbarDrag.left+e.clientX-toolbarDrag.x)),y=Math.max(72,Math.min(innerHeight-toolbar.offsetHeight-12,toolbarDrag.top+e.clientY-toolbarDrag.y));toolbar.style.left=x+'px';toolbar.style.top=y+'px';toolbar.style.right='auto'});
+miniActions.drag.addEventListener('pointerup',e=>{if(!toolbarDrag||toolbarDrag.id!==e.pointerId)return;const r=toolbar.getBoundingClientRect();workspacePrefs.toolbarPosition={x:r.left,y:r.top};saveWorkspacePrefs();toolbarDrag=null});
+restoreToolbarPosition();
+
