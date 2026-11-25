@@ -544,6 +544,99 @@
     @media (min-width: 720px) {
       .skeleton-grid { grid-template-columns: repeat(4, 1fr); }
     }
+
+    /* Homepage card rhythm: align actions and make project previews feel interactive. */
+    .project-gallery-card,
+    .product-card {
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+    .project-gallery-card {
+      display: flex;
+      flex-direction: column;
+    }
+    .project-gallery-card .project-card-body {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .project-gallery-card .project-card-body p { margin-bottom: 14px; }
+    .project-gallery-card .project-card-body .service-link { margin-top: auto; }
+    .product-card { display: block; min-width: 0; }
+    .product-card h4 { overflow-wrap: anywhere; }
+    .services-strip { align-items: stretch; }
+    .service-card { display: flex; flex-direction: column; min-width: 0; }
+    .service-card p { flex: 1; }
+    .service-tag {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      margin: 0;
+      max-width: calc(100% - 86px);
+      text-align: right;
+    }
+    .service-icon { flex: 0 0 46px; }
+    .project-gallery-card:hover,
+    .product-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(0,176,155,.45);
+      box-shadow: 0 10px 26px rgba(20,50,45,.10);
+    }
+    .project-gallery-card:focus-visible,
+    .product-card:focus-visible,
+    .service-link:focus-visible,
+    .review-form-disclosure > summary:focus-visible {
+      outline: 3px solid var(--teal);
+      outline-offset: 3px;
+    }
+    .review-form-disclosure {
+      background: #fafbfc;
+      transition: border-color .18s ease, background-color .18s ease;
+    }
+    .review-form-disclosure > summary {
+      list-style-position: outside;
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+    }
+    .review-form-disclosure[open] { padding-bottom: 18px; }
+    .review-form-disclosure[open] .review-form-wrap {
+      border: 0;
+      padding: 20px 2px 2px;
+      background: transparent;
+    }
+    :root[data-theme="dark"] .project-gallery-card,
+    :root[data-theme="dark"] .project-gallery-empty,
+    :root[data-theme="dark"] .review-form-disclosure {
+      background: var(--dm-surface);
+      border-color: var(--dm-border);
+      color: var(--dm-text);
+    }
+    :root[data-theme="dark"] .project-gallery-card h3,
+    :root[data-theme="dark"] .review-form-disclosure > summary {
+      color: var(--dm-text);
+    }
+    :root[data-theme="dark"] .project-gallery-card p,
+    :root[data-theme="dark"] .project-gallery-empty {
+      color: var(--dm-text-light);
+    }
+    :root[data-theme="dark"] .review-form-disclosure[open] > summary {
+      border-bottom-color: var(--dm-border);
+    }
+    :root[data-theme="dark"] .service-tag {
+      color: #c7ed8b;
+      background: #263820;
+    }
+    @media (max-width: 719px) {
+      section { padding: 44px 0; }
+      .project-gallery-card img { height: 190px; }
+      .trust-section { margin: 0 12px; padding: 32px 20px; }
+      .shop-preview-head { align-items: flex-start; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .project-gallery-card, .product-card, .review-form-disclosure { transition: none; }
+      .project-gallery-card:hover, .product-card:hover { transform: none; }
+    }
   </style>
 </head>
 <body>
