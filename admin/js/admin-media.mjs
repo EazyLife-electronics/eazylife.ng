@@ -4,6 +4,7 @@
 // The ImageKit private key never enters this file or the browser.
 import { initFirebase } from '../../js/firebase.mjs';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { loadUsage, unlinkImageFromContent, findBrokenReferences } from './admin-media-usage.mjs';
 
 const WORKER_URL = 'https://eazylife-media.damzyeazy.workers.dev';
 const UPLOAD_URL = 'https://upload.imagekit.io/api/v1/files/upload';
@@ -81,12 +82,14 @@ function ensureMediaManagementUI() {
     '<div class="flex flex-wrap items-center gap-2">' +
       '<select id="mediaSortSelect" class="flex-1 min-w-[145px] p-2.5 rounded-lg border border-gray-200 bg-white text-xs">' +
         '<option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="name-asc">Name A–Z</option><option value="name-desc">Name Z–A</option><option value="size-desc">Largest first</option><option value="size-asc">Smallest first</option>' +
-      '</select><button id="mediaSelectAllBtn" type="button" class="px-3 py-2.5 rounded-lg border border-gray-200 text-xs font-bold">Select all</button><span id="mediaSelectionCount" class="text-xs text-gray-500">0 selected</span>' +
+      '</select><select id="mediaUsageFilter" class="flex-1 min-w-[120px] p-2.5 rounded-lg border border-gray-200 bg-white text-xs"><option value="all">All images</option><option value="unused">Unused only</option><option value="used">In use only</option></select><button id="mediaSelectAllBtn" type="button" class="px-3 py-2.5 rounded-lg border border-gray-200 text-xs font-bold">Select all</button><span id="mediaSelectionCount" class="text-xs text-gray-500">0 selected</span>' +
     '</div>' +
     '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3 space-y-2">' +
       '<p class="text-[11px] font-bold text-gray-600">Bulk action</p>' +
       '<button id="mediaDeleteSelectedBtn" type="button" class="w-full rounded-lg bg-red-50 text-red-700 py-2.5 text-xs font-bold">Delete selected images</button>' +
-      '<p class="text-[10px] text-gray-500">Deleting is permanent and removes the image from any website content using its URL.</p>' +
+      '<p class="text-[10px] text-gray-500">Deleting is permanent. Images that are in use are skipped here; delete one on its own card to see where it is used and, if you choose, remove it from that content.</p>' +
+      '<div class="grid grid-cols-2 gap-2"><button id="mediaRecheckBtn" type="button" class="rounded-lg bg-white border border-gray-200 py-2.5 text-xs font-bold text-gray-700">Re-check usage</button><button id="mediaBrokenBtn" type="button" class="rounded-lg bg-white border border-gray-200 py-2.5 text-xs font-bold text-gray-700">Find broken images</button></div>' +
+      '<div id="mediaUsageReport" class="space-y-2"></div>' +
     '</div>';
   $("mediaGrid").parentElement.insertBefore(toolbar, $("mediaGrid"));
   $("mediaSearchInput").addEventListener("input", renderMediaGrid);
@@ -99,14 +102,20 @@ function ensureMediaManagementUI() {
     renderMediaGrid();
   });
   $("mediaDeleteSelectedBtn").addEventListener("click", runBulkDelete);
+  $("mediaUsageFilter").addEventListener("change", renderMediaGrid);
+  $("mediaRecheckBtn").addEventListener("click", recheckUsage);
+  $("mediaBrokenBtn").addEventListener("click", runBrokenCheck);
 }
 
 function getVisibleMedia() {
   const query = ($("mediaSearchInput")?.value || "").trim().toLowerCase();
   const folder = $("mediaBrowseFolder")?.value || "all";
+  const usageFilter = $("mediaUsageFilter")?.value || "all";
   const list = mediaAssets.filter(x => {
     const name = x.name || x.filePath?.split("/").pop() || "";
-    return (!query || name.toLowerCase().includes(query)) && (folder === "all" || x.filePath?.startsWith(folder + "/"));
+    const uses = assetUses(x);
+    const usageOk = usageFilter === "all" || uses === null || (usageFilter === "unused" ? uses.length === 0 : uses.length > 0);
+    return usageOk && (!query || name.toLowerCase().includes(query)) && (folder === "all" || x.filePath?.startsWith(folder + "/"));
   });
   const sort = $("mediaSortSelect")?.value || "newest";
   list.sort((a, b) => {
@@ -160,6 +169,7 @@ function createMediaCard(asset) {
   meta.className = "text-[10px] text-gray-400";
   meta.textContent = [folder?.label || asset.filePath || "", mediaSize(asset.size)].filter(Boolean).join(" · ");
   body.appendChild(meta);
+  appendUsageInfo(body, asset);
   const copy = document.createElement("button");
   copy.type = "button";
   copy.textContent = "Copy URL";
@@ -212,6 +222,135 @@ function renderMediaGrid() {
   $("mediaFolderLabel").textContent = label + " · " + cards.length + " shown";
 }
 
+// ---- Usage guard: which website content uses each image -------------------
+let usageState = null; // { index: Map, failed: [], at }
+
+function assetFileName(asset) {
+  return (asset.name || (asset.filePath || "").split("/").pop() || "").toLowerCase();
+}
+
+// null = usage could not be checked at all; otherwise the list of places using it.
+function assetUses(asset) {
+  if (!usageState) return null;
+  return usageState.index.get(assetFileName(asset)) || [];
+}
+
+function usageIncomplete() {
+  return !usageState || usageState.failed.length > 0;
+}
+
+function describeUse(u) {
+  return u.collection + " · " + u.label + " (" + u.path + ")";
+}
+
+function appendUsageInfo(body, asset) {
+  const uses = assetUses(asset);
+  const badge = document.createElement("p");
+  if (uses === null) {
+    badge.className = "text-[10px] font-bold text-amber-700";
+    badge.textContent = "Usage unknown";
+    body.appendChild(badge);
+    return;
+  }
+  if (!uses.length) {
+    badge.className = "text-[10px] font-bold " + (usageState.failed.length ? "text-amber-700" : "text-green-700");
+    badge.textContent = usageState.failed.length ? "Not found in checked content" : "Unused";
+    body.appendChild(badge);
+    return;
+  }
+  badge.className = "text-[10px] font-bold text-blue-700";
+  badge.textContent = "Used in " + uses.length + " place" + (uses.length === 1 ? "" : "s");
+  body.appendChild(badge);
+  const details = document.createElement("details");
+  details.className = "text-[10px] text-gray-600";
+  const summary = document.createElement("summary");
+  summary.textContent = "Where used";
+  summary.style.cursor = "pointer";
+  details.appendChild(summary);
+  const list = document.createElement("ul");
+  list.className = "list-disc pl-4 break-words";
+  uses.forEach(u => { const li = document.createElement("li"); li.textContent = describeUse(u); list.appendChild(li); });
+  details.appendChild(list);
+  body.appendChild(details);
+}
+
+async function refreshUsage(force = false) {
+  try {
+    usageState = await loadUsage({ force });
+  } catch (error) {
+    console.warn("Could not check image usage:", error);
+    usageState = null;
+  }
+}
+
+function usageSummary() {
+  if (!usageState) return " Usage could not be checked.";
+  const unused = mediaAssets.filter(a => (assetUses(a) || []).length === 0).length;
+  const note = usageState.failed.length ? " (could not read: " + usageState.failed.join(", ") + ")" : "";
+  return " " + unused + " unused" + note + ".";
+}
+
+async function recheckUsage() {
+  setStatus("mediaLibraryStatus", "Re-checking where images are used…");
+  await refreshUsage(true);
+  renderMediaGrid();
+  setStatus("mediaLibraryStatus", mediaAssets.length + " image(s)." + usageSummary(), usageState ? "success" : "error");
+}
+
+async function runBrokenCheck() {
+  const report = $("mediaUsageReport");
+  const button = $("mediaBrokenBtn");
+  if (!report || !button) return;
+  report.replaceChildren();
+  button.disabled = true;
+  try {
+    setStatus("mediaLibraryStatus", "Reading website content for image links…");
+    await refreshUsage(true);
+    if (!usageState) throw new Error("Could not read website content.");
+    const { broken, checked } = await findBrokenReferences(usageState.index, (done, total) =>
+      setStatus("mediaLibraryStatus", "Checking images " + done + " of " + total + "…"));
+    const note = document.createElement("p");
+    note.className = "text-[11px] " + (broken.length ? "font-bold text-red-700" : "text-green-700");
+    note.textContent = (broken.length
+      ? broken.length + " broken image link" + (broken.length === 1 ? "" : "s") + " found (" + checked + " images checked)."
+      : "No broken image links found (" + checked + " images checked).") +
+      (usageState.failed.length ? " Could not read: " + usageState.failed.join(", ") + "." : "");
+    report.appendChild(note);
+    broken.forEach(u => {
+      const row = document.createElement("div");
+      row.className = "rounded-lg border border-red-100 bg-red-50 p-2 text-[10px] text-gray-700 space-y-1";
+      const text = document.createElement("p");
+      text.className = "break-words";
+      text.textContent = describeUse(u) + " → " + u.name;
+      const fix = document.createElement("button");
+      fix.type = "button";
+      fix.className = "rounded-lg bg-white border border-red-200 px-2 py-1 font-bold text-red-700";
+      fix.textContent = u.pure ? "Remove this broken link" : "Embedded in text — edit it by hand";
+      fix.disabled = !u.pure;
+      fix.addEventListener("click", async () => {
+        if (!confirm("Remove the broken image link from " + describeUse(u) + "? The image field will be left empty.")) return;
+        try {
+          fix.disabled = true;
+          await unlinkImageFromContent([u], [u.name]);
+          row.remove();
+          await refreshUsage(true);
+          renderMediaGrid();
+        } catch (error) {
+          fix.disabled = false;
+          setStatus("mediaLibraryStatus", error.message || "Could not remove the link.", "error");
+        }
+      });
+      row.append(text, fix);
+      report.appendChild(row);
+    });
+    setStatus("mediaLibraryStatus", broken.length ? "Broken image check finished." : "Broken image check finished: all good.", broken.length ? "error" : "success");
+  } catch (error) {
+    setStatus("mediaLibraryStatus", error.message || "Broken image check failed.", "error");
+  } finally {
+    button.disabled = false;
+  }
+}
+
 async function requestMediaAction(action, payload) {
   const token = await getIdToken();
   const response = await fetch(WORKER_URL + "/manage", {
@@ -241,13 +380,36 @@ async function renameMediaAsset(asset) {
 }
 
 async function deleteMediaAsset(asset) {
-  if (!confirm('Permanently delete "' + (asset.name || "this image") + '"? Website content using it will lose the image. This cannot be undone.')) return;
+  const name = asset.name || "this image";
+  const uses = assetUses(asset);
   try {
+    if (uses === null || (usageState.failed.length && !uses.length)) {
+      const why = uses === null ? "the usage check failed" : "these could not be read: " + usageState.failed.join(", ");
+      if (!confirm("Could not fully check where \"" + name + "\" is used (" + why + "). If it is in use, that content will show a broken image.\n\nDelete it permanently anyway?")) return;
+    } else if (!uses.length) {
+      if (!confirm("\"" + name + "\" is not used by any product, project, hero, review or other content.\n\nPermanently delete it? This cannot be undone.")) return;
+    } else {
+      const embedded = uses.filter(u => !u.pure);
+      if (embedded.length) {
+        alert("\"" + name + "\" is inside longer text in:\n• " + embedded.slice(0, 8).map(describeUse).join("\n• ") + "\n\nEdit that text first, then delete the image. Nothing was changed.");
+        return;
+      }
+      const shown = uses.slice(0, 8).map(describeUse).join("\n• ");
+      const more = uses.length > 8 ? "\n…and " + (uses.length - 8) + " more" : "";
+      if (!confirm("\"" + name + "\" is used in " + uses.length + " place(s):\n• " + shown + more + "\n\nPress OK to continue (you will be asked to confirm again), or Cancel to keep the image.")) return;
+      const typed = prompt("This removes the image from every place listed and deletes it permanently.\nType DELETE to confirm.");
+      if (typed === null || typed.trim() !== "DELETE") {
+        setStatus("mediaLibraryStatus", "Nothing was deleted.", "muted");
+        return;
+      }
+      setStatus("mediaLibraryStatus", "Removing the image from website content…");
+      await unlinkImageFromContent(uses, [assetFileName(asset)]);
+    }
     setStatus("mediaLibraryStatus", "Deleting image…");
     await requestMediaAction("delete", { fileId: asset.fileId });
     selectedMediaIds.delete(asset.fileId);
-    setStatus("mediaLibraryStatus", "Image deleted.", "success");
     await loadMedia();
+    setStatus("mediaLibraryStatus", "Image deleted.", "success");
   } catch (error) {
     setStatus("mediaLibraryStatus", error.message || "Could not delete image.", "error");
   }
@@ -266,24 +428,40 @@ async function runBulkDelete() {
     return;
   }
 
-  if (!confirm("Permanently delete " + selected.length + " selected image(s)? Website content using them will lose those images. This cannot be undone.")) {
+  if (usageIncomplete()) {
+    setStatus("mediaLibraryStatus", "Bulk delete is paused because the usage check is incomplete. Tap \"Re-check usage\", or delete images one at a time.", "error");
+    return;
+  }
+
+  const inUse = selected.filter(x => assetUses(x).length > 0);
+  const deletable = selected.filter(x => assetUses(x).length === 0);
+
+  if (!deletable.length) {
+    setStatus("mediaLibraryStatus", "All " + selected.length + " selected image(s) are in use, so nothing was deleted. Delete one on its own card to see where it is used.", "error");
+    return;
+  }
+
+  const skipNote = inUse.length
+    ? "\n\n" + inUse.length + " selected image(s) are in use and will be skipped:\n• " + inUse.slice(0, 6).map(x => x.name || x.filePath).join("\n• ") + (inUse.length > 6 ? "\n…and " + (inUse.length - 6) + " more" : "")
+    : "";
+  if (!confirm("Permanently delete " + deletable.length + " unused image(s)? This cannot be undone." + skipNote)) {
     return;
   }
 
   let done = 0;
 
   try {
-    for (const asset of selected) {
-      setStatus("mediaLibraryStatus", "Deleting " + (done + 1) + " of " + selected.length + "…");
+    for (const asset of deletable) {
+      setStatus("mediaLibraryStatus", "Deleting " + (done + 1) + " of " + deletable.length + "…");
       await requestMediaAction("delete", { fileId: asset.fileId });
+      selectedMediaIds.delete(asset.fileId);
       done++;
     }
 
-    selectedMediaIds.clear();
     await loadMedia();
-    setStatus("mediaLibraryStatus", done + " image(s) deleted successfully.", "success");
+    setStatus("mediaLibraryStatus", done + " unused image(s) deleted." + (inUse.length ? " " + inUse.length + " in-use image(s) were kept." : ""), "success");
   } catch (error) {
-    const message = done + " of " + selected.length + " deleted. " +
+    const message = done + " of " + deletable.length + " deleted. " +
       (error.message || "The delete operation failed.");
     await loadMedia();
     setStatus("mediaLibraryStatus", message, "error");
@@ -319,10 +497,11 @@ async function loadMedia() {
       return found;
     }));
     mediaAssets = results.flat();
+    await refreshUsage(false);
     const valid = new Set(mediaAssets.map(x => x.fileId).filter(Boolean));
     selectedMediaIds = new Set([...selectedMediaIds].filter(id => valid.has(id)));
     renderMediaGrid();
-    setStatus("mediaLibraryStatus", mediaAssets.length + " image(s) loaded from " + (folders.length === 1 ? folders[0].label : "all media folders") + ".", "success");
+    setStatus("mediaLibraryStatus", mediaAssets.length + " image(s) loaded from " + (folders.length === 1 ? folders[0].label : "all media folders") + "." + usageSummary(), "success");
   } catch (error) {
     console.error("Media library loading failed:", error);
     setStatus("mediaLibraryStatus", error.message || "Could not load the media library.", "error");
