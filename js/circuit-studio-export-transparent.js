@@ -263,3 +263,33 @@ renderLibrary();$('symbolStyle').value=project.style||'engineering';render();app
   });
  }catch(error){console.warn('Admin artwork access could not be checked:',error)}
 })();
+
+
+// Dockable/floating panels. Hiding a panel never changes the active selection
+// and selection changes never force a dismissed inspector back into view.
+const workspace=$('circuitWorkspace'),libraryPanel=$('componentLibraryPanel'),propertiesPanel=$('propertiesPanel');
+const panelButtons={library:{hide:$('toggleLibraryPanel'),show:$('showLibraryPanel'),float:$('floatLibraryPanel')},inspector:{hide:$('toggleInspector'),show:$('showInspectorPanel'),float:$('floatInspectorPanel')}};
+function syncWorkspacePanels(){
+ if(!workspace)return;
+ for(const [key,panel] of [['library',libraryPanel],['inspector',propertiesPanel]]){
+  const b=panelButtons[key],hidden=panel.classList.contains('cs-panel-hidden'),floating=panel.classList.contains('cs-panel-floating');
+  workspace.classList.toggle('cs-'+key+'-hidden',hidden);
+  workspace.classList.toggle('cs-'+key+'-floating',floating&&!hidden);
+  b.show.hidden=!hidden;b.hide.textContent='Hide';b.float.textContent=floating?'Dock':'Float';
+  b.float.setAttribute('aria-label',floating?'Dock '+key+' panel beside canvas':'Float '+key+' panel over canvas');
+ }
+}
+function setWorkspacePanel(key,action){
+ const panel=key==='library'?libraryPanel:propertiesPanel;
+ if(!panel)return;
+ if(action==='hide'){panel.classList.add('cs-panel-hidden');panel.classList.remove('cs-panel-floating')}
+ else if(action==='show'){panel.classList.remove('cs-panel-hidden');panel.classList.add('cs-panel-floating')}
+ else if(action==='float'){panel.classList.toggle('cs-panel-floating');panel.classList.remove('cs-panel-hidden')}
+ syncWorkspacePanels();
+}
+for(const [key,b] of Object.entries(panelButtons)){
+ b.hide?.addEventListener('click',()=>setWorkspacePanel(key,'hide'));
+ b.show?.addEventListener('click',()=>setWorkspacePanel(key,'show'));
+ b.float?.addEventListener('click',()=>setWorkspacePanel(key,'float'));
+}
+syncWorkspacePanels();
