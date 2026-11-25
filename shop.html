@@ -156,6 +156,14 @@
     document.addEventListener('click', function (e) {
         if (!menuPanel.classList.contains('hidden') && !menuPanel.contains(e.target) && e.target !== menuBtn) {
             menuPanel.classList.add('hidden');
+            menuBtn.setAttribute('aria-expanded', 'false');
+        }
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && !menuPanel.classList.contains('hidden')) {
+            menuPanel.classList.add('hidden');
+            menuBtn.setAttribute('aria-expanded', 'false');
+            menuBtn.focus();
         }
     });
 </script>
