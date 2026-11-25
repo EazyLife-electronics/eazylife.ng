@@ -303,6 +303,7 @@
 
     try {
       const [projects, products] = await Promise.all([getPublishedProjects(), getProducts()]);
+      content.setAttribute('aria-busy','false');
       if (selectedId) {
         const project = projects.find(p => p.id === selectedId);
         if (!project) content.innerHTML = '<p class="empty">This project is unavailable or is no longer published. <a href="projects.html">Return to the gallery.</a></p>';
