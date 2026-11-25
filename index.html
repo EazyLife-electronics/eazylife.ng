@@ -222,6 +222,10 @@
     .hero h1 { font-size: 2.1rem; font-weight: 800; color: var(--dark); line-height: 1.15; margin-bottom: 14px; }
     .hero h1 span { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .hero p.lead { color: var(--text-light); font-size: 1rem; max-width: 480px; margin-bottom: 24px; }
+    .review-form-disclosure { margin-top: 24px; border: 1px solid var(--border, rgba(128,128,128,.25)); border-radius: 14px; padding: 0 18px; background: var(--surface, transparent); }
+    .review-form-disclosure > summary { cursor: pointer; padding: 17px 2px; font-weight: 700; color: var(--text); }
+    .review-form-disclosure[open] > summary { border-bottom: 1px solid var(--border, rgba(128,128,128,.2)); }
+    .review-form-disclosure .review-form-wrap { margin-top: 0; }
     .hero-ctas { display: flex; flex-wrap: wrap; gap: 10px; }
     .hero-ctas { justify-content: center; }
     .hero-ctas .btn-stem-hero {
@@ -288,56 +292,125 @@
 
     /* SHOP PREVIEW */
     #shop-preview { background: #fafbfc; }
-    .shop-preview-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; gap: 16px; flex-wrap: wrap; }
-    .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
-    .product-card { background: #fff; border: 1px solid #eee; border-radius: 18px; padding: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
-    .product-card .thumb { position: relative; margin-bottom: 10px; }
-    .product-card .thumb img { height: 110px; width: 100%; object-fit: contain; border-radius: 12px; background: #f8f9fa; margin-bottom: 0; display: block; }
-    .product-card .badge-promo { position: absolute; top: 6px; left: 6px; background: var(--teal); color: #fff; font-size: 0.6rem; font-weight: 800; padding: 2px 6px; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
-    .product-card .cat { font-size: 0.62rem; font-weight: 800; text-transform: uppercase; color: var(--teal-dark); letter-spacing: 0.05em;}
-    .product-card h4 { font-size: 0.82rem; font-weight: 700; color: var(--dark); margin: 4px 0 8px; line-height: 1.3; min-height: 2.6em; }
-    .product-card .price { font-weight: 800; font-size: 0.88rem; color: var(--dark); }
-    .product-card .price .old { text-decoration: line-through; color: #bbb; font-weight: 600; font-size: 0.72rem; margin-left: 4px; }
-    .product-card .bulk-hint { font-size: 0.66rem; font-weight: 800; color: var(--teal-dark); margin-top: 4px; display: flex; align-items: center; gap: 4px; }
+    .shop-preview-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; gap: 14px; flex-wrap: wrap; }
+    .product-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; align-items: stretch; }
+    .product-card { display: flex; flex-direction: column; min-width: 0; background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+    .product-card .thumb { position: relative; margin-bottom: 8px; }
+    .product-card .thumb img { height: 104px; width: 100%; object-fit: contain; border-radius: 10px; background: #f8f9fa; margin-bottom: 0; display: block; }
+    .product-card .badge-promo { position: absolute; top: 6px; left: 6px; background: var(--teal); color: #fff; font-size: 0.58rem; font-weight: 800; padding: 2px 6px; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+    .product-card .cat { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; color: var(--teal-dark); letter-spacing: 0.05em; line-height: 1.3; }
+    .product-card h4 { font-size: 0.8rem; font-weight: 700; color: var(--dark); margin: 4px 0 7px; line-height: 1.35; min-height: 2.7em; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+    .product-card .price { font-weight: 800; font-size: 0.86rem; color: var(--dark); margin-top: auto; overflow-wrap: anywhere; }
+    .product-card .price .old { text-decoration: line-through; color: #888; font-weight: 600; font-size: 0.7rem; margin-left: 3px; }
+    .product-card .bulk-hint { font-size: 0.64rem; font-weight: 800; color: var(--teal-dark); margin-top: 4px; display: flex; align-items: flex-start; gap: 4px; line-height: 1.35; }
     .shop-preview-loading, .shop-preview-empty { text-align: center; color: var(--text-light); font-size: 0.88rem; padding: 30px; grid-column: 1 / -1; }
 
     /* ENGINEERING PROJECT GALLERY */
-    .project-gallery-grid { display:grid; grid-template-columns:1fr; gap:16px; }
-    .project-gallery-card { background:#fff; border:1px solid var(--border); border-radius:18px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,.04); }
-    .project-gallery-card img { width:100%; height:210px; object-fit:cover; background:#f4f6f6; }
-    .project-gallery-card .project-card-body { padding:18px; }
-    .project-gallery-card .project-category { color:var(--teal-dark); font-size:.68rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
-    .project-gallery-card h3 { color:var(--dark); font-size:1rem; margin:5px 0 8px; }
-    .project-gallery-card p { color:var(--text-light); font-size:.84rem; }
-    .project-gallery-empty { grid-column:1/-1; padding:28px; text-align:center; color:var(--text-light); background:#fafbfc; border:1px dashed var(--border); border-radius:16px; }
-    @media(min-width:720px) { .project-gallery-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
-    /* SERVICES STRIP */
-    .services-strip { display: grid; grid-template-columns: 1fr; gap: 14px; }
-    .service-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; position: relative; }
-    .service-icon { width: 46px; height: 46px; border-radius: 12px; background: var(--teal-light); color: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 1.15rem; margin-bottom: 14px; }
-    .service-tag { display: inline-block; font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--lime-dark); background: var(--lime-light); padding: 3px 9px; border-radius: 999px; margin-bottom: 10px; }
-    .service-card h3 { font-size: 1.02rem; font-weight: 800; color: var(--dark); margin-bottom: 8px; }
-    .service-card p { font-size: 0.85rem; color: var(--text-light); margin-bottom: 14px; }
-    .service-link { font-size: 0.8rem; font-weight: 700; color: var(--teal); display: inline-flex; align-items: center; gap: 6px; }
-
+    .project-gallery-grid { display:grid; grid-template-columns:1fr; gap:12px; align-items:stretch; }
+    .project-gallery-card { min-width:0; background:#fff; border:1px solid var(--border); border-radius:16px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,.04); }
+    .project-gallery-card > a:first-child { display:block; overflow:hidden; background:#f4f6f6; }
+    .project-gallery-card img { width:100%; height:184px; object-fit:cover; background:#f4f6f6; display:block; }
+    .project-gallery-card .project-card-body { padding:14px; }
+    .project-gallery-card .project-category { color:var(--teal-dark); font-size:.64rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; line-height:1.3; }
+    .project-gallery-card h3 { color:var(--dark); font-size:.94rem; line-height:1.35; margin:5px 0 7px; }
+    .project-gallery-card h3 a { color:inherit; text-decoration:none; }
+    .project-gallery-card p { color:var(--text-light); font-size:.81rem; line-height:1.5; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; line-clamp:3; overflow:hidden; margin-bottom:12px; }
+    .project-gallery-empty { grid-column:1/-1; padding:24px; text-align:center; color:var(--text-light); background:#fafbfc; border:1px dashed var(--border); border-radius:16px; }
+    @media(min-width:720px) { .project-gallery-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } .project-gallery-card img { height:190px; } }
+    /* SERVICES STRIP: compact horizontal cards keep the six offerings scannable. */
+    .services-strip { display:grid; grid-template-columns:1fr; gap:12px; }
+    .service-card {
+      display:grid;
+      grid-template-columns:42px minmax(0,1fr);
+      grid-template-rows:auto auto;
+      column-gap:14px;
+      align-items:start;
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:16px;
+      position:relative;
+      min-width:0;
+    }
+    .service-icon {
+      grid-column:1;
+      grid-row:1 / span 4;
+      width:42px;
+      height:42px;
+      border-radius:11px;
+      background:var(--teal-light);
+      color:var(--teal);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:1rem;
+      margin:2px 0 0;
+    }
+    .service-card h3 {
+      grid-column:2;
+      font-size:.96rem;
+      font-weight:800;
+      color:var(--dark);
+      margin:0 0 5px;
+      line-height:1.3;
+    }
+    .service-card p {
+      grid-column:2;
+      font-size:.81rem;
+      color:var(--text-light);
+      margin:0 0 9px;
+      line-height:1.5;
+    }
+    .service-card .service-link {
+      grid-column:2;
+      justify-self:start;
+      font-size:.77rem;
+      font-weight:700;
+      color:var(--teal);
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      margin-top:0;
+    }
+    .service-tag {
+      grid-column:2;
+      justify-self:start;
+      display:inline-block;
+      width:max-content;
+      max-width:100%;
+      font-size:.59rem;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      color:var(--lime-dark);
+      background:var(--lime-light);
+      padding:3px 8px;
+      border-radius:999px;
+      margin:0 0 6px;
+    }
+    @media (min-width:720px) {
+      .services-strip { grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    }
     /* TRUST / ABOUT */
-    .trust-section { background: var(--dark); color: #fff; border-radius: 24px; margin: 0 20px; padding: 40px 24px; }
+    .trust-section { background: var(--dark); color: #fff; border-radius: 22px; margin: 0 20px; padding: 34px 24px; }
     .trust-section .section-label { color: var(--lime); }
-    .trust-section h2 { color: #fff; }
-    .trust-section p.section-sub { color: #cbd5d1; }
-    .trust-grid { display: grid; grid-template-columns: 1fr; gap: 16px; margin-top: 24px; }
-    .trust-item { display: flex; gap: 12px; align-items: flex-start; }
-    .trust-item i { color: var(--lime); font-size: 1.1rem; margin-top: 2px; }
-    .trust-item h4 { font-size: 0.88rem; font-weight: 700; margin-bottom: 2px; }
-    .trust-item p { font-size: 0.8rem; color: #a8b5b1; }
+    .trust-section h2 { color: #fff; margin-bottom: 8px; }
+    .trust-section p.section-sub { color: #cbd5d1; max-width: 650px; line-height: 1.55; }
+    .trust-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
+    .trust-item { display: flex; gap: 11px; align-items: flex-start; min-width: 0; padding: 12px; border: 1px solid rgba(255,255,255,.13); border-radius: 13px; background: rgba(255,255,255,.045); }
+    .trust-item i { flex: 0 0 18px; color: var(--lime); font-size: 1rem; margin-top: 2px; text-align: center; }
+    .trust-item h4 { font-size: 0.84rem; font-weight: 700; margin-bottom: 2px; line-height: 1.35; }
+    .trust-item p { font-size: 0.77rem; color: #b8c5c1; line-height: 1.45; }
 
     /* TESTIMONIALS */
-    .testimonials-grid { display: grid; grid-template-columns: 1fr; gap: 14px; margin-bottom: 32px; }
-    .review-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
-    .review-card .stars { color: var(--orange); font-size: 0.85rem; margin-bottom: 8px; }
-    .review-card p.text { font-size: 0.88rem; color: var(--text); margin-bottom: 12px; }
-    .review-card .who { font-size: 0.78rem; font-weight: 700; color: var(--dark); }
-    .review-card .who span { display: block; font-weight: 500; color: var(--text-light); font-size: 0.74rem; }
+    .testimonials-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 28px; }
+    .review-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; min-width: 0; }
+    .review-card .review-meta { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 5px 12px; margin-bottom: 9px; }
+    .review-card .stars { color: var(--orange); font-size: 0.8rem; letter-spacing: 0.02em; white-space: nowrap; line-height: 1.4; }
+    .review-card p.text { font-size: 0.84rem; color: var(--text); margin-bottom: 0; line-height: 1.55; }
+    .review-card .who { display: inline-flex; align-items: baseline; flex-wrap: wrap; gap: 0 6px; font-size: 0.76rem; font-weight: 700; color: var(--dark); min-width: 0; }
+    .review-card .who span { display: inline; font-weight: 500; color: var(--text-light); font-size: 0.72rem; }
+    .review-card .who span:not(:empty)::before { content: "·"; margin-right: 6px; }
     .follow-heading { color: var(--dark); }
 
     .review-form-wrap { background: #fafbfc; border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
@@ -393,21 +466,31 @@
     }
     .nav-dropdown-item i { color: var(--teal); width: 16px; text-align: center; }
     .nav-dropdown-item:hover { background: var(--teal-light); color: var(--dark); }
+    .nav-dropdown-toggle:focus-visible,
+    .nav-dropdown-item:focus-visible,
+    .contact-item:focus-visible,
+    .social-card:focus-visible {
+      outline: 3px solid var(--teal);
+      outline-offset: 3px;
+    }
     
     :root[data-theme="dark"] .nav-dropdown-item { color: var(--dm-text); }
     :root[data-theme="dark"] .nav-dropdown-item:hover { background: var(--dm-surface-2); }
     :root[data-theme="dark"] .nav-dropdown-item i { color: #5ee0c4; }
                         
     /* CONTACT / FOOTER */
-    .contact-info { display: flex; flex-direction: column; gap: 14px; margin-top: 20px; }
-    .contact-item { display: flex; gap: 14px; align-items: flex-start; background: #fff; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; }
-    .contact-item i { color: var(--teal); font-size: 1.1rem; margin-top: 2px; width: 20px; }
-    .contact-item h4 { font-size: 0.85rem; font-weight: 700; color: var(--dark); margin-bottom: 2px; }
-    .contact-item p { font-size: 0.8rem; color: var(--text-light); }
-    .social-cards { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
-    .social-card { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: #fff; }
-    .social-card-left { display: flex; align-items: center; gap: 12px; }
-    .social-card-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.95rem; }
+    .contact-grid { align-items: start; }
+    .contact-info { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+    .contact-item { display: flex; gap: 12px; align-items: flex-start; background: #fff; border: 1px solid var(--border); border-radius: 13px; padding: 13px 14px; min-width: 0; transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease; }
+    .contact-item > i { flex: 0 0 20px; color: var(--teal); font-size: 1.05rem; margin-top: 2px; width: 20px; text-align: center; }
+    .contact-item h4 { font-size: 0.83rem; font-weight: 700; color: var(--dark); margin-bottom: 3px; line-height: 1.35; }
+    .contact-item p { font-size: 0.77rem; color: var(--text-light); line-height: 1.5; overflow-wrap: anywhere; }
+    .contact-item:hover { border-color: rgba(0,176,155,.48); transform: translateY(-1px); box-shadow: 0 5px 16px rgba(20,50,45,.06); }
+    .social-cards { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+    .social-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-radius: 13px; border: 1px solid var(--border); background: #fff; transition: border-color .18s ease, background-color .18s ease; }
+    .social-card-left { display: flex; align-items: center; gap: 11px; min-width: 0; }
+    .social-card-icon { flex: 0 0 34px; width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.9rem; }
+    .social-card:hover { border-color: rgba(0,176,155,.48); background: #fbfefd; }
     .sc-wa .social-card-icon { background: #25D366; }
     .sc-fb .social-card-icon { background: #1877F2; }
     .sc-ig .social-card-icon { background: linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); }
@@ -426,12 +509,9 @@
       .trust-grid { grid-template-columns: repeat(2, 1fr); }
       .testimonials-grid { grid-template-columns: repeat(2, 1fr); }
       .form-row { grid-template-columns: 1fr 1fr; }
-      .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; }
+      .contact-grid { display: grid; grid-template-columns: minmax(0,1.1fr) minmax(260px,.9fr); gap: 36px; }
     }
-    :root[data-theme="dark"] {
-      --dm-bg: #10181a; --dm-surface: #1a2422; --dm-surface-2: #202b29;
-      --dm-text: #eef2f0; --dm-text-light: #9fb0ac; --dm-border: #2c3a37;
-    }
+    :root[data-theme="dark"] {      --dm-bg: #10181a; --dm-surface: #1a2422; --dm-surface-2: #202b29;      --dm-text: #eef2f0; --dm-text-light: #9fb0ac; --dm-border: #2c3a37;    }
     :root[data-theme="dark"] body { background: var(--dm-bg); color: var(--dm-text); }
     :root[data-theme="dark"] .nav { background: rgba(16,24,26,0.92); border-bottom-color: var(--dm-border); }
     :root[data-theme="dark"] .hero { background: linear-gradient(180deg, #163330 0%, var(--dm-bg) 100%); }
@@ -451,6 +531,11 @@
     :root[data-theme="dark"] .social-card,
     :root[data-theme="dark"] .review-form-wrap { background: var(--dm-surface); border-color: var(--dm-border); }
     :root[data-theme="dark"] .product-card .thumb img { background: var(--dm-surface-2); }
+    :root[data-theme="dark"] .product-card { background: var(--dm-surface); border-color: var(--dm-border); }
+    :root[data-theme="dark"] .product-card h4,
+    :root[data-theme="dark"] .product-card .price { color: var(--dm-text); }
+    :root[data-theme="dark"] .product-card .cat,
+    :root[data-theme="dark"] .product-card .bulk-hint { color: #70d9c4; }
     :root[data-theme="dark"] .product-card h4,
     :root[data-theme="dark"] .service-card h3,
     :root[data-theme="dark"] .review-card .who,
@@ -472,14 +557,22 @@
     .theme-toggle { width: 38px; height: 38px; border-radius: 999px; border: 1.5px solid var(--border); background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.95rem; color: var(--dark); }
     :root[data-theme="dark"] .theme-toggle { background: var(--dm-surface); border-color: var(--dm-border); color: var(--dm-text); }
     /* STEM LAB FEATURE — isolated homepage invitation */
-    .stem-teaser { padding: 34px 0; background: linear-gradient(120deg, #e8faf5, #f2f9e4); border-top: 1px solid #dcefe5; border-bottom: 1px solid #dcefe5; }
+    .stem-teaser { padding: 28px 0; background: linear-gradient(120deg, #e8faf5, #f2f9e4); border-top: 1px solid #dcefe5; border-bottom: 1px solid #dcefe5; }
     .stem-teaser-inner { display:flex; align-items:center; justify-content:space-between; gap:24px; }
-    .stem-teaser-inner h2 { font-family:'Poppins',sans-serif; color:var(--dark); font-size:clamp(1.25rem,2.4vw,1.8rem); line-height:1.25; margin:5px 0 8px; }
-    .stem-teaser-inner p { color:var(--text-light); font-size:.88rem; max-width:650px; margin:0; }
+    .stem-teaser-inner > div { min-width:0; }
+    .stem-teaser-inner h2 { font-family:'Poppins',sans-serif; color:var(--dark); font-size:clamp(1.2rem,2.2vw,1.65rem); line-height:1.25; margin:4px 0 6px; }
+    .stem-teaser-inner p { color:var(--text-light); font-size:.85rem; line-height:1.55; max-width:590px; margin:0; }
+    .stem-teaser-inner > .btn { flex:0 0 auto; white-space:nowrap; }
+    .circuit-studio-teaser { background:linear-gradient(120deg,#f2f8ed,#e8f7f5); border-top:0; }
     :root[data-theme="dark"] .stem-teaser { background:linear-gradient(120deg,#142d27,#1c2d20); border-color:var(--dm-border); }
+    :root[data-theme="dark"] .circuit-studio-teaser { background:linear-gradient(120deg,#192c25,#172d32); border-top:1px solid var(--dm-border); }
     :root[data-theme="dark"] .stem-teaser-inner h2 { color:var(--dm-text); }
     :root[data-theme="dark"] .stem-teaser-inner p { color:var(--dm-text-light); }
-    @media(max-width:650px){.stem-teaser-inner{align-items:flex-start;flex-direction:column}.stem-teaser-inner .btn{width:100%}}
+    @media(max-width:650px){
+      .stem-teaser { padding:24px 0; }
+      .stem-teaser-inner { align-items:stretch; flex-direction:column; gap:16px; }
+      .stem-teaser-inner .btn { width:100%; min-height:48px; white-space:normal; }
+    }
     /* Mobile: dropdown becomes a full-width sheet anchored to the viewport,
     so it can never clip off the left/right edge regardless of button position. */
     @media (max-width: 720px) {
@@ -491,6 +584,10 @@
         width: auto;
         min-width: 0;
         max-width: none;
+        max-height: calc(100vh - 88px);
+        max-height: calc(100dvh - 88px);
+        overflow-y: auto;
+        overscroll-behavior: contain;
       }
     }
     /* ========================================= */
@@ -526,7 +623,7 @@
       border-color: var(--dm-border);
     }
     .skeleton-img { height: 110px; width: 100%; }
-    .skeleton-img-project { height: 210px; width: 100%; }
+    .skeleton-img-project { height: 184px; width: 100%; }
     .skeleton-text { height: 16px; width: 85%; }
     .skeleton-text-sm { height: 12px; width: 60%; }
     .skeleton-price { height: 20px; width: 45%; margin-top: auto; }
@@ -539,6 +636,151 @@
     }
     @media (min-width: 720px) {
       .skeleton-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    /* Homepage card rhythm: align actions and make project previews feel interactive. */
+    .project-gallery-card,
+    .product-card {
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+    .project-gallery-card {
+      display: flex;
+      flex-direction: column;
+    }
+    .project-gallery-card .project-card-body {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .project-gallery-card .project-card-body p { margin-bottom: 14px; }
+    .project-gallery-card .project-card-body .service-link { margin-top: auto; }
+    .product-card { display: block; min-width: 0; }
+    .product-card h4 { overflow-wrap: anywhere; }
+    .services-strip { align-items: stretch; }
+    /* Preserve the compact icon-left layout; do not let later card-rhythm rules
+       switch these cards back to a vertical flex layout. */
+    .service-card {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr);
+      grid-template-rows: auto auto auto auto;
+      column-gap: 14px;
+      align-content: start;
+      min-width: 0;
+    }
+    .service-card .service-icon {
+      grid-column: 1;
+      grid-row: 1 / span 4;
+      flex: none;
+    }
+    .service-card h3,
+    .service-card p,
+    .service-card .service-link,
+    .service-card .service-tag {
+      grid-column: 2;
+      min-width: 0;
+    }
+    .service-card .service-tag {
+      position: static;
+      justify-self: start;
+      max-width: 100%;
+      margin: 0 0 6px;
+      text-align: left;
+    }
+    .service-card p { flex: initial; }
+    .project-gallery-card:hover,
+    .product-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(0,176,155,.45);
+      box-shadow: 0 10px 26px rgba(20,50,45,.10);
+    }
+    .project-gallery-card:focus-visible,
+    .product-card:focus-visible,
+    .service-link:focus-visible,
+    .review-form-disclosure > summary:focus-visible {
+      outline: 3px solid var(--teal);
+      outline-offset: 3px;
+    }
+    .review-form-disclosure {
+      background: #fafbfc;
+      transition: border-color .18s ease, background-color .18s ease;
+    }
+    .review-form-disclosure > summary {
+      list-style-position: outside;
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+    }
+    .review-form-disclosure[open] { padding-bottom: 18px; }
+    .review-form-disclosure[open] .review-form-wrap {
+      border: 0;
+      padding: 20px 2px 2px;
+      background: transparent;
+    }
+    :root[data-theme="dark"] .project-gallery-card,
+    :root[data-theme="dark"] .project-gallery-empty,
+    :root[data-theme="dark"] .review-form-disclosure {
+      background: var(--dm-surface);
+      border-color: var(--dm-border);
+      color: var(--dm-text);
+    }
+    :root[data-theme="dark"] .project-gallery-card h3,
+    :root[data-theme="dark"] .review-form-disclosure > summary {
+      color: var(--dm-text);
+    }
+    :root[data-theme="dark"] .project-gallery-card p,
+    :root[data-theme="dark"] .project-gallery-empty {
+      color: var(--dm-text-light);
+    }
+    :root[data-theme="dark"] .review-form-disclosure[open] > summary {
+      border-bottom-color: var(--dm-border);
+    }
+    :root[data-theme="dark"] .service-tag {
+      color: #c7ed8b;
+      background: #263820;
+    }
+    @media (max-width: 719px) {
+      section { padding: 44px 0; }
+      .project-gallery-card img { height: 190px; }
+      .trust-section { margin: 0 12px; padding: 32px 20px; }
+      .shop-preview-head { align-items: flex-start; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .project-gallery-card, .product-card, .review-form-disclosure { transition: none; }
+      .project-gallery-card:hover, .product-card:hover { transform: none; }
+    }
+
+    /* Final consistency pass: visible keyboard focus across every homepage control. */
+    :where(a, button, input, select, textarea, summary):focus-visible {
+      outline: 3px solid var(--teal);
+      outline-offset: 3px;
+    }
+    .form-group input:focus-visible,
+    .form-group select:focus-visible,
+    .form-group textarea:focus-visible {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(0,176,155,.14);
+    }
+    :root[data-theme="dark"] :where(a, button, input, select, textarea, summary):focus-visible {
+      outline-color: #5ee0c4;
+    }
+    :root[data-theme="dark"] .form-group input:focus-visible,
+    :root[data-theme="dark"] .form-group select:focus-visible,
+    :root[data-theme="dark"] .form-group textarea:focus-visible {
+      border-color: #5ee0c4;
+      box-shadow: 0 0 0 3px rgba(94,224,196,.18);
+    }
+
+    /* Keep in-page destinations visible below the sticky navigation. */
+    section[id] { scroll-margin-top: 88px; }
+
+    /* Respect reduced-motion preferences across scrolling and loading states too. */
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .skeleton { animation: none; }
+      .btn, .contact-item, .social-card, .nav-dropdown-item {
+        transition: none;
+      }
     }
   </style>
 </head>
@@ -580,7 +822,7 @@
         </div>
 
         <a href="shop.html" class="btn btn-primary"><i class="fas fa-shopping-basket"></i> Shop</a>
-        <a href="https://wa.me/2347051548082" target="_blank" class="btn btn-wa"><i class="fab fa-whatsapp"></i></a>
+        <a href="https://wa.me/2347051548082" target="_blank" rel="noopener" class="btn btn-wa" aria-label="Chat with EazyLife on WhatsApp" title="Chat with us on WhatsApp"><i class="fab fa-whatsapp" aria-hidden="true"></i></a>
       </div>
     </div>
   </nav>
@@ -591,15 +833,15 @@
       <div class="hero-badges">
         <span class="hero-badge"><i class="fas fa-circle-check"></i> CAC Registered, BN-9462420</span>
         <span class="hero-badge"><i class="fas fa-location-dot"></i> Ibadan, Nigeria</span>
-        <span class="hero-badge"><i class="fas fa-truck-fast"></i> On-Demand Doorstep Delivery</span>
+        <span class="hero-badge"><i class="fas fa-truck-fast"></i> Delivery Arranged on Request</span>
       </div>
       <h1>Engineering Ideas Into <span>Working Solutions.</span></h1>
-      <p class="lead">We work on practical electronics, robotics, embedded systems, custom prototypes and hands-on STEM education. We also provide tools for designing circuits, source components on request and arrange doorstep delivery. Mobile lab sessions and in-person meetings are available by appointment.</p>
+      <p class="lead">Explore practical engineering projects, source electronics components and developer-ready workstations, or experiment with circuits and robotics in our interactive learning tools. We also design prototypes and deliver hands-on STEM sessions by arrangement.</p>
       <div class="hero-ctas">
-        <a href="#services" class="btn btn-primary"><i class="fas fa-microchip"></i> Explore Engineering</a>
-        <a href="stem-lab.html" class="btn btn-stem-hero"><i class="fas fa-flask"></i> STEM Lab</a>
-        <a href="circuit-studio.html" class="btn btn-circuit-studio"><i class="fas fa-draw-polygon"></i> Circuit Studio</a>
-        <a href="https://wa.me/2347051548082?text=Hello%20Eazylife,%20I%20would%20like%20to%20discuss%20an%20engineering%20project." target="_blank" rel="noopener" class="btn btn-outline"><i class="fab fa-whatsapp"></i> Discuss a Project</a>
+        <a href="shop.html" class="btn btn-primary"><i class="fas fa-shopping-basket"></i> Shop Components</a>
+        <a href="projects.html" class="btn btn-outline"><i class="fas fa-diagram-project"></i> View Our Projects</a>
+        <a href="stem-lab.html" class="btn btn-stem-hero"><i class="fas fa-flask"></i> Try the STEM Lab</a>
+        <a href="https://wa.me/2347051548082?text=Hello%20Eazylife,%20I%20would%20like%20to%20discuss%20an%20engineering%20project." target="_blank" rel="noopener" class="btn btn-circuit-studio"><i class="fab fa-whatsapp"></i> Discuss a Project</a>
       </div>
     </div>
   </section>
@@ -643,34 +885,6 @@
     </div>
   </section>
 
-  <!-- STEM LAB FEATURE — additive entry point to the interactive learning area -->
-  <section class="stem-teaser" aria-label="Explore the EazyLife STEM Lab">
-    <div class="container">
-      <div class="stem-teaser-inner">
-        <div>
-          <div class="section-label">Explore · Experiment · Engineer</div>
-          <h2>Don't just learn how technology works. Try it.</h2>
-          <p>Step into the EazyLife STEM Lab. Experiment with circuits, control a virtual motor and discover how sensors measure the world.</p>
-        </div>
-        <a href="stem-lab.html" class="btn btn-primary"><i class="fas fa-flask"></i> Enter the STEM Lab <i class="fas fa-arrow-right"></i></a>
-      </div>
-    </div>
-  </section>
-
-  <!-- CIRCUIT STUDIO FEATURE -->
-  <section class="stem-teaser circuit-studio-teaser" aria-label="Design electronic circuits with Circuit Studio">
-    <div class="container">
-      <div class="stem-teaser-inner">
-        <div>
-          <div class="section-label">Plan · Connect · Create</div>
-          <h2>Design your circuit before you build it.</h2>
-          <p>Use EazyLife Circuit Studio to arrange electronic components, connect pins, route wires around obstacles and create clean circuit diagrams. Export shareable PNG and JPG images, print or save as PDF, or keep SVG and project JSON files.</p>
-        </div>
-        <a href="circuit-studio.html" class="btn btn-primary"><i class="fas fa-draw-polygon"></i> Open Circuit Studio <i class="fas fa-arrow-right"></i></a>
-      </div>
-    </div>
-  </section>
-
   <!-- SHOP PREVIEW (live from Firestore) -->
   <section id="shop-preview" aria-label="Shop Preview">
     <div class="container">
@@ -710,6 +924,35 @@
     </div>
   </section>
 
+
+  <!-- STEM LAB FEATURE — additive entry point to the interactive learning area -->
+  <section class="stem-teaser" aria-label="Explore the EazyLife STEM Lab">
+    <div class="container">
+      <div class="stem-teaser-inner">
+        <div>
+          <div class="section-label">Explore · Experiment · Engineer</div>
+          <h2>Don't just learn how technology works. Try it.</h2>
+          <p>Step into the EazyLife STEM Lab. Experiment with circuits, control a virtual motor and discover how sensors measure the world.</p>
+        </div>
+        <a href="stem-lab.html" class="btn btn-primary"><i class="fas fa-flask"></i> Enter the STEM Lab <i class="fas fa-arrow-right"></i></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CIRCUIT STUDIO FEATURE -->
+  <section class="stem-teaser circuit-studio-teaser" aria-label="Design electronic circuits with Circuit Studio">
+    <div class="container">
+      <div class="stem-teaser-inner">
+        <div>
+          <div class="section-label">Plan · Connect · Create</div>
+          <h2>Design your circuit before you build it.</h2>
+          <p>Arrange components, connect pins and route wires to create clear circuit diagrams. Export PNG or JPG images, print to PDF, or save editable SVG and project JSON files.</p>
+        </div>
+        <a href="circuit-studio.html" class="btn btn-primary"><i class="fas fa-draw-polygon"></i> Open Circuit Studio <i class="fas fa-arrow-right"></i></a>
+      </div>
+    </div>
+  </section>
+
   <!-- SERVICES (equally weighted, includes partner referrals) -->
   <section id="services" aria-label="Our Services">
     <div class="container">
@@ -732,7 +975,7 @@
         <div class="service-card">
           <div class="service-icon"><i class="fas fa-magnifying-glass-dollar"></i></div>
           <h3>Electronic Components</h3>
-          <p>Browse Arduino boards, sensors, modules and essential electronics parts in our shop. If you cannot find what you need, use the request option there and we’ll help source it for you, with doorstep delivery subject to availability and logistics.</p>
+          <p>Browse Arduino boards, sensors, modules and essential parts. Can't find what you need? Send a sourcing request through the shop. Delivery is arranged subject to availability and logistics.</p>
           <a href="shop.html" class="service-link">Browse components <i class="fas fa-arrow-right"></i></a>
         </div>
         <div class="service-card">
@@ -763,8 +1006,8 @@
   <section aria-label="About EazyLife">
     <div class="trust-section">
       <div class="section-label">Why EazyLife</div>
-      <h2 class="section-title">Practical Engineering, Made Accessible</h2>
-      <p class="section-sub" id="aboutText">Eazylife Robotics and Electronics Solutions helps people, schools and businesses turn ideas into working systems through practical engineering, accessible components and hands-on learning.</p>
+      <h2 class="section-title">Practical Engineering You Can Build On</h2>
+      <p class="section-sub" id="aboutText">We make engineering more accessible through useful components, hands-on learning and practical support that helps people move from ideas to working solutions.</p>
       <div class="trust-grid">
         <div class="trust-item">
           <i class="fas fa-certificate"></i>
@@ -772,7 +1015,7 @@
         </div>
         <div class="trust-item">
           <i class="fas fa-globe"></i>
-          <div><h4>Verified Domain</h4><p>Our website is eazylife.ng, under Nigeria's .ng domain.</p></div>
+          <div><h4>Practical, Hands-On Approach</h4><p>We focus on working circuits, tested prototypes and learning through making.</p></div>
         </div>
         <div class="trust-item">
           <i class="fas fa-eye"></i>
@@ -809,44 +1052,44 @@
 
       <p style="margin:-12px 0 28px;"><a class="service-link" href="reviews.html">Explore all customer reviews <i class="fas fa-arrow-right"></i></a></p>
 
-      <div class="review-form-wrap">
-        <h3>Share Your Experience</h3>
-        <p>Used EazyLife? We'd love your honest feedback. Approved reviews appear on this page.</p>
-        <form id="reviewForm" action="https://formspree.io/f/xzdozlbk" method="POST">
-          <input type="hidden" name="_subject" value="New EazyLife Review Submission" />
-          <div class="form-row">
-            <div class="form-group">
-              <label for="r-name">Your Name *</label>
-              <input type="text" id="r-name" name="name" placeholder="e.g. Adebayo T." required />
+      <details class="review-form-disclosure">
+        <summary>Share your experience with EazyLife</summary>
+        <div class="review-form-wrap">
+          <h3>Share Your Experience</h3>
+          <p>Used EazyLife? We'd love your honest feedback. Approved reviews appear on this page.</p>
+          <form id="reviewForm" action="https://formspree.io/f/xzdozlbk" method="POST">
+            <input type="hidden" name="_subject" value="New EazyLife Review Submission" />
+            <div class="form-row">              <div class="form-group">
+                <label for="r-name">Your Name *</label>                <input type="text" id="r-name" name="name" placeholder="e.g. Adebayo T." required />
+              </div>
+              <div class="form-group">
+                <label for="r-title">Occupation / Location</label>
+                <input type="text" id="r-title" name="title" placeholder="e.g. Student, Ibadan" />
+              </div>
             </div>
             <div class="form-group">
-              <label for="r-title">Occupation / Location</label>
-              <input type="text" id="r-title" name="title" placeholder="e.g. Student, Ibadan" />
+              <label for="r-stars">Rating *</label>
+              <select id="r-stars" name="stars" required>
+                <option value="" disabled selected>Select a rating</option>
+                <option value="5">★★★★★ Excellent</option>
+                <option value="4">★★★★☆ Very Good</option>
+                <option value="3">★★★☆☆ Good</option>
+                <option value="2">★★☆☆☆ Fair</option>
+                <option value="1">★☆☆☆☆ Poor</option>              </select>
             </div>
-          </div>
-          <div class="form-group">
-            <label for="r-stars">Rating *</label>
-            <select id="r-stars" name="stars" required>
-              <option value="" disabled selected>Select a rating</option>
-              <option value="5">★★★★★ Excellent</option>
-              <option value="4">★★★★☆ Very Good</option>
-              <option value="3">★★★☆☆ Good</option>
-              <option value="2">★★☆☆☆ Fair</option>
-              <option value="1">★☆☆☆☆ Poor</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="r-text">Your Review *</label>
-            <textarea id="r-text" name="review" placeholder="Tell others about your experience with EazyLife..." required></textarea>
-          </div>
-          <input type="text" name="_gotcha" style="display:none" />
-          <button type="submit" class="btn-submit"><i class="fas fa-paper-plane"></i> Submit Review</button>
-          <div class="form-success" id="formSuccess">
-            <i class="fas fa-circle-check"></i>
-            <p>Thank you! Your review has been received and will appear here once approved.</p>
-          </div>
-        </form>
-      </div>
+            <div class="form-group">
+              <label for="r-text">Your Review *</label>
+              <textarea id="r-text" name="review" placeholder="Tell others about your experience with EazyLife..." required></textarea>
+            </div>
+            <input type="text" name="_gotcha" style="display:none" />
+            <button type="submit" class="btn-submit"><i class="fas fa-paper-plane"></i> Submit Review</button>
+            <div class="form-success" id="formSuccess">
+              <i class="fas fa-circle-check"></i>
+              <p>Thank you! Your review has been received and will appear here once approved.</p>
+            </div>
+          </form>
+        </div>
+      </details>
     </div>
   </section>
 
@@ -858,11 +1101,11 @@
         <h2 class="section-title">Find and Contact EazyLife</h2>
         <p class="section-sub" style="margin-bottom:24px;">We are based in Ibadan and attend to customers through online enquiries, component sourcing and mobile services. Please arrange in-person visits in advance. We do not have a walk-in showroom.</p>
         <div class="contact-info">
-          <a href="https://wa.me/2347051548082" target="_blank" class="contact-item">
+          <a href="https://wa.me/2347051548082" target="_blank" rel="noopener noreferrer" class="contact-item">
             <i class="fab fa-whatsapp"></i>
             <div><h4>WhatsApp</h4><p>+234 705 154 8082. This is the quickest way to reach us.</p></div>
           </a>
-          <a href="https://maps.app.goo.gl/wgWmKP8UQYWbf5np9" target="_blank" class="contact-item">
+          <a href="https://maps.app.goo.gl/wgWmKP8UQYWbf5np9" target="_blank" rel="noopener noreferrer" class="contact-item">
             <i class="fas fa-location-dot"></i>
             <div><h4>Ibadan Business Address, By Appointment</h4><p>21, Ile Asuni, Popo yemoja Road, off Iyana lodge, Oke-Ado, Ibadan, Oyo State. Please contact us before visiting. Visits are by appointment only.</p></div>
           </a>
@@ -873,22 +1116,15 @@
         </div>
       </div>
       <div>
-        <h3 class="follow-heading" style="font-size:1rem;font-weight:700;margin-bottom:16px;">Follow Us Online</h3>
+        <h3 class="follow-heading" style="font-size:1rem;font-weight:700;margin-bottom:6px;">Follow Our Work</h3>
+        <p class="section-sub" style="font-size:.8rem;margin-bottom:0;">See project updates, builds and practical engineering ideas from EazyLife.</p>
         <div class="social-cards">
-          <a href="https://wa.me/2347051548082?text=Hello%20EazyLife,%20I%20am%20interested%20in%20your%20services." target="_blank" rel="noopener" class="social-card sc-wa">
-            <div class="social-card-left"><div class="social-card-icon"><i class="fab fa-whatsapp"></i></div><div><h4>WhatsApp</h4><p>Chat with us directly</p></div></div>
-            <i class="fas fa-arrow-right"></i>
-          </a>
-          <a href="https://www.facebook.com/share/18UAAaL3xe/" target="_blank" rel="noopener" class="social-card sc-fb">
+          <a href="https://www.facebook.com/share/18UAAaL3xe/" target="_blank" rel="noopener noreferrer" class="social-card sc-fb">
             <div class="social-card-left"><div class="social-card-icon"><i class="fab fa-facebook-f"></i></div><div><h4>Facebook</h4><p>EazyLife Robotics & Electronics</p></div></div>
             <i class="fas fa-arrow-right"></i>
           </a>
-          <a href="https://www.instagram.com/eazylifeng" target="_blank" rel="noopener" class="social-card sc-ig">
+          <a href="https://www.instagram.com/eazylifeng" target="_blank" rel="noopener noreferrer" class="social-card sc-ig">
             <div class="social-card-left"><div class="social-card-icon"><i class="fab fa-instagram"></i></div><div><h4>Instagram</h4><p>@eazylifeng</p></div></div>
-            <i class="fas fa-arrow-right"></i>
-          </a>
-          <a href="https://maps.app.goo.gl/wgWmKP8UQYWbf5np9" target="_blank" rel="noopener" class="social-card sc-gm">
-            <div class="social-card-left"><div class="social-card-icon"><i class="fas fa-location-dot"></i></div><div><h4>Business Address, By Appointment</h4><p>Ibadan, Oyo State. Please contact us before arranging an in-person visit.</p></div></div>
             <i class="fas fa-arrow-right"></i>
           </a>
         </div>
@@ -952,6 +1188,13 @@
         if (!navDropdown.contains(e.target)) {
           navDropdown.classList.remove('open');
           navToggleBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && navDropdown.classList.contains('open')) {
+          navDropdown.classList.remove('open');
+          navToggleBtn.setAttribute('aria-expanded', 'false');
+          navToggleBtn.focus();
         }
       });
     }
@@ -1058,9 +1301,11 @@
           const image = r.coverImage || (Array.isArray(r.images) ? r.images[0] : '');
           return `<article class="review-card">
             ${image ? `<a href="reviews.html?id=${encodeURIComponent(r.id)}"><img src="${escapeHtml(optimizedImageUrl(image,640))}" ${responsiveImageAttrs(image,[320,480,640,960],"(max-width: 720px) 100vw, 33vw")} alt="Project photograph associated with review by ${escapeHtml(r.name)}" loading="lazy" decoding="async" width="640" height="420" style="width:100%;height:170px;object-fit:cover;border-radius:12px;margin-bottom:14px;"></a>` : ''}
-            <div class="stars">${'★'.repeat(stars)}${'☆'.repeat(5-stars)}</div>
+            <div class="review-meta">
+              <div class="stars" aria-label="${stars} out of 5 stars">${'★'.repeat(stars)}${'☆'.repeat(5-stars)}</div>
+              <div class="who">${escapeHtml(r.name)}<span>${escapeHtml(r.title || '')}</span></div>
+            </div>
             <p class="text">"${escapeHtml(summary.length > 210 ? summary.slice(0,207).trim() + '…' : summary)}"</p>
-            <div class="who">${escapeHtml(r.name)}<span>${escapeHtml(r.title || '')}</span></div>
             <a class="service-link" href="reviews.html?id=${encodeURIComponent(r.id)}" style="display:inline-flex;margin-top:12px;">Read full review <i class="fas fa-arrow-right"></i></a>
           </article>`;
         }).join('');

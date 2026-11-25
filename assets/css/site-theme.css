@@ -74,7 +74,7 @@ body{transition:background-color .18s ease,color .18s ease}
   justify-content:center;
   gap:7px;
   flex:0 0 auto;
-  min-height:38px;
+  min-height:44px;
   padding:9px 13px;
   border:1px solid var(--el-border);
   border-radius:999px;
@@ -141,7 +141,7 @@ body{transition:background-color .18s ease,color .18s ease}
   justify-content:center;
   gap:7px;
   flex:0 0 auto;
-  min-height:38px;
+  min-height:44px;
   padding:9px 13px;
   border:1px solid var(--el-border);
   border-radius:999px;
@@ -156,4 +156,18 @@ body{transition:background-color .18s ease,color .18s ease}
 :root .nav-actions a:not(.btn-wa):hover {
   border-color:var(--el-teal);
   background:var(--el-soft);
+}
+
+/* Comfortable tap targets and visible keyboard focus in both colour themes. */
+:root .nav-actions a:not(.btn-wa),
+:root .stem-nav-links a,
+:root .sl-nav-links a {
+  min-height:44px;
+}
+:root:not([data-theme="dark"]) .nav-actions a:focus-visible,
+:root:not([data-theme="dark"]) .stem-nav-links a:focus-visible,
+:root:not([data-theme="dark"]) .sl-nav-links a:focus-visible,
+:root:not([data-theme="dark"]) .el-theme-toggle:focus-visible {
+  outline:3px solid #008a78;
+  outline-offset:3px;
 }

@@ -148,3 +148,789 @@
 
 /* Keep grouped admin-only controls hidden until the authorized account is confirmed. */
 .cs-admin-project-tools[hidden]{display:none!important}
+
+
+/* Tablet layout: preserve a usable drawing area instead of floating two wide panels
+   over a narrow canvas. Laptop/desktop keeps the full floating-panel workspace. */
+@media (min-width:621px) and (max-width:900px){
+ .cs-page{overflow:auto}
+ .cs-topbar{position:sticky;top:0;z-index:40;height:auto;min-height:54px;padding:8px 12px;flex-wrap:wrap}
+ .cs-top-actions{justify-content:flex-start;flex-wrap:nowrap;max-width:100%}
+ .cs-app{position:relative;inset:auto;width:100%;height:auto;min-height:calc(100dvh - 54px);overflow:visible}
+ .cs-toolbar{position:relative;top:auto;left:auto;transform:none;width:100%;max-height:none;overflow:visible;flex-wrap:wrap;justify-content:flex-start;border-radius:0;box-shadow:none;backdrop-filter:none}
+ .cs-tool-group{flex-wrap:wrap}
+ .cs-workspace{position:relative;inset:auto;display:grid;grid-template-columns:minmax(175px,30%) minmax(0,1fr);grid-template-rows:minmax(520px,1fr) auto;width:100%;height:auto;min-height:0}
+ .cs-library-panel{position:relative;inset:auto;grid-column:1;grid-row:1;width:auto;max-height:none;min-height:520px;border:0;border-right:1px solid var(--cs-border);border-radius:0;box-shadow:none;backdrop-filter:none}
+ .cs-canvas-panel{position:relative;inset:auto;grid-column:2;grid-row:1;width:auto;height:auto;min-height:520px}
+ .cs-canvas-head{position:relative;top:auto;left:auto;transform:none;width:auto;max-width:none;height:auto;min-height:48px;border:0;border-radius:0;box-shadow:none;backdrop-filter:none;flex-wrap:wrap}
+ .cs-canvas-wrap{position:relative;inset:auto;width:100%;height:auto;min-height:460px;flex:1}
+ .cs-properties-panel{position:relative;inset:auto;grid-column:1/-1;grid-row:2;width:auto;max-height:260px;min-height:150px;margin:0;border:0;border-top:1px solid var(--cs-border);border-radius:0;box-shadow:none;backdrop-filter:none}
+ .cs-statusbar{position:relative;inset:auto;transform:none;width:100%;max-width:none;border:0;border-radius:0;backdrop-filter:none}
+}
+
+
+/* Component library clarity, keyboard access and empty-search recovery. */
+.cs-category{white-space:nowrap}
+.cs-category:focus-visible,.cs-component-card:focus-visible,.cs-library-empty button:focus-visible{outline:3px solid var(--cs-accent);outline-offset:2px}
+.cs-component-card{transition:border-color .15s ease,background .15s ease,transform .15s ease}
+.cs-component-card:hover{transform:translateY(-1px)}
+.cs-library-empty{grid-column:1/-1;display:grid;gap:7px;padding:14px 10px;border:1px dashed var(--cs-border);border-radius:9px;background:var(--cs-soft);text-align:center}
+.cs-library-empty strong{font-size:12px;color:var(--cs-ink)}
+.cs-library-empty span{font-size:10px;line-height:1.5;color:var(--cs-muted)}
+.cs-library-empty button{justify-self:center;border:1px solid var(--cs-border);border-radius:7px;padding:7px 10px;background:var(--cs-panel);color:var(--cs-accent);font-size:11px;font-weight:700;cursor:pointer}
+@media(max-width:900px){
+ .cs-categories{flex-wrap:nowrap;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:thin}
+}
+@media(prefers-reduced-motion:reduce){.cs-component-card{transition:none}.cs-component-card:hover{transform:none}}
+
+/* Keep canvas hit targets consistent in screen pixels while zooming. */
+.cs-wire-hit{vector-effect:non-scaling-stroke;stroke-width:20}
+.cs-wire-endpoint,.cs-bend-handle,.cs-junction{vector-effect:non-scaling-stroke}
+.cs-selected .cs-selection-box{vector-effect:non-scaling-stroke}
+
+
+/* Responsive EazyLife site navigation: one predictable menu on desktop, tablet and mobile. */
+.cs-topbar{overflow:visible}
+.cs-top-actions{position:relative;display:flex;align-items:center;gap:8px;overflow:visible;flex:0 0 auto}
+.cs-nav-toggle{display:inline-flex;align-items:center;justify-content:center;font-size:18px;line-height:1}
+.cs-site-nav[hidden]{display:none}
+.cs-site-nav:not([hidden]){position:absolute;z-index:60;top:calc(100% + 9px);right:0;display:grid;grid-template-columns:repeat(2,minmax(150px,1fr));gap:3px;width:min(440px,calc(100vw - 24px));max-height:min(70vh,520px);overflow:auto;padding:9px;border:1px solid var(--cs-border);border-radius:13px;background:var(--cs-panel);box-shadow:0 14px 36px #10251f2b}
+.cs-site-nav .cs-home-link{display:flex;align-items:center;min-height:40px;padding:9px 11px;border-radius:8px;color:var(--cs-ink);font-size:13px;white-space:normal;text-decoration:none}
+.cs-site-nav .cs-home-link:hover,.cs-site-nav .cs-home-link:focus-visible{background:var(--cs-soft);color:var(--cs-accent);outline:2px solid var(--cs-accent);outline-offset:-2px}
+.cs-nav-toggle[aria-expanded="true"]{background:var(--cs-accent);border-color:var(--cs-accent);color:#fff}
+@media(max-width:620px){
+ .cs-topbar{height:48px;padding:0 10px;gap:8px}
+ .cs-top-actions{gap:6px}
+ .cs-nav-toggle,.cs-icon-btn{width:36px;height:36px;flex:0 0 36px}
+ .cs-site-nav:not([hidden]){position:fixed;top:54px;right:8px;left:auto;width:min(330px,calc(100vw - 16px));grid-template-columns:1fr;max-height:calc(100dvh - 68px);padding:8px}
+ .cs-site-nav .cs-home-link{min-height:44px;font-size:14px}
+}
+@media(min-width:621px) and (max-width:900px){
+ .cs-topbar{flex-wrap:nowrap}
+ .cs-top-actions{margin-left:auto}
+ .cs-site-nav:not([hidden]){grid-template-columns:repeat(2,minmax(140px,1fr))}
+}
+@media(prefers-reduced-motion:no-preference){.cs-site-nav:not([hidden]){animation:cs-nav-in .14s ease-out}@keyframes cs-nav-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}}
+
+
+/* Circuit Studio inspector: clearer hierarchy and more usable responsive space. */
+.cs-properties-panel{scrollbar-gutter:stable;overscroll-behavior:contain}
+.cs-properties-content{min-width:0;gap:10px}
+.cs-properties-content>*{min-width:0}
+.cs-property-preview{height:72px;flex:0 0 auto}
+.cs-property-preview svg{width:80%;height:62px}
+.cs-property-group{min-width:0;border:1px solid var(--cs-border);border-radius:9px;background:var(--cs-soft);padding:0 10px}
+.cs-property-group>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:42px;cursor:pointer;list-style:none;color:var(--cs-ink);font-size:11px;font-weight:750}
+.cs-property-group>summary::-webkit-details-marker{display:none}
+.cs-property-group>summary::after{content:'＋';color:var(--cs-accent);font-size:15px;font-weight:600}
+.cs-property-group[open]>summary::after{content:'−'}
+.cs-property-group[open]>summary{border-bottom:1px solid var(--cs-border);margin-bottom:10px}
+.cs-property-group .cs-field-row{margin:8px 0}
+.cs-property-group .cs-hint{margin:8px 0}
+.cs-properties-content .cs-field{min-width:0}
+.cs-properties-content .cs-field input,.cs-properties-content .cs-field select,.cs-properties-content .cs-field textarea{min-width:0;max-width:100%}
+.cs-properties-content button:focus-visible,.cs-properties-content input:focus-visible,.cs-properties-content select:focus-visible,.cs-properties-content textarea:focus-visible,.cs-property-group>summary:focus-visible{outline:2px solid var(--cs-accent);outline-offset:2px}
+.cs-properties-panel .cs-panel-heading{position:sticky;top:-16px;z-index:2;padding:3px 0 8px;background:var(--cs-panel)}
+.cs-wire-bends{display:grid;gap:4px}
+.cs-wire-bends .cs-pin-editor{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 38px;align-items:end}
+.cs-wire-bends .cs-pin-editor .cs-pin-btn{min-height:42px}
+.cs-pin-type-row{grid-template-columns:minmax(0,1fr) minmax(120px,48%);gap:8px}
+@media(min-width:901px){.cs-workspace{grid-template-columns:245px minmax(300px,1fr) 300px}.cs-properties-panel{padding:14px}.cs-properties-panel .cs-panel-heading{top:-14px}}
+@media(min-width:621px) and (max-width:900px){.cs-properties-panel{max-height:300px;min-height:190px;padding:12px}.cs-properties-panel .cs-panel-heading{top:-12px}}
+@media(max-width:620px){
+ .cs-properties-panel{bottom:calc(24dvh + 52px);max-height:30dvh;min-height:0;padding:9px 10px;scrollbar-gutter:auto}
+ .cs-properties-panel .cs-panel-heading{top:-9px;padding:2px 0 6px;margin-bottom:7px}
+ .cs-properties-panel .cs-panel-heading h2{font-size:13px}
+ .cs-properties-content{gap:8px}
+ .cs-property-preview{height:54px}.cs-property-preview svg{height:48px}
+ .cs-property-group{padding:0 9px}
+ .cs-property-group>summary{min-height:38px;font-size:11px}
+ .cs-properties-content .cs-field-row{gap:7px}
+ .cs-properties-content .cs-pin-btn{min-height:40px}
+ .cs-wire-bends .cs-pin-editor{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 38px}
+ .cs-pin-type-row{grid-template-columns:minmax(0,1fr) minmax(112px,48%)}
+}
+
+
+/* Circuit Studio inspector: readable controls, clear context and room for mobile editing. */
+@media(min-width:901px){
+ .cs-workspace{grid-template-columns:245px minmax(300px,1fr) 290px}
+ .cs-properties-panel{width:290px;padding:16px 14px}
+}
+.cs-properties-panel .cs-panel-heading{position:sticky;top:-16px;z-index:3;padding:5px 0 9px;background:var(--cs-panel);border-bottom:1px solid var(--cs-border)}
+.cs-properties-panel .cs-panel-heading h2{font-size:15px;line-height:1.25}
+.cs-properties-content{gap:10px;min-width:0}
+.cs-properties-content .cs-field{min-width:0;font-size:11px;font-weight:600}
+.cs-properties-content .cs-field input,.cs-properties-content .cs-field select,.cs-properties-content .cs-field textarea{min-width:0;font-size:14px}
+.cs-properties-content .cs-field input:focus-visible,.cs-properties-content .cs-field select:focus-visible,.cs-properties-content .cs-field textarea:focus-visible{outline:2px solid var(--cs-accent);outline-offset:1px;border-color:var(--cs-accent)}
+.cs-property-group{border:1px solid var(--cs-border);border-radius:9px;background:var(--cs-soft);overflow:hidden}
+.cs-property-group summary{position:relative;padding:11px 32px 11px 11px;font-size:11px;font-weight:750;cursor:pointer;list-style:none}
+.cs-property-group summary::-webkit-details-marker{display:none}
+.cs-property-group summary:after{content:'＋';position:absolute;right:11px;top:8px;font-size:16px;color:var(--cs-accent)}
+.cs-property-group[open] summary:after{content:'−'}
+.cs-property-group> :not(summary){margin-left:10px;margin-right:10px}
+.cs-property-group> :last-child{margin-bottom:10px}
+.cs-property-preview{flex:0 0 82px;height:82px}
+.cs-properties-content .cs-empty-property strong{display:block;color:var(--cs-ink);font-size:13px;margin-bottom:4px}
+.cs-properties-content .cs-empty-property p{margin:5px 0 0}
+.cs-properties-content button:focus-visible{outline:2px solid var(--cs-accent);outline-offset:2px}
+.cs-wire-bends{display:grid;gap:4px}
+.cs-wire-bends .cs-pin-editor{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 40px;gap:7px}
+.cs-wire-bends .cs-pin-editor .cs-field{font-size:10px}
+.cs-wire-bends .cs-pin-editor input{font-size:14px;min-height:40px}
+.cs-wire-bends .cs-pin-editor button{min-height:40px}
+.cs-pin-type-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(110px,1.1fr);align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--cs-border);font-size:11px;color:var(--cs-ink)}
+.cs-pin-type-row select{width:100%;min-width:0;padding:8px;border:1px solid var(--cs-border);border-radius:7px;background:var(--cs-panel);color:var(--cs-ink);font-size:12px}
+@media(max-width:620px){
+ .cs-properties-panel{bottom:calc(24dvh + 50px);max-height:min(38dvh,360px);min-height:88px;padding:8px 10px;overflow:auto;overscroll-behavior:contain}
+ .cs-properties-panel .cs-panel-heading{top:-8px;margin-bottom:7px;padding:3px 0 7px}
+ .cs-properties-panel .cs-panel-heading h2{font-size:13px}
+ .cs-properties-content{gap:8px}
+ .cs-properties-content .cs-field{font-size:10px}
+ .cs-property-preview{height:64px;flex-basis:64px}
+ .cs-property-preview svg{height:58px}
+ .cs-property-group summary{padding:10px 30px 10px 9px}
+ .cs-wire-bends .cs-pin-editor{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 38px}
+ .cs-inspector-note{display:none}
+}
+@media(prefers-reduced-motion:reduce){.cs-property-group summary{scroll-behavior:auto}}
+
+
+/* Consistent, touch-friendly project dialogs and confirmation states. */
+.cs-action-dialog{width:min(440px,calc(100vw - 28px));max-width:calc(100vw - 28px);max-height:min(82dvh,620px);overflow:auto;padding:clamp(14px,3vw,22px);overscroll-behavior:contain}
+.cs-action-dialog form{display:grid;gap:12px}
+.cs-action-dialog .cs-dialog-head{align-items:flex-start;gap:12px}
+.cs-action-dialog .cs-dialog-head h2{margin:4px 0 2px;font-size:clamp(17px,3vw,20px)}
+.cs-action-dialog .cs-field{display:grid;gap:7px;font-size:12px;font-weight:650;color:var(--cs-ink)}
+.cs-action-dialog .cs-field input{width:100%;min-height:44px;padding:10px 12px;font-size:16px;background:var(--cs-work);color:var(--cs-ink);border:1px solid var(--cs-border);border-radius:9px}
+.cs-action-dialog .cs-field input:focus-visible{outline:2px solid var(--cs-accent);outline-offset:2px;border-color:var(--cs-accent)}
+.cs-dialog-message{margin:2px 0 8px;font-size:13px;line-height:1.6;color:var(--cs-muted);overflow-wrap:anywhere}
+.cs-dialog-error{margin:-5px 0 0;color:var(--cs-danger);font-size:12px}
+.cs-dialog-actions{flex-wrap:wrap;gap:8px}
+.cs-action-dialog .cs-dialog-actions button{min-height:42px;min-width:92px}
+.cs-action-dialog .cs-danger{background:color-mix(in srgb,var(--cs-danger) 9%,var(--cs-panel));border-color:color-mix(in srgb,var(--cs-danger) 45%,var(--cs-border));font-weight:750}
+.cs-action-dialog button:focus-visible{outline:2px solid var(--cs-accent);outline-offset:2px}
+.cs-toast{max-width:min(560px,calc(100vw - 24px));text-align:center;line-height:1.45;z-index:80}
+@media(max-width:620px){
+ .cs-action-dialog{width:calc(100vw - 20px);max-width:calc(100vw - 20px);max-height:calc(100dvh - 28px);padding:15px}
+ .cs-action-dialog .cs-dialog-actions{display:grid;grid-template-columns:1fr 1fr}
+ .cs-action-dialog .cs-dialog-actions button{width:100%;min-height:46px}
+}
+@media(prefers-reduced-motion:reduce){.cs-toast{transition:none}}
+
+
+/* Mobile inspector: compact, collapsible and independently scrollable.
+   Keep the drawing surface available even when the page itself is viewport-locked. */
+@media(max-width:620px){
+ .cs-properties-panel{
+  left:8px;right:8px;bottom:calc(24dvh + 52px + env(safe-area-inset-bottom));
+  top:auto;width:auto;height:auto;max-height:min(28dvh,230px);min-height:0;
+  padding:7px 9px;overflow-x:hidden;overflow-y:auto;
+  overscroll-behavior:contain;touch-action:pan-y;
+  scrollbar-width:thin;scrollbar-gutter:auto;
+ }
+ .cs-properties-panel .cs-panel-heading{
+  position:sticky;top:-7px;z-index:5;display:flex;align-items:center;
+  justify-content:space-between;gap:8px;margin:0 0 7px;padding:3px 0 6px;
+  background:var(--cs-panel);border-bottom:1px solid var(--cs-border);
+ }
+ .cs-properties-panel .cs-panel-heading>div{min-width:0}
+ .cs-properties-panel .cs-panel-heading h2{font-size:12px;margin:2px 0 0}
+ .cs-inspector-toggle{flex:0 0 auto;min-width:54px;min-height:34px;padding:5px 9px;font-size:10px}
+ .cs-properties-panel.cs-inspector-collapsed{
+  height:43px;min-height:43px;max-height:43px;overflow:hidden;
+  padding:5px 9px;bottom:calc(24dvh + 52px + env(safe-area-inset-bottom));
+ }
+ .cs-properties-panel.cs-inspector-collapsed .cs-panel-heading{margin:0;padding:0;border:0;min-height:31px}
+ .cs-properties-panel.cs-inspector-collapsed .cs-properties-content,
+ .cs-properties-panel.cs-inspector-collapsed .cs-inspector-note{display:none}
+ .cs-properties-panel .cs-properties-content{gap:7px;padding-bottom:5px}
+ .cs-properties-panel .cs-field input,
+ .cs-properties-panel .cs-field select,
+ .cs-properties-panel .cs-field textarea{min-height:38px;font-size:14px}
+ .cs-properties-panel .cs-field-row{gap:7px}
+ .cs-properties-panel .cs-pin-btn{min-height:38px;font-size:11px}
+ .cs-library-panel{bottom:max(8px,env(safe-area-inset-bottom));max-height:24dvh}
+}
+@media(max-width:380px){
+ .cs-properties-panel{max-height:25dvh;bottom:calc(24dvh + 48px + env(safe-area-inset-bottom))}
+ .cs-properties-panel.cs-inspector-collapsed{bottom:calc(24dvh + 48px + env(safe-area-inset-bottom))}
+}
+
+
+/* Workspace panels are optional: dock them beside the canvas or float above it. */
+.cs-workspace{position:relative}
+.cs-panel-controls{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.cs-panel-controls .cs-small-btn{white-space:nowrap}
+.cs-library-panel .cs-panel-heading{gap:8px}
+.cs-workspace.cs-library-hidden{grid-template-columns:minmax(0,1fr) 290px}
+.cs-workspace.cs-inspector-hidden{grid-template-columns:245px minmax(0,1fr)}
+.cs-workspace.cs-library-hidden.cs-inspector-hidden{grid-template-columns:minmax(0,1fr)}
+.cs-workspace.cs-library-floating{grid-template-columns:minmax(0,1fr) 290px}
+.cs-workspace.cs-inspector-floating{grid-template-columns:245px minmax(0,1fr)}
+.cs-workspace.cs-library-floating.cs-inspector-hidden,
+.cs-workspace.cs-inspector-floating.cs-library-hidden,
+.cs-workspace.cs-library-floating.cs-inspector-floating{grid-template-columns:minmax(0,1fr)}
+.cs-library-panel.cs-panel-hidden,
+.cs-properties-panel.cs-panel-hidden{display:none!important}
+.cs-library-panel.cs-panel-floating,
+.cs-properties-panel.cs-panel-floating{
+ position:absolute;top:10px;bottom:10px;z-index:35;width:min(310px,calc(100% - 20px));
+ max-height:none;min-height:0;overflow:auto;border:1px solid var(--cs-border);
+ border-radius:14px;box-shadow:0 12px 36px rgba(0,0,0,.24);background:var(--cs-panel)
+}
+.cs-library-panel.cs-panel-floating{left:10px}
+.cs-properties-panel.cs-panel-floating{right:10px}
+.cs-panel-reopen{
+ position:absolute;top:10px;z-index:34;min-height:40px;padding:8px 12px;
+ border:1px solid var(--cs-border);border-radius:10px;background:var(--cs-panel);
+ color:var(--cs-ink);font-family:inherit;font-size:12px;font-weight:600;line-height:1.2;box-shadow:0 5px 18px rgba(0,0,0,.16);cursor:pointer
+}
+.cs-reopen-library{left:10px}
+.cs-reopen-inspector{right:10px}
+.cs-panel-reopen[hidden]{display:none!important}
+@media(min-width:901px){
+ .cs-workspace.cs-library-hidden{grid-template-columns:0 minmax(0,1fr) 290px}
+ .cs-workspace.cs-inspector-hidden{grid-template-columns:245px minmax(0,1fr)}
+ .cs-workspace.cs-library-hidden.cs-inspector-hidden{grid-template-columns:minmax(0,1fr)}
+ .cs-library-panel.cs-panel-floating{width:min(330px,calc(100% - 24px))}
+ .cs-properties-panel.cs-panel-floating{width:min(350px,calc(100% - 24px))}
+}
+@media(min-width:621px) and (max-width:900px){
+ .cs-workspace.cs-library-hidden{grid-template-columns:minmax(0,1fr) 260px}
+ .cs-workspace.cs-inspector-hidden{grid-template-columns:245px minmax(0,1fr) 0}
+ .cs-workspace.cs-library-hidden.cs-inspector-hidden{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:620px){
+ .cs-workspace.cs-library-hidden,
+ .cs-workspace.cs-inspector-hidden,
+ .cs-workspace.cs-library-hidden.cs-inspector-hidden,
+ .cs-workspace.cs-library-floating,
+ .cs-workspace.cs-inspector-floating{grid-template-columns:minmax(0,1fr)}
+ .cs-library-panel.cs-panel-floating,
+ .cs-properties-panel.cs-panel-floating{left:8px;right:8px;top:8px;bottom:8px;width:auto;max-height:none;border-radius:13px}
+ .cs-library-panel.cs-panel-floating{bottom:8px}
+ .cs-properties-panel.cs-panel-floating{bottom:8px}
+ .cs-panel-reopen{top:8px;min-height:38px}
+ .cs-reopen-library{left:8px}
+ .cs-reopen-inspector{right:8px}
+ .cs-library-panel .cs-panel-heading{position:sticky;top:-16px;z-index:5;background:var(--cs-panel)}
+ .cs-properties-panel.cs-panel-floating .cs-panel-heading{top:-8px}
+ .cs-properties-panel.cs-inspector-collapsed.cs-panel-floating{height:48px;min-height:48px;max-height:48px;bottom:auto}
+}
+
+
+/* User-configurable drawing toolbar: full, compact single-line, or floating. */
+.cs-app{position:relative}
+.cs-toolbar-modebar{display:flex;align-items:center;gap:5px;flex:0 0 100%;padding-bottom:7px;border-bottom:1px solid var(--cs-border)}
+.cs-toolbar-mode-label{font-size:10px;font-weight:750;color:var(--cs-muted);margin-right:4px}
+.cs-toolbar-modebar .cs-small-btn{padding:5px 10px;min-height:29px;font-size:10px}
+.cs-toolbar-modebar .cs-small-btn[aria-pressed=true]{background:var(--cs-accent);border-color:var(--cs-accent);color:#fff}
+.cs-toolbar-mini-actions{display:none;align-items:center;gap:5px;flex:1;min-width:0;white-space:nowrap;overflow-x:auto;scrollbar-width:thin}
+.cs-toolbar-mini-actions .cs-btn{padding:6px 10px;min-height:34px;flex:0 0 auto}
+.cs-toolbar.cs-toolbar-mini{align-items:center;gap:6px;padding:6px 10px}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-modebar{flex:0 0 auto;padding:0;border:0}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-mode-label{display:none}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-mini-actions{display:flex}
+.cs-toolbar.cs-toolbar-mini:not(.cs-toolbar-expanded)>.cs-tool-group{display:none}
+.cs-toolbar.cs-toolbar-mini.cs-toolbar-expanded>.cs-tool-group{display:flex}
+.cs-toolbar.cs-toolbar-mini.cs-toolbar-expanded{flex-wrap:wrap}
+.cs-toolbar.cs-toolbar-mini.cs-toolbar-expanded .cs-toolbar-mini-actions{flex:1 1 100%;order:2}
+.cs-toolbar.cs-toolbar-floating{
+ position:absolute;top:8px;left:8px;right:8px;z-index:46;max-height:calc(100% - 16px);
+ overflow:auto;border:1px solid var(--cs-border);border-radius:13px;
+ box-shadow:0 10px 32px rgba(0,0,0,.24)
+}
+.cs-toolbar.cs-toolbar-floating:not(.cs-toolbar-expanded){width:max-content;max-width:calc(100% - 16px);right:auto}
+.cs-toolbar.cs-toolbar-floating:not(.cs-toolbar-expanded) .cs-toolbar-modebar{flex:0 0 auto}
+.cs-toolbar.cs-toolbar-floating:not(.cs-toolbar-expanded) .cs-toolbar-mini-actions{flex:0 1 auto}
+.cs-toolbar.cs-toolbar-floating:not(.cs-toolbar-expanded)>.cs-tool-group{display:none}
+.cs-toolbar.cs-toolbar-floating.cs-toolbar-expanded{left:8px;right:8px}
+.cs-toolbar.cs-toolbar-floating.cs-toolbar-expanded .cs-tool-group{display:flex;flex-wrap:wrap}
+.cs-toolbar.cs-toolbar-floating .cs-toolbar-modebar{background:var(--cs-panel)}
+.cs-toolbar.cs-toolbar-floating .cs-toolbar-mini-actions{display:flex}
+.cs-toolbar.cs-toolbar-floating .cs-toolbar-mode-label{display:none}
+@media(max-width:620px){
+ .cs-toolbar-modebar{gap:4px;padding-bottom:5px}
+ .cs-toolbar-modebar .cs-small-btn{padding:5px 8px}
+ .cs-toolbar.cs-toolbar-mini{flex-wrap:nowrap}
+ .cs-toolbar.cs-toolbar-mini .cs-tool-group{flex-wrap:nowrap;overflow-x:auto}
+ .cs-toolbar.cs-toolbar-floating{top:6px;left:6px;right:6px}
+ .cs-toolbar.cs-toolbar-floating:not(.cs-toolbar-expanded){max-width:calc(100% - 12px)}
+}
+
+/* Bubble-first workspace controls: panels never occupy the entire phone. */
+.cs-workspace-bubble{
+ width:48px;height:48px;min-width:48px;min-height:48px;padding:0;border-radius:50%;
+ display:grid;place-items:center;background:var(--cs-panel);color:var(--cs-ink);
+ border:1px solid var(--cs-accent);box-shadow:0 5px 20px rgba(0,0,0,.28);
+ font-size:20px;font-weight:700;cursor:grab;touch-action:none
+}
+.cs-workspace-bubble:active{cursor:grabbing}
+.cs-workspace-bubble[hidden]{display:none!important}
+.cs-toolbar-bubble{position:fixed;left:12px;top:78px;z-index:101}
+.cs-panel-reopen{position:fixed;z-index:100;border-radius:50%;width:48px;height:48px;padding:0;font-size:19px}
+.cs-reopen-library{left:12px;right:auto}
+.cs-reopen-inspector{right:12px;left:auto}
+.cs-library-panel.cs-panel-floating,.cs-properties-panel.cs-panel-floating{
+ position:absolute;top:12px;bottom:auto;z-index:42;width:min(360px,calc(100% - 24px));
+ max-height:min(68dvh,620px);height:auto;min-height:0;overflow:auto;
+ border:1px solid var(--cs-border);border-radius:14px;
+ box-shadow:0 12px 36px rgba(0,0,0,.28);background:var(--cs-panel)
+}
+.cs-library-panel.cs-panel-floating{left:12px;right:auto}
+.cs-properties-panel.cs-panel-floating{right:12px;left:auto}
+@media(max-width:620px){
+ .cs-library-panel.cs-panel-floating,.cs-properties-panel.cs-panel-floating{
+  left:8px;right:8px;top:8px;bottom:auto;width:auto;
+  max-height:64dvh;height:auto;min-height:0
+ }
+ .cs-properties-panel.cs-inspector-collapsed.cs-panel-floating{height:48px;min-height:48px;max-height:48px}
+ .cs-workspace-bubble,.cs-panel-reopen{width:46px;height:46px;min-width:46px;min-height:46px}
+}
+/* Mode bar is part of the single scroll track in Mini/Float. */
+.cs-toolbar-mode-hide{display:none}
+.cs-toolbar.cs-toolbar-mini{
+ flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;overflow-y:hidden;
+ white-space:nowrap;scrollbar-width:thin;max-width:100%
+}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-modebar{
+ flex:0 0 auto;padding:0;border:0;white-space:nowrap
+}
+.cs-toolbar.cs-toolbar-mini .cs-tool-group{flex:0 0 auto;flex-wrap:nowrap;white-space:nowrap}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-mini-actions{display:none!important}
+.cs-toolbar.cs-toolbar-mini:not(.cs-toolbar-expanded)>.cs-tool-group{display:flex}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-modebar .cs-toolbar-mode-label{display:none}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-modebar .cs-small-btn{padding:5px 8px}
+.cs-toolbar.cs-toolbar-mini .cs-tool-group{overflow:visible}
+.cs-toolbar.cs-toolbar-mini .cs-view-tools{flex:0 0 auto}
+.cs-toolbar.cs-toolbar-mini .cs-zoom-help{display:none}
+.cs-toolbar.cs-toolbar-floating{
+ position:fixed;top:78px;left:12px;right:auto;width:max-content;max-width:calc(100vw - 24px);
+ z-index:98;max-height:min(58dvh,520px);overflow:auto;resize:none;
+ border:1px solid var(--cs-border);border-radius:14px;box-shadow:0 10px 32px rgba(0,0,0,.28);
+ touch-action:pan-y
+}
+.cs-toolbar.cs-toolbar-floating:not(.cs-toolbar-expanded){width:max-content;max-width:calc(100vw - 24px)}
+.cs-toolbar.cs-toolbar-floating.cs-toolbar-expanded{left:12px;right:12px;width:auto}
+.cs-toolbar.cs-toolbar-floating.cs-toolbar-expanded .cs-tool-group{flex-wrap:wrap}
+.cs-toolbar.cs-toolbar-floating .cs-toolbar-modebar{flex:0 0 auto}
+.cs-toolbar.cs-toolbar-floating .cs-toolbar-mini-actions{display:flex}
+.cs-toolbar.cs-toolbar-floating .cs-toolbar-mode-label{display:none}
+.cs-toolbar.cs-toolbar-hidden{display:none!important}
+.cs-toolbar-modebar{flex:0 0 auto}
+.cs-toolbar-mini-actions{flex:0 0 auto}
+.cs-toolbar-modebar .cs-small-btn[aria-pressed=true]{background:var(--cs-accent);color:#fff;border-color:var(--cs-accent)}
+.cs-toolbar.cs-toolbar-mini:not(.cs-toolbar-expanded)>.cs-tool-group{display:flex}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-modebar{display:flex}
+.cs-toolbar.cs-toolbar-mini:not(.cs-modebar-open) .cs-toolbar-modebar .cs-toolbar-mode-label,
+.cs-toolbar.cs-toolbar-mini:not(.cs-modebar-open) .cs-toolbar-modebar #toolbarModeMini,
+.cs-toolbar.cs-toolbar-mini:not(.cs-modebar-open) .cs-toolbar-modebar #toolbarModeFull,
+.cs-toolbar.cs-toolbar-mini:not(.cs-modebar-open) .cs-toolbar-modebar #toolbarModeFloat,
+.cs-toolbar.cs-toolbar-mini:not(.cs-modebar-open) .cs-toolbar-modebar #toolbarModeHide{display:none}
+.cs-toolbar.cs-toolbar-mini:not(.cs-modebar-open) .cs-toolbar-modebar{display:none}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-mini-actions{display:flex!important;flex:0 0 auto;order:-1}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-mini-actions #miniExpand{display:none}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-mini-actions #toolbarModeMenu{display:inline-flex}
+.cs-toolbar.cs-toolbar-floating:not(.cs-toolbar-expanded) .cs-toolbar-mini-actions #miniExpand{display:inline-flex}
+.cs-toolbar.cs-toolbar-floating:not(.cs-toolbar-expanded) .cs-toolbar-modebar{display:none}
+.cs-toolbar.cs-toolbar-floating .cs-toolbar-mini-actions{display:flex!important}
+.cs-toolbar.cs-toolbar-floating.cs-toolbar-expanded .cs-toolbar-modebar{display:flex}
+.cs-toolbar.cs-toolbar-floating .cs-toolbar-mini-actions #toolbarModeMenu{display:inline-flex}
+.cs-toolbar.cs-toolbar-floating:not(.cs-toolbar-expanded)>.cs-tool-group{display:none}
+.cs-toolbar.cs-toolbar-mini.cs-modebar-open .cs-toolbar-modebar{display:flex}
+.cs-toolbar.cs-toolbar-mini.cs-modebar-open .cs-toolbar-mini-actions{order:0}
+@media(min-width:621px){
+ .cs-toolbar.cs-toolbar-full{overflow:visible;flex-wrap:wrap}
+ .cs-toolbar.cs-toolbar-full .cs-tool-group{flex-wrap:wrap;min-width:0}
+ .cs-toolbar.cs-toolbar-full .cs-toolbar-modebar{flex:0 0 100%}
+}
+
+.cs-toolbar-drag-handle{display:none;cursor:grab;touch-action:none}
+.cs-toolbar-drag-handle:active{cursor:grabbing}
+.cs-toolbar.cs-toolbar-floating .cs-toolbar-mini-actions #toolbarDragHandle{display:inline-flex}
+
+/* Full mode fits the frame by wrapping controls, never by sideways scrolling. */
+@media(min-width:621px){
+ .cs-toolbar:not(.cs-toolbar-mini):not(.cs-toolbar-floating):not(.cs-toolbar-hidden){
+  position:fixed;top:54px;left:50%;right:auto;transform:translateX(-50%);
+  width:min(96vw,1500px);max-height:min(42dvh,360px);
+  overflow-x:hidden;overflow-y:auto;flex-wrap:wrap;justify-content:flex-start
+ }
+ .cs-toolbar:not(.cs-toolbar-mini):not(.cs-toolbar-floating):not(.cs-toolbar-hidden) .cs-tool-group{
+  flex:0 1 auto;min-width:0;flex-wrap:wrap;overflow:visible
+ }
+}
+@media(max-width:620px){
+ .cs-toolbar:not(.cs-toolbar-mini):not(.cs-toolbar-floating):not(.cs-toolbar-hidden){
+  top:52px;left:8px;right:8px;transform:none;width:auto;
+  max-height:38dvh;overflow-x:hidden;overflow-y:auto;
+  flex-wrap:wrap;align-content:flex-start
+ }
+ .cs-toolbar:not(.cs-toolbar-mini):not(.cs-toolbar-floating):not(.cs-toolbar-hidden) .cs-tool-group{
+  flex:0 1 auto;min-width:0;max-width:100%;flex-wrap:wrap;overflow:visible
+ }
+}
+
+
+/* Final dock-and-bubble workspace policy: no floating panels or toolbar. */
+.cs-toolbar.cs-toolbar-full{
+ position:relative!important;top:auto!important;left:auto!important;right:auto!important;
+ transform:none!important;width:100%!important;max-width:100%;max-height:min(38dvh,440px);
+ overflow-x:hidden!important;overflow-y:auto!important;flex-wrap:wrap!important;
+ align-content:flex-start;justify-content:flex-start;z-index:5;border-radius:0;box-shadow:none
+}
+.cs-toolbar.cs-toolbar-full .cs-toolbar-modebar{flex:0 0 100%;white-space:normal}
+.cs-toolbar.cs-toolbar-full .cs-tool-group{flex:0 1 auto;min-width:0;max-width:100%;flex-wrap:wrap;overflow:visible}
+.cs-toolbar.cs-toolbar-mini{
+ position:relative!important;top:auto!important;left:auto!important;right:auto!important;
+ transform:none!important;width:100%!important;max-width:100%;height:auto;max-height:58px;
+ flex-wrap:nowrap!important;justify-content:flex-start;overflow-x:auto!important;overflow-y:hidden!important;
+ white-space:nowrap;scrollbar-width:thin;z-index:5;border-radius:0;box-shadow:none
+}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-modebar{flex:0 0 auto!important;white-space:nowrap;border:0;padding:0}
+.cs-toolbar.cs-toolbar-mini .cs-tool-group{display:flex!important;flex:0 0 auto!important;flex-wrap:nowrap!important;white-space:nowrap;max-width:none;overflow:visible}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-mini-actions{display:none!important}
+.cs-toolbar.cs-toolbar-hidden{display:none!important}
+.cs-toolbar-bubble{position:fixed!important;z-index:120!important}
+.cs-library-panel.cs-panel-floating,.cs-properties-panel.cs-panel-floating{position:relative!important;inset:auto!important;width:auto!important;max-height:none!important;height:auto!important;box-shadow:none!important;border-radius:0!important}
+.cs-library-panel.cs-panel-hidden,.cs-properties-panel.cs-panel-hidden{display:none!important}
+.cs-workspace.cs-library-hidden{grid-template-columns:minmax(0,1fr) 290px}
+.cs-workspace.cs-inspector-hidden{grid-template-columns:245px minmax(0,1fr)}
+.cs-workspace.cs-library-hidden.cs-inspector-hidden{grid-template-columns:minmax(0,1fr)}
+@media(min-width:901px){
+ .cs-workspace.cs-library-hidden{grid-template-columns:0 minmax(0,1fr) 290px}
+ .cs-workspace.cs-inspector-hidden{grid-template-columns:245px minmax(0,1fr)}
+ .cs-workspace.cs-library-hidden.cs-inspector-hidden{grid-template-columns:minmax(0,1fr)}
+}
+@media(min-width:621px) and (max-width:900px){
+ .cs-workspace.cs-library-hidden{grid-template-columns:minmax(0,1fr) 260px}
+ .cs-workspace.cs-inspector-hidden{grid-template-columns:245px minmax(0,1fr)}
+ .cs-workspace.cs-library-hidden.cs-inspector-hidden{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:620px){
+ .cs-toolbar.cs-toolbar-full{max-height:36dvh}
+ .cs-toolbar.cs-toolbar-mini{height:48px;max-height:48px}
+ .cs-workspace{display:flex!important;flex-direction:column;min-height:0}
+ .cs-library-panel,.cs-properties-panel{position:relative!important;inset:auto!important;display:block;width:100%;max-height:35dvh;min-height:0;flex:0 0 auto;overflow:auto;border-radius:0!important;box-shadow:none!important}
+ .cs-library-panel.cs-panel-hidden,.cs-properties-panel.cs-panel-hidden{display:none!important}
+ .cs-canvas-panel{position:relative;inset:auto;width:100%;min-height:48dvh;flex:1 1 auto}
+ .cs-canvas-wrap{position:relative;inset:auto;width:100%;min-height:42dvh;flex:1 1 auto}
+ .cs-panel-reopen{position:fixed!important;z-index:120!important}
+}
+
+
+/* Screenshot follow-up: keep project actions inside the toolbar and make every mode reachable. */
+.cs-app{position:relative}
+.cs-toolbar.cs-toolbar-full,.cs-toolbar.cs-toolbar-mini{
+ position:relative!important;inset:auto!important;transform:none!important;
+ margin:0!important
+}
+.cs-toolbar .cs-toolbar-modebar{
+ display:flex!important;visibility:visible!important;opacity:1!important;
+ flex:0 0 auto!important;align-items:center;gap:6px;order:0
+}
+.cs-toolbar.cs-toolbar-full .cs-toolbar-modebar{flex:0 0 100%!important}
+.cs-toolbar.cs-toolbar-full .cs-toolbar-modebar button{display:inline-flex!important}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-modebar{flex:0 0 auto!important}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-modebar button{display:inline-flex!important}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-modebar .cs-toolbar-mode-label{display:inline!important}
+.cs-toolbar.cs-toolbar-full .cs-tool-group{display:flex!important}
+.cs-toolbar.cs-toolbar-mini .cs-tool-group{display:flex!important}
+.cs-toolbar .cs-project-actions-row{
+ position:relative!important;inset:auto!important;transform:none!important;
+ flex:0 0 100%;width:100%;max-width:none;min-width:0;margin:0;
+ display:flex;align-items:center;justify-content:space-between;gap:8px;
+ border-radius:8px;box-shadow:none;backdrop-filter:none
+}
+.cs-toolbar .cs-project-actions-row>div:first-child{min-width:0;display:flex;flex-direction:column}
+.cs-toolbar .cs-project-actions-row .cs-canvas-actions{display:flex;align-items:center;flex-wrap:nowrap;gap:6px}
+.cs-toolbar.cs-toolbar-mini .cs-project-actions-row{
+ flex:0 0 auto!important;width:auto!important;max-width:none!important;
+ flex-wrap:nowrap!important;white-space:nowrap;padding:0 6px
+}
+.cs-toolbar.cs-toolbar-mini .cs-project-actions-row>div:first-child{display:none!important}
+.cs-toolbar.cs-toolbar-mini .cs-project-actions-row .cs-canvas-actions{flex-wrap:nowrap!important;white-space:nowrap}
+.cs-toolbar.cs-toolbar-mini .cs-project-actions-row .cs-small-btn{flex:0 0 auto}
+.cs-toolbar-bubble{
+ position:absolute!important;top:8px!important;right:12px!important;left:auto!important;
+ z-index:140!important;margin:0!important
+}
+.cs-toolbar.cs-toolbar-hidden{display:none!important}
+@media(max-width:620px){
+ .cs-toolbar.cs-toolbar-full{max-height:42dvh!important;overflow-x:hidden!important;overflow-y:auto!important}
+ .cs-toolbar.cs-toolbar-full .cs-toolbar-modebar{flex:0 0 100%!important}
+ .cs-toolbar.cs-toolbar-mini{max-height:54px!important;height:54px!important}
+ .cs-toolbar.cs-toolbar-mini .cs-toolbar-modebar .cs-toolbar-mode-label{display:none!important}
+ .cs-toolbar.cs-toolbar-mini .cs-project-actions-row{height:44px}
+ .cs-toolbar.cs-toolbar-mini .cs-project-actions-row .cs-canvas-actions{gap:4px}
+ .cs-toolbar.cs-toolbar-mini .cs-project-actions-row .cs-small-btn{padding:5px 7px;font-size:12px}
+ /* Mobile dock order: canvas, inspector, then components library. */
+ .cs-workspace{display:flex!important;flex-direction:column!important}
+ .cs-canvas-panel{order:1!important}
+ .cs-properties-panel{order:2!important}
+ .cs-library-panel{order:3!important}
+ .cs-library-panel:not(.cs-panel-hidden),.cs-properties-panel:not(.cs-panel-hidden){
+  position:relative!important;inset:auto!important;left:auto!important;right:auto!important;
+  bottom:auto!important;top:auto!important;width:100%!important;max-height:32dvh!important;
+  flex:0 0 auto!important;z-index:4!important
+ }
+ .cs-library-panel.cs-panel-hidden,.cs-properties-panel.cs-panel-hidden{display:none!important}
+ .cs-panel-reopen{position:fixed!important;z-index:130!important}
+}
+
+
+/* Stable toolbar mode controls and status row outside the drawing surface. */
+#toolbarModeBar{
+ position:relative!important;inset:auto!important;transform:none!important;
+ display:flex!important;visibility:visible!important;opacity:1!important;
+ align-items:center;justify-content:flex-start;gap:7px;flex-wrap:wrap;
+ width:100%;max-width:100%;min-height:42px;margin:0;padding:5px 12px;
+ background:var(--cs-panel);border-bottom:1px solid var(--cs-border);
+ z-index:8
+}
+#toolbarModeBar[hidden]{display:none!important}
+#toolbarModeBar .cs-toolbar-mode-label{display:inline!important}
+#toolbarModeBar button{display:inline-flex!important;visibility:visible!important;opacity:1!important}
+.cs-toolbar-bubble{
+ position:absolute!important;top:4px!important;right:12px!important;left:auto!important;
+ z-index:140!important;margin:0!important;align-self:flex-end
+}
+.cs-toolbar-bubble[hidden]{display:none!important}
+.cs-statusbar{
+ position:relative!important;inset:auto!important;transform:none!important;
+ grid-column:1/-1!important;grid-row:auto!important;order:4!important;
+ width:100%;max-width:100%;margin:0!important;flex:0 0 auto!important;
+ z-index:2
+}
+@media(min-width:621px){
+ .cs-workspace{align-items:stretch}
+ .cs-statusbar{display:flex;justify-content:space-between}
+}
+@media(max-width:620px){
+ .cs-app{display:flex;flex-direction:column;min-height:calc(100dvh - 70px)}
+ #toolbarModeBar{min-height:40px;padding:4px 10px;gap:5px;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;white-space:nowrap}
+ #toolbarModeBar .cs-toolbar-mode-label{flex:0 0 auto;font-size:11px}
+ #toolbarModeBar button{flex:0 0 auto;min-height:32px}
+ .cs-toolbar-bubble{top:2px!important;right:10px!important}
+ .cs-workspace{order:3!important}
+ .cs-statusbar{order:4!important;display:flex!important;flex-wrap:wrap;gap:5px;justify-content:space-between;padding:8px 12px!important}
+ .cs-statusbar>span:nth-child(2){display:none!important}
+}
+
+
+/* Final viewport-safe layout: toolbar modes stay reachable, bubbles stay below site nav. */
+.cs-app{
+ height:calc(100dvh - 64px)!important;min-height:0!important;
+ overflow:hidden!important;display:flex!important;flex-direction:column!important;
+ position:relative!important
+}
+#toolbarModeBar{
+ position:relative!important;display:flex!important;visibility:visible!important;
+ opacity:1!important;inset:auto!important;transform:none!important;
+ flex:0 0 auto!important;width:100%!important;max-width:100%!important;
+ min-height:40px!important;height:auto!important;max-height:none!important;
+ overflow:visible!important;flex-wrap:wrap!important;white-space:normal!important;
+ padding:4px 12px!important;z-index:20!important
+}
+#toolbarModeBar[hidden]{display:none!important}
+#toolbarModeBar button{display:inline-flex!important;visibility:visible!important;opacity:1!important;flex:0 0 auto!important}
+.cs-toolbar.cs-toolbar-full,.cs-toolbar.cs-toolbar-mini{
+ position:relative!important;inset:auto!important;transform:none!important;
+ flex:0 0 auto!important;width:100%!important;max-width:100%!important;
+ margin:0!important;z-index:5!important
+}
+.cs-toolbar.cs-toolbar-full{
+ max-height:min(34dvh,390px)!important;overflow-x:hidden!important;overflow-y:auto!important;
+ flex-wrap:wrap!important;align-content:flex-start!important
+}
+.cs-toolbar.cs-toolbar-full .cs-tool-group{display:flex!important;flex:0 1 auto!important;min-width:0!important;max-width:100%!important;flex-wrap:wrap!important}
+.cs-toolbar.cs-toolbar-mini{
+ height:52px!important;max-height:52px!important;overflow-x:auto!important;overflow-y:hidden!important;
+ flex-wrap:nowrap!important;white-space:nowrap!important;justify-content:flex-start!important
+}
+.cs-toolbar.cs-toolbar-mini .cs-tool-group{display:flex!important;flex:0 0 auto!important;flex-wrap:nowrap!important;white-space:nowrap!important;max-width:none!important}
+.cs-toolbar.cs-toolbar-mini .cs-project-actions-row{flex:0 0 auto!important;width:auto!important;max-width:none!important;white-space:nowrap!important}
+.cs-toolbar.cs-toolbar-hidden{display:none!important}
+.cs-toolbar-bubble{
+ position:fixed!important;top:calc(64px + env(safe-area-inset-top,0px) + 8px)!important;
+ left:auto!important;right:12px!important;bottom:auto!important;transform:none!important;
+ z-index:999!important;width:44px!important;height:44px!important;
+ display:grid!important;place-items:center!important
+}
+.cs-toolbar-bubble[hidden]{display:none!important}
+.cs-workspace{
+ position:relative!important;flex:1 1 0!important;min-height:0!important;
+ height:auto!important;max-height:none!important;overflow:hidden!important
+}
+.cs-canvas-panel{min-height:0!important;height:100%!important}
+.cs-canvas-wrap{min-height:0!important;height:100%!important;flex:1 1 0!important}
+.cs-statusbar{position:relative!important;flex:0 0 auto!important;inset:auto!important;transform:none!important;order:4!important}
+.cs-panel-reopen{
+ position:fixed!important;z-index:998!important;bottom:auto!important;
+ width:46px!important;height:46px!important;min-width:46px!important;min-height:46px!important
+}
+.cs-panel-reopen[hidden]{display:none!important}
+@media(max-width:620px){
+ .cs-app{height:calc(100dvh - 64px - env(safe-area-inset-bottom,0px))!important;min-height:0!important}
+ #toolbarModeBar{min-height:40px!important;max-height:none!important;flex-wrap:nowrap!important;overflow-x:auto!important;overflow-y:hidden!important;white-space:nowrap!important;padding:4px 8px!important}
+ #toolbarModeBar .cs-toolbar-mode-label{flex:0 0 auto!important}
+ #toolbarModeBar button{min-height:32px!important}
+ .cs-toolbar.cs-toolbar-full{max-height:30dvh!important}
+ .cs-toolbar.cs-toolbar-mini{height:48px!important;max-height:48px!important}
+ .cs-workspace{display:flex!important;flex:1 1 0!important;min-height:0!important;flex-direction:column!important;overflow:hidden!important}
+ .cs-canvas-panel{order:1!important;flex:1 1 0!important;min-height:0!important;height:auto!important}
+ .cs-properties-panel{order:2!important;flex:0 1 auto!important;max-height:24dvh!important;min-height:0!important}
+ .cs-library-panel{order:3!important;flex:0 1 auto!important;max-height:24dvh!important;min-height:0!important}
+ .cs-library-panel:not(.cs-panel-hidden),.cs-properties-panel:not(.cs-panel-hidden){
+  position:relative!important;inset:auto!important;width:100%!important;max-height:24dvh!important;
+  flex:0 1 auto!important;z-index:4!important;overflow:auto!important
+ }
+ .cs-canvas-wrap{height:100%!important;min-height:0!important;flex:1 1 0!important}
+ .cs-statusbar{display:flex!important;flex-wrap:wrap!important;padding:6px 10px!important}
+ .cs-toolbar-bubble{top:calc(64px + env(safe-area-inset-top,0px) + 6px)!important;right:10px!important}
+}
+
+
+/* Keep the mode strip and toolbar inside the app viewport, below the fixed site navigation. */
+@media(min-width:621px){
+ .cs-app{position:fixed!important;top:54px!important;left:0!important;right:0!important;bottom:0!important;width:100vw!important;height:auto!important;min-height:0!important}
+ #toolbarModeBar{position:relative!important;top:auto!important;left:auto!important;right:auto!important;z-index:12!important;flex:0 0 auto!important}
+ .cs-toolbar.cs-toolbar-full,.cs-toolbar.cs-toolbar-mini{position:relative!important;top:auto!important;left:auto!important;right:auto!important;transform:none!important}
+ .cs-toolbar-bubble{position:fixed!important;top:62px!important;right:14px!important;left:auto!important;z-index:1000!important}
+}
+@media(min-width:621px) and (max-width:900px){
+ .cs-app{top:54px!important;height:auto!important}
+ #toolbarModeBar{width:100%!important;max-width:100%!important;overflow:visible!important;flex-wrap:wrap!important}
+ .cs-toolbar.cs-toolbar-full{max-height:34dvh!important;overflow-x:hidden!important;overflow-y:auto!important}
+}
+@media(max-width:620px){
+ .cs-app{top:48px!important;left:0!important;right:0!important;bottom:0!important;width:100vw!important;height:auto!important;min-height:0!important}
+ #toolbarModeBar{position:relative!important;top:auto!important;left:auto!important;right:auto!important;z-index:12!important;flex:0 0 auto!important}
+ .cs-toolbar.cs-toolbar-full,.cs-toolbar.cs-toolbar-mini{position:relative!important;top:auto!important;left:auto!important;right:auto!important;transform:none!important}
+ .cs-toolbar-bubble{position:fixed!important;top:56px!important;right:10px!important;left:auto!important;z-index:1000!important}
+}
+
+
+/* Mobile-only final correction: reopen bubbles live outside the clipped workspace. */
+@media(max-width:620px){
+ .cs-app{display:flex!important;flex-direction:column!important;overflow:visible!important}
+ .cs-workspace{position:relative!important;display:flex!important;flex:1 1 0!important;
+  min-height:0!important;height:auto!important;max-height:none!important;overflow:hidden!important;
+  order:3!important}
+ .cs-canvas-panel{position:relative!important;order:1!important;flex:1 1 0!important;
+  min-height:0!important;height:auto!important;overflow:hidden!important}
+ .cs-canvas-wrap{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+  min-height:0!important;flex:1 1 0!important}
+ .cs-properties-panel:not(.cs-panel-hidden){order:2!important;flex:0 1 auto!important;
+  min-height:0!important;max-height:21dvh!important;overflow-y:auto!important}
+ .cs-library-panel:not(.cs-panel-hidden){order:3!important;flex:0 1 auto!important;
+  min-height:0!important;max-height:21dvh!important;overflow-y:auto!important}
+ .cs-statusbar{
+  position:relative!important;display:flex!important;order:10!important;
+  flex:0 0 auto!important;width:100%!important;min-height:34px!important;
+  margin:0!important;padding:5px 10px!important;inset:auto!important;
+  transform:none!important;z-index:3!important;align-items:center!important
+ }
+ .cs-statusbar #selectionStatus{flex:1 1 auto!important;min-width:0!important}
+ .cs-statusbar #coordinateStatus{flex:0 0 auto!important;white-space:nowrap!important}
+ .cs-panel-reopen{
+  position:fixed!important;display:grid!important;place-items:center!important;
+  z-index:1600!important;width:48px!important;height:48px!important;
+  min-width:48px!important;min-height:48px!important;border-radius:50%!important;
+  pointer-events:auto!important;touch-action:manipulation!important
+ }
+ .cs-panel-reopen[hidden]{display:none!important}
+ .cs-reopen-library{left:12px!important;right:auto!important}
+ .cs-reopen-inspector{left:auto!important;right:12px!important}
+}
+
+
+/* Mobile workspace recovery: explicit rows prevent the canvas collapsing to zero height. */
+@media(max-width:620px){
+ .cs-app{
+  position:fixed!important;top:48px!important;right:0!important;bottom:0!important;left:0!important;
+  width:100vw!important;height:auto!important;min-height:0!important;max-height:none!important;
+  box-sizing:border-box!important;display:grid!important;
+  grid-template-rows:auto auto minmax(160px,1fr) auto!important;
+  grid-template-columns:minmax(0,1fr)!important;align-content:stretch!important;
+  gap:0!important;overflow:hidden!important
+ }
+ #toolbarModeBar{grid-row:1!important;grid-column:1!important;order:0!important}
+ #circuitToolbar{grid-row:2!important;grid-column:1!important;order:0!important;
+  max-height:25dvh!important;min-height:0!important}
+ #showToolbarBubble{position:fixed!important}
+ #circuitWorkspace{
+  grid-row:3!important;grid-column:1!important;order:0!important;
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+  grid-template-rows:minmax(160px,1fr) minmax(0,17dvh) minmax(0,17dvh)!important;
+  flex:initial!important;width:100%!important;height:100%!important;min-height:0!important;
+  max-height:none!important;overflow:hidden!important;position:relative!important
+ }
+ #circuitWorkspace>.cs-canvas-panel{
+  grid-row:1!important;grid-column:1!important;order:0!important;
+  display:block!important;position:relative!important;width:100%!important;height:100%!important;
+  min-height:160px!important;max-height:none!important;min-width:0!important;
+  flex:initial!important;overflow:hidden!important
+ }
+ #canvasWrap{
+  position:absolute!important;inset:0!important;display:block!important;
+  width:100%!important;height:100%!important;min-height:0!important;
+  max-height:none!important;flex:initial!important;overflow:hidden!important
+ }
+ #circuitCanvas{display:block!important;width:100%!important;height:100%!important;min-height:0!important}
+ #circuitWorkspace>#propertiesPanel:not(.cs-panel-hidden){
+  grid-row:2!important;grid-column:1!important;order:0!important;
+  display:block!important;position:relative!important;inset:auto!important;
+  width:100%!important;height:100%!important;min-height:0!important;max-height:none!important;
+  flex:initial!important;overflow:auto!important;z-index:5!important
+ }
+ #circuitWorkspace>#componentLibraryPanel:not(.cs-panel-hidden){
+  grid-row:3!important;grid-column:1!important;order:0!important;
+  display:block!important;position:relative!important;inset:auto!important;
+  width:100%!important;height:100%!important;min-height:0!important;max-height:none!important;
+  flex:initial!important;overflow:auto!important;z-index:5!important
+ }
+ #propertiesPanel.cs-panel-hidden,#componentLibraryPanel.cs-panel-hidden{display:none!important}
+ #circuitWorkspace:has(#propertiesPanel.cs-panel-hidden){grid-template-rows:minmax(160px,1fr) minmax(0,17dvh) minmax(0,17dvh)!important}
+ #circuitWorkspace:has(#componentLibraryPanel.cs-panel-hidden){grid-template-rows:minmax(160px,1fr) minmax(0,17dvh) minmax(0,17dvh)!important}
+ #circuitWorkspace:has(#propertiesPanel.cs-panel-hidden):has(#componentLibraryPanel.cs-panel-hidden){grid-template-rows:minmax(160px,1fr)!important}
+ .cs-statusbar{
+  grid-row:4!important;grid-column:1!important;order:0!important;
+  display:flex!important;position:relative!important;width:100%!important;height:auto!important;
+  min-height:34px!important;max-height:42px!important;flex:initial!important;
+  margin:0!important;padding:5px 10px!important;inset:auto!important;
+  transform:none!important;overflow:hidden!important;z-index:5!important
+ }
+ .cs-statusbar>span:nth-child(2){display:none!important}
+ .cs-statusbar #selectionStatus{min-width:0!important;flex:1 1 auto!important}
+ .cs-statusbar #coordinateStatus{white-space:nowrap!important;flex:0 0 auto!important}
+ .cs-selection-toolbar{position:absolute!important;top:6px!important;left:6px!important;right:6px!important;z-index:20!important}
+}
+
+
+@media(max-width:620px){
+ #circuitWorkspace:has(#propertiesPanel.cs-panel-hidden):not(:has(#componentLibraryPanel.cs-panel-hidden)){
+  grid-template-rows:minmax(160px,1fr) minmax(0,17dvh)!important
+ }
+ #circuitWorkspace:has(#propertiesPanel.cs-panel-hidden):not(:has(#componentLibraryPanel.cs-panel-hidden)) #componentLibraryPanel{
+  grid-row:2!important
+ }
+ #circuitWorkspace:has(#componentLibraryPanel.cs-panel-hidden):not(:has(#propertiesPanel.cs-panel-hidden)){
+  grid-template-rows:minmax(160px,1fr) minmax(0,17dvh)!important
+ }
+ #circuitWorkspace:has(#componentLibraryPanel.cs-panel-hidden):not(:has(#propertiesPanel.cs-panel-hidden)) #propertiesPanel{
+  grid-row:2!important
+ }
+}
+
+
+/* Mobile selection actions: cancel the inherited half-width translate that pushed the bar off-screen. */
+@media(max-width:620px){
+ .cs-selection-toolbar{
+  left:50%!important;right:auto!important;transform:translateX(-50%)!important;
+  width:max-content!important;max-width:calc(100vw - 20px)!important;
+  box-sizing:border-box!important;justify-content:center!important;
+  overflow-x:auto!important;overflow-y:hidden!important
+ }
+}

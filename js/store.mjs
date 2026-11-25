@@ -37,9 +37,9 @@ if (typeof window !== 'undefined' &&
 const PRODUCTS_CACHE_KEY = 'eazylife_products_v1';
 const PRODUCTS_CACHE_MS = 5 * 60 * 1000;
 
-export async function getProducts() {
+export async function getProducts({ forceRefresh = false } = {}) {
   const isAdminPage = typeof location !== 'undefined' && location.pathname.includes('/admin/');
-  if (!isAdminPage) {
+  if (!isAdminPage && !forceRefresh) {
     try {
       const cached = JSON.parse(sessionStorage.getItem(PRODUCTS_CACHE_KEY) || 'null');
       if (cached && Array.isArray(cached.items) && Date.now() - cached.at < PRODUCTS_CACHE_MS) return cached.items;
