@@ -7,7 +7,8 @@ A public, browser-based schematic illustration editor for creating, refining and
 ## Product decisions
 
 - Public visitors can draw and export without an account.
-- Anonymous drafts are stored locally in browser localStorage (with an IndexedDB upgrade planned); portable JSON import/export is the cross-device workflow for the first release.
+- Public visitors cannot save or restore editable project files locally and cannot import or export project JSON. They can export finished diagrams as visual files (SVG, PNG, JPG) or PDF.
+- The editable project format remains internal to the editor and private admin library; public exports are visual deliverables, not a project interchange workflow.
 - Published component assets and curated diagrams are managed through the existing EazyLife admin and Firebase project.
 - Both engineering schematic conventions (IEC/ANSI variants) and educational presentation styles are supported.
 - Circuit data is structured JSON. SVG is a generated output, never the sole editable source.
@@ -59,10 +60,10 @@ A production admin upload path must use a stricter sanitizer and server-side val
 
 ## Planned stages
 
-1. **Editor foundation:** responsive SVG workspace, grid, zoom, pan, searchable component library, placement, selection, transforms, properties, basic SVG/JSON export and local draft save.
+1. **Editor foundation:** responsive SVG workspace, grid, zoom, pan, searchable component library, placement, selection, transforms, properties and visual SVG/PNG/JPG/PDF export.
 2. **Component refinement:** visual shape/path editor, live SVG source editor, pin editor, component preview/testing, version-aware component definitions.
 3. **Wiring engine:** pin snapping, orthogonal routing, junctions, crossing rules, wire editing and undo/redo coverage.
-4. **Project persistence:** IndexedDB drafts, import/export validation, autosave, project metadata and recovery.
+4. **Private project persistence:** admin-only cloud save/open, project metadata and recovery. Public local drafts and project-file import/export are intentionally excluded.
 5. **Firebase/admin:** additive Firestore collections, admin component CRUD/versioning, publication workflow, security rules and asset validation.
 6. **Hosted diagrams:** stable slugs, published SVG delivery, version-pinned and latest-version embeds, usage tracking.
 7. **Quality and integration:** mobile/touch testing, accessibility, theme checks, STEM module embedding and regression testing.
@@ -75,7 +76,8 @@ A production admin upload path must use a stricter sanitizer and server-side val
 - Pin coordinates can be adjusted independently from artwork.
 - Artwork can be edited as SVG markup with live preview and validation.
 - Wires connect defined pins and export correctly.
-- Projects can be saved locally, exported as JSON and imported.
+- Public visitors can export visual diagrams as SVG, PNG, JPG and PDF, but cannot save editable drafts or import/export project JSON.
+- The authorized admin can save and reopen projects in the private cloud library.
 - SVG export is standalone and excludes editor-only UI.
 - Mobile, dark theme and light theme remain usable.
 - No existing site page, Firestore collection or admin workflow is changed by the editor foundation.
@@ -120,9 +122,9 @@ The current routing stage uses a generated orthogonal route between endpoints. M
 
 ## Private named project library (2026-11-21)
 
-- The public editor remains open to visitors. Anonymous users retain local browser drafts and portable JSON import/export.
+- The public editor remains open to visitors, but editable project persistence and project-file interchange are intentionally unavailable to public users. Public visitors can export visual files and PDF only.
 - When the authorized EazyLife admin account (damzyeazy@gmail.com) is signed in, the toolbar exposes **Save to my circuits** and **Open saved**.
 - Named designs are stored as structured project JSON in the additive Firestore collection `circuitStudioProjects`; the collection is admin-read/write only in Firestore rules. Public component and published-diagram access is unchanged.
 - Admin can save/update the currently opened project, save a named copy, reopen saved work and delete private records. Save timestamps and title are stored with the project.
-- SVG remains a clean visual export and is not the native editable project interchange. Use JSON or the private project library to preserve component instances, wire endpoints/routes, junctions, labels, style and capture bounds. Exported SVG intentionally excludes selection/hit-area overlays and editor controls.
+- SVG, PNG and JPG are visual exports, not editable project files. Editable project data is retained only in the private admin library. Exported artwork intentionally excludes selection/hit-area overlays and editor controls.
 - Deploy the additive `circuitStudioProjects` rule to Firebase before testing cloud save/open. Never make this collection publicly readable.
