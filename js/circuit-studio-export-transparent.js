@@ -276,12 +276,14 @@ function syncWorkspacePanels(){
   b.show.hidden=!hidden;b.hide.textContent='Hide';b.float.textContent=floating?'Dock':'Float';
   b.float.setAttribute('aria-label',floating?'Dock '+key+' panel beside canvas':'Float '+key+' panel over canvas');
  }
+ workspacePrefs.panels={library:{hidden:libraryPanel.classList.contains('cs-panel-hidden'),floating:libraryPanel.classList.contains('cs-panel-floating')},inspector:{hidden:propertiesPanel.classList.contains('cs-panel-hidden'),floating:propertiesPanel.classList.contains('cs-panel-floating'),collapsed:propertiesPanel.classList.contains('cs-inspector-collapsed')}};
+ saveWorkspacePrefs();
 }
 function setWorkspacePanel(key,action){
  const panel=key==='library'?libraryPanel:propertiesPanel;
  if(!panel)return;
- if(action==='hide'){panel.classList.add('cs-panel-hidden');panel.classList.remove('cs-panel-floating')}
- else if(action==='show'){panel.classList.remove('cs-panel-hidden');panel.classList.add('cs-panel-floating')}
+ if(action==='hide'){panel.classList.add('cs-panel-hidden')}
+ else if(action==='show'){panel.classList.remove('cs-panel-hidden');if(workspacePrefs.panels?.[key]?.floating)panel.classList.add('cs-panel-floating')}
  else if(action==='float'){panel.classList.toggle('cs-panel-floating');panel.classList.remove('cs-panel-hidden')}
  syncWorkspacePanels();
 }
@@ -291,3 +293,31 @@ for(const [key,b] of Object.entries(panelButtons)){
  b.float?.addEventListener('click',()=>setWorkspacePanel(key,'float'));
 }
 syncWorkspacePanels();
+
+
+// Persist workspace layout locally, separate from the admin-only circuit draft.
+const WORKSPACE_PREF_KEY='eazylife-circuit-workspace-v1';
+const toolbar=$('circuitToolbar'),modeButtons={mini:$('toolbarModeMini'),full:$('toolbarModeFull'),float:$('toolbarModeFloat')};
+const miniActions={new:$('miniNew'),select:$('miniSelect'),connect:$('miniConnect'),undo:$('miniUndo'),redo:$('miniRedo'),expand:$('miniExpand')};
+function readWorkspacePrefs(){try{return JSON.parse(localStorage.getItem(WORKSPACE_PREF_KEY)||'{}')}catch{return{}}}
+let workspacePrefs=readWorkspacePrefs();
+function saveWorkspacePrefs(){try{localStorage.setItem(WORKSPACE_PREF_KEY,JSON.stringify(workspacePrefs))}catch(e){/* Workspace preferences are optional if browser storage is blocked. */}}
+function setToolbarMode(mode,expanded=workspacePrefs.toolbarExpanded===true){
+ if(!['mini','full','float'].includes(mode))mode='full';
+ toolbar.classList.toggle('cs-toolbar-mini',mode==='mini'||mode==='float');
+ toolbar.classList.toggle('cs-toolbar-floating',mode==='float');
+ toolbar.classList.toggle('cs-toolbar-expanded',mode==='full'||expanded);
+ for(const [key,button] of Object.entries(modeButtons))button.setAttribute('aria-pressed',String(key===mode));
+ miniActions.expand.textContent=expanded?'Less ▴':'More ▾';miniActions.expand.setAttribute('aria-expanded',String(expanded));
+ workspacePrefs.toolbarMode=mode;workspacePrefs.toolbarExpanded=expanded;saveWorkspacePrefs();
+}
+modeButtons.mini.addEventListener('click',()=>setToolbarMode('mini',false));
+modeButtons.full.addEventListener('click',()=>setToolbarMode('full',true));
+modeButtons.float.addEventListener('click',()=>setToolbarMode('float',false));
+miniActions.expand.addEventListener('click',()=>setToolbarMode(workspacePrefs.toolbarMode,!(toolbar.classList.contains('cs-toolbar-expanded'))));
+miniActions.new.addEventListener('click',()=>$('newProject').click());
+miniActions.select.addEventListener('click',()=>$('toolSelect').click());
+miniActions.connect.addEventListener('click',()=>$('toolConnect').click());
+miniActions.undo.addEventListener('click',()=>$('undo').click());
+miniActions.redo.addEventListener('click',()=>$('redo').click());
+setToolbarMode(workspacePrefs.toolbarMode||'full',workspacePrefs.toolbarExpanded===true);
