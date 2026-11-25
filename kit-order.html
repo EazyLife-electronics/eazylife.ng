@@ -94,7 +94,8 @@ $('submit').addEventListener('click',async()=>{
  const name=$('customerName').value.trim(),phone=$('phone').value.trim(),address=$('address').value.trim(),items=selected();
  if(!name||!phone||!address)return showError('Please enter your name, phone number and delivery address.');
  if(!$('terms').checked)return showError('Please confirm that you understand the availability and fulfilment terms.');
- if(unresolvedLinks)return showError('Some saved project components could not be matched to the catalogue. Please contact EazyLife to repair the links before submitting.');\n if(!items.length)return showError('Select at least one component.');
+ if(unresolvedLinks)return showError('Some saved project components could not be matched to the catalogue. Please contact EazyLife to repair the links before submitting.');\n if(unresolvedLinks)return showError('Some saved project components could not be matched to the catalogue. Please contact EazyLife to repair the links before submitting.');
+ if(!items.length)return showError('Select at least one component.');
  const btn=$('submit');btn.disabled=true;btn.textContent='Submitting...';$('error').classList.add('hidden');
  const orderItems=items.map(x=>({productId:x.product.id,variantId:x.variantData.id,sku:x.variantData.sku||'',name:x.product.name,variant:variantLabel(x.variantData,x.product.variants.findIndex(v=>v.id===x.variantData.id)),price:unitPrice(x.variantData),quantity:x.quantity,required:x.required!==false}));
  const subtotal=orderItems.reduce((n,x)=>n+x.price*x.quantity,0);
