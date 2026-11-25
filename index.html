@@ -554,14 +554,22 @@
     .theme-toggle { width: 38px; height: 38px; border-radius: 999px; border: 1.5px solid var(--border); background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.95rem; color: var(--dark); }
     :root[data-theme="dark"] .theme-toggle { background: var(--dm-surface); border-color: var(--dm-border); color: var(--dm-text); }
     /* STEM LAB FEATURE — isolated homepage invitation */
-    .stem-teaser { padding: 34px 0; background: linear-gradient(120deg, #e8faf5, #f2f9e4); border-top: 1px solid #dcefe5; border-bottom: 1px solid #dcefe5; }
+    .stem-teaser { padding: 28px 0; background: linear-gradient(120deg, #e8faf5, #f2f9e4); border-top: 1px solid #dcefe5; border-bottom: 1px solid #dcefe5; }
     .stem-teaser-inner { display:flex; align-items:center; justify-content:space-between; gap:24px; }
-    .stem-teaser-inner h2 { font-family:'Poppins',sans-serif; color:var(--dark); font-size:clamp(1.25rem,2.4vw,1.8rem); line-height:1.25; margin:5px 0 8px; }
-    .stem-teaser-inner p { color:var(--text-light); font-size:.88rem; max-width:650px; margin:0; }
+    .stem-teaser-inner > div { min-width:0; }
+    .stem-teaser-inner h2 { font-family:'Poppins',sans-serif; color:var(--dark); font-size:clamp(1.2rem,2.2vw,1.65rem); line-height:1.25; margin:4px 0 6px; }
+    .stem-teaser-inner p { color:var(--text-light); font-size:.85rem; line-height:1.55; max-width:590px; margin:0; }
+    .stem-teaser-inner > .btn { flex:0 0 auto; white-space:nowrap; }
+    .circuit-studio-teaser { background:linear-gradient(120deg,#f2f8ed,#e8f7f5); border-top:0; }
     :root[data-theme="dark"] .stem-teaser { background:linear-gradient(120deg,#142d27,#1c2d20); border-color:var(--dm-border); }
+    :root[data-theme="dark"] .circuit-studio-teaser { background:linear-gradient(120deg,#192c25,#172d32); border-top:1px solid var(--dm-border); }
     :root[data-theme="dark"] .stem-teaser-inner h2 { color:var(--dm-text); }
     :root[data-theme="dark"] .stem-teaser-inner p { color:var(--dm-text-light); }
-    @media(max-width:650px){.stem-teaser-inner{align-items:flex-start;flex-direction:column}.stem-teaser-inner .btn{width:100%}}
+    @media(max-width:650px){
+      .stem-teaser { padding:24px 0; }
+      .stem-teaser-inner { align-items:stretch; flex-direction:column; gap:16px; }
+      .stem-teaser-inner .btn { width:100%; min-height:48px; white-space:normal; }
+    }
     /* Mobile: dropdown becomes a full-width sheet anchored to the viewport,
     so it can never clip off the left/right edge regardless of button position. */
     @media (max-width: 720px) {
@@ -902,7 +910,7 @@
         <div>
           <div class="section-label">Plan · Connect · Create</div>
           <h2>Design your circuit before you build it.</h2>
-          <p>Use EazyLife Circuit Studio to arrange electronic components, connect pins, route wires around obstacles and create clean circuit diagrams. Export shareable PNG and JPG images, print or save as PDF, or keep SVG and project JSON files.</p>
+          <p>Arrange components, connect pins and route wires to create clear circuit diagrams. Export PNG or JPG images, print to PDF, or save editable SVG and project JSON files.</p>
         </div>
         <a href="circuit-studio.html" class="btn btn-primary"><i class="fas fa-draw-polygon"></i> Open Circuit Studio <i class="fas fa-arrow-right"></i></a>
       </div>
