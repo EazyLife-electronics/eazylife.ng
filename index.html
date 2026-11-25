@@ -222,6 +222,10 @@
     .hero h1 { font-size: 2.1rem; font-weight: 800; color: var(--dark); line-height: 1.15; margin-bottom: 14px; }
     .hero h1 span { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .hero p.lead { color: var(--text-light); font-size: 1rem; max-width: 480px; margin-bottom: 24px; }
+    .review-form-disclosure { margin-top: 24px; border: 1px solid var(--border, rgba(128,128,128,.25)); border-radius: 14px; padding: 0 18px; background: var(--surface, transparent); }
+    .review-form-disclosure > summary { cursor: pointer; padding: 17px 2px; font-weight: 700; color: var(--text); }
+    .review-form-disclosure[open] > summary { border-bottom: 1px solid var(--border, rgba(128,128,128,.2)); }
+    .review-form-disclosure .review-form-wrap { margin-top: 0; }
     .hero-ctas { display: flex; flex-wrap: wrap; gap: 10px; }
     .hero-ctas { justify-content: center; }
     .hero-ctas .btn-stem-hero {
@@ -643,34 +647,6 @@
     </div>
   </section>
 
-  <!-- STEM LAB FEATURE — additive entry point to the interactive learning area -->
-  <section class="stem-teaser" aria-label="Explore the EazyLife STEM Lab">
-    <div class="container">
-      <div class="stem-teaser-inner">
-        <div>
-          <div class="section-label">Explore · Experiment · Engineer</div>
-          <h2>Don't just learn how technology works. Try it.</h2>
-          <p>Step into the EazyLife STEM Lab. Experiment with circuits, control a virtual motor and discover how sensors measure the world.</p>
-        </div>
-        <a href="stem-lab.html" class="btn btn-primary"><i class="fas fa-flask"></i> Enter the STEM Lab <i class="fas fa-arrow-right"></i></a>
-      </div>
-    </div>
-  </section>
-
-  <!-- CIRCUIT STUDIO FEATURE -->
-  <section class="stem-teaser circuit-studio-teaser" aria-label="Design electronic circuits with Circuit Studio">
-    <div class="container">
-      <div class="stem-teaser-inner">
-        <div>
-          <div class="section-label">Plan · Connect · Create</div>
-          <h2>Design your circuit before you build it.</h2>
-          <p>Use EazyLife Circuit Studio to arrange electronic components, connect pins, route wires around obstacles and create clean circuit diagrams. Export shareable PNG and JPG images, print or save as PDF, or keep SVG and project JSON files.</p>
-        </div>
-        <a href="circuit-studio.html" class="btn btn-primary"><i class="fas fa-draw-polygon"></i> Open Circuit Studio <i class="fas fa-arrow-right"></i></a>
-      </div>
-    </div>
-  </section>
-
   <!-- SHOP PREVIEW (live from Firestore) -->
   <section id="shop-preview" aria-label="Shop Preview">
     <div class="container">
@@ -706,6 +682,35 @@
           <div class="skeleton skeleton-text"></div>
           <div class="skeleton skeleton-price"></div>
         </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- STEM LAB FEATURE — additive entry point to the interactive learning area -->
+  <section class="stem-teaser" aria-label="Explore the EazyLife STEM Lab">
+    <div class="container">
+      <div class="stem-teaser-inner">
+        <div>
+          <div class="section-label">Explore · Experiment · Engineer</div>
+          <h2>Don't just learn how technology works. Try it.</h2>
+          <p>Step into the EazyLife STEM Lab. Experiment with circuits, control a virtual motor and discover how sensors measure the world.</p>
+        </div>
+        <a href="stem-lab.html" class="btn btn-primary"><i class="fas fa-flask"></i> Enter the STEM Lab <i class="fas fa-arrow-right"></i></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CIRCUIT STUDIO FEATURE -->
+  <section class="stem-teaser circuit-studio-teaser" aria-label="Design electronic circuits with Circuit Studio">
+    <div class="container">
+      <div class="stem-teaser-inner">
+        <div>
+          <div class="section-label">Plan · Connect · Create</div>
+          <h2>Design your circuit before you build it.</h2>
+          <p>Use EazyLife Circuit Studio to arrange electronic components, connect pins, route wires around obstacles and create clean circuit diagrams. Export shareable PNG and JPG images, print or save as PDF, or keep SVG and project JSON files.</p>
+        </div>
+        <a href="circuit-studio.html" class="btn btn-primary"><i class="fas fa-draw-polygon"></i> Open Circuit Studio <i class="fas fa-arrow-right"></i></a>
       </div>
     </div>
   </section>
@@ -809,44 +814,47 @@
 
       <p style="margin:-12px 0 28px;"><a class="service-link" href="reviews.html">Explore all customer reviews <i class="fas fa-arrow-right"></i></a></p>
 
-      <div class="review-form-wrap">
-        <h3>Share Your Experience</h3>
-        <p>Used EazyLife? We'd love your honest feedback. Approved reviews appear on this page.</p>
-        <form id="reviewForm" action="https://formspree.io/f/xzdozlbk" method="POST">
-          <input type="hidden" name="_subject" value="New EazyLife Review Submission" />
-          <div class="form-row">
-            <div class="form-group">
-              <label for="r-name">Your Name *</label>
-              <input type="text" id="r-name" name="name" placeholder="e.g. Adebayo T." required />
+      <details class="review-form-disclosure">
+        <summary>Share your experience with EazyLife</summary>
+        <div class="review-form-wrap">
+          <h3>Share Your Experience</h3>
+          <p>Used EazyLife? We'd love your honest feedback. Approved reviews appear on this page.</p>
+          <form id="reviewForm" action="https://formspree.io/f/xzdozlbk" method="POST">
+            <input type="hidden" name="_subject" value="New EazyLife Review Submission" />
+            <div class="form-row">
+              <div class="form-group">
+                <label for="r-name">Your Name *</label>
+                <input type="text" id="r-name" name="name" placeholder="e.g. Adebayo T." required />
+              </div>
+              <div class="form-group">
+                <label for="r-title">Occupation / Location</label>
+                <input type="text" id="r-title" name="title" placeholder="e.g. Student, Ibadan" />
+              </div>
             </div>
             <div class="form-group">
-              <label for="r-title">Occupation / Location</label>
-              <input type="text" id="r-title" name="title" placeholder="e.g. Student, Ibadan" />
+              <label for="r-stars">Rating *</label>
+              <select id="r-stars" name="stars" required>
+                <option value="" disabled selected>Select a rating</option>
+                <option value="5">★★★★★ Excellent</option>
+                <option value="4">★★★★☆ Very Good</option>
+                <option value="3">★★★☆☆ Good</option>
+                <option value="2">★★☆☆☆ Fair</option>
+                <option value="1">★☆☆☆☆ Poor</option>
+              </select>
             </div>
-          </div>
-          <div class="form-group">
-            <label for="r-stars">Rating *</label>
-            <select id="r-stars" name="stars" required>
-              <option value="" disabled selected>Select a rating</option>
-              <option value="5">★★★★★ Excellent</option>
-              <option value="4">★★★★☆ Very Good</option>
-              <option value="3">★★★☆☆ Good</option>
-              <option value="2">★★☆☆☆ Fair</option>
-              <option value="1">★☆☆☆☆ Poor</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="r-text">Your Review *</label>
-            <textarea id="r-text" name="review" placeholder="Tell others about your experience with EazyLife..." required></textarea>
-          </div>
-          <input type="text" name="_gotcha" style="display:none" />
-          <button type="submit" class="btn-submit"><i class="fas fa-paper-plane"></i> Submit Review</button>
-          <div class="form-success" id="formSuccess">
-            <i class="fas fa-circle-check"></i>
-            <p>Thank you! Your review has been received and will appear here once approved.</p>
-          </div>
-        </form>
-      </div>
+            <div class="form-group">
+              <label for="r-text">Your Review *</label>
+              <textarea id="r-text" name="review" placeholder="Tell others about your experience with EazyLife..." required></textarea>
+            </div>
+            <input type="text" name="_gotcha" style="display:none" />
+            <button type="submit" class="btn-submit"><i class="fas fa-paper-plane"></i> Submit Review</button>
+            <div class="form-success" id="formSuccess">
+              <i class="fas fa-circle-check"></i>
+              <p>Thank you! Your review has been received and will appear here once approved.</p>
+            </div>
+          </form>
+        </div>
+      </details>
     </div>
   </section>
 
