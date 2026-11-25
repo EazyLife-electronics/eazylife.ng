@@ -288,7 +288,7 @@
             <span class="text-xs font-bold text-gray-500 dark:text-gray-400">Quantity</span>
             <div class="flex items-center gap-3">
                 <button onclick="changePmQty(-1)" class="w-11 h-11 min-w-[44px] min-h-[44px] bg-white dark:bg-[#182420] dark:text-gray-100 rounded-lg shadow-sm font-bold" aria-label="Decrease quantity">-</button>
-                <input id="pmQty" type="text" inputmode="numeric" pattern="[0-9]*" value="1" onfocus="this.select()" onchange="setPmQty(this.value)" class="font-black text-sm w-10 text-center dark:text-gray-100 bg-white dark:bg-[#182420] rounded-lg py-1.5 outline-none">
+                <input id="pmQty" type="text" inputmode="numeric" pattern="[0-9]*" value="1" onfocus="this.select()" onchange="setPmQty(this.value)" class="font-black text-base w-14 min-w-[56px] h-11 min-h-[44px] text-center dark:text-gray-100 bg-white dark:bg-[#182420] border border-gray-200 dark:border-[#2a3835] rounded-lg px-1 outline-none focus-visible:ring-2 focus-visible:ring-teal-500" aria-label="Quantity">
                 <button onclick="changePmQty(1)" class="w-11 h-11 min-w-[44px] min-h-[44px] bg-white dark:bg-[#182420] dark:text-gray-100 rounded-lg shadow-sm font-bold" aria-label="Increase quantity">+</button>
             </div>
         </div>
