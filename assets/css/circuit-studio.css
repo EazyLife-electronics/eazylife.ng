@@ -356,3 +356,62 @@
  .cs-properties-panel{max-height:25dvh;bottom:calc(24dvh + 48px + env(safe-area-inset-bottom))}
  .cs-properties-panel.cs-inspector-collapsed{bottom:calc(24dvh + 48px + env(safe-area-inset-bottom))}
 }
+
+
+/* Workspace panels are optional: dock them beside the canvas or float above it. */
+.cs-workspace{position:relative}
+.cs-panel-controls{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.cs-panel-controls .cs-small-btn{white-space:nowrap}
+.cs-library-panel .cs-panel-heading{gap:8px}
+.cs-workspace.cs-library-hidden{grid-template-columns:0 minmax(0,1fr) 290px}
+.cs-workspace.cs-inspector-hidden{grid-template-columns:245px minmax(0,1fr) 0}
+.cs-workspace.cs-library-hidden.cs-inspector-hidden{grid-template-columns:minmax(0,1fr)}
+.cs-workspace.cs-library-floating,
+.cs-workspace.cs-inspector-floating{grid-template-columns:minmax(0,1fr)}
+.cs-library-panel.cs-panel-hidden,
+.cs-properties-panel.cs-panel-hidden{display:none!important}
+.cs-library-panel.cs-panel-floating,
+.cs-properties-panel.cs-panel-floating{
+ position:absolute;top:10px;bottom:10px;z-index:35;width:min(310px,calc(100% - 20px));
+ max-height:none;min-height:0;overflow:auto;border:1px solid var(--cs-border);
+ border-radius:14px;box-shadow:0 12px 36px rgba(0,0,0,.24);background:var(--cs-panel)
+}
+.cs-library-panel.cs-panel-floating{left:10px}
+.cs-properties-panel.cs-panel-floating{right:10px}
+.cs-panel-reopen{
+ position:absolute;top:10px;z-index:34;min-height:40px;padding:8px 12px;
+ border:1px solid var(--cs-border);border-radius:10px;background:var(--cs-panel);
+ color:var(--cs-ink);font:600 12px/1.2 inherit;box-shadow:0 5px 18px rgba(0,0,0,.16);cursor:pointer
+}
+.cs-reopen-library{left:10px}
+.cs-reopen-inspector{right:10px}
+.cs-panel-reopen[hidden]{display:none!important}
+@media(min-width:901px){
+ .cs-workspace.cs-library-hidden{grid-template-columns:0 minmax(0,1fr) 290px}
+ .cs-workspace.cs-inspector-hidden{grid-template-columns:245px minmax(0,1fr) 0}
+ .cs-workspace.cs-library-hidden.cs-inspector-hidden{grid-template-columns:minmax(0,1fr)}
+ .cs-library-panel.cs-panel-floating{width:min(330px,calc(100% - 24px))}
+ .cs-properties-panel.cs-panel-floating{width:min(350px,calc(100% - 24px))}
+}
+@media(min-width:621px) and (max-width:900px){
+ .cs-workspace.cs-library-hidden{grid-template-columns:0 minmax(0,1fr) 260px}
+ .cs-workspace.cs-inspector-hidden{grid-template-columns:245px minmax(0,1fr) 0}
+ .cs-workspace.cs-library-hidden.cs-inspector-hidden{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:620px){
+ .cs-workspace.cs-library-hidden,
+ .cs-workspace.cs-inspector-hidden,
+ .cs-workspace.cs-library-hidden.cs-inspector-hidden,
+ .cs-workspace.cs-library-floating,
+ .cs-workspace.cs-inspector-floating{grid-template-columns:minmax(0,1fr)}
+ .cs-library-panel.cs-panel-floating,
+ .cs-properties-panel.cs-panel-floating{left:8px;right:8px;top:8px;bottom:8px;width:auto;max-height:none;border-radius:13px}
+ .cs-library-panel.cs-panel-floating{bottom:8px}
+ .cs-properties-panel.cs-panel-floating{bottom:8px}
+ .cs-panel-reopen{top:8px;min-height:38px}
+ .cs-reopen-library{left:8px}
+ .cs-reopen-inspector{right:8px}
+ .cs-library-panel .cs-panel-heading{position:sticky;top:-16px;z-index:5;background:var(--cs-panel)}
+ .cs-properties-panel.cs-panel-floating .cs-panel-heading{top:-8px}
+ .cs-properties-panel.cs-inspector-collapsed.cs-panel-floating{height:48px;min-height:48px;max-height:48px;bottom:auto}
+}
