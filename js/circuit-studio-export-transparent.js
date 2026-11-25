@@ -264,58 +264,89 @@ renderLibrary();$('symbolStyle').value=project.style||'engineering';render();app
 
 
 const WORKSPACE_PREF_KEY='eazylife-circuit-workspace-v1';
-
-// Dockable/floating panels. Hiding a panel never changes the active selection
-// and selection changes never force a dismissed inspector back into view.
+function readWorkspacePrefs(){try{return JSON.parse(localStorage.getItem(WORKSPACE_PREF_KEY)||'{}')}catch{return{}}}
+let workspacePrefs=readWorkspacePrefs();
+function saveWorkspacePrefs(){try{localStorage.setItem(WORKSPACE_PREF_KEY,JSON.stringify(workspacePrefs))}catch(e){/* Workspace preferences are optional if browser storage is blocked. */}}
 const workspace=$('circuitWorkspace'),libraryPanel=$('componentLibraryPanel'),propertiesPanel=$('propertiesPanel');
-const panelButtons={library:{hide:$('toggleLibraryPanel'),show:$('showLibraryPanel'),float:$('floatLibraryPanel')},inspector:{hide:$('toggleInspector'),show:$('showInspectorPanel'),float:$('floatInspectorPanel')}};
+const toolbar=$('circuitToolbar'),toolbarBubble=$('showToolbarBubble');
+const modeButtons={mini:$('toolbarModeMini'),full:$('toolbarModeFull'),float:$('toolbarModeFloat'),hide:$('toolbarModeHide')};
+const miniActions={new:$('miniNew'),select:$('miniSelect'),connect:$('miniConnect'),undo:$('miniUndo'),redo:$('miniRedo'),expand:$('miniExpand'),mode:$('toolbarModeMenu')};
+const panelButtons={library:{hide:$('toggleLibraryPanel'),show:$('showLibraryPanel'),float:$('floatLibraryPanel'),bubble:$('showLibraryPanel')},inspector:{hide:$('toggleInspector'),show:$('showInspectorPanel'),float:$('floatInspectorPanel'),bubble:$('showInspectorPanel')}};
 function syncWorkspacePanels(){
- if(!workspace)return;
  for(const [key,panel] of [['library',libraryPanel],['inspector',propertiesPanel]]){
   const b=panelButtons[key],hidden=panel.classList.contains('cs-panel-hidden'),floating=panel.classList.contains('cs-panel-floating');
   workspace.classList.toggle('cs-'+key+'-hidden',hidden);
   workspace.classList.toggle('cs-'+key+'-floating',floating&&!hidden);
   b.show.hidden=!hidden;b.hide.textContent='Hide';b.float.textContent=floating?'Dock':'Float';
-  b.float.setAttribute('aria-label',floating?'Dock '+key+' panel beside canvas':'Float '+key+' panel over canvas');
+  b.float.setAttribute('aria-label',floating?'Dock '+key+' panel':'Float '+key+' panel');
+  b.bubble.hidden=!hidden;
+  b.bubble.setAttribute('aria-label','Show '+(key==='library'?'components library':'properties inspector'));
  }
  workspacePrefs.panels={library:{hidden:libraryPanel.classList.contains('cs-panel-hidden'),floating:libraryPanel.classList.contains('cs-panel-floating')},inspector:{hidden:propertiesPanel.classList.contains('cs-panel-hidden'),floating:propertiesPanel.classList.contains('cs-panel-floating'),collapsed:propertiesPanel.classList.contains('cs-inspector-collapsed')}};
  saveWorkspacePrefs();
 }
 function setWorkspacePanel(key,action){
- const panel=key==='library'?libraryPanel:propertiesPanel;
- if(!panel)return;
- if(action==='hide'){panel.classList.add('cs-panel-hidden')}
+ const panel=key==='library'?libraryPanel:propertiesPanel;if(!panel)return;
+ if(action==='hide')panel.classList.add('cs-panel-hidden');
  else if(action==='show'){panel.classList.remove('cs-panel-hidden');if(workspacePrefs.panels?.[key]?.floating)panel.classList.add('cs-panel-floating')}
  else if(action==='float'){panel.classList.toggle('cs-panel-floating');panel.classList.remove('cs-panel-hidden')}
  syncWorkspacePanels();
 }
 for(const [key,b] of Object.entries(panelButtons)){
- b.hide?.addEventListener('click',()=>setWorkspacePanel(key,'hide'));
- b.show?.addEventListener('click',()=>setWorkspacePanel(key,'show'));
- b.float?.addEventListener('click',()=>setWorkspacePanel(key,'float'));
+ b.hide.addEventListener('click',()=>setWorkspacePanel(key,'hide'));
+ b.show.addEventListener('click',()=>setWorkspacePanel(key,'show'));
+ b.float.addEventListener('click',()=>setWorkspacePanel(key,'float'));
 }
+for(const key of ['library','inspector']){
+ const p=workspacePrefs.panels?.[key],panel=key==='library'?libraryPanel:propertiesPanel;
+ if(p?.hidden)panel.classList.add('cs-panel-hidden');
+ if(p?.floating)panel.classList.add('cs-panel-floating');
+}
+if(workspacePrefs.panels?.inspector?.collapsed===true)setInspectorCollapsed(true);
+else if(workspacePrefs.panels?.inspector?.collapsed===false)setInspectorCollapsed(false);
+else if(matchMedia('(max-width: 620px)').matches)setInspectorCollapsed(true);
 syncWorkspacePanels();
 
+// Draggable, persistent WhatsApp-style panel bubbles. A click opens the panel;
+// dragging only changes the bubble's screen position.
+function positionBubble(el,key,defaultSide){
+ const saved=workspacePrefs.bubblePositions?.[key];
+ el.style.position='fixed';el.style.zIndex='100';el.style.touchAction='none';
+ if(saved&&Number.isFinite(saved.x)&&Number.isFinite(saved.y)){el.style.left=saved.x+'px';el.style.top=saved.y+'px';el.style.right='auto'}
+ else{el.style.top=(78+(key==='inspector'?54:0))+'px';el.style.left=defaultSide==='left'?'12px':'auto';el.style.right=defaultSide==='right'?'12px':'auto'}
+ let moved=false,startX=0,startY=0,originX=0,originY=0;
+ el.addEventListener('pointerdown',e=>{if(e.button!==0)return;moved=false;startX=e.clientX;startY=e.clientY;const r=el.getBoundingClientRect();originX=r.left;originY=r.top;el.setPointerCapture?.(e.pointerId)});
+ el.addEventListener('pointermove',e=>{if(!el.hasPointerCapture?.(e.pointerId))return;const dx=e.clientX-startX,dy=e.clientY-startY;if(Math.abs(dx)+Math.abs(dy)>5)moved=true;if(!moved)return;const x=Math.max(6,Math.min(innerWidth-el.offsetWidth-6,originX+dx)),y=Math.max(72,Math.min(innerHeight-el.offsetHeight-12,originY+dy));el.style.left=x+'px';el.style.top=y+'px';el.style.right='auto'});
+ el.addEventListener('pointerup',e=>{if(moved){workspacePrefs.bubblePositions=workspacePrefs.bubblePositions||{};const r=el.getBoundingClientRect();workspacePrefs.bubblePositions[key]={x:r.left,y:r.top};saveWorkspacePrefs();el.dataset.dragged='1';setTimeout(()=>delete el.dataset.dragged,0)}});
+ el.addEventListener('click',e=>{if(el.dataset.dragged==='1'){e.preventDefault();e.stopImmediatePropagation()}});
+}
+positionBubble(panelButtons.library.bubble,'library','left');
+positionBubble(panelButtons.inspector.bubble,'inspector','right');
+positionBubble(toolbarBubble,'toolbar','left');
 
-// Persist workspace layout locally, separate from the admin-only circuit draft.
-const toolbar=$('circuitToolbar'),modeButtons={mini:$('toolbarModeMini'),full:$('toolbarModeFull'),float:$('toolbarModeFloat')};
-const miniActions={new:$('miniNew'),select:$('miniSelect'),connect:$('miniConnect'),undo:$('miniUndo'),redo:$('miniRedo'),expand:$('miniExpand')};
-function readWorkspacePrefs(){try{return JSON.parse(localStorage.getItem(WORKSPACE_PREF_KEY)||'{}')}catch{return{}}}
-let workspacePrefs=readWorkspacePrefs();
-function saveWorkspacePrefs(){try{localStorage.setItem(WORKSPACE_PREF_KEY,JSON.stringify(workspacePrefs))}catch(e){/* Workspace preferences are optional if browser storage is blocked. */}}
+// Toolbar modes: Hide leaves a bubble; Mini is one continuous scroll row;
+// Full wraps to the available frame; Float is a compact movable overlay.
 function setToolbarMode(mode,expanded=workspacePrefs.toolbarExpanded===true){
- if(!['mini','full','float'].includes(mode))mode='full';
+ if(!['mini','full','float','hide'].includes(mode))mode='full';
+ const previous=workspacePrefs.lastVisibleToolbarMode||'mini';
+ if(mode!=='hide')workspacePrefs.lastVisibleToolbarMode=mode;
+ toolbar.hidden=mode==='hide';toolbarBubble.hidden=mode!=='hide';
  toolbar.classList.toggle('cs-toolbar-mini',mode==='mini'||mode==='float');
  toolbar.classList.toggle('cs-toolbar-floating',mode==='float');
- toolbar.classList.toggle('cs-toolbar-expanded',mode==='full'||expanded);
+ toolbar.classList.toggle('cs-toolbar-expanded',mode==='full'||(mode==='float'&&expanded));
+ toolbar.classList.toggle('cs-toolbar-hidden',mode==='hide');
  for(const [key,button] of Object.entries(modeButtons))button.setAttribute('aria-pressed',String(key===mode));
- miniActions.expand.textContent=expanded?'Less ▴':'More ▾';miniActions.expand.setAttribute('aria-expanded',String(expanded));
+ miniActions.expand.textContent=expanded?'Collapse ▴':'More ▾';miniActions.expand.setAttribute('aria-expanded',String(expanded));
  workspacePrefs.toolbarMode=mode;workspacePrefs.toolbarExpanded=expanded;saveWorkspacePrefs();
+ if(mode==='hide')workspacePrefs.lastVisibleToolbarMode=previous;
 }
 modeButtons.mini.addEventListener('click',()=>setToolbarMode('mini',false));
 modeButtons.full.addEventListener('click',()=>setToolbarMode('full',true));
 modeButtons.float.addEventListener('click',()=>setToolbarMode('float',false));
+modeButtons.hide.addEventListener('click',()=>setToolbarMode('hide',false));
+toolbarBubble.addEventListener('click',()=>setToolbarMode(workspacePrefs.lastVisibleToolbarMode||'mini',workspacePrefs.toolbarExpanded===true));
 miniActions.expand.addEventListener('click',()=>setToolbarMode(workspacePrefs.toolbarMode,!(toolbar.classList.contains('cs-toolbar-expanded'))));
+miniActions.mode.addEventListener('click',()=>{toolbar.classList.toggle('cs-modebar-open');miniActions.mode.setAttribute('aria-expanded',String(toolbar.classList.contains('cs-modebar-open')))});
 miniActions.new.addEventListener('click',()=>$('newProject').click());
 miniActions.select.addEventListener('click',()=>$('toolSelect').click());
 miniActions.connect.addEventListener('click',()=>$('toolConnect').click());
