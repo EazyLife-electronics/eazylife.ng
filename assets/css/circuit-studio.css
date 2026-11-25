@@ -187,3 +187,27 @@
 .cs-wire-hit{vector-effect:non-scaling-stroke;stroke-width:20}
 .cs-wire-endpoint,.cs-bend-handle,.cs-junction{vector-effect:non-scaling-stroke}
 .cs-selected .cs-selection-box{vector-effect:non-scaling-stroke}
+
+
+/* Responsive EazyLife site navigation: one predictable menu on desktop, tablet and mobile. */
+.cs-topbar{overflow:visible}
+.cs-top-actions{position:relative;display:flex;align-items:center;gap:8px;overflow:visible;flex:0 0 auto}
+.cs-nav-toggle{display:inline-flex;align-items:center;justify-content:center;font-size:18px;line-height:1}
+.cs-site-nav[hidden]{display:none}
+.cs-site-nav:not([hidden]){position:absolute;z-index:60;top:calc(100% + 9px);right:0;display:grid;grid-template-columns:repeat(2,minmax(150px,1fr));gap:3px;width:min(440px,calc(100vw - 24px));max-height:min(70vh,520px);overflow:auto;padding:9px;border:1px solid var(--cs-border);border-radius:13px;background:var(--cs-panel);box-shadow:0 14px 36px #10251f2b}
+.cs-site-nav .cs-home-link{display:flex;align-items:center;min-height:40px;padding:9px 11px;border-radius:8px;color:var(--cs-ink);font-size:13px;white-space:normal;text-decoration:none}
+.cs-site-nav .cs-home-link:hover,.cs-site-nav .cs-home-link:focus-visible{background:var(--cs-soft);color:var(--cs-accent);outline:2px solid var(--cs-accent);outline-offset:-2px}
+.cs-nav-toggle[aria-expanded="true"]{background:var(--cs-accent);border-color:var(--cs-accent);color:#fff}
+@media(max-width:620px){
+ .cs-topbar{height:48px;padding:0 10px;gap:8px}
+ .cs-top-actions{gap:6px}
+ .cs-nav-toggle,.cs-icon-btn{width:36px;height:36px;flex:0 0 36px}
+ .cs-site-nav:not([hidden]){position:fixed;top:54px;right:8px;left:auto;width:min(330px,calc(100vw - 16px));grid-template-columns:1fr;max-height:calc(100dvh - 68px);padding:8px}
+ .cs-site-nav .cs-home-link{min-height:44px;font-size:14px}
+}
+@media(min-width:621px) and (max-width:900px){
+ .cs-topbar{flex-wrap:nowrap}
+ .cs-top-actions{margin-left:auto}
+ .cs-site-nav:not([hidden]){grid-template-columns:repeat(2,minmax(140px,1fr))}
+}
+@media(prefers-reduced-motion:no-preference){.cs-site-nav:not([hidden]){animation:cs-nav-in .14s ease-out}@keyframes cs-nav-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}}
