@@ -844,3 +844,66 @@
  .cs-reopen-library{left:12px!important;right:auto!important}
  .cs-reopen-inspector{left:auto!important;right:12px!important}
 }
+
+
+/* Mobile workspace recovery: explicit rows prevent the canvas collapsing to zero height. */
+@media(max-width:620px){
+ .cs-app{
+  position:fixed!important;top:48px!important;right:0!important;bottom:0!important;left:0!important;
+  width:100vw!important;height:auto!important;min-height:0!important;max-height:none!important;
+  box-sizing:border-box!important;display:grid!important;
+  grid-template-rows:auto auto minmax(160px,1fr) auto!important;
+  grid-template-columns:minmax(0,1fr)!important;align-content:stretch!important;
+  gap:0!important;overflow:hidden!important
+ }
+ #toolbarModeBar{grid-row:1!important;grid-column:1!important;order:0!important}
+ #circuitToolbar{grid-row:2!important;grid-column:1!important;order:0!important;
+  max-height:25dvh!important;min-height:0!important}
+ #showToolbarBubble{position:fixed!important}
+ #circuitWorkspace{
+  grid-row:3!important;grid-column:1!important;order:0!important;
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+  grid-template-rows:minmax(160px,1fr) minmax(0,17dvh) minmax(0,17dvh)!important;
+  flex:initial!important;width:100%!important;height:100%!important;min-height:0!important;
+  max-height:none!important;overflow:hidden!important;position:relative!important
+ }
+ #circuitWorkspace>.cs-canvas-panel{
+  grid-row:1!important;grid-column:1!important;order:0!important;
+  display:block!important;position:relative!important;width:100%!important;height:100%!important;
+  min-height:160px!important;max-height:none!important;min-width:0!important;
+  flex:initial!important;overflow:hidden!important
+ }
+ #canvasWrap{
+  position:absolute!important;inset:0!important;display:block!important;
+  width:100%!important;height:100%!important;min-height:0!important;
+  max-height:none!important;flex:initial!important;overflow:hidden!important
+ }
+ #circuitCanvas{display:block!important;width:100%!important;height:100%!important;min-height:0!important}
+ #circuitWorkspace>#propertiesPanel:not(.cs-panel-hidden){
+  grid-row:2!important;grid-column:1!important;order:0!important;
+  display:block!important;position:relative!important;inset:auto!important;
+  width:100%!important;height:100%!important;min-height:0!important;max-height:none!important;
+  flex:initial!important;overflow:auto!important;z-index:5!important
+ }
+ #circuitWorkspace>#componentLibraryPanel:not(.cs-panel-hidden){
+  grid-row:3!important;grid-column:1!important;order:0!important;
+  display:block!important;position:relative!important;inset:auto!important;
+  width:100%!important;height:100%!important;min-height:0!important;max-height:none!important;
+  flex:initial!important;overflow:auto!important;z-index:5!important
+ }
+ #propertiesPanel.cs-panel-hidden,#componentLibraryPanel.cs-panel-hidden{display:none!important}
+ #circuitWorkspace:has(#propertiesPanel.cs-panel-hidden){grid-template-rows:minmax(160px,1fr) minmax(0,17dvh) minmax(0,17dvh)!important}
+ #circuitWorkspace:has(#componentLibraryPanel.cs-panel-hidden){grid-template-rows:minmax(160px,1fr) minmax(0,17dvh) minmax(0,17dvh)!important}
+ #circuitWorkspace:has(#propertiesPanel.cs-panel-hidden):has(#componentLibraryPanel.cs-panel-hidden){grid-template-rows:minmax(160px,1fr)!important}
+ .cs-statusbar{
+  grid-row:4!important;grid-column:1!important;order:0!important;
+  display:flex!important;position:relative!important;width:100%!important;height:auto!important;
+  min-height:34px!important;max-height:42px!important;flex:initial!important;
+  margin:0!important;padding:5px 10px!important;inset:auto!important;
+  transform:none!important;overflow:hidden!important;z-index:5!important
+ }
+ .cs-statusbar>span:nth-child(2){display:none!important}
+ .cs-statusbar #selectionStatus{min-width:0!important;flex:1 1 auto!important}
+ .cs-statusbar #coordinateStatus{white-space:nowrap!important;flex:0 0 auto!important}
+ .cs-selection-toolbar{position:absolute!important;top:6px!important;left:6px!important;right:6px!important;z-index:20!important}
+}
