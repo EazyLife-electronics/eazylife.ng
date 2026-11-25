@@ -211,3 +211,42 @@
  .cs-site-nav:not([hidden]){grid-template-columns:repeat(2,minmax(140px,1fr))}
 }
 @media(prefers-reduced-motion:no-preference){.cs-site-nav:not([hidden]){animation:cs-nav-in .14s ease-out}@keyframes cs-nav-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}}
+
+
+/* Circuit Studio inspector: clearer hierarchy and more usable responsive space. */
+.cs-properties-panel{scrollbar-gutter:stable;overscroll-behavior:contain}
+.cs-properties-content{min-width:0;gap:10px}
+.cs-properties-content>*{min-width:0}
+.cs-property-preview{height:72px;flex:0 0 auto}
+.cs-property-preview svg{width:80%;height:62px}
+.cs-property-group{min-width:0;border:1px solid var(--cs-border);border-radius:9px;background:var(--cs-soft);padding:0 10px}
+.cs-property-group>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:42px;cursor:pointer;list-style:none;color:var(--cs-ink);font-size:11px;font-weight:750}
+.cs-property-group>summary::-webkit-details-marker{display:none}
+.cs-property-group>summary::after{content:'＋';color:var(--cs-accent);font-size:15px;font-weight:600}
+.cs-property-group[open]>summary::after{content:'−'}
+.cs-property-group[open]>summary{border-bottom:1px solid var(--cs-border);margin-bottom:10px}
+.cs-property-group .cs-field-row{margin:8px 0}
+.cs-property-group .cs-hint{margin:8px 0}
+.cs-properties-content .cs-field{min-width:0}
+.cs-properties-content .cs-field input,.cs-properties-content .cs-field select,.cs-properties-content .cs-field textarea{min-width:0;max-width:100%}
+.cs-properties-content button:focus-visible,.cs-properties-content input:focus-visible,.cs-properties-content select:focus-visible,.cs-properties-content textarea:focus-visible,.cs-property-group>summary:focus-visible{outline:2px solid var(--cs-accent);outline-offset:2px}
+.cs-properties-panel .cs-panel-heading{position:sticky;top:-16px;z-index:2;padding:3px 0 8px;background:var(--cs-panel)}
+.cs-wire-bends{display:grid;gap:4px}
+.cs-wire-bends .cs-pin-editor{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 38px;align-items:end}
+.cs-wire-bends .cs-pin-editor .cs-pin-btn{min-height:42px}
+.cs-pin-type-row{grid-template-columns:minmax(0,1fr) minmax(120px,48%);gap:8px}
+@media(min-width:901px){.cs-workspace{grid-template-columns:245px minmax(300px,1fr) 300px}.cs-properties-panel{padding:14px}.cs-properties-panel .cs-panel-heading{top:-14px}}
+@media(min-width:621px) and (max-width:900px){.cs-properties-panel{max-height:300px;min-height:190px;padding:12px}.cs-properties-panel .cs-panel-heading{top:-12px}}
+@media(max-width:620px){
+ .cs-properties-panel{bottom:calc(24dvh + 52px);max-height:30dvh;min-height:0;padding:9px 10px;scrollbar-gutter:auto}
+ .cs-properties-panel .cs-panel-heading{top:-9px;padding:2px 0 6px;margin-bottom:7px}
+ .cs-properties-panel .cs-panel-heading h2{font-size:13px}
+ .cs-properties-content{gap:8px}
+ .cs-property-preview{height:54px}.cs-property-preview svg{height:48px}
+ .cs-property-group{padding:0 9px}
+ .cs-property-group>summary{min-height:38px;font-size:11px}
+ .cs-properties-content .cs-field-row{gap:7px}
+ .cs-properties-content .cs-pin-btn{min-height:40px}
+ .cs-wire-bends .cs-pin-editor{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 38px}
+ .cs-pin-type-row{grid-template-columns:minmax(0,1fr) minmax(112px,48%)}
+}
