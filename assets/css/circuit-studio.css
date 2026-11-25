@@ -418,3 +418,43 @@
  .cs-properties-panel.cs-panel-floating .cs-panel-heading{top:-8px}
  .cs-properties-panel.cs-inspector-collapsed.cs-panel-floating{height:48px;min-height:48px;max-height:48px;bottom:auto}
 }
+
+
+/* User-configurable drawing toolbar: full, compact single-line, or floating. */
+.cs-app{position:relative}
+.cs-toolbar-modebar{display:flex;align-items:center;gap:5px;flex:0 0 100%;padding-bottom:7px;border-bottom:1px solid var(--cs-border)}
+.cs-toolbar-mode-label{font-size:10px;font-weight:750;color:var(--cs-muted);margin-right:4px}
+.cs-toolbar-modebar .cs-small-btn{padding:5px 10px;min-height:29px;font-size:10px}
+.cs-toolbar-modebar .cs-small-btn[aria-pressed=true]{background:var(--cs-accent);border-color:var(--cs-accent);color:#fff}
+.cs-toolbar-mini-actions{display:none;align-items:center;gap:5px;flex:1;min-width:0;white-space:nowrap;overflow-x:auto;scrollbar-width:thin}
+.cs-toolbar-mini-actions .cs-btn{padding:6px 10px;min-height:34px;flex:0 0 auto}
+.cs-toolbar.cs-toolbar-mini{align-items:center;gap:6px;padding:6px 10px}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-modebar{flex:0 0 auto;padding:0;border:0}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-mode-label{display:none}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-mini-actions{display:flex}
+.cs-toolbar.cs-toolbar-mini:not(.cs-toolbar-expanded)>.cs-tool-group{display:none}
+.cs-toolbar.cs-toolbar-mini.cs-toolbar-expanded>.cs-tool-group{display:flex}
+.cs-toolbar.cs-toolbar-mini.cs-toolbar-expanded{flex-wrap:wrap}
+.cs-toolbar.cs-toolbar-mini.cs-toolbar-expanded .cs-toolbar-mini-actions{flex:1 1 100%;order:2}
+.cs-toolbar.cs-toolbar-floating{
+ position:absolute;top:8px;left:8px;right:8px;z-index:46;max-height:calc(100% - 16px);
+ overflow:auto;border:1px solid var(--cs-border);border-radius:13px;
+ box-shadow:0 10px 32px rgba(0,0,0,.24)
+}
+.cs-toolbar.cs-toolbar-floating:not(.cs-toolbar-expanded){width:max-content;max-width:calc(100% - 16px);right:auto}
+.cs-toolbar.cs-toolbar-floating:not(.cs-toolbar-expanded) .cs-toolbar-modebar{flex:0 0 auto}
+.cs-toolbar.cs-toolbar-floating:not(.cs-toolbar-expanded) .cs-toolbar-mini-actions{flex:0 1 auto}
+.cs-toolbar.cs-toolbar-floating:not(.cs-toolbar-expanded)>.cs-tool-group{display:none}
+.cs-toolbar.cs-toolbar-floating.cs-toolbar-expanded{left:8px;right:8px}
+.cs-toolbar.cs-toolbar-floating.cs-toolbar-expanded .cs-tool-group{display:flex;flex-wrap:wrap}
+.cs-toolbar.cs-toolbar-floating .cs-toolbar-modebar{background:var(--cs-panel)}
+.cs-toolbar.cs-toolbar-floating .cs-toolbar-mini-actions{display:flex}
+.cs-toolbar.cs-toolbar-floating .cs-toolbar-mode-label{display:none}
+@media(max-width:620px){
+ .cs-toolbar-modebar{gap:4px;padding-bottom:5px}
+ .cs-toolbar-modebar .cs-small-btn{padding:5px 8px}
+ .cs-toolbar.cs-toolbar-mini{flex-wrap:nowrap}
+ .cs-toolbar.cs-toolbar-mini .cs-tool-group{flex-wrap:nowrap;overflow-x:auto}
+ .cs-toolbar.cs-toolbar-floating{top:6px;left:6px;right:6px}
+ .cs-toolbar.cs-toolbar-floating:not(.cs-toolbar-expanded){max-width:calc(100% - 12px)}
+}
