@@ -571,3 +571,50 @@
   flex:0 1 auto;min-width:0;max-width:100%;flex-wrap:wrap;overflow:visible
  }
 }
+
+
+/* Final dock-and-bubble workspace policy: no floating panels or toolbar. */
+.cs-toolbar.cs-toolbar-full{
+ position:relative!important;top:auto!important;left:auto!important;right:auto!important;
+ transform:none!important;width:100%!important;max-width:100%;max-height:min(38dvh,440px);
+ overflow-x:hidden!important;overflow-y:auto!important;flex-wrap:wrap!important;
+ align-content:flex-start;justify-content:flex-start;z-index:5;border-radius:0;box-shadow:none
+}
+.cs-toolbar.cs-toolbar-full .cs-toolbar-modebar{flex:0 0 100%;white-space:normal}
+.cs-toolbar.cs-toolbar-full .cs-tool-group{flex:0 1 auto;min-width:0;max-width:100%;flex-wrap:wrap;overflow:visible}
+.cs-toolbar.cs-toolbar-mini{
+ position:relative!important;top:auto!important;left:auto!important;right:auto!important;
+ transform:none!important;width:100%!important;max-width:100%;height:auto;max-height:58px;
+ flex-wrap:nowrap!important;justify-content:flex-start;overflow-x:auto!important;overflow-y:hidden!important;
+ white-space:nowrap;scrollbar-width:thin;z-index:5;border-radius:0;box-shadow:none
+}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-modebar{flex:0 0 auto!important;white-space:nowrap;border:0;padding:0}
+.cs-toolbar.cs-toolbar-mini .cs-tool-group{display:flex!important;flex:0 0 auto!important;flex-wrap:nowrap!important;white-space:nowrap;max-width:none;overflow:visible}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-mini-actions{display:none!important}
+.cs-toolbar.cs-toolbar-hidden{display:none!important}
+.cs-toolbar-bubble{position:fixed!important;z-index:120!important}
+.cs-library-panel.cs-panel-floating,.cs-properties-panel.cs-panel-floating{position:relative!important;inset:auto!important;width:auto!important;max-height:none!important;height:auto!important;box-shadow:none!important;border-radius:0!important}
+.cs-library-panel.cs-panel-hidden,.cs-properties-panel.cs-panel-hidden{display:none!important}
+.cs-workspace.cs-library-hidden{grid-template-columns:minmax(0,1fr) 290px}
+.cs-workspace.cs-inspector-hidden{grid-template-columns:245px minmax(0,1fr)}
+.cs-workspace.cs-library-hidden.cs-inspector-hidden{grid-template-columns:minmax(0,1fr)}
+@media(min-width:901px){
+ .cs-workspace.cs-library-hidden{grid-template-columns:0 minmax(0,1fr) 290px}
+ .cs-workspace.cs-inspector-hidden{grid-template-columns:245px minmax(0,1fr)}
+ .cs-workspace.cs-library-hidden.cs-inspector-hidden{grid-template-columns:minmax(0,1fr)}
+}
+@media(min-width:621px) and (max-width:900px){
+ .cs-workspace.cs-library-hidden{grid-template-columns:minmax(0,1fr) 260px}
+ .cs-workspace.cs-inspector-hidden{grid-template-columns:245px minmax(0,1fr)}
+ .cs-workspace.cs-library-hidden.cs-inspector-hidden{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:620px){
+ .cs-toolbar.cs-toolbar-full{max-height:36dvh}
+ .cs-toolbar.cs-toolbar-mini{height:48px;max-height:48px}
+ .cs-workspace{display:flex!important;flex-direction:column;min-height:0}
+ .cs-library-panel,.cs-properties-panel{position:relative!important;inset:auto!important;display:block;width:100%;max-height:35dvh;min-height:0;flex:0 0 auto;overflow:auto;border-radius:0!important;box-shadow:none!important}
+ .cs-library-panel.cs-panel-hidden,.cs-properties-panel.cs-panel-hidden{display:none!important}
+ .cs-canvas-panel{position:relative;inset:auto;width:100%;min-height:48dvh;flex:1 1 auto}
+ .cs-canvas-wrap{position:relative;inset:auto;width:100%;min-height:42dvh;flex:1 1 auto}
+ .cs-panel-reopen{position:fixed!important;z-index:120!important}
+}
