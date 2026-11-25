@@ -71,10 +71,7 @@
       <span class="cs-toolbar-mode-label">Toolbar</span>
       <button id="toolbarModeMini" class="cs-small-btn" type="button" aria-pressed="false">Mini</button>
       <button id="toolbarModeFull" class="cs-small-btn" type="button" aria-pressed="false">Full</button>
-      <button id="toolbarModeFloat" class="cs-small-btn" type="button" aria-pressed="false">Float</button><button id="toolbarModeHide" class="cs-small-btn" type="button" aria-pressed="false">Hide</button>
-    </div>
-    <div class="cs-toolbar-mini-actions" aria-label="Quick drawing actions">
-      <button id="miniNew" class="cs-btn" type="button">New</button><button id="miniSelect" class="cs-btn active" type="button">Select</button><button id="miniConnect" class="cs-btn" type="button">Wire</button><button id="miniUndo" class="cs-btn" type="button" title="Undo">↶</button><button id="miniRedo" class="cs-btn" type="button" title="Redo">↷</button><button id="miniExpand" class="cs-btn" type="button" aria-expanded="false">More ▾</button><button id="toolbarModeMenu" class="cs-btn" type="button" aria-expanded="false" aria-label="Toolbar layout options">☷</button><button id="toolbarDragHandle" class="cs-btn cs-toolbar-drag-handle" type="button" aria-label="Move floating toolbar" title="Drag to move toolbar">⠿</button>
+      <button id="toolbarModeHide" class="cs-small-btn" type="button" aria-pressed="false">Hide</button>
     </div>
     <div class="cs-tool-group">
       <button id="newProject" class="cs-btn">New</button>
@@ -104,7 +101,7 @@
   <button id="showToolbarBubble" class="cs-workspace-bubble cs-toolbar-bubble" type="button" hidden aria-label="Show drawing toolbar" title="Show drawing toolbar">☰</button>
   <div class="cs-workspace" id="circuitWorkspace"><button id="showLibraryPanel" class="cs-panel-reopen cs-reopen-library cs-workspace-bubble" type="button" hidden aria-label="Show components library" title="Show components library">▦</button><button id="showInspectorPanel" class="cs-panel-reopen cs-reopen-inspector cs-workspace-bubble" type="button" hidden aria-label="Show properties inspector" title="Show properties inspector">⚙</button>
     <aside id="componentLibraryPanel" class="cs-library-panel">
-      <div class="cs-panel-heading"><div><span class="cs-eyebrow">LIBRARY</span><h2>Components</h2></div><div class="cs-panel-controls"><span id="componentCount" class="cs-count">0</span><button id="toggleLibraryPanel" class="cs-small-btn" type="button" aria-label="Hide component library">Hide</button><button id="floatLibraryPanel" class="cs-small-btn" type="button" aria-label="Float component library over canvas">Float</button></div></div>
+      <div class="cs-panel-heading"><div><span class="cs-eyebrow">LIBRARY</span><h2>Components</h2></div><div class="cs-panel-controls"><span id="componentCount" class="cs-count">0</span><button id="toggleLibraryPanel" class="cs-small-btn" type="button" aria-label="Hide component library">Hide</button></div></div>
       <input id="componentSearch" class="cs-search" type="search" placeholder="Search name, category or code…" aria-label="Search components">
       <div id="categoryFilters" class="cs-categories"></div>
       <div id="componentLibrary" class="cs-component-list" aria-live="polite"></div>
@@ -124,7 +121,7 @@
       <div class="cs-statusbar"><span id="selectionStatus">Nothing selected</span><span>Connect wires: choose Connect wires, then tap two pins. Pan: choose Pan or use Space + drag.</span><span id="coordinateStatus">x: 0 · y: 0</span></div>
     </section>
     <aside id="propertiesPanel" class="cs-properties-panel">
-      <div class="cs-panel-heading"><div><span class="cs-eyebrow">INSPECTOR</span><h2 id="propertiesHeading">Properties</h2></div><div class="cs-panel-controls"><button id="toggleInspector" class="cs-small-btn cs-inspector-toggle" type="button" aria-controls="propertiesContent" aria-expanded="true">Hide</button><button id="floatInspectorPanel" class="cs-small-btn" type="button" aria-label="Float properties inspector over canvas">Float</button></div></div>
+      <div class="cs-panel-heading"><div><span class="cs-eyebrow">INSPECTOR</span><h2 id="propertiesHeading">Properties</h2></div><div class="cs-panel-controls"><button id="toggleInspector" class="cs-small-btn cs-inspector-toggle" type="button" aria-label="Hide properties inspector">Hide</button></div></div>
       <div id="propertiesContent" class="cs-properties-content"><div class="cs-empty-property">Select a component, wire or label to edit its properties.</div></div>
       <div class="cs-inspector-note"><strong>Shared component library</strong><p>Artwork and connection pins are maintained together in Admin → Circuit Components. The workspace edits diagram placement, labels, rotation and wires.</p></div>
     </aside>
