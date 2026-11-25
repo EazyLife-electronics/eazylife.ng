@@ -907,3 +907,19 @@
  .cs-statusbar #coordinateStatus{white-space:nowrap!important;flex:0 0 auto!important}
  .cs-selection-toolbar{position:absolute!important;top:6px!important;left:6px!important;right:6px!important;z-index:20!important}
 }
+
+
+@media(max-width:620px){
+ #circuitWorkspace:has(#propertiesPanel.cs-panel-hidden):not(:has(#componentLibraryPanel.cs-panel-hidden)){
+  grid-template-rows:minmax(160px,1fr) minmax(0,17dvh)!important
+ }
+ #circuitWorkspace:has(#propertiesPanel.cs-panel-hidden):not(:has(#componentLibraryPanel.cs-panel-hidden)) #componentLibraryPanel{
+  grid-row:2!important
+ }
+ #circuitWorkspace:has(#componentLibraryPanel.cs-panel-hidden):not(:has(#propertiesPanel.cs-panel-hidden)){
+  grid-template-rows:minmax(160px,1fr) minmax(0,17dvh)!important
+ }
+ #circuitWorkspace:has(#componentLibraryPanel.cs-panel-hidden):not(:has(#propertiesPanel.cs-panel-hidden)) #propertiesPanel{
+  grid-row:2!important
+ }
+}
