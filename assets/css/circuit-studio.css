@@ -294,3 +294,26 @@
  .cs-inspector-note{display:none}
 }
 @media(prefers-reduced-motion:reduce){.cs-property-group summary{scroll-behavior:auto}}
+
+
+/* Consistent, touch-friendly project dialogs and confirmation states. */
+.cs-action-dialog{width:min(440px,calc(100vw - 28px));max-width:calc(100vw - 28px);max-height:min(82dvh,620px);overflow:auto;padding:clamp(14px,3vw,22px);overscroll-behavior:contain}
+.cs-action-dialog form{display:grid;gap:12px}
+.cs-action-dialog .cs-dialog-head{align-items:flex-start;gap:12px}
+.cs-action-dialog .cs-dialog-head h2{margin:4px 0 2px;font-size:clamp(17px,3vw,20px)}
+.cs-action-dialog .cs-field{display:grid;gap:7px;font-size:12px;font-weight:650;color:var(--cs-ink)}
+.cs-action-dialog .cs-field input{width:100%;min-height:44px;padding:10px 12px;font-size:16px;background:var(--cs-work);color:var(--cs-ink);border:1px solid var(--cs-border);border-radius:9px}
+.cs-action-dialog .cs-field input:focus-visible{outline:2px solid var(--cs-accent);outline-offset:2px;border-color:var(--cs-accent)}
+.cs-dialog-message{margin:2px 0 8px;font-size:13px;line-height:1.6;color:var(--cs-muted);overflow-wrap:anywhere}
+.cs-dialog-error{margin:-5px 0 0;color:var(--cs-danger);font-size:12px}
+.cs-dialog-actions{flex-wrap:wrap;gap:8px}
+.cs-action-dialog .cs-dialog-actions button{min-height:42px;min-width:92px}
+.cs-action-dialog .cs-danger{background:color-mix(in srgb,var(--cs-danger) 9%,var(--cs-panel));border-color:color-mix(in srgb,var(--cs-danger) 45%,var(--cs-border));font-weight:750}
+.cs-action-dialog button:focus-visible{outline:2px solid var(--cs-accent);outline-offset:2px}
+.cs-toast{max-width:min(560px,calc(100vw - 24px));text-align:center;line-height:1.45;z-index:80}
+@media(max-width:620px){
+ .cs-action-dialog{width:calc(100vw - 20px);max-width:calc(100vw - 20px);max-height:calc(100dvh - 28px);padding:15px}
+ .cs-action-dialog .cs-dialog-actions{display:grid;grid-template-columns:1fr 1fr}
+ .cs-action-dialog .cs-dialog-actions button{width:100%;min-height:46px}
+}
+@media(prefers-reduced-motion:reduce){.cs-toast{transition:none}}
