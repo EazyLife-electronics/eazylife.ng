@@ -3,6 +3,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Keep this email list in sync with ADMIN_EMAILS in admin/js/admin-auth.mjs
     function isAdmin() {
       return request.auth != null
         && request.auth.token.email == 'damzyeazy@gmail.com';

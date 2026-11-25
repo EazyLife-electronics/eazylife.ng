@@ -1,15 +1,20 @@
-import {COMPONENTS} from '../../js/circuit-components.js';
-let db=null,auth=null,col=null,onAuthStateChanged=null,signOut=null,collection=null,doc=null,getDocs=null,onSnapshot=null,setDoc=null,serverTimestamp=null;
-const $=id=>document.getElementById(id),svgNS='http://www.w3.org/2000/svg';
-const canvas=$('canvas'),art=$('artLayer'),pinLayer=$('pinLayer'),preview=$('previewLayer'),handleLayer=$('handleLayer');
-const requestedComponent=new URLSearchParams(location.search).get('component');
-function redirectToAdminLogin(user){
- const login=new URL('index.html',location.href);
- login.searchParams.set('returnTo',location.href);
- const finish=()=>location.replace(login.href);
- if(user&&user.email!=='damzyeazy@gmail.com'&&auth)signOut(auth).finally(finish);
- else finish();
-}
+import { COMPONENTS } from '../../js/circuit-components.js';
+import { initFirebase } from '../../js/firebase.mjs';
+import { isAdminUser, redirectToAdminLogin } from './admin-auth.mjs';
+import {
+  onAuthStateChanged, signOut
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import {
+  collection, doc, getDocs, onSnapshot, setDoc, serverTimestamp
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const { db, auth } = initFirebase();
+const col = collection(db, 'circuitComponents');
+const $ = id => document.getElementById(id);
+const svgNS = 'http://www.w3.org/2000/svg';
+const canvas = $('canvas'), art = $('artLayer'), pinLayer = $('pinLayer'), preview = $('previewLayer'), handleLayer = $('handleLayer');
+const requestedComponent = new URLSearchParams(location.search).get('component');
+
 let objects=[],pins=[],all=[...COMPONENTS],selected=null,selectedItems=[],tool='select',drawing=null,drag=null,marquee=null,history=[],future=[],editing=null,seq=1;
 const say=(s,bad=false)=>{$('message').textContent=s;$('message').style.color=bad?'#c22':'#087f70'};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -82,4 +87,55 @@ restore(snapshot());history=[snapshot()];
 // Show the bundled starter library immediately, then overlay Firestore records once the admin session is confirmed.
 renderList();
 say('Starter component library loaded. Connecting to your saved component library…');
-(async()=>{try{say('Starter symbols loaded. Connecting to Firebase…');const [appSdk,authSdk,storeSdk]=await Promise.all([import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js'),import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js'),import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js')]);({onAuthStateChanged,signOut}=authSdk);({collection,doc,getDocs,onSnapshot,setDoc,serverTimestamp}=storeSdk);const config={apiKey:'AIzaSyBmF_InIyNfcDMeX4VE_EkSdIipz0nWz6g',authDomain:'eazylife-ng.firebaseapp.com',projectId:'eazylife-ng',storageBucket:'eazylife-ng.firebasestorage.app',messagingSenderId:'310295030883',appId:'1:310295030883:web:f6bb12e70d856309995c56'};const app=appSdk.getApps().find(a=>a.name==='[DEFAULT]')||appSdk.initializeApp(config);db=storeSdk.getFirestore(app);auth=authSdk.getAuth(app);col=collection(db,'circuitComponents');onAuthStateChanged(auth,user=>{if(!user||user.email!=='damzyeazy@gmail.com'){redirectToAdminLogin(user);return}document.body.classList.remove('auth-pending');say('Signed in. Loading saved components from Firestore…');getDocs(col).then(s=>{const saved=s.docs.map(d=>({...d.data(),id:d.id}));const merged=new Map(COMPONENTS.map(item=>[item.id,item]));saved.forEach(item=>merged.set(item.id,{...merged.get(item.id),...item}));all=[...merged.values()];renderList();if(requestedComponent){const target=saved.find(c=>c.id===requestedComponent);if(!target){say('Shared component “'+requestedComponent+'” was not found. No new component will be created.',true);return}document.body.classList.add('component-focus-mode');$('new').hidden=true;$('seed').hidden=true;$('save').textContent='Save shared component';load(target)}else say('Loaded '+all.length+' components, including '+saved.length+' saved Firestore records.');}).catch(e=>{all=[...COMPONENTS];renderList();say('Could not load saved components from Firestore: '+(e.message||e),true);console.error('Painter Firestore read failed:',e)});onSnapshot(col,s=>{const saved=s.docs.map(d=>({...d.data(),id:d.id}));const merged=new Map(COMPONENTS.map(item=>[item.id,item]));saved.forEach(item=>merged.set(item.id,{...merged.get(item.id),...item}));all=[...merged.values()];renderList()},e=>{say('Live Firestore updates failed: '+e.message,true);console.error(e)});});}catch(e){say('Firebase connection failed: '+(e.message||e)+'. The built-in component library and drawing tools remain available; saved records cannot load until the connection is restored.',true);console.error('Painter Firebase initialization failed:',e)}})();
+
+// ---- Auth + Firestore bootstrap (uses shared Firebase + App Check) ----
+renderList();
+say('Starter symbols loaded. Checking admin session…');
+
+onAuthStateChanged(auth, user => {
+  if (!isAdminUser(user)) {
+    redirectToAdminLogin(auth, signOut, user);
+    return;
+  }
+  document.body.classList.remove('auth-pending');
+  document.body.classList.remove('component-access-denied');
+  say('Signed in. Loading saved components from Firestore…');
+
+  getDocs(col).then(s => {
+    const saved = s.docs.map(d => ({ ...d.data(), id: d.id }));
+    const merged = new Map(COMPONENTS.map(item => [item.id, item]));
+    saved.forEach(item => merged.set(item.id, { ...merged.get(item.id), ...item }));
+    all = [...merged.values()];
+    renderList();
+    if (requestedComponent) {
+      const target = saved.find(c => c.id === requestedComponent);
+      if (!target) {
+        say('Shared component “' + requestedComponent + '” was not found. No new component will be created.', true);
+        return;
+      }
+      document.body.classList.add('component-focus-mode');
+      $('new').hidden = true;
+      $('seed').hidden = true;
+      $('save').textContent = 'Save shared component';
+      load(target);
+    } else {
+      say('Loaded ' + all.length + ' components, including ' + saved.length + ' saved Firestore records.');
+    }
+  }).catch(e => {
+    all = [...COMPONENTS];
+    renderList();
+    say('Could not load saved components from Firestore: ' + (e.message || e), true);
+    console.error('Painter Firestore read failed:', e);
+  });
+
+  onSnapshot(col, s => {
+    const saved = s.docs.map(d => ({ ...d.data(), id: d.id }));
+    const merged = new Map(COMPONENTS.map(item => [item.id, item]));
+    saved.forEach(item => merged.set(item.id, { ...merged.get(item.id), ...item }));
+    all = [...merged.values()];
+    renderList();
+  }, e => {
+    say('Live Firestore updates failed: ' + e.message, true);
+    console.error(e);
+  });
+});

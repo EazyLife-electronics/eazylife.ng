@@ -23,6 +23,7 @@ import { initSettings, loadSettingsForm } from './admin-settings.mjs';
 import { setQuotationProducts } from './admin-quotations.mjs';
 import { initSchoolStem, resetSchoolStem } from './admin-school-stem.mjs';
 import { initTechnicalTraining, resetTechnicalTraining } from './admin-technical-training.mjs';
+import { isAdminUser, consumeAdminReturnTo } from './admin-auth.mjs';
 
 const { auth } = initFirebase();
 
@@ -174,19 +175,17 @@ document.getElementById('logoutBtn').addEventListener('click', () => signOut(aut
 
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    const returnTo = new URLSearchParams(location.search).get('returnTo');
-    if (user.email === 'damzyeazy@gmail.com' && returnTo) {
-      try {
-        const target = new URL(returnTo, location.origin);
-        if (target.origin === location.origin &&
-            target.pathname.endsWith('/admin/circuit-component-painter.html')) {
-          location.replace(target.href);
-          return;
-        }
-      } catch (error) {
-        console.warn('Ignoring invalid admin return destination:', error);
+    if (!isAdminUser(user)) {
+      const errorEl = document.getElementById('loginError');
+      if (errorEl) {
+        errorEl.style.color = '#c22';
+        errorEl.textContent = 'This account is not authorized for the EazyLife admin dashboard.';
+        errorEl.classList.remove('hidden');
       }
+      signOut(auth);
+      return;
     }
+    if (consumeAdminReturnTo(user)) return;
     checkMediaService(user);
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('dashboard').classList.remove('hidden');
@@ -209,7 +208,7 @@ onAuthStateChanged(auth, (user) => {
 });
 
 function startDashboard() {
-  if (auth.currentUser?.email === 'damzyeazy@gmail.com') {
+  if (isAdminUser(auth.currentUser)) {
     initSchoolStem();
     initTechnicalTraining();
   } else {
