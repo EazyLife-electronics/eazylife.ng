@@ -95,6 +95,7 @@
     .project-menu-toggle{display:none}
     .nav-actions a:focus-visible,.nav-actions button:focus-visible{outline:3px solid #00B09B;outline-offset:3px}
     @media(max-width:760px){.nav .nav-actions .project-menu-toggle{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border:1px solid var(--border);border-radius:50%;background:#fff;color:var(--teal-dark);padding:0}.nav .nav-actions>a{display:none!important}.nav .nav-actions.menu-open{flex:1 0 100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;overflow:visible;white-space:normal;padding-top:8px}.nav .nav-actions.menu-open>a{display:flex!important;align-items:center;justify-content:center;text-align:center;white-space:normal;padding:11px 9px;font-size:.76rem;min-width:0}.nav .nav-actions.menu-open .btn-wa{grid-column:1/-1;justify-self:stretch;width:auto;border-radius:999px;padding:11px}.nav-inner:has(.nav-actions.menu-open){flex-wrap:wrap}}
+    .project-skeleton{border:1px solid var(--border);border-radius:18px;overflow:hidden;background:#fff;box-shadow:0 3px 14px #00000008}.project-skeleton-media,.project-skeleton-line{position:relative;overflow:hidden;background:#e8eeec}.project-skeleton-media{height:230px}.project-skeleton-body{padding:18px}.project-skeleton-line{height:12px;border-radius:8px;margin:12px 0}.project-skeleton-line:first-child{height:9px}.project-skeleton-line:last-child{height:38px;border-radius:999px;margin-top:18px}.project-skeleton-media::after,.project-skeleton-line::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.72),transparent);animation:project-shimmer 1.35s infinite}@keyframes project-shimmer{to{transform:translateX(100%)}}:root[data-theme="dark"] .project-skeleton{background:#142522;border-color:#30413d}:root[data-theme="dark"] .project-skeleton-media,:root[data-theme="dark"] .project-skeleton-line{background:#263632}:root[data-theme="dark"] .project-skeleton-media::after,:root[data-theme="dark"] .project-skeleton-line::after{background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent)}@media(prefers-reduced-motion:reduce){.project-skeleton-media::after,.project-skeleton-line::after{animation:none;transform:none}}
   </style>
 <script>(function(){var t=null;try{t=localStorage.getItem('eazylife-theme')}catch(e){}t=t||(matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);document.documentElement.classList.toggle('dark',t==='dark')})();</script>
 <link rel="stylesheet" href="assets/css/site-theme.css">
@@ -154,7 +155,7 @@
     <div class="eyebrow">Proof of work</div><h1>Engineering Project Gallery</h1>
     <p>Explore practical builds, experiments and engineering work from EazyLife. Select a project to see its story, images and available build details.</p>
   </div></header>
-  <main class="gallery"><div class="container" id="content"><p class="empty">Loading projects...</p></div></main>
+  <main class="gallery"><div class="container" id="content" aria-busy="true" aria-live="polite"><div class="grid" aria-label="Loading project gallery"><article class="project-skeleton" aria-hidden="true"><div class="project-skeleton-media"></div><div class="project-skeleton-body"><div class="project-skeleton-line" style="width:34%"></div><div class="project-skeleton-line" style="width:68%"></div><div class="project-skeleton-line" style="width:96%"></div><div class="project-skeleton-line" style="width:78%"></div><div class="project-skeleton-line" style="width:52%"></div></div></article><article class="project-skeleton" aria-hidden="true"><div class="project-skeleton-media"></div><div class="project-skeleton-body"><div class="project-skeleton-line" style="width:34%"></div><div class="project-skeleton-line" style="width:68%"></div><div class="project-skeleton-line" style="width:96%"></div><div class="project-skeleton-line" style="width:78%"></div><div class="project-skeleton-line" style="width:52%"></div></div></article><article class="project-skeleton" aria-hidden="true"><div class="project-skeleton-media"></div><div class="project-skeleton-body"><div class="project-skeleton-line" style="width:34%"></div><div class="project-skeleton-line" style="width:68%"></div><div class="project-skeleton-line" style="width:96%"></div><div class="project-skeleton-line" style="width:78%"></div><div class="project-skeleton-line" style="width:52%"></div></div></article><article class="project-skeleton" aria-hidden="true"><div class="project-skeleton-media"></div><div class="project-skeleton-body"><div class="project-skeleton-line" style="width:34%"></div><div class="project-skeleton-line" style="width:68%"></div><div class="project-skeleton-line" style="width:96%"></div><div class="project-skeleton-line" style="width:78%"></div><div class="project-skeleton-line" style="width:52%"></div></div></article><article class="project-skeleton" aria-hidden="true"><div class="project-skeleton-media"></div><div class="project-skeleton-body"><div class="project-skeleton-line" style="width:34%"></div><div class="project-skeleton-line" style="width:68%"></div><div class="project-skeleton-line" style="width:96%"></div><div class="project-skeleton-line" style="width:78%"></div><div class="project-skeleton-line" style="width:52%"></div></div></article><article class="project-skeleton" aria-hidden="true"><div class="project-skeleton-media"></div><div class="project-skeleton-body"><div class="project-skeleton-line" style="width:34%"></div><div class="project-skeleton-line" style="width:68%"></div><div class="project-skeleton-line" style="width:96%"></div><div class="project-skeleton-line" style="width:78%"></div><div class="project-skeleton-line" style="width:52%"></div></div></article></div></div></main>
   <footer><div class="container">EazyLife Robotics &amp; Electronics Solutions · Ibadan, Nigeria · <a href="https://wa.me/2347051548082">Contact us</a></div></footer>
   <script type="module">
     import { getPublishedProjects, getProducts } from './js/store.mjs';
@@ -183,6 +184,7 @@
     }
 
     function renderGallery(projects) {
+      content.setAttribute("aria-busy","false");
       const categories = [...new Set(projects.map(p => String(p.category || '').trim()).filter(Boolean))].sort((a,b) => a.localeCompare(b));
       content.innerHTML =
         '<div class="gallery-tools">' +
@@ -270,6 +272,7 @@
     }
 
     function renderDetail(p, products) {
+      content.setAttribute("aria-busy","false");
       document.title = (p.title || 'Project') + ' | EazyLife';
       document.getElementById('pageHeader').style.display = 'none';
       const cover = safeUrl(p.coverImage) || safeUrl(Array.isArray(p.images) ? p.images[0] : '');
@@ -310,6 +313,7 @@
       }
     } catch (error) {
       console.error('Could not load projects:', error);
+      content.setAttribute('aria-busy','false');
       content.innerHTML = '<p class="empty">We could not load the project gallery right now. Please refresh or try again later.</p>';
     }
   </script>
