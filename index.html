@@ -353,7 +353,51 @@
     .form-success { display: none; text-align: center; padding: 16px; color: var(--teal-dark); font-size: 0.85rem; }
     .form-success.show { display: block; }
     .form-success i { font-size: 1.4rem; margin-bottom: 6px; display: block; }
-
+                        
+    /* NAV DROPDOWN MENU */
+    .nav-dropdown { position: relative; }
+    .nav-dropdown-toggle { display: flex; align-items: center; gap: 6px; }
+    .nav-dropdown-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      padding: 12px;
+      min-width: 240px;
+      z-index: 110;
+      flex-direction: column;
+      gap: 4px;
+    }
+    :root[data-theme="dark"] .nav-dropdown-menu {
+      background: var(--dm-surface);
+      border-color: var(--dm-border);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    .nav-dropdown.open .nav-dropdown-menu { display: flex; }
+    
+    .nav-dropdown-section { display: flex; flex-direction: column; gap: 2px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+    .nav-dropdown-section:last-of-type { border-bottom: none; padding-bottom: 4px; }
+    :root[data-theme="dark"] .nav-dropdown-section { border-color: var(--dm-border); }
+    
+    .nav-dropdown-heading { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--teal-dark); padding: 4px 12px; }
+    
+    .nav-dropdown-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 10px;
+      font-size: 0.85rem; font-weight: 600; color: var(--text);
+      transition: background 0.15s ease;
+    }
+    .nav-dropdown-item i { color: var(--teal); width: 16px; text-align: center; }
+    .nav-dropdown-item:hover { background: var(--teal-light); color: var(--dark); }
+    
+    :root[data-theme="dark"] .nav-dropdown-item { color: var(--dm-text); }
+    :root[data-theme="dark"] .nav-dropdown-item:hover { background: var(--dm-surface-2); }
+    :root[data-theme="dark"] .nav-dropdown-item i { color: #5ee0c4; }
+                        
     /* CONTACT / FOOTER */
     .contact-info { display: flex; flex-direction: column; gap: 14px; margin-top: 20px; }
     .contact-item { display: flex; gap: 14px; align-items: flex-start; background: #fff; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; }
@@ -444,21 +488,38 @@
   <nav class="nav">
     <div class="nav-inner">
       <a href="index.html" class="nav-logo"><img id="navLogo" src="assets/pictures/logo_black_transparent.png" alt="EazyLife" style="height:34px;width:auto;display:block;"></a>
-      <div class="nav-actions">
+        <div class="nav-actions">
         <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode" type="button"><i class="fas fa-moon"></i></button>
+        
         <a href="shop.html#cart" id="navCartBtn" class="btn btn-outline" style="position:relative; display:none;">
           <i class="fas fa-shopping-basket"></i>
           <span id="navCartCount" style="background:var(--teal); color:#fff; border-radius:999px; padding:1px 7px; font-size:0.68rem; font-weight:800;">0</span>
         </a>
-        <a href="projects.html" class="btn btn-outline"><i class="fas fa-diagram-project"></i> Project Gallery</a>
-        <a href="stem-lab.html" class="btn btn-outline btn-stem-lab" aria-label="Explore the interactive STEM Lab"><i class="fas fa-flask"></i> STEM Lab</a>
-        <a href="circuit-studio.html" class="btn btn-outline btn-circuit-studio" aria-label="Open EazyLife Circuit Studio"><i class="fas fa-draw-polygon"></i> Circuit Studio</a>
-        <a href="stem-electronics-fundamentals.html" class="btn btn-outline"><i class="fas fa-book-open"></i> Lessons</a>
-        <a href="stem-projects.html" class="btn btn-outline"><i class="fas fa-microchip"></i> Project Playground</a>
-        <a href="stem-resistor-colour-code.html" class="btn btn-outline"><i class="fas fa-calculator"></i> Tools</a>
-        <a href="reviews.html" class="btn btn-outline"><i class="fas fa-star"></i> Reviews</a>
-        <a href="shop.html" class="btn btn-outline"><i class="fas fa-shopping-basket"></i> Shop</a>
-        <a href="track.html" class="btn btn-outline" title="Track Order"><i class="fas fa-truck-fast"></i> Track Order</a>
+
+        <!-- NEW CLEAN DROPDOWN MENU -->
+        <div class="nav-dropdown">
+          <button class="btn btn-outline nav-dropdown-toggle" aria-expanded="false" aria-controls="navDropdownMenu">
+            <i class="fas fa-bars"></i> Menu <i class="fas fa-chevron-down" style="font-size:0.6rem; margin-left:2px;"></i>
+          </button>
+          <div class="nav-dropdown-menu" id="navDropdownMenu">
+            <div class="nav-dropdown-section">
+              <span class="nav-dropdown-heading">Learn & Build</span>
+              <a href="stem-lab.html" class="nav-dropdown-item"><i class="fas fa-flask"></i> STEM Lab</a>
+              <a href="circuit-studio.html" class="nav-dropdown-item"><i class="fas fa-draw-polygon"></i> Circuit Studio</a>
+              <a href="projects.html" class="nav-dropdown-item"><i class="fas fa-diagram-project"></i> Project Gallery</a>
+              <a href="stem-electronics-fundamentals.html" class="nav-dropdown-item"><i class="fas fa-book-open"></i> Lessons</a>
+              <a href="stem-projects.html" class="nav-dropdown-item"><i class="fas fa-microchip"></i> Playground</a>
+              <a href="stem-resistor-colour-code.html" class="nav-dropdown-item"><i class="fas fa-calculator"></i> Tools</a>
+            </div>
+            <div class="nav-dropdown-section">
+              <span class="nav-dropdown-heading">Support</span>
+              <a href="reviews.html" class="nav-dropdown-item"><i class="fas fa-star"></i> Reviews</a>
+              <a href="track.html" class="nav-dropdown-item"><i class="fas fa-truck-fast"></i> Track Order</a>
+            </div>
+          </div>
+        </div>
+
+        <a href="shop.html" class="btn btn-primary"><i class="fas fa-shopping-basket"></i> Shop</a>
         <a href="https://wa.me/2347051548082" target="_blank" class="btn btn-wa"><i class="fab fa-whatsapp"></i></a>
       </div>
     </div>
@@ -769,7 +830,24 @@
       localStorage.setItem('eazylife-theme', next);
       applyThemeVisuals();
     });
-
+    
+    // Nav dropdown toggle logic
+    const navDropdown = document.querySelector('.nav-dropdown');
+    const navToggleBtn = document.querySelector('.nav-dropdown-toggle');
+    if (navToggleBtn) {
+      navToggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        navDropdown.classList.toggle('open');
+        navToggleBtn.setAttribute('aria-expanded', navDropdown.classList.contains('open'));
+      });
+      // Close dropdown when clicking anywhere else on the page
+      document.addEventListener('click', (e) => {
+        if (!navDropdown.contains(e.target)) {
+          navDropdown.classList.remove('open');
+          navToggleBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
     // If the person hasn't manually chosen a theme, keep following the system preference live
     if (window.matchMedia && !localStorage.getItem('eazylife-theme')) {
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
