@@ -975,9 +975,9 @@
                             <button disabled class="bg-gray-200 dark:bg-[#2a3835] text-gray-400 w-full py-2.5 rounded-xl font-bold text-xs cursor-not-allowed">Out of Stock</button>
                         ` : cardLine ? `
                             <div class="flex items-center justify-center gap-2 bg-gray-50 dark:bg-[#1c2925] p-1 rounded-xl">
-                                <button onclick="changeCardQty('${p.id}',-1)" class="w-8 h-8 bg-white dark:bg-[#182420] dark:text-gray-100 rounded-lg shadow-sm font-bold">-</button>
-                                <input type="text" inputmode="numeric" pattern="[0-9]*" value="${cardLine.quantity}" onfocus="this.select()" onchange="setCardQty('${p.id}', this.value)" class="font-black text-sm w-10 text-center dark:text-gray-100 bg-white dark:bg-[#182420] rounded-lg py-1.5 outline-none">
-                                <button onclick="changeCardQty('${p.id}',1)" class="w-8 h-8 bg-white dark:bg-[#182420] dark:text-gray-100 rounded-lg shadow-sm font-bold">+</button>
+                                <button onclick="changeCardQty('${p.id}',-1)" class="w-11 h-11 bg-white dark:bg-[#182420] dark:text-gray-100 rounded-lg shadow-sm font-bold">-</button>
+                                <input type="text" inputmode="numeric" pattern="[0-9]*" value="${cardLine.quantity}" onfocus="this.select()" onchange="setCardQty('${p.id}', this.value)" class="font-black text-base w-14 text-center dark:text-gray-100 bg-white dark:bg-[#182420] rounded-lg py-1.5 outline-none">
+                                <button onclick="changeCardQty('${p.id}',1)" class="w-11 h-11 bg-white dark:bg-[#182420] dark:text-gray-100 rounded-lg shadow-sm font-bold">+</button>
                             </div>
                             <button onclick="openProductModal('${p.id}')" class="w-full text-center text-[10px] text-gray-400 mt-1 underline decoration-dotted">${otherQty > 0 ? `+${otherQty} more in other options` : 'Change option'}</button>
                         ` : `
