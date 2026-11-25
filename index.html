@@ -315,15 +315,80 @@
     .project-gallery-card p { color:var(--text-light); font-size:.84rem; }
     .project-gallery-empty { grid-column:1/-1; padding:28px; text-align:center; color:var(--text-light); background:#fafbfc; border:1px dashed var(--border); border-radius:16px; }
     @media(min-width:720px) { .project-gallery-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
-    /* SERVICES STRIP */
-    .services-strip { display: grid; grid-template-columns: 1fr; gap: 14px; }
-    .service-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; position: relative; }
-    .service-icon { width: 46px; height: 46px; border-radius: 12px; background: var(--teal-light); color: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 1.15rem; margin-bottom: 14px; }
-    .service-tag { display: inline-block; font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--lime-dark); background: var(--lime-light); padding: 3px 9px; border-radius: 999px; margin-bottom: 10px; }
-    .service-card h3 { font-size: 1.02rem; font-weight: 800; color: var(--dark); margin-bottom: 8px; }
-    .service-card p { font-size: 0.85rem; color: var(--text-light); margin-bottom: 14px; }
-    .service-link { font-size: 0.8rem; font-weight: 700; color: var(--teal); display: inline-flex; align-items: center; gap: 6px; }
-
+    /* SERVICES STRIP: compact horizontal cards keep the six offerings scannable. */
+    .services-strip { display:grid; grid-template-columns:1fr; gap:12px; }
+    .service-card {
+      display:grid;
+      grid-template-columns:42px minmax(0,1fr);
+      grid-template-rows:auto auto;
+      column-gap:14px;
+      align-items:start;
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:16px;
+      position:relative;
+      min-width:0;
+    }
+    .service-icon {
+      grid-column:1;
+      grid-row:1 / span 2;
+      width:42px;
+      height:42px;
+      border-radius:11px;
+      background:var(--teal-light);
+      color:var(--teal);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:1rem;
+      margin:2px 0 0;
+    }
+    .service-card h3 {
+      grid-column:2;
+      font-size:.96rem;
+      font-weight:800;
+      color:var(--dark);
+      margin:0 0 5px;
+      line-height:1.3;
+    }
+    .service-card p {
+      grid-column:2;
+      font-size:.81rem;
+      color:var(--text-light);
+      margin:0 0 9px;
+      line-height:1.5;
+    }
+    .service-card .service-link {
+      grid-column:2;
+      justify-self:start;
+      font-size:.77rem;
+      font-weight:700;
+      color:var(--teal);
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      margin-top:0;
+    }
+    .service-tag {
+      grid-column:2;
+      justify-self:start;
+      display:inline-block;
+      width:max-content;
+      max-width:100%;
+      font-size:.59rem;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      color:var(--lime-dark);
+      background:var(--lime-light);
+      padding:3px 8px;
+      border-radius:999px;
+      margin:0 0 6px;
+    }
+    @media (min-width:720px) {
+      .services-strip { grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    }
     /* TRUST / ABOUT */
     .trust-section { background: var(--dark); color: #fff; border-radius: 24px; margin: 0 20px; padding: 40px 24px; }
     .trust-section .section-label { color: var(--lime); }
