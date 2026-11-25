@@ -48,7 +48,7 @@
 <script type="module">
 import { getProducts, getPublishedProjects, placeOrder, getSettings } from './js/store.mjs';
 const params=new URLSearchParams(location.search), projectId=params.get('project');
-let project=null,products=[],settings={},lines=[];
+let project=null,products=[],settings={},lines=[],unresolvedLinks=0;
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 function variantLabel(v,i){const a=[v?.processor,v?.ram,v?.rom,v?.color].filter(Boolean);return a.length?a.join(' / '):'Variant '+(i+1)}
@@ -65,7 +65,7 @@ function render(){
   const v=variants.find(z=>String(z.id)===String(x.variantId)) || (x.variant ? variants.find((z,j)=>norm(variantLabel(z,j))===norm(x.variant)) : null);
   return {...x,key:i,product:p,variantData:v,checked:x.required!==false,quantity:Math.max(1,Number(x.quantity)||1)};
  });
- const unresolved=lines.filter(x=>!x.product||!x.variantData);
+ const unresolved=lines.filter(x=>!x.product||!x.variantData);\n unresolvedLinks=unresolved.length;
  lines=lines.filter(x=>x.product&&x.variantData);
  $('count').textContent=lines.length+' orderable component'+(lines.length===1?'':'s')+(unresolved.length?' · '+unresolved.length+' need repair':'');
  $('noItems').classList.toggle('hidden',lines.length>0);
@@ -80,7 +80,7 @@ function render(){
  $('items').querySelectorAll('[data-qty]').forEach(el=>el.addEventListener('click',()=>{const x=lines.find(z=>z.key===Number(el.dataset.qty));x.quantity=Math.max(1,x.quantity+Number(el.dataset.delta));render()}));
  updateTotal();
 }
-function updateTotal(){const sum=selected().reduce((n,x)=>n+unitPrice(x.variantData)*x.quantity,0);$('subtotal').textContent='₦'+sum.toLocaleString();$('submit').disabled=!selected().length}
+function updateTotal(){const sum=selected().reduce((n,x)=>n+unitPrice(x.variantData)*x.quantity,0);$('subtotal').textContent='₦'+sum.toLocaleString();$('submit').disabled=!selected().length||unresolvedLinks>0}
 async function init(){
  try{
   const [ps,allProjects,site]=await Promise.all([getProducts({forceRefresh:true}),getPublishedProjects(),getSettings()]);
@@ -93,7 +93,7 @@ $('submit').addEventListener('click',async()=>{
  const name=$('customerName').value.trim(),phone=$('phone').value.trim(),address=$('address').value.trim(),items=selected();
  if(!name||!phone||!address)return showError('Please enter your name, phone number and delivery address.');
  if(!$('terms').checked)return showError('Please confirm that you understand the availability and fulfilment terms.');
- if(!items.length)return showError('Select at least one component.');
+ if(unresolvedLinks)return showError('Some saved project components could not be matched to the catalogue. Please contact EazyLife to repair the links before submitting.');\n if(!items.length)return showError('Select at least one component.');
  const btn=$('submit');btn.disabled=true;btn.textContent='Submitting...';$('error').classList.add('hidden');
  const orderItems=items.map(x=>({productId:x.product.id,variantId:x.variantData.id,sku:x.variantData.sku||'',name:x.product.name,variant:variantLabel(x.variantData,x.product.variants.findIndex(v=>v.id===x.variantData.id)),price:unitPrice(x.variantData),quantity:x.quantity,required:x.required!==false}));
  const subtotal=orderItems.reduce((n,x)=>n+x.price*x.quantity,0);
