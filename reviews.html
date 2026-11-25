@@ -78,9 +78,11 @@
   function card(r){
     const image=safeUrl(r.coverImage||(r.images||[])[0]);
     const summary=r.summary||r.text||'';
+    const short=summary.length>150?summary.slice(0,147).trim()+'…':summary;
     return `<article class="card">${image?`<a href="reviews.html?id=${encodeURIComponent(r.id)}"><img src="${esc(optimizedImageUrl(image,640))}" ${responsiveImageAttrs(image,[320,480,640,960],"(max-width: 650px) 100vw, 50vw")} alt="Project photograph associated with the review by ${esc(r.name)}" loading="lazy" decoding="async" width="640" height="420"></a>`:''}
       <div class="stars" aria-label="${Number(r.stars)||0} out of 5 stars">${stars(r)}</div><h2 style="font-size:1.02rem;margin:9px 0 0">${esc(r.name||'Customer')}</h2>
-      <div class="meta">${esc(r.title||'')}${r.categories?.length?' · '+esc(r.categories.join(', ')):''}</div><p class="summary">${esc(summary.length>260?summary.slice(0,257).trim()+'…':summary)}</p>
+      <div class="meta">${esc(r.title||'')}${r.categories?.length?' · '+esc(r.categories.join(', ')):''}</div><p class="summary review-preview">${esc(short)}</p>
+      ${summary.length>150?`<button class="more review-expand" type="button" aria-expanded="false" data-full-text="${esc(summary)}">Show more</button>`:''}
       <a class="more" href="reviews.html?id=${encodeURIComponent(r.id)}">Read full review <i class="fas fa-arrow-right"></i></a></article>`;
   }
   function render(){
@@ -103,7 +105,7 @@
     detailView.innerHTML=`<a class="back" href="reviews.html"><i class="fas fa-arrow-left"></i> All reviews</a>
       <div class="eyebrow" style="margin-top:28px">Customer review</div><h1>${esc(r.name||'Customer experience')}</h1>
       <div class="meta">${esc(r.title||'')}${r.categories?.length?' · '+esc(r.categories.join(', ')):''}</div>
-      <div class="stars">${stars(r)}</div><blockquote class="quote">“${esc(r.text||'')}”</blockquote>
+      <div class="stars">${stars(r)}</div><details class="review-full"><summary>Read full customer review</summary><blockquote class="quote">“${esc(r.text||'')}”</blockquote></details>
       ${projectBlock(r.project)}
       ${photos.length?`<h2 style="font-size:1.2rem;margin-top:28px">Associated project photographs</h2><div class="detail-photos">${photos.map((src,i)=>`<img src="${esc(optimizedImageUrl(src,640))}" ${responsiveImageAttrs(src,[320,480,640,960],"(max-width: 650px) 100vw, 50vw")} alt="Project photograph ${i+1} associated with this review" loading="lazy" decoding="async" width="640" height="420">`).join('')}</div><p class="notice">Photographs are shared by EazyLife as supporting project context. They are not presented as identity verification.</p>`:''}
       <p class="notice">Review text is displayed as submitted. Any project summary or additional context is provided by EazyLife.</p>
