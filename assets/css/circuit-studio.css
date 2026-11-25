@@ -549,3 +549,25 @@
 .cs-toolbar-drag-handle{display:none;cursor:grab;touch-action:none}
 .cs-toolbar-drag-handle:active{cursor:grabbing}
 .cs-toolbar.cs-toolbar-floating .cs-toolbar-mini-actions #toolbarDragHandle{display:inline-flex}
+
+/* Full mode fits the frame by wrapping controls, never by sideways scrolling. */
+@media(min-width:621px){
+ .cs-toolbar:not(.cs-toolbar-mini):not(.cs-toolbar-floating):not(.cs-toolbar-hidden){
+  position:fixed;top:54px;left:50%;right:auto;transform:translateX(-50%);
+  width:min(96vw,1500px);max-height:min(42dvh,360px);
+  overflow-x:hidden;overflow-y:auto;flex-wrap:wrap;justify-content:flex-start
+ }
+ .cs-toolbar:not(.cs-toolbar-mini):not(.cs-toolbar-floating):not(.cs-toolbar-hidden) .cs-tool-group{
+  flex:0 1 auto;min-width:0;flex-wrap:wrap;overflow:visible
+ }
+}
+@media(max-width:620px){
+ .cs-toolbar:not(.cs-toolbar-mini):not(.cs-toolbar-floating):not(.cs-toolbar-hidden){
+  top:52px;left:8px;right:8px;transform:none;width:auto;
+  max-height:38dvh;overflow-x:hidden;overflow-y:auto;
+  flex-wrap:wrap;align-content:flex-start
+ }
+ .cs-toolbar:not(.cs-toolbar-mini):not(.cs-toolbar-floating):not(.cs-toolbar-hidden) .cs-tool-group{
+  flex:0 1 auto;min-width:0;max-width:100%;flex-wrap:wrap;overflow:visible
+ }
+}
