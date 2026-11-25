@@ -65,7 +65,8 @@ function render(){
   const v=variants.find(z=>String(z.id)===String(x.variantId)) || (x.variant ? variants.find((z,j)=>norm(variantLabel(z,j))===norm(x.variant)) : null);
   return {...x,key:i,product:p,variantData:v,checked:x.required!==false,quantity:Math.max(1,Number(x.quantity)||1)};
  });
- const unresolved=lines.filter(x=>!x.product||!x.variantData);\n unresolvedLinks=unresolved.length;
+ const unresolved=lines.filter(x=>!x.product||!x.variantData);
+ unresolvedLinks=unresolved.length;
  lines=lines.filter(x=>x.product&&x.variantData);
  $('count').textContent=lines.length+' orderable component'+(lines.length===1?'':'s')+(unresolved.length?' · '+unresolved.length+' need repair':'');
  $('noItems').classList.toggle('hidden',lines.length>0);
