@@ -292,19 +292,21 @@ function setWorkspacePanel(key,action){
  syncWorkspacePanels();
 }
 panelButtons.library.hide.addEventListener('click',()=>setWorkspacePanel('library','hide'));
-panelButtons.library.show.addEventListener('click',()=>setWorkspacePanel('library','show'));
+panelButtons.library.show.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();setWorkspacePanel('library','show')});
+panelButtons.library.bubble.addEventListener('pointerdown',e=>e.stopPropagation());
 panelButtons.inspector.hide.addEventListener('click',()=>setWorkspacePanel('inspector','hide'));
-panelButtons.inspector.show.addEventListener('click',()=>setWorkspacePanel('inspector','show'));
+panelButtons.inspector.show.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();setWorkspacePanel('inspector','show')});
+panelButtons.inspector.bubble.addEventListener('pointerdown',e=>e.stopPropagation());
 for(const key of ['library','inspector'])if(workspacePrefs.panels?.[key]?.hidden)(key==='library'?libraryPanel:propertiesPanel).classList.add('cs-panel-hidden');
 syncWorkspacePanels();
 // Persistent, draggable bubbles are the only way to reopen a hidden panel.
 function positionBubble(el,key,side){
  const saved=workspacePrefs.bubblePositions?.[key];el.style.position='fixed';el.style.zIndex='110';el.style.touchAction='none';
  const clamp=()=>{const r=el.getBoundingClientRect(),x=Math.max(6,Math.min(innerWidth-r.width-6,r.left)),safeTop=Math.max(72,(document.querySelector('.cs-topbar')?.getBoundingClientRect().bottom||64)+8),y=Math.max(safeTop,Math.min(innerHeight-r.height-10,r.top));el.style.left=x+'px';el.style.top=y+'px';el.style.right='auto'};
- if(saved&&Number.isFinite(saved.x)&&Number.isFinite(saved.y)){el.style.left=saved.x+'px';el.style.top=saved.y+'px';el.style.right='auto'}else{el.style.top='76px';el.style.left=side==='left'?'12px':'auto';el.style.right=side==='right'?'12px':'auto'}clamp();
+ if(saved&&Number.isFinite(saved.x)&&Number.isFinite(saved.y)){el.style.left=saved.x+'px';el.style.top=saved.y+'px';el.style.right='auto'}else{el.style.top=(innerWidth<=620?Math.round(innerHeight*(key==='library'?.43:.57)):76)+'px';el.style.left=side==='left'?'12px':'auto';el.style.right=side==='right'?'12px':'auto'}clamp();
  let moved=false,sx=0,sy=0,ox=0,oy=0;
  el.addEventListener('pointerdown',e=>{if(e.button!==0)return;moved=false;sx=e.clientX;sy=e.clientY;const r=el.getBoundingClientRect();ox=r.left;oy=r.top;el.setPointerCapture?.(e.pointerId)});
- el.addEventListener('pointermove',e=>{if(!el.hasPointerCapture?.(e.pointerId))return;const dx=e.clientX-sx,dy=e.clientY-sy;if(Math.abs(dx)+Math.abs(dy)>6)moved=true;if(!moved)return;el.style.left=Math.max(6,Math.min(innerWidth-el.offsetWidth-6,ox+dx))+'px';el.style.top=Math.max(58,Math.min(innerHeight-el.offsetHeight-10,oy+dy))+'px';el.style.right='auto'});
+ el.addEventListener('pointermove',e=>{if(!el.hasPointerCapture?.(e.pointerId))return;const dx=e.clientX-sx,dy=e.clientY-sy;if(Math.abs(dx)+Math.abs(dy)>6)moved=true;if(!moved)return;const safeTop=Math.max(72,(document.querySelector('.cs-topbar')?.getBoundingClientRect().bottom||64)+8);el.style.left=Math.max(6,Math.min(innerWidth-el.offsetWidth-6,ox+dx))+'px';el.style.top=Math.max(safeTop,Math.min(innerHeight-el.offsetHeight-10,oy+dy))+'px';el.style.right='auto'});
  el.addEventListener('pointerup',()=>{if(moved){const r=el.getBoundingClientRect();workspacePrefs.bubblePositions=workspacePrefs.bubblePositions||{};workspacePrefs.bubblePositions[key]={x:r.left,y:r.top};saveWorkspacePrefs();el.dataset.dragged='1';requestAnimationFrame(()=>delete el.dataset.dragged)}});
  window.addEventListener('resize',clamp);
  el.addEventListener('click',e=>{if(el.dataset.dragged==='1'){e.preventDefault();e.stopImmediatePropagation()}});
