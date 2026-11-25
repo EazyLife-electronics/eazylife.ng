@@ -148,3 +148,22 @@
 
 /* Keep grouped admin-only controls hidden until the authorized account is confirmed. */
 .cs-admin-project-tools[hidden]{display:none!important}
+
+
+/* Tablet layout: preserve a usable drawing area instead of floating two wide panels
+   over a narrow canvas. Laptop/desktop keeps the full floating-panel workspace. */
+@media (min-width:621px) and (max-width:900px){
+ .cs-page{overflow:auto}
+ .cs-topbar{position:sticky;top:0;z-index:40;height:auto;min-height:54px;padding:8px 12px;flex-wrap:wrap}
+ .cs-top-actions{justify-content:flex-start;flex-wrap:nowrap;max-width:100%}
+ .cs-app{position:relative;inset:auto;width:100%;height:auto;min-height:calc(100dvh - 54px);overflow:visible}
+ .cs-toolbar{position:relative;top:auto;left:auto;transform:none;width:100%;max-height:none;overflow:visible;flex-wrap:wrap;justify-content:flex-start;border-radius:0;box-shadow:none;backdrop-filter:none}
+ .cs-tool-group{flex-wrap:wrap}
+ .cs-workspace{position:relative;inset:auto;display:grid;grid-template-columns:minmax(175px,30%) minmax(0,1fr);grid-template-rows:minmax(520px,1fr) auto;width:100%;height:auto;min-height:0}
+ .cs-library-panel{position:relative;inset:auto;grid-column:1;grid-row:1;width:auto;max-height:none;min-height:520px;border:0;border-right:1px solid var(--cs-border);border-radius:0;box-shadow:none;backdrop-filter:none}
+ .cs-canvas-panel{position:relative;inset:auto;grid-column:2;grid-row:1;width:auto;height:auto;min-height:520px}
+ .cs-canvas-head{position:relative;top:auto;left:auto;transform:none;width:auto;max-width:none;height:auto;min-height:48px;border:0;border-radius:0;box-shadow:none;backdrop-filter:none;flex-wrap:wrap}
+ .cs-canvas-wrap{position:relative;inset:auto;width:100%;height:auto;min-height:460px;flex:1}
+ .cs-properties-panel{position:relative;inset:auto;grid-column:1/-1;grid-row:2;width:auto;max-height:260px;min-height:150px;margin:0;border:0;border-top:1px solid var(--cs-border);border-radius:0;box-shadow:none;backdrop-filter:none}
+ .cs-statusbar{position:relative;inset:auto;transform:none;width:100%;max-width:none;border:0;border-radius:0;backdrop-filter:none}
+}
