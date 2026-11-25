@@ -618,3 +618,63 @@
  .cs-canvas-wrap{position:relative;inset:auto;width:100%;min-height:42dvh;flex:1 1 auto}
  .cs-panel-reopen{position:fixed!important;z-index:120!important}
 }
+
+
+/* Screenshot follow-up: keep project actions inside the toolbar and make every mode reachable. */
+.cs-app{position:relative}
+.cs-toolbar.cs-toolbar-full,.cs-toolbar.cs-toolbar-mini{
+ position:relative!important;inset:auto!important;transform:none!important;
+ margin:0!important
+}
+.cs-toolbar .cs-toolbar-modebar{
+ display:flex!important;visibility:visible!important;opacity:1!important;
+ flex:0 0 auto!important;align-items:center;gap:6px;order:0
+}
+.cs-toolbar.cs-toolbar-full .cs-toolbar-modebar{flex:0 0 100%!important}
+.cs-toolbar.cs-toolbar-full .cs-toolbar-modebar button{display:inline-flex!important}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-modebar{flex:0 0 auto!important}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-modebar button{display:inline-flex!important}
+.cs-toolbar.cs-toolbar-mini .cs-toolbar-modebar .cs-toolbar-mode-label{display:inline!important}
+.cs-toolbar.cs-toolbar-full .cs-tool-group{display:flex!important}
+.cs-toolbar.cs-toolbar-mini .cs-tool-group{display:flex!important}
+.cs-toolbar .cs-project-actions-row{
+ position:relative!important;inset:auto!important;transform:none!important;
+ flex:0 0 100%;width:100%;max-width:none;min-width:0;margin:0;
+ display:flex;align-items:center;justify-content:space-between;gap:8px;
+ border-radius:8px;box-shadow:none;backdrop-filter:none
+}
+.cs-toolbar .cs-project-actions-row>div:first-child{min-width:0;display:flex;flex-direction:column}
+.cs-toolbar .cs-project-actions-row .cs-canvas-actions{display:flex;align-items:center;flex-wrap:nowrap;gap:6px}
+.cs-toolbar.cs-toolbar-mini .cs-project-actions-row{
+ flex:0 0 auto!important;width:auto!important;max-width:none!important;
+ flex-wrap:nowrap!important;white-space:nowrap;padding:0 6px
+}
+.cs-toolbar.cs-toolbar-mini .cs-project-actions-row>div:first-child{display:none!important}
+.cs-toolbar.cs-toolbar-mini .cs-project-actions-row .cs-canvas-actions{flex-wrap:nowrap!important;white-space:nowrap}
+.cs-toolbar.cs-toolbar-mini .cs-project-actions-row .cs-small-btn{flex:0 0 auto}
+.cs-toolbar-bubble{
+ position:absolute!important;top:8px!important;right:12px!important;left:auto!important;
+ z-index:140!important;margin:0!important
+}
+.cs-toolbar.cs-toolbar-hidden{display:none!important}
+@media(max-width:620px){
+ .cs-toolbar.cs-toolbar-full{max-height:42dvh!important;overflow-x:hidden!important;overflow-y:auto!important}
+ .cs-toolbar.cs-toolbar-full .cs-toolbar-modebar{flex:0 0 100%!important}
+ .cs-toolbar.cs-toolbar-mini{max-height:54px!important;height:54px!important}
+ .cs-toolbar.cs-toolbar-mini .cs-toolbar-modebar .cs-toolbar-mode-label{display:none!important}
+ .cs-toolbar.cs-toolbar-mini .cs-project-actions-row{height:44px}
+ .cs-toolbar.cs-toolbar-mini .cs-project-actions-row .cs-canvas-actions{gap:4px}
+ .cs-toolbar.cs-toolbar-mini .cs-project-actions-row .cs-small-btn{padding:5px 7px;font-size:12px}
+ /* Mobile dock order: canvas, inspector, then components library. */
+ .cs-workspace{display:flex!important;flex-direction:column!important}
+ .cs-canvas-panel{order:1!important}
+ .cs-properties-panel{order:2!important}
+ .cs-library-panel{order:3!important}
+ .cs-library-panel:not(.cs-panel-hidden),.cs-properties-panel:not(.cs-panel-hidden){
+  position:relative!important;inset:auto!important;left:auto!important;right:auto!important;
+  bottom:auto!important;top:auto!important;width:100%!important;max-height:32dvh!important;
+  flex:0 0 auto!important;z-index:4!important
+ }
+ .cs-library-panel.cs-panel-hidden,.cs-properties-panel.cs-panel-hidden{display:none!important}
+ .cs-panel-reopen{position:fixed!important;z-index:130!important}
+}
