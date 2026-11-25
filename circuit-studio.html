@@ -20,7 +20,7 @@
 <title>Circuit Diagram Editor & Design Tool | EazyLife</title>
 <script>(function(){var t=null;try{t=localStorage.getItem('eazylife-theme')}catch(e){}t=t||(matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);document.documentElement.classList.toggle('dark',t==='dark')})();</script>
 <link rel="stylesheet" href="assets/css/site-theme.css">
-<link rel="stylesheet" href="assets/css/circuit-studio.css?v=public-project-workflow-1">
+<link rel="stylesheet" href="assets/css/circuit-studio.css?v=admin-project-tools-2">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -67,6 +67,10 @@
     <div class="cs-tool-group">
       <button id="newProject" class="cs-btn">New</button>
       <div id="adminProjectTools" class="cs-tool-group cs-admin-project-tools" hidden aria-label="Admin project tools">
+        <button id="saveProject" class="cs-btn" type="button">Save local draft</button>
+        <button id="importProject" class="cs-btn" type="button">Import JSON</button>
+        <input id="projectFile" type="file" accept=".json,application/json" hidden>
+        <button id="exportJson" class="cs-btn" type="button">Download JSON</button>
         <button id="saveCloudProject" class="cs-btn" type="button">Save to my circuits</button>
         <button id="openCloudProjects" class="cs-btn" type="button">Open saved</button>
       </div>
@@ -116,6 +120,6 @@
 
 <dialog id="textEditDialog" class="cs-dialog cs-text-dialog"><form method="dialog" class="cs-dialog-head"><div><span class="cs-eyebrow">TEXT EDITOR</span><h2 id="textEditTitle">Edit text</h2></div><button class="cs-icon-btn" value="cancel" aria-label="Close">✕</button></form><label class="cs-field">Text<input id="canvasTextInput" type="text" autocomplete="off"></label><div class="cs-dialog-actions"><button id="applyCanvasText" class="cs-btn cs-primary" type="button">Apply</button></div></dialog>
 <dialog id="savedProjectsDialog" class="cs-dialog cs-project-dialog"><div class="cs-dialog-head"><div><span class="cs-eyebrow">PRIVATE ADMIN LIBRARY</span><h2>My saved circuits</h2></div><button id="closeSavedProjects" class="cs-icon-btn" type="button" aria-label="Close">✕</button></div><p class="cs-hint">These designs are private to your authorized EazyLife admin account. Save the current design to update it, or save a copy.</p><div class="cs-dialog-actions cs-project-actions"><button id="saveProjectCopy" class="cs-btn" type="button">Save a copy</button><button id="refreshSavedProjects" class="cs-btn" type="button">Refresh list</button></div><div id="savedProjectsList" class="cs-project-list" aria-live="polite"></div></dialog><div id="toast" class="cs-toast" role="status" aria-live="polite"></div>
-<script type="module" src="js/circuit-studio-export-transparent.js?v=public-project-workflow-1"></script>
+<script type="module" src="js/circuit-studio-export-transparent.js?v=admin-project-tools-2"></script>
 <script src="js/site-theme.js"></script>
 </body></html>
