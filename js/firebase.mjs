@@ -20,10 +20,7 @@ const firebaseConfig = {
   measurementId: "G-07CCF0NFEQ"
 };
 
-// TODO: replace with the reCAPTCHA v3 site key from Firebase Console ->
-// Build -> App Check -> Apps -> Register (web) -> reCAPTCHA v3. Until this
-// is a real key, App Check tokens won't validate, so leave enforcement OFF
-// in the console until this is set and deployed. See README-app-check.md.
+// Real reCAPTCHA Enterprise site key. App Check is enforced in the Firebase console.
 const RECAPTCHA_V3_SITE_KEY = '6Ld4YTEuAAAAAC16rwAB0N07sdOOGjdQZPBHVn12';
 
 let cached = null;
@@ -34,10 +31,8 @@ export function initFirebase() {
   const db = getFirestore(app);
   const auth = getAuth(app);
 
-  // App Check attaches a signed attestation token to every Firestore request,
-  // so once enforcement is turned on in the console, scripted/bot traffic
-  // (e.g. brute-forcing order tracking codes) gets rejected before it ever
-  // reaches Firestore. Safe to initialize even before enforcement is enabled.
+  // App Check attaches a signed attestation token to every Firestore request.
+  // Enforcement is already enabled in the Firebase console for this project.
   if (RECAPTCHA_V3_SITE_KEY) {
     try {
       initializeAppCheck(app, {
