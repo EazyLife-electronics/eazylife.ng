@@ -1027,5 +1027,43 @@
     loadShopPreview();
     loadAboutText();
   </script>
+  <!-- ========================================= -->
+<!-- FLOATING WHATSAPP BUTTON (UI/UX FIX)      -->
+<!-- ========================================= -->
+<a href="https://wa.me/2347051548082?text=Hello%20EazyLife,%20I%20have%20an%20enquiry." 
+   target="_blank" 
+   rel="noopener" 
+   class="whatsapp-fab" 
+   aria-label="Chat with us on WhatsApp">
+  <i class="fab fa-whatsapp"></i>
+</a>
+
+<style>
+  .whatsapp-fab {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 56px;
+    height: 56px;
+    background: #25D366;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    z-index: 999;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-decoration: none;
+  }
+  .whatsapp-fab:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+  }
+  .whatsapp-fab:active {
+    transform: scale(0.95);
+  }
+</style>
 </body>
 </html>
