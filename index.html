@@ -237,21 +237,25 @@
       transform: translateY(-1px);
     }
     @media (max-width: 520px) {
-      /* Keep all four hero actions in one horizontal row on phones. */
-      .hero-ctas { display: flex; flex-wrap: nowrap; align-items: stretch; gap: 6px; width: 100%; }
-      .hero-ctas .btn {
-        flex: 1 1 0;
-        min-width: 0;
-        min-height: 48px;
-        padding: 9px 4px;
-        gap: 4px;
-        font-size: clamp(0.5rem, 2.55vw, 0.68rem);
-        line-height: 1.15;
-        text-align: center;
-        white-space: normal;
-        overflow-wrap: anywhere;
+      /* Mobile Hero: Clean 2x2 grid for easy tapping */
+      .hero-ctas { 
+        display: grid; 
+        grid-template-columns: 1fr 1fr; 
+        gap: 12px; 
+        width: 100%; 
       }
-      .hero-ctas .btn i { flex: 0 0 auto; }
+      .hero-ctas .btn { 
+        min-height: 48px; /* Proper mobile touch target size */
+        padding: 12px 8px; 
+        font-size: 0.8rem; /* Readable text size */
+        text-align: center; 
+        justify-content: center;
+        white-space: normal;
+        line-height: 1.2;
+      }
+      .hero-ctas .btn i { 
+        flex: 0 0 auto; 
+      }
     }
     :root[data-theme="dark"] .hero-ctas .btn-stem-hero {
       color: #b6f3e7;
