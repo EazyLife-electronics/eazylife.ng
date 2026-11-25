@@ -790,3 +790,23 @@
  .cs-statusbar{display:flex!important;flex-wrap:wrap!important;padding:6px 10px!important}
  .cs-toolbar-bubble{top:calc(64px + env(safe-area-inset-top,0px) + 6px)!important;right:10px!important}
 }
+
+
+/* Keep the mode strip and toolbar inside the app viewport, below the fixed site navigation. */
+@media(min-width:621px){
+ .cs-app{position:fixed!important;top:54px!important;left:0!important;right:0!important;bottom:0!important;width:100vw!important;height:auto!important;min-height:0!important}
+ #toolbarModeBar{position:relative!important;top:auto!important;left:auto!important;right:auto!important;z-index:12!important;flex:0 0 auto!important}
+ .cs-toolbar.cs-toolbar-full,.cs-toolbar.cs-toolbar-mini{position:relative!important;top:auto!important;left:auto!important;right:auto!important;transform:none!important}
+ .cs-toolbar-bubble{position:fixed!important;top:62px!important;right:14px!important;left:auto!important;z-index:1000!important}
+}
+@media(min-width:621px) and (max-width:900px){
+ .cs-app{top:54px!important;height:auto!important}
+ #toolbarModeBar{width:100%!important;max-width:100%!important;overflow:visible!important;flex-wrap:wrap!important}
+ .cs-toolbar.cs-toolbar-full{max-height:34dvh!important;overflow-x:hidden!important;overflow-y:auto!important}
+}
+@media(max-width:620px){
+ .cs-app{top:48px!important;left:0!important;right:0!important;bottom:0!important;width:100vw!important;height:auto!important;min-height:0!important}
+ #toolbarModeBar{position:relative!important;top:auto!important;left:auto!important;right:auto!important;z-index:12!important;flex:0 0 auto!important}
+ .cs-toolbar.cs-toolbar-full,.cs-toolbar.cs-toolbar-mini{position:relative!important;top:auto!important;left:auto!important;right:auto!important;transform:none!important}
+ .cs-toolbar-bubble{position:fixed!important;top:56px!important;right:10px!important;left:auto!important;z-index:1000!important}
+}
