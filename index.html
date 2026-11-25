@@ -479,15 +479,18 @@
     :root[data-theme="dark"] .nav-dropdown-item i { color: #5ee0c4; }
                         
     /* CONTACT / FOOTER */
-    .contact-info { display: flex; flex-direction: column; gap: 14px; margin-top: 20px; }
-    .contact-item { display: flex; gap: 14px; align-items: flex-start; background: #fff; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; }
-    .contact-item i { color: var(--teal); font-size: 1.1rem; margin-top: 2px; width: 20px; }
-    .contact-item h4 { font-size: 0.85rem; font-weight: 700; color: var(--dark); margin-bottom: 2px; }
-    .contact-item p { font-size: 0.8rem; color: var(--text-light); }
-    .social-cards { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
-    .social-card { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: #fff; }
-    .social-card-left { display: flex; align-items: center; gap: 12px; }
-    .social-card-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.95rem; }
+    .contact-grid { align-items: start; }
+    .contact-info { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+    .contact-item { display: flex; gap: 12px; align-items: flex-start; background: #fff; border: 1px solid var(--border); border-radius: 13px; padding: 13px 14px; min-width: 0; transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease; }
+    .contact-item > i { flex: 0 0 20px; color: var(--teal); font-size: 1.05rem; margin-top: 2px; width: 20px; text-align: center; }
+    .contact-item h4 { font-size: 0.83rem; font-weight: 700; color: var(--dark); margin-bottom: 3px; line-height: 1.35; }
+    .contact-item p { font-size: 0.77rem; color: var(--text-light); line-height: 1.5; overflow-wrap: anywhere; }
+    .contact-item:hover { border-color: rgba(0,176,155,.48); transform: translateY(-1px); box-shadow: 0 5px 16px rgba(20,50,45,.06); }
+    .social-cards { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+    .social-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-radius: 13px; border: 1px solid var(--border); background: #fff; transition: border-color .18s ease, background-color .18s ease; }
+    .social-card-left { display: flex; align-items: center; gap: 11px; min-width: 0; }
+    .social-card-icon { flex: 0 0 34px; width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.9rem; }
+    .social-card:hover { border-color: rgba(0,176,155,.48); background: #fbfefd; }
     .sc-wa .social-card-icon { background: #25D366; }
     .sc-fb .social-card-icon { background: #1877F2; }
     .sc-ig .social-card-icon { background: linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); }
@@ -506,7 +509,7 @@
       .trust-grid { grid-template-columns: repeat(2, 1fr); }
       .testimonials-grid { grid-template-columns: repeat(2, 1fr); }
       .form-row { grid-template-columns: 1fr 1fr; }
-      .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; }
+      .contact-grid { display: grid; grid-template-columns: minmax(0,1.1fr) minmax(260px,.9fr); gap: 36px; }
     }
     :root[data-theme="dark"] {      --dm-bg: #10181a; --dm-surface: #1a2422; --dm-surface-2: #202b29;      --dm-text: #eef2f0; --dm-text-light: #9fb0ac; --dm-border: #2c3a37;    }
     :root[data-theme="dark"] body { background: var(--dm-bg); color: var(--dm-text); }
@@ -1080,12 +1083,9 @@
         </div>
       </div>
       <div>
-        <h3 class="follow-heading" style="font-size:1rem;font-weight:700;margin-bottom:16px;">Connect with EazyLife</h3>
+        <h3 class="follow-heading" style="font-size:1rem;font-weight:700;margin-bottom:6px;">Follow Our Work</h3>
+        <p class="section-sub" style="font-size:.8rem;margin-bottom:0;">See project updates, builds and practical engineering ideas from EazyLife.</p>
         <div class="social-cards">
-          <a href="https://wa.me/2347051548082?text=Hello%20EazyLife,%20I%20am%20interested%20in%20your%20services." target="_blank" rel="noopener noreferrer" class="social-card sc-wa">
-            <div class="social-card-left"><div class="social-card-icon"><i class="fab fa-whatsapp"></i></div><div><h4>WhatsApp</h4><p>Chat with us directly</p></div></div>
-            <i class="fas fa-arrow-right"></i>
-          </a>
           <a href="https://www.facebook.com/share/18UAAaL3xe/" target="_blank" rel="noopener noreferrer" class="social-card sc-fb">
             <div class="social-card-left"><div class="social-card-icon"><i class="fab fa-facebook-f"></i></div><div><h4>Facebook</h4><p>EazyLife Robotics & Electronics</p></div></div>
             <i class="fas fa-arrow-right"></i>
