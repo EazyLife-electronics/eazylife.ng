@@ -481,6 +481,19 @@
     :root[data-theme="dark"] .stem-teaser-inner h2 { color:var(--dm-text); }
     :root[data-theme="dark"] .stem-teaser-inner p { color:var(--dm-text-light); }
     @media(max-width:650px){.stem-teaser-inner{align-items:flex-start;flex-direction:column}.stem-teaser-inner .btn{width:100%}}
+    /* Mobile: dropdown becomes a full-width sheet anchored to the viewport,
+    so it can never clip off the left/right edge regardless of button position. */
+    @media (max-width: 720px) {
+      .nav-dropdown-menu {
+        position: fixed;
+        left: 12px;
+        right: 12px;
+        top: 76px;            /* sits just below the sticky nav */
+        width: auto;
+        min-width: 0;
+        max-width: none;
+      }
+    }
   </style>
 </head>
 <body>
