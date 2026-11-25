@@ -263,6 +263,8 @@ renderLibrary();$('symbolStyle').value=project.style||'engineering';render();app
 })();
 
 
+const WORKSPACE_PREF_KEY='eazylife-circuit-workspace-v1';
+
 // Dockable/floating panels. Hiding a panel never changes the active selection
 // and selection changes never force a dismissed inspector back into view.
 const workspace=$('circuitWorkspace'),libraryPanel=$('componentLibraryPanel'),propertiesPanel=$('propertiesPanel');
@@ -296,7 +298,6 @@ syncWorkspacePanels();
 
 
 // Persist workspace layout locally, separate from the admin-only circuit draft.
-const WORKSPACE_PREF_KEY='eazylife-circuit-workspace-v1';
 const toolbar=$('circuitToolbar'),modeButtons={mini:$('toolbarModeMini'),full:$('toolbarModeFull'),float:$('toolbarModeFloat')};
 const miniActions={new:$('miniNew'),select:$('miniSelect'),connect:$('miniConnect'),undo:$('miniUndo'),redo:$('miniRedo'),expand:$('miniExpand')};
 function readWorkspacePrefs(){try{return JSON.parse(localStorage.getItem(WORKSPACE_PREF_KEY)||'{}')}catch{return{}}}
