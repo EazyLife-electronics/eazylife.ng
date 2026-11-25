@@ -462,6 +462,13 @@
     }
     .nav-dropdown-item i { color: var(--teal); width: 16px; text-align: center; }
     .nav-dropdown-item:hover { background: var(--teal-light); color: var(--dark); }
+    .nav-dropdown-toggle:focus-visible,
+    .nav-dropdown-item:focus-visible,
+    .contact-item:focus-visible,
+    .social-card:focus-visible {
+      outline: 3px solid var(--teal);
+      outline-offset: 3px;
+    }
     
     :root[data-theme="dark"] .nav-dropdown-item { color: var(--dm-text); }
     :root[data-theme="dark"] .nav-dropdown-item:hover { background: var(--dm-surface-2); }
@@ -497,8 +504,7 @@
       .form-row { grid-template-columns: 1fr 1fr; }
       .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; }
     }
-    :root[data-theme="dark"] {      --dm-bg: #10181a; --dm-surface: #1a2422; --dm-surface-2: #202b29;      --dm-text: #eef2f0; --dm-text-light: #9fb0ac; --dm-border: #2c3a37;
-    }
+    :root[data-theme="dark"] {      --dm-bg: #10181a; --dm-surface: #1a2422; --dm-surface-2: #202b29;      --dm-text: #eef2f0; --dm-text-light: #9fb0ac; --dm-border: #2c3a37;    }
     :root[data-theme="dark"] body { background: var(--dm-bg); color: var(--dm-text); }
     :root[data-theme="dark"] .nav { background: rgba(16,24,26,0.92); border-bottom-color: var(--dm-border); }
     :root[data-theme="dark"] .hero { background: linear-gradient(180deg, #163330 0%, var(--dm-bg) 100%); }
@@ -558,6 +564,10 @@
         width: auto;
         min-width: 0;
         max-width: none;
+        max-height: calc(100vh - 88px);
+        max-height: calc(100dvh - 88px);
+        overflow-y: auto;
+        overscroll-behavior: contain;
       }
     }
     /* ========================================= */
@@ -952,7 +962,7 @@
         </div>
         <div class="trust-item">
           <i class="fas fa-globe"></i>
-          <div><h4>Practical, Clear Guidance</h4><p>We explain component choices, design decisions and project requirements before work begins.</p></div>
+          <div><h4>Practical, Hands-On Approach</h4><p>We focus on working circuits, tested prototypes and learning through making.</p></div>
         </div>
         <div class="trust-item">
           <i class="fas fa-eye"></i>
@@ -997,8 +1007,7 @@
           <form id="reviewForm" action="https://formspree.io/f/xzdozlbk" method="POST">
             <input type="hidden" name="_subject" value="New EazyLife Review Submission" />
             <div class="form-row">              <div class="form-group">
-                <label for="r-name">Your Name *</label>
-                <input type="text" id="r-name" name="name" placeholder="e.g. Adebayo T." required />
+                <label for="r-name">Your Name *</label>                <input type="text" id="r-name" name="name" placeholder="e.g. Adebayo T." required />
               </div>
               <div class="form-group">
                 <label for="r-title">Occupation / Location</label>
