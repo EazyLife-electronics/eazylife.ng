@@ -102,7 +102,7 @@
                 <i class="fas fa-moon"></i>
             </button>
             <div class="nav-menu">
-                <button id="navMenuBtn" type="button" aria-label="Open menu" class="w-10 h-10 rounded-full border border-gray-200 dark:border-[#2a3835] dark:bg-[#182420] flex items-center justify-center text-gray-700 dark:text-gray-200">
+                <button id="navMenuBtn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navMenuPanel" class="w-10 h-10 rounded-full border border-gray-200 dark:border-[#2a3835] dark:bg-[#182420] flex items-center justify-center text-gray-700 dark:text-gray-200">
                     <i class="fas fa-bars"></i>
                 </button>
                 <div id="navMenuPanel" class="nav-menu-panel hidden">
@@ -151,7 +151,7 @@
     var menuPanel = document.getElementById('navMenuPanel');
     menuBtn.addEventListener('click', function (e) {
         e.stopPropagation();
-        menuPanel.classList.toggle('hidden');
+        menuPanel.classList.toggle('hidden');\n        menuBtn.setAttribute('aria-expanded', String(!menuPanel.classList.contains('hidden')));
     });
     document.addEventListener('click', function (e) {
         if (!menuPanel.classList.contains('hidden') && !menuPanel.contains(e.target) && e.target !== menuBtn) {
@@ -278,9 +278,9 @@
         <div class="flex items-center justify-between mb-5 bg-gray-50 dark:bg-[#1c2925] rounded-xl p-3">
             <span class="text-xs font-bold text-gray-500 dark:text-gray-400">Quantity</span>
             <div class="flex items-center gap-3">
-                <button onclick="changePmQty(-1)" class="w-8 h-8 bg-white dark:bg-[#182420] dark:text-gray-100 rounded-lg shadow-sm font-bold">-</button>
+                <button onclick="changePmQty(-1)" class="w-11 h-11 min-w-[44px] min-h-[44px] bg-white dark:bg-[#182420] dark:text-gray-100 rounded-lg shadow-sm font-bold" aria-label="Decrease quantity">-</button>
                 <input id="pmQty" type="text" inputmode="numeric" pattern="[0-9]*" value="1" onfocus="this.select()" onchange="setPmQty(this.value)" class="font-black text-sm w-10 text-center dark:text-gray-100 bg-white dark:bg-[#182420] rounded-lg py-1.5 outline-none">
-                <button onclick="changePmQty(1)" class="w-8 h-8 bg-white dark:bg-[#182420] dark:text-gray-100 rounded-lg shadow-sm font-bold">+</button>
+                <button onclick="changePmQty(1)" class="w-11 h-11 min-w-[44px] min-h-[44px] bg-white dark:bg-[#182420] dark:text-gray-100 rounded-lg shadow-sm font-bold" aria-label="Increase quantity">+</button>
             </div>
         </div>
 
