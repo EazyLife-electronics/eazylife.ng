@@ -151,7 +151,8 @@
     var menuPanel = document.getElementById('navMenuPanel');
     menuBtn.addEventListener('click', function (e) {
         e.stopPropagation();
-        menuPanel.classList.toggle('hidden');\n        menuBtn.setAttribute('aria-expanded', String(!menuPanel.classList.contains('hidden')));
+        menuPanel.classList.toggle('hidden');
+        menuBtn.setAttribute('aria-expanded', String(!menuPanel.classList.contains('hidden')));
     });
     document.addEventListener('click', function (e) {
         if (!menuPanel.classList.contains('hidden') && !menuPanel.contains(e.target) && e.target !== menuBtn) {
