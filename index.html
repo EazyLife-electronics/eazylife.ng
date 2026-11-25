@@ -497,8 +497,7 @@
       .form-row { grid-template-columns: 1fr 1fr; }
       .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; }
     }
-    :root[data-theme="dark"] {
-      --dm-bg: #10181a; --dm-surface: #1a2422; --dm-surface-2: #202b29;
+    :root[data-theme="dark"] {      --dm-bg: #10181a; --dm-surface: #1a2422; --dm-surface-2: #202b29;
       --dm-text: #eef2f0; --dm-text-light: #9fb0ac; --dm-border: #2c3a37;
     }
     :root[data-theme="dark"] body { background: var(--dm-bg); color: var(--dm-text); }
@@ -630,17 +629,36 @@
     .product-card { display: block; min-width: 0; }
     .product-card h4 { overflow-wrap: anywhere; }
     .services-strip { align-items: stretch; }
-    .service-card { display: flex; flex-direction: column; min-width: 0; }
-    .service-card p { flex: 1; }
-    .service-tag {
-      position: absolute;
-      top: 18px;
-      right: 18px;
-      margin: 0;
-      max-width: calc(100% - 86px);
-      text-align: right;
+    /* Preserve the compact icon-left layout; do not let later card-rhythm rules
+       switch these cards back to a vertical flex layout. */
+    .service-card {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr);
+      grid-template-rows: auto auto auto auto;
+      column-gap: 14px;
+      align-content: start;
+      min-width: 0;
     }
-    .service-icon { flex: 0 0 46px; }
+    .service-card .service-icon {
+      grid-column: 1;
+      grid-row: 1 / span 4;
+      flex: none;
+    }
+    .service-card h3,
+    .service-card p,
+    .service-card .service-link,
+    .service-card .service-tag {
+      grid-column: 2;
+      min-width: 0;
+    }
+    .service-card .service-tag {
+      position: static;
+      justify-self: start;
+      max-width: 100%;
+      margin: 0 0 6px;
+      text-align: left;
+    }
+    .service-card p { flex: initial; }
     .project-gallery-card:hover,
     .product-card:hover {
       transform: translateY(-3px);
@@ -997,8 +1015,7 @@
                 <option value="4">★★★★☆ Very Good</option>
                 <option value="3">★★★☆☆ Good</option>
                 <option value="2">★★☆☆☆ Fair</option>
-                <option value="1">★☆☆☆☆ Poor</option>
-              </select>
+                <option value="1">★☆☆☆☆ Poor</option>              </select>
             </div>
             <div class="form-group">
               <label for="r-text">Your Review *</label>
