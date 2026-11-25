@@ -20,7 +20,7 @@
 <title>Circuit Diagram Editor & Design Tool | EazyLife</title>
 <script>(function(){var t=null;try{t=localStorage.getItem('eazylife-theme')}catch(e){}t=t||(matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);document.documentElement.classList.toggle('dark',t==='dark')})();</script>
 <link rel="stylesheet" href="assets/css/site-theme.css">
-<link rel="stylesheet" href="assets/css/circuit-studio.css?v=workspace-panels-2">
+<link rel="stylesheet" href="assets/css/circuit-studio.css?v=bubble-toolbar-1">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -71,10 +71,10 @@
       <span class="cs-toolbar-mode-label">Toolbar</span>
       <button id="toolbarModeMini" class="cs-small-btn" type="button" aria-pressed="false">Mini</button>
       <button id="toolbarModeFull" class="cs-small-btn" type="button" aria-pressed="false">Full</button>
-      <button id="toolbarModeFloat" class="cs-small-btn" type="button" aria-pressed="false">Float</button>
+      <button id="toolbarModeFloat" class="cs-small-btn" type="button" aria-pressed="false">Float</button><button id="toolbarModeHide" class="cs-small-btn" type="button" aria-pressed="false">Hide</button>
     </div>
     <div class="cs-toolbar-mini-actions" aria-label="Quick drawing actions">
-      <button id="miniNew" class="cs-btn" type="button">New</button><button id="miniSelect" class="cs-btn active" type="button">Select</button><button id="miniConnect" class="cs-btn" type="button">Wire</button><button id="miniUndo" class="cs-btn" type="button" title="Undo">↶</button><button id="miniRedo" class="cs-btn" type="button" title="Redo">↷</button><button id="miniExpand" class="cs-btn" type="button" aria-expanded="false">More ▾</button>
+      <button id="miniNew" class="cs-btn" type="button">New</button><button id="miniSelect" class="cs-btn active" type="button">Select</button><button id="miniConnect" class="cs-btn" type="button">Wire</button><button id="miniUndo" class="cs-btn" type="button" title="Undo">↶</button><button id="miniRedo" class="cs-btn" type="button" title="Redo">↷</button><button id="miniExpand" class="cs-btn" type="button" aria-expanded="false">More ▾</button><button id="toolbarModeMenu" class="cs-btn" type="button" aria-expanded="false" aria-label="Toolbar layout options">☷</button>
     </div>
     <div class="cs-tool-group">
       <button id="newProject" class="cs-btn">New</button>
@@ -101,7 +101,8 @@
       <button id="zoomOut" class="cs-btn" type="button" aria-label="Zoom out" title="Zoom out">−</button><span id="zoomReadout" aria-live="polite" aria-label="Current zoom">100%</span><button id="zoomIn" class="cs-btn" type="button" aria-label="Zoom in" title="Zoom in">+</button><button id="zoomReset" class="cs-btn" type="button" title="Return to 100% zoom">100%</button><button id="fitCanvas" class="cs-btn">Fit content</button><button id="clearCapture" class="cs-btn">Clear frame</button><span class="cs-zoom-help">Open canvas · Wheel / pinch to zoom · Pan tool or Space + drag</span>
     </div>
   </section>
-  <div class="cs-workspace" id="circuitWorkspace"><button id="showLibraryPanel" class="cs-panel-reopen cs-reopen-library" type="button" hidden>＋ Components</button><button id="showInspectorPanel" class="cs-panel-reopen cs-reopen-inspector" type="button" hidden>＋ Properties</button>
+  <button id="showToolbarBubble" class="cs-workspace-bubble cs-toolbar-bubble" type="button" hidden aria-label="Show drawing toolbar" title="Show drawing toolbar">☰</button>
+  <div class="cs-workspace" id="circuitWorkspace"><button id="showLibraryPanel" class="cs-panel-reopen cs-reopen-library cs-workspace-bubble" type="button" hidden aria-label="Show components library" title="Show components library">▦</button><button id="showInspectorPanel" class="cs-panel-reopen cs-reopen-inspector cs-workspace-bubble" type="button" hidden aria-label="Show properties inspector" title="Show properties inspector">⚙</button>
     <aside id="componentLibraryPanel" class="cs-library-panel">
       <div class="cs-panel-heading"><div><span class="cs-eyebrow">LIBRARY</span><h2>Components</h2></div><div class="cs-panel-controls"><span id="componentCount" class="cs-count">0</span><button id="toggleLibraryPanel" class="cs-small-btn" type="button" aria-label="Hide component library">Hide</button><button id="floatLibraryPanel" class="cs-small-btn" type="button" aria-label="Float component library over canvas">Float</button></div></div>
       <input id="componentSearch" class="cs-search" type="search" placeholder="Search name, category or code…" aria-label="Search components">
@@ -148,6 +149,6 @@
   </form>
 </dialog>
 <div id="toast" class="cs-toast" role="status" aria-live="polite"></div>
-<script type="module" src="js/circuit-studio-export-transparent.js?v=workspace-panels-2"></script>
+<script type="module" src="js/circuit-studio-export-transparent.js?v=bubble-toolbar-1"></script>
 <script src="js/site-theme.js"></script>
 </body></html>
