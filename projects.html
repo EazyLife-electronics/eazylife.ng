@@ -256,6 +256,7 @@
       const linked = rows.filter(x => x.productId && x.variantId);
       const manual = rows.filter(x => !x.productId || !x.variantId);
       const byId = new Map(products.map(x => [x.id, x]));
+      const resolvedCount = linked.filter(x => { const product = byId.get(x.productId) || products.find(p => String(p.name||'').trim().toLowerCase() === String(x.productName||'').trim().toLowerCase()); return !!product && (product.variants||[]).some((v,i) => String(v.id) === String(x.variantId) || (x.variant && ( [v?.processor,v?.ram,v?.rom,v?.color].filter(Boolean).join(' / ') || 'Variant '+(i+1)).trim().toLowerCase() === String(x.variant).trim().toLowerCase())); }).length;
       const line = x => {
         const product = byId.get(x.productId);
         const variants = product?.variants || [];
@@ -267,7 +268,7 @@
         return '<div class="kit-line"><div><strong>' + esc(label) + '</strong><small>' + esc(x.variant || '') + ' · Qty ' + Number(x.quantity || 1) + (x.required === false ? ' · Optional' : ' · Required') + '</small></div><div class="kit-line-side">' + (price != null ? '<b>₦' + price.toLocaleString() + '</b>' : '<b>Price unavailable</b>') + '<span class="kit-stock ' + (available ? 'available' : 'unavailable') + '">' + (available ? 'Listed in store' : 'Availability to be confirmed') + '</span><a href="' + url + '">View item</a></div></div>';
       };
       return '<section class="detail-block kit-section"><h2>Components for this project</h2><p class="detail-copy">Explore the components individually or request a kit. Store-linked components are included in the kit order at current catalogue prices. Availability is confirmed by EazyLife after submission.</p>' +
-        (linked.length ? '<div class="kit-lines">' + linked.map(line).join('') + '</div><a class="btn btn-primary kit-order-btn" href="kit-order.html?project=' + encodeURIComponent(p.id) + '">Order project kit <i class="fas fa-arrow-right"></i></a>' : '<p class="empty">No store-linked components have been added to this project yet.</p>') +
+        (linked.length ? '<div class="kit-lines">' + linked.map(line).join('') + '</div>' + (resolvedCount < linked.length ? '<p class="text-sm" role="status" style="color:#98600b;background:#fff4df;padding:12px;border-radius:12px">Some saved catalogue links need repair. We have kept these components visible and will not silently omit them from a kit request. Please contact EazyLife to restore the links.</p>' : '') + '<a class="btn btn-primary kit-order-btn" href="kit-order.html?project=' + encodeURIComponent(p.id) + '">Review project kit <i class="fas fa-arrow-right"></i></a>' : '<p class="empty">No store-linked components have been added to this project yet.</p>') +
         (manual.length ? '<div class="kit-manual"><strong>Additional materials not listed in the store</strong><ul>' + manual.map(x => '<li>' + esc(x.name) + ' · Qty ' + Number(x.quantity || 1) + (x.required === false ? ' · Optional' : '') + '</li>').join('') + '</ul><p>These items are not included in the online kit order. Contact us if you need help sourcing them.</p></div>' : '') + '</section>';
     }
 
