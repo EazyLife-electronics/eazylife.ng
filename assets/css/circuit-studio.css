@@ -317,3 +317,42 @@
  .cs-action-dialog .cs-dialog-actions button{width:100%;min-height:46px}
 }
 @media(prefers-reduced-motion:reduce){.cs-toast{transition:none}}
+
+
+/* Mobile inspector: compact, collapsible and independently scrollable.
+   Keep the drawing surface available even when the page itself is viewport-locked. */
+@media(max-width:620px){
+ .cs-properties-panel{
+  left:8px;right:8px;bottom:calc(24dvh + 52px + env(safe-area-inset-bottom));
+  top:auto;width:auto;height:auto;max-height:min(28dvh,230px);min-height:0;
+  padding:7px 9px;overflow-x:hidden;overflow-y:auto;
+  overscroll-behavior:contain;touch-action:pan-y;
+  scrollbar-width:thin;scrollbar-gutter:auto;
+ }
+ .cs-properties-panel .cs-panel-heading{
+  position:sticky;top:-7px;z-index:5;display:flex;align-items:center;
+  justify-content:space-between;gap:8px;margin:0 0 7px;padding:3px 0 6px;
+  background:var(--cs-panel);border-bottom:1px solid var(--cs-border);
+ }
+ .cs-properties-panel .cs-panel-heading>div{min-width:0}
+ .cs-properties-panel .cs-panel-heading h2{font-size:12px;margin:2px 0 0}
+ .cs-inspector-toggle{flex:0 0 auto;min-width:54px;min-height:34px;padding:5px 9px;font-size:10px}
+ .cs-properties-panel.cs-inspector-collapsed{
+  height:43px;min-height:43px;max-height:43px;overflow:hidden;
+  padding:5px 9px;bottom:calc(24dvh + 52px + env(safe-area-inset-bottom));
+ }
+ .cs-properties-panel.cs-inspector-collapsed .cs-panel-heading{margin:0;padding:0;border:0;min-height:31px}
+ .cs-properties-panel.cs-inspector-collapsed .cs-properties-content,
+ .cs-properties-panel.cs-inspector-collapsed .cs-inspector-note{display:none}
+ .cs-properties-panel .cs-properties-content{gap:7px;padding-bottom:5px}
+ .cs-properties-panel .cs-field input,
+ .cs-properties-panel .cs-field select,
+ .cs-properties-panel .cs-field textarea{min-height:38px;font-size:14px}
+ .cs-properties-panel .cs-field-row{gap:7px}
+ .cs-properties-panel .cs-pin-btn{min-height:38px;font-size:11px}
+ .cs-library-panel{bottom:max(8px,env(safe-area-inset-bottom));max-height:24dvh}
+}
+@media(max-width:380px){
+ .cs-properties-panel{max-height:25dvh;bottom:calc(24dvh + 48px + env(safe-area-inset-bottom))}
+ .cs-properties-panel.cs-inspector-collapsed{bottom:calc(24dvh + 48px + env(safe-area-inset-bottom))}
+}
