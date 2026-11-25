@@ -92,9 +92,9 @@
       <button id="zoomOut" class="cs-btn" type="button" aria-label="Zoom out" title="Zoom out">−</button><span id="zoomReadout" aria-live="polite" aria-label="Current zoom">100%</span><button id="zoomIn" class="cs-btn" type="button" aria-label="Zoom in" title="Zoom in">+</button><button id="zoomReset" class="cs-btn" type="button" title="Return to 100% zoom">100%</button><button id="fitCanvas" class="cs-btn">Fit content</button><button id="clearCapture" class="cs-btn">Clear frame</button><span class="cs-zoom-help">Open canvas · Wheel / pinch to zoom · Pan tool or Space + drag</span>
     </div>
   </section>
-  <div class="cs-workspace">
-    <aside class="cs-library-panel">
-      <div class="cs-panel-heading"><div><span class="cs-eyebrow">LIBRARY</span><h2>Components</h2></div><span id="componentCount" class="cs-count">0</span></div>
+  <div class="cs-workspace" id="circuitWorkspace"><button id="showLibraryPanel" class="cs-panel-reopen cs-reopen-library" type="button" hidden>＋ Components</button><button id="showInspectorPanel" class="cs-panel-reopen cs-reopen-inspector" type="button" hidden>＋ Properties</button>
+    <aside id="componentLibraryPanel" class="cs-library-panel">
+      <div class="cs-panel-heading"><div><span class="cs-eyebrow">LIBRARY</span><h2>Components</h2></div><div class="cs-panel-controls"><span id="componentCount" class="cs-count">0</span><button id="toggleLibraryPanel" class="cs-small-btn" type="button" aria-label="Hide component library">Hide</button><button id="floatLibraryPanel" class="cs-small-btn" type="button" aria-label="Float component library over canvas">Float</button></div></div>
       <input id="componentSearch" class="cs-search" type="search" placeholder="Search name, category or code…" aria-label="Search components">
       <div id="categoryFilters" class="cs-categories"></div>
       <div id="componentLibrary" class="cs-component-list" aria-live="polite"></div>
@@ -114,7 +114,7 @@
       <div class="cs-statusbar"><span id="selectionStatus">Nothing selected</span><span>Connect wires: choose Connect wires, then tap two pins. Pan: choose Pan or use Space + drag.</span><span id="coordinateStatus">x: 0 · y: 0</span></div>
     </section>
     <aside id="propertiesPanel" class="cs-properties-panel">
-      <div class="cs-panel-heading"><div><span class="cs-eyebrow">INSPECTOR</span><h2 id="propertiesHeading">Properties</h2></div><button id="toggleInspector" class="cs-small-btn cs-inspector-toggle" type="button" aria-controls="propertiesContent" aria-expanded="true">Hide</button></div>
+      <div class="cs-panel-heading"><div><span class="cs-eyebrow">INSPECTOR</span><h2 id="propertiesHeading">Properties</h2></div><div class="cs-panel-controls"><button id="toggleInspector" class="cs-small-btn cs-inspector-toggle" type="button" aria-controls="propertiesContent" aria-expanded="true">Hide</button><button id="floatInspectorPanel" class="cs-small-btn" type="button" aria-label="Float properties inspector over canvas">Float</button></div></div>
       <div id="propertiesContent" class="cs-properties-content"><div class="cs-empty-property">Select a component, wire or label to edit its properties.</div></div>
       <div class="cs-inspector-note"><strong>Shared component library</strong><p>Artwork and connection pins are maintained together in Admin → Circuit Components. The workspace edits diagram placement, labels, rotation and wires.</p></div>
     </aside>
