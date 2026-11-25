@@ -24,7 +24,7 @@ const firebaseConfig = {
 // Build -> App Check -> Apps -> Register (web) -> reCAPTCHA v3. Until this
 // is a real key, App Check tokens won't validate, so leave enforcement OFF
 // in the console until this is set and deployed. See README-app-check.md.
-const RECAPTCHA_V3_SITE_KEY = 'REPLACE_WITH_RECAPTCHA_V3_SITE_KEY';
+const RECAPTCHA_V3_SITE_KEY = '6LcicS4uAAAAAEQU69n6vnGTuKU2m_3RGbJW3XjE';
 
 let cached = null;
 
@@ -38,7 +38,7 @@ export function initFirebase() {
   // so once enforcement is turned on in the console, scripted/bot traffic
   // (e.g. brute-forcing order tracking codes) gets rejected before it ever
   // reaches Firestore. Safe to initialize even before enforcement is enabled.
-  if (RECAPTCHA_V3_SITE_KEY && RECAPTCHA_V3_SITE_KEY !== 'REPLACE_WITH_RECAPTCHA_V3_SITE_KEY') {
+  if (RECAPTCHA_V3_SITE_KEY) {
     try {
       initializeAppCheck(app, {
         provider: new ReCaptchaV3Provider(RECAPTCHA_V3_SITE_KEY),
