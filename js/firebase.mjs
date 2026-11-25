@@ -24,7 +24,7 @@ const firebaseConfig = {
 // Build -> App Check -> Apps -> Register (web) -> reCAPTCHA v3. Until this
 // is a real key, App Check tokens won't validate, so leave enforcement OFF
 // in the console until this is set and deployed. See README-app-check.md.
-const RECAPTCHA_V3_SITE_KEY = '6LcicS4uAAAAAEQU69n6vnGTuKU2m_3RGbJW3XjE';
+const RECAPTCHA_V3_SITE_KEY = '6Ld4YTEuAAAAAC16rwAB0N07sdOOGjdQZPBHVn12';
 
 let cached = null;
 
