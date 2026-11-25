@@ -678,3 +678,42 @@
  .cs-library-panel.cs-panel-hidden,.cs-properties-panel.cs-panel-hidden{display:none!important}
  .cs-panel-reopen{position:fixed!important;z-index:130!important}
 }
+
+
+/* Stable toolbar mode controls and status row outside the drawing surface. */
+#toolbarModeBar{
+ position:relative!important;inset:auto!important;transform:none!important;
+ display:flex!important;visibility:visible!important;opacity:1!important;
+ align-items:center;justify-content:flex-start;gap:7px;flex-wrap:wrap;
+ width:100%;max-width:100%;min-height:42px;margin:0;padding:5px 12px;
+ background:var(--cs-panel);border-bottom:1px solid var(--cs-border);
+ z-index:8
+}
+#toolbarModeBar[hidden]{display:none!important}
+#toolbarModeBar .cs-toolbar-mode-label{display:inline!important}
+#toolbarModeBar button{display:inline-flex!important;visibility:visible!important;opacity:1!important}
+.cs-toolbar-bubble{
+ position:absolute!important;top:4px!important;right:12px!important;left:auto!important;
+ z-index:140!important;margin:0!important;align-self:flex-end
+}
+.cs-toolbar-bubble[hidden]{display:none!important}
+.cs-statusbar{
+ position:relative!important;inset:auto!important;transform:none!important;
+ grid-column:1/-1!important;grid-row:auto!important;order:4!important;
+ width:100%;max-width:100%;margin:0!important;flex:0 0 auto!important;
+ z-index:2
+}
+@media(min-width:621px){
+ .cs-workspace{align-items:stretch}
+ .cs-statusbar{display:flex;justify-content:space-between}
+}
+@media(max-width:620px){
+ .cs-app{display:flex;flex-direction:column;min-height:calc(100dvh - 70px)}
+ #toolbarModeBar{min-height:40px;padding:4px 10px;gap:5px;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;white-space:nowrap}
+ #toolbarModeBar .cs-toolbar-mode-label{flex:0 0 auto;font-size:11px}
+ #toolbarModeBar button{flex:0 0 auto;min-height:32px}
+ .cs-toolbar-bubble{top:2px!important;right:10px!important}
+ .cs-workspace{order:3!important}
+ .cs-statusbar{order:4!important;display:flex!important;flex-wrap:wrap;gap:5px;justify-content:space-between;padding:8px 12px!important}
+ .cs-statusbar>span:nth-child(2){display:none!important}
+}
