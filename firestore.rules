@@ -152,6 +152,15 @@ service cloud.firestore {
       allow read, create, update, delete: if isAdmin();
     }
 
+    // Private out-of-school Technical Training records and price catalogue.
+    match /technicalTrainingLeads/{leadId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
+    match /technicalTrainingPricing/{configId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
     match /deliveries/{deliveryId} {
       // Public `get` only (never `list`): the tracking page fetches one
       // specific delivery by ID, which it can only learn from the order's

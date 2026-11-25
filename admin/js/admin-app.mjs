@@ -22,6 +22,7 @@ import { initProjects, renderProjects, checkDueProjectPublications, setProjectKi
 import { initSettings, loadSettingsForm } from './admin-settings.mjs';
 import { setQuotationProducts } from './admin-quotations.mjs';
 import { initSchoolStem, resetSchoolStem } from './admin-school-stem.mjs';
+import { initTechnicalTraining, resetTechnicalTraining } from './admin-technical-training.mjs';
 
 const { auth } = initFirebase();
 
@@ -195,6 +196,7 @@ onAuthStateChanged(auth, (user) => {
   } else {
     document.getElementById('dashboard').classList.add('hidden');
     resetSchoolStem();
+    resetTechnicalTraining();
     document.getElementById('loginScreen').classList.remove('hidden');
     if (unsubProducts) unsubProducts();
     if (unsubHeroes) unsubHeroes();
@@ -207,8 +209,13 @@ onAuthStateChanged(auth, (user) => {
 });
 
 function startDashboard() {
-  if (auth.currentUser?.email === 'damzyeazy@gmail.com') initSchoolStem();
-  else resetSchoolStem();
+  if (auth.currentUser?.email === 'damzyeazy@gmail.com') {
+    initSchoolStem();
+    initTechnicalTraining();
+  } else {
+    resetSchoolStem();
+    resetTechnicalTraining();
+  }
   unsubProducts = watchProducts((products) => {
     renderProducts(products);
     setQuotationProducts(products);
