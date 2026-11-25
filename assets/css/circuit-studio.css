@@ -545,3 +545,7 @@
  .cs-toolbar.cs-toolbar-full .cs-tool-group{flex-wrap:wrap;min-width:0}
  .cs-toolbar.cs-toolbar-full .cs-toolbar-modebar{flex:0 0 100%}
 }
+
+.cs-toolbar-drag-handle{display:none;cursor:grab;touch-action:none}
+.cs-toolbar-drag-handle:active{cursor:grabbing}
+.cs-toolbar.cs-toolbar-floating .cs-toolbar-mini-actions #toolbarDragHandle{display:inline-flex}
