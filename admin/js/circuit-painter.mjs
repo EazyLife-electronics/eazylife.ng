@@ -1,6 +1,6 @@
 import { COMPONENTS } from '../../js/circuit-components.js';
 import { initFirebase } from '../../js/firebase.mjs';
-import { isAdminUser, redirectToAdminLogin } from './admin-auth.mjs';
+import { isAdminUser, verifyAdminAccess, redirectToAdminLogin } from './admin-auth.mjs';
 import {
   onAuthStateChanged, signOut
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
@@ -92,8 +92,8 @@ say('Starter component library loaded. Connecting to your saved component librar
 renderList();
 say('Starter symbols loaded. Checking admin session…');
 
-onAuthStateChanged(auth, user => {
-  if (!isAdminUser(user)) {
+onAuthStateChanged(auth, async user => {
+  if (!await verifyAdminAccess(user, db)) {
     redirectToAdminLogin(auth, signOut, user);
     return;
   }

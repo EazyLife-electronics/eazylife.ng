@@ -1,44 +1,73 @@
-// admin/js/admin-auth.mjs
-// Single source of truth for who is allowed into the admin UI and the
-// Component Painter. Firestore rules still need the same email listed in
-// isAdmin() — keep them in sync when you change this list.
-//
-// To add another admin later: append their email here AND update
-// firestore.rules isAdmin(). Prefer Firebase custom claims long-term.
+// Central admin authorization shared by the dashboard, Circuit Studio and tools.
+// Firebase Auth proves identity; the private adminAccess/{uid} document grants access.
+// Approval documents are created/managed in Firebase Console, never by client users.
+import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { reload } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
-export const ADMIN_EMAILS = Object.freeze([
-  'damzyeazy@gmail.com'
-]);
+const approvedUids = new Set();
+const approvalDiagnostics = new Map();
 
-export function isAdminUser(user) {
-  if (!user || !user.email) return false;
-  const email = String(user.email).trim().toLowerCase();
-  return ADMIN_EMAILS.some(allowed => allowed.toLowerCase() === email);
+export function getAdminApprovalDiagnostic(user) {
+  return user ? approvalDiagnostics.get(user.uid) || '' : '';
 }
 
-/**
- * Redirect an unauthenticated or non-admin visitor to the admin login page,
- * optionally signing out a wrong account first. Preserves returnTo so the
- * dashboard can send them back after a successful admin sign-in.
- */
+export async function verifyAdminAccess(user, db) {
+  if (!user || !db) return false;
+  approvalDiagnostics.delete(user.uid);
+  try {
+    // Auth state can be cached after provider linking. Refresh the server-side
+    // user record and ID token before making any verification decision.
+    await reload(user);
+    await user.getIdToken(true);
+
+    const passwordProvider = (user.providerData || []).some(p => p.providerId === 'password');
+    if (passwordProvider && !user.emailVerified) {
+      approvedUids.delete(user.uid);
+      approvalDiagnostics.set(user.uid, 'auth/email-not-verified: Firebase still reports this account email as unverified after refreshing the user record.');
+      return false;
+    }
+
+    // Prevent a stalled Firestore request from leaving the login screen in a
+    // permanent approval-check state. The underlying request may still finish.
+    const lookup = getDoc(doc(db, 'adminAccess', user.uid));
+    let timeoutId;
+    const snap = await Promise.race([
+      lookup,
+      new Promise((_, reject) => {
+        timeoutId = setTimeout(() => {
+          const error = new Error('Admin approval lookup timed out after 12 seconds.');
+          error.code = 'admin/approval-timeout';
+          reject(error);
+        }, 12000);
+      })
+    ]).finally(() => clearTimeout(timeoutId));
+    const data = snap.exists() ? snap.data() : null;
+    const approved = !!data && data.status === 'approved' && data.role === 'admin';
+    if (approved) approvedUids.add(user.uid);
+    else approvedUids.delete(user.uid);
+    return approved;
+  } catch (error) {
+    approvedUids.delete(user.uid);
+    approvalDiagnostics.set(user.uid, `${error.code || 'lookup-error'}: ${error.message || 'Admin authorization check failed.'}`);
+    console.error('Admin authorization check failed:', error);
+    return false;
+  }
+}
+
+// Synchronous check is intentionally cache-only. Call verifyAdminAccess first
+// after every auth-state change before showing privileged UI.
+export function isAdminUser(user) {
+  return !!user && approvedUids.has(user.uid);
+}
+
 export function redirectToAdminLogin(auth, signOutFn, user, options = {}) {
   const login = new URL(options.loginPath || 'index.html', location.href);
-  if (options.returnTo !== false) {
-    login.searchParams.set('returnTo', options.returnTo || location.href);
-  }
+  if (options.returnTo !== false) login.searchParams.set('returnTo', options.returnTo || location.href);
   const finish = () => location.replace(login.href);
-  if (user && !isAdminUser(user) && auth && typeof signOutFn === 'function') {
-    Promise.resolve(signOutFn(auth)).finally(finish);
-  } else {
-    finish();
-  }
+  if (user && auth && typeof signOutFn === 'function') Promise.resolve(signOutFn(auth)).finally(finish);
+  else finish();
 }
 
-/**
- * After a successful admin login on index.html, send the user back to a
- * same-origin admin tool page if returnTo is present and safe.
- * Returns true if a redirect was started.
- */
 export function consumeAdminReturnTo(user) {
   if (!isAdminUser(user)) return false;
   const returnTo = new URLSearchParams(location.search).get('returnTo');
@@ -46,12 +75,10 @@ export function consumeAdminReturnTo(user) {
   try {
     const target = new URL(returnTo, location.origin);
     if (target.origin !== location.origin) return false;
-    // Only allow known admin tool pages under /admin/
     const path = target.pathname;
-    const allowed =
-      path.endsWith('/admin/circuit-component-painter.html') ||
-      path.endsWith('/admin/portfolio-import.html') ||
-      path.endsWith('/admin/customers.html');
+    const allowed = path.endsWith('/admin/circuit-component-painter.html')
+      || path.endsWith('/admin/portfolio-import.html')
+      || path.endsWith('/admin/customers.html');
     if (!allowed) return false;
     location.replace(target.href);
     return true;

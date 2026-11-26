@@ -2,8 +2,8 @@ import { initFirebase } from '../../js/firebase.mjs';
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { collection, getDocs, doc, writeBatch } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 import { portfolioProjects } from '../data/portfolio-projects.mjs';
+import { verifyAdminAccess, redirectToAdminLogin } from './admin-auth.mjs';
 
-const ADMIN_EMAIL = 'damzyeazy@gmail.com';
 const { auth, db } = initFirebase();
 const $ = id => document.getElementById(id);
 let existingTitles = new Set();
@@ -21,15 +21,11 @@ $('selectReady').addEventListener('click', () => { selected = new Set(readyProje
 $('clearSelection').addEventListener('click', () => { selected.clear(); render(); });
 $('import').addEventListener('click', importSelected);
 
-onAuthStateChanged(auth, user => {
-  if (!user) {
+onAuthStateChanged(auth, async user => {
+  if (!user || !await verifyAdminAccess(user, db)) {
     $('loginPanel').classList.remove('hidden');
     $('app').classList.add('hidden');
-    return;
-  }
-  if ((user.email || '').toLowerCase() !== ADMIN_EMAIL) {
-    $('loginError').textContent = 'This account is not authorised to use the EazyLife portfolio importer.';
-    signOut(auth);
+    redirectToAdminLogin(auth, signOut, user, { loginPath: 'index.html' });
     return;
   }
   $('loginPanel').classList.add('hidden');

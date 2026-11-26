@@ -123,7 +123,7 @@ The current routing stage uses a generated orthogonal route between endpoints. M
 ## Private named project library (2026-11-21)
 
 - The public editor remains open to visitors, but editable project persistence and project-file interchange are intentionally unavailable to public users. Public visitors can export visual files and PDF only.
-- When the authorized EazyLife admin account (damzyeazy@gmail.com) is signed in, the toolbar exposes **Save local draft**, **Import JSON**, **Download JSON**, **Save to my circuits** and **Open saved**. These controls remain hidden from public visitors.
+- When the owner-approved Firebase UID is signed in, the toolbar exposes **Save local draft**, **Import JSON**, **Download JSON**, **Save to my circuits** and **Open saved**. These controls remain hidden from public visitors.
 - Named designs are stored as structured project JSON in the additive Firestore collection `circuitStudioProjects`; the collection is admin-read/write only in Firestore rules. Public component and published-diagram access is unchanged.
 - Admin can save/update the currently opened project, save a named copy, reopen saved work and delete private records. Save timestamps and title are stored with the project.
 - SVG, PNG and JPG are visual exports, not editable project files. Admin editable project data can be retained in browser-local drafts, JSON backups or the private cloud library. Exported artwork intentionally excludes selection/hit-area overlays and editor controls.
