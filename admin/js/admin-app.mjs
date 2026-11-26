@@ -6,7 +6,7 @@
 // etc.) — this file just wires them together.
 import { initFirebase } from '../../js/firebase.mjs';
 import {
-  onAuthStateChanged, signInWithEmailAndPassword, signOut
+  onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, GoogleAuthProvider, signInWithPopup, signOut
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   watchProducts, watchHeroes, watchReviews, watchRequests, watchOrders, watchProjects
@@ -23,7 +23,7 @@ import { initSettings, loadSettingsForm } from './admin-settings.mjs';
 import { setQuotationProducts } from './admin-quotations.mjs';
 import { initSchoolStem, resetSchoolStem } from './admin-school-stem.mjs';
 import { initTechnicalTraining, resetTechnicalTraining } from './admin-technical-training.mjs';
-import { isAdminUser, consumeAdminReturnTo } from './admin-auth.mjs';
+import { isAdminUser, verifyAdminAccess, consumeAdminReturnTo } from './admin-auth.mjs';
 
 const { auth } = initFirebase();
 
@@ -138,75 +138,16 @@ document.querySelectorAll('[data-notification-tab]').forEach(button => {
 });
 
 /* ---------------- AUTH ---------------- */
-
-const loginButton = document.getElementById('loginBtn');
-loginButton.dataset.authHandlerReady = 'yes';
-loginButton.addEventListener('click', async () => {
-  const email = document.getElementById('loginEmail').value.trim();
-  const password = document.getElementById('loginPassword').value;
-  const errorEl = document.getElementById('loginError');
-  errorEl.style.color = '#087f70';
-  errorEl.textContent = 'Connecting to Firebase…';
-  errorEl.classList.remove('hidden');
-  loginButton.disabled = true;
-  loginButton.textContent = 'Signing in…';
-  try {
-    if (!email || !password) throw new Error('Enter both your admin email and password.');
-    await signInWithEmailAndPassword(auth, email, password);
-    errorEl.textContent = 'Sign-in successful. Opening dashboard…';
-  } catch (err) {
-    console.error('EazyLife admin sign-in failed:', err);
-    const messages = {
-      'auth/unauthorized-domain': 'This preview domain is not authorized in Firebase Authentication. Add raw.githack.com under Authentication → Settings → Authorized domains.',
-      'auth/invalid-credential': 'Email or password is incorrect.',
-      'auth/invalid-email': 'The email address is not valid.',
-      'auth/too-many-requests': 'Too many attempts. Wait a while before trying again.',
-      'auth/network-request-failed': 'Network request failed. Check your connection or browser extensions.'
-    };
-    errorEl.style.color = '#c22';
-    errorEl.textContent = messages[err.code] || ('Login failed: ' + (err.code || err.message || 'Unknown Firebase error'));
-  } finally {
-    loginButton.disabled = false;
-    loginButton.textContent = 'Log In';
-  }
-});
-
-document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
-
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    if (!isAdminUser(user)) {
-      const errorEl = document.getElementById('loginError');
-      if (errorEl) {
-        errorEl.style.color = '#c22';
-        errorEl.textContent = 'This account is not authorized for the EazyLife admin dashboard.';
-        errorEl.classList.remove('hidden');
-      }
-      signOut(auth);
-      return;
-    }
-    if (consumeAdminReturnTo(user)) return;
-    checkMediaService(user);
-    document.getElementById('loginScreen').classList.add('hidden');
-    document.getElementById('dashboard').classList.remove('hidden');
-    startDashboard();
-    if (projectPublishTimer) clearInterval(projectPublishTimer);
-    projectPublishTimer = setInterval(checkDueProjectPublications, 60000);
-  } else {
-    document.getElementById('dashboard').classList.add('hidden');
-    resetSchoolStem();
-    resetTechnicalTraining();
-    document.getElementById('loginScreen').classList.remove('hidden');
-    if (unsubProducts) unsubProducts();
-    if (unsubHeroes) unsubHeroes();
-    if (unsubReviews) unsubReviews();
-    if (unsubRequests) unsubRequests();
-    if (unsubOrders) unsubOrders();
-    if (unsubProjects) unsubProjects();
-    if (projectPublishTimer) { clearInterval(projectPublishTimer); projectPublishTimer = null; }
-  }
-});
-
+const loginButton=document.getElementById('loginBtn'),errorEl=document.getElementById('loginError'),googleButton=document.getElementById('googleLoginBtn'),registerButton=document.getElementById('registerBtn'),resendButton=document.getElementById('resendVerificationBtn');
+function authMessage(message,bad=false){errorEl.style.color=bad?'#c22':'#087f70';errorEl.textContent=message;errorEl.classList.remove('hidden')}
+function setAuthBusy(busy){[loginButton,registerButton,googleButton].forEach(b=>b.disabled=busy);loginButton.textContent=busy?'Please wait…':'Log In'}
+async function explainAuthFailure(err){const messages={'auth/unauthorized-domain':'This website domain is not authorized in Firebase Authentication settings.','auth/invalid-credential':'Email or password is incorrect.','auth/email-already-in-use':'That email already has an account. Sign in instead.','auth/weak-password':'Choose a stronger password (at least 6 characters).','auth/invalid-email':'The email address is not valid.','auth/too-many-requests':'Too many attempts. Wait before trying again.','auth/network-request-failed':'Network request failed. Check your connection.'};authMessage(messages[err.code]||('Authentication failed: '+(err.code||err.message||'Unknown error')),true)}
+loginButton.addEventListener('click',async()=>{const email=document.getElementById('loginEmail').value.trim(),password=document.getElementById('loginPassword').value;if(!email||!password)return authMessage('Enter your email and password.',true);setAuthBusy(true);authMessage('Connecting to Firebase…');try{await signInWithEmailAndPassword(auth,email,password);authMessage('Signed in. Checking admin approval…')}catch(err){await explainAuthFailure(err)}finally{setAuthBusy(false)}});
+registerButton.addEventListener('click',async()=>{const email=document.getElementById('loginEmail').value.trim(),password=document.getElementById('loginPassword').value;if(!email||!password)return authMessage('Enter an email and password to create your account.',true);setAuthBusy(true);try{const credential=await createUserWithEmailAndPassword(auth,email,password);await sendEmailVerification(credential.user);await signOut(auth);authMessage('Account created. Check your inbox and verify your email, then sign in. Admin access still requires owner approval of your Firebase UID.')}catch(err){await explainAuthFailure(err)}finally{setAuthBusy(false)}});
+googleButton.addEventListener('click',async()=>{setAuthBusy(true);try{await signInWithPopup(auth,new GoogleAuthProvider());authMessage('Google sign-in complete. Checking admin approval…')}catch(err){await explainAuthFailure(err)}finally{setAuthBusy(false)}});
+resendButton.addEventListener('click',async()=>{const user=auth.currentUser;if(!user)return authMessage('Sign in with your email and password first.',true);try{await sendEmailVerification(user);await signOut(auth);authMessage('Verification email sent. Verify it, then sign in again.')}catch(err){await explainAuthFailure(err)}});
+document.getElementById('logoutBtn').addEventListener('click',()=>signOut(auth));
+onAuthStateChanged(auth,async user=>{if(user){const approved=await verifyAdminAccess(user,db);if(!approved){const passwordProvider=(user.providerData||[]).some(p=>p.providerId==='password'),detail=passwordProvider&&!user.emailVerified?'Please verify your email before admin approval can be checked.':'This account is not approved yet.';authMessage(detail+' To approve it, create adminAccess/'+user.uid+' in Firestore with role: admin and status: approved, using Firebase Console.');resendButton.classList.toggle('hidden',!passwordProvider||user.emailVerified);await signOut(auth);return}if(consumeAdminReturnTo(user))return;checkMediaService(user);document.getElementById('loginScreen').classList.add('hidden');document.getElementById('dashboard').classList.remove('hidden');startDashboard();if(projectPublishTimer)clearInterval(projectPublishTimer);projectPublishTimer=setInterval(checkDueProjectPublications,60000)}else{document.getElementById('dashboard').classList.add('hidden');resetSchoolStem();resetTechnicalTraining();document.getElementById('loginScreen').classList.remove('hidden');if(unsubProducts)unsubProducts();if(unsubHeroes)unsubHeroes();if(unsubReviews)unsubReviews();if(unsubRequests)unsubRequests();if(unsubOrders)unsubOrders();if(unsubProjects)unsubProjects();if(projectPublishTimer){clearInterval(projectPublishTimer);projectPublishTimer=null}}});
 function startDashboard() {
   if (isAdminUser(auth.currentUser)) {
     initSchoolStem();
