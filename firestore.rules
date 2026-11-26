@@ -3,10 +3,22 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Keep this email list in sync with ADMIN_EMAILS in admin/js/admin-auth.mjs
+    // Admin privileges are granted by an owner-managed UID record.
+    // Users cannot create or modify their own approval documents.
     function isAdmin() {
       return request.auth != null
-        && request.auth.token.email == 'damzyeazy@gmail.com';
+        && request.auth.token.email_verified == true
+        && exists(/databases/$(database)/documents/adminAccess/$(request.auth.uid))
+        && get(/databases/$(database)/documents/adminAccess/$(request.auth.uid)).data.role == 'admin'
+        && get(/databases/$(database)/documents/adminAccess/$(request.auth.uid)).data.status == 'approved';
+    }
+
+    match /adminAccess/{uid} {
+      // A signed-in user may read only their own approval state; approved admins
+      // may inspect records. Client-side create/update/delete are never allowed.
+      allow get: if request.auth != null && (request.auth.uid == uid || isAdmin());
+      allow list: if isAdmin();
+      allow create, update, delete: if false;
     }
 
     // Private named Circuit Studio projects; public visitors cannot read or write these records.
