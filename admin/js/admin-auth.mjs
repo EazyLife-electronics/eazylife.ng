@@ -2,6 +2,7 @@
 // Firebase Auth proves identity; the private adminAccess/{uid} document grants access.
 // Approval documents are created/managed in Firebase Console, never by client users.
 import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { reload } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
 const approvedUids = new Set();
 const approvalDiagnostics = new Map();
@@ -14,11 +15,18 @@ export async function verifyAdminAccess(user, db) {
   if (!user || !db) return false;
   approvalDiagnostics.delete(user.uid);
   try {
+    // Auth state can be cached after provider linking. Refresh the server-side
+    // user record and ID token before making any verification decision.
+    await reload(user);
+    await user.getIdToken(true);
+
     const passwordProvider = (user.providerData || []).some(p => p.providerId === 'password');
     if (passwordProvider && !user.emailVerified) {
       approvedUids.delete(user.uid);
+      approvalDiagnostics.set(user.uid, 'auth/email-not-verified: Firebase still reports this account email as unverified after refreshing the user record.');
       return false;
     }
+
     // Prevent a stalled Firestore request from leaving the login screen in a
     // permanent approval-check state. The underlying request may still finish.
     const lookup = getDoc(doc(db, 'adminAccess', user.uid));
@@ -40,8 +48,8 @@ export async function verifyAdminAccess(user, db) {
     return approved;
   } catch (error) {
     approvedUids.delete(user.uid);
-    approvalDiagnostics.set(user.uid, `${error.code || 'lookup-error'}: ${error.message || 'Firestore approval read failed.'}`);
-    console.error('Admin approval lookup failed:', error);
+    approvalDiagnostics.set(user.uid, `${error.code || 'lookup-error'}: ${error.message || 'Admin authorization check failed.'}`);
+    console.error('Admin authorization check failed:', error);
     return false;
   }
 }
