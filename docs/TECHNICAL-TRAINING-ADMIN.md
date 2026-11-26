@@ -27,7 +27,7 @@ All new prices start at zero. Zero means not configured, not a free course. Conf
 - `technicalTrainingLeads`: private learner and institutional enquiry / training records with a snapshot of selected course fees.
 - `technicalTrainingPricing`: private course price matrix and additional fee settings.
 
-Both collections are restricted by `firestore.rules` to the existing EazyLife admin identity (`damzyeazy@gmail.com`). The module tab is hidden for other signed-in accounts, and in-memory records are cleared on logout.
+Both collections are restricted by `firestore.rules` to owner-approved Firebase UIDs in `adminAccess/{uid}`. The module tab is hidden for other signed-in accounts, and in-memory records are cleared on logout.
 
 ## Deployment and testing
 
