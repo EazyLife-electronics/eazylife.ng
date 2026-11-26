@@ -23,7 +23,7 @@ import { initSettings, loadSettingsForm } from './admin-settings.mjs';
 import { setQuotationProducts } from './admin-quotations.mjs';
 import { initSchoolStem, resetSchoolStem } from './admin-school-stem.mjs';
 import { initTechnicalTraining, resetTechnicalTraining } from './admin-technical-training.mjs';
-import { isAdminUser, verifyAdminAccess, consumeAdminReturnTo, getAdminApprovalDiagnostic } from './admin-auth.mjs';
+import { isAdminUser, verifyAdminAccess, consumeAdminReturnTo, getAdminApprovalDiagnostic } from './admin-auth.mjs?v=approval-diagnostics-20261126';
 
 const { auth, db } = initFirebase();
 
