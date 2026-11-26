@@ -25,10 +25,15 @@
     <div class="bg-white w-full max-w-sm rounded-[24px] shadow-xl p-8">
         <img data-theme-logo data-theme-logo-light="../assets/pictures/logo_black_transparent.png" data-theme-logo-dark="../assets/pictures/logo_white_transparent.png" src="../assets/pictures/logo_black_transparent.png" alt="EazyLife" style="height:42px;width:auto;display:block;margin:0 auto 12px">
         <p class="text-center text-gray-400 text-sm mb-6">Admin Dashboard</p>
-        <input id="loginEmail" type="email" placeholder="Admin email" class="w-full p-3 mb-3 rounded-xl bg-gray-50 border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
-        <input id="loginPassword" type="password" placeholder="Password" class="w-full p-3 mb-4 rounded-xl bg-gray-50 border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
-        <button id="loginBtn" class="bg-eazylife text-white w-full py-3 rounded-xl font-bold text-sm shadow-lg">Log In</button>
-        <p id="loginError" class="text-red-500 text-xs text-center mt-3 hidden"></p>
+        <p class="text-xs text-gray-500 text-center mb-4">Sign in with an approved admin account. New accounts require owner approval.</p>
+        <input id="loginEmail" type="email" autocomplete="email" placeholder="Email address" class="w-full p-3 mb-3 rounded-xl bg-gray-50 border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
+        <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Password (minimum 6 characters)" class="w-full p-3 mb-3 rounded-xl bg-gray-50 border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-[#00B09B]">
+        <button id="loginBtn" type="button" class="bg-eazylife text-white w-full py-3 rounded-xl font-bold text-sm shadow-lg">Log In</button>
+        <button id="registerBtn" type="button" class="w-full mt-2 py-2.5 rounded-xl border border-gray-200 text-gray-700 font-bold text-xs">Create account with email</button>
+        <div class="flex items-center gap-3 my-3 text-[10px] text-gray-400"><span class="h-px bg-gray-200 flex-1"></span>OR<span class="h-px bg-gray-200 flex-1"></span></div>
+        <button id="googleLoginBtn" type="button" class="w-full py-2.5 rounded-xl border border-gray-200 text-gray-700 font-bold text-xs"><i class="fab fa-google mr-2"></i>Continue with Google</button>
+        <button id="resendVerificationBtn" type="button" class="hidden w-full mt-2 py-2 text-xs text-teal-700 font-bold">Resend verification email</button>
+        <p id="loginError" role="status" aria-live="polite" class="text-red-500 text-xs text-center mt-3 hidden"></p>
     </div>
 </div>
 <div id="dashboard" class="hidden">
