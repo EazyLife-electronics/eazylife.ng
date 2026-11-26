@@ -17,7 +17,7 @@ The School STEM module is an internal section of `/admin/`. It reuses the existi
 - `schoolStemMeetings`: internal meeting records and internal estimate snapshots.
 - `schoolStemPricing`: private rate card and margin settings.
 
-Both collections are restricted in `firestore.rules` to the existing EazyLife admin identity (`damzyeazy@gmail.com`). The module tab is also hidden for other signed-in accounts, and its in-memory data is cleared on logout.
+Both collections are restricted in `firestore.rules` to owner-approved Firebase UIDs in `adminAccess/{uid}`. The module tab is also hidden for other signed-in accounts, and its in-memory data is cleared on logout.
 
 ## Deployment and testing
 
