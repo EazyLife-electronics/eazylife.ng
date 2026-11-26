@@ -4,16 +4,35 @@
 import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const approvedUids = new Set();
+const approvalDiagnostics = new Map();
+
+export function getAdminApprovalDiagnostic(user) {
+  return user ? approvalDiagnostics.get(user.uid) || '' : '';
+}
 
 export async function verifyAdminAccess(user, db) {
   if (!user || !db) return false;
+  approvalDiagnostics.delete(user.uid);
   try {
     const passwordProvider = (user.providerData || []).some(p => p.providerId === 'password');
     if (passwordProvider && !user.emailVerified) {
       approvedUids.delete(user.uid);
       return false;
     }
-    const snap = await getDoc(doc(db, 'adminAccess', user.uid));
+    // Prevent a stalled Firestore request from leaving the login screen in a
+    // permanent approval-check state. The underlying request may still finish.
+    const lookup = getDoc(doc(db, 'adminAccess', user.uid));
+    let timeoutId;
+    const snap = await Promise.race([
+      lookup,
+      new Promise((_, reject) => {
+        timeoutId = setTimeout(() => {
+          const error = new Error('Admin approval lookup timed out after 12 seconds.');
+          error.code = 'admin/approval-timeout';
+          reject(error);
+        }, 12000);
+      })
+    ]).finally(() => clearTimeout(timeoutId));
     const data = snap.exists() ? snap.data() : null;
     const approved = !!data && data.status === 'approved' && data.role === 'admin';
     if (approved) approvedUids.add(user.uid);
@@ -21,6 +40,7 @@ export async function verifyAdminAccess(user, db) {
     return approved;
   } catch (error) {
     approvedUids.delete(user.uid);
+    approvalDiagnostics.set(user.uid, `${error.code || 'lookup-error'}: ${error.message || 'Firestore approval read failed.'}`);
     console.error('Admin approval lookup failed:', error);
     return false;
   }
