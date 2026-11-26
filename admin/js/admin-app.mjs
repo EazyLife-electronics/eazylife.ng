@@ -25,7 +25,7 @@ import { initSchoolStem, resetSchoolStem } from './admin-school-stem.mjs';
 import { initTechnicalTraining, resetTechnicalTraining } from './admin-technical-training.mjs';
 import { isAdminUser, verifyAdminAccess, consumeAdminReturnTo } from './admin-auth.mjs';
 
-const { auth } = initFirebase();
+const { auth, db } = initFirebase();
 
 const MEDIA_WORKER_URL = 'https://eazylife-media.damzyeazy.workers.dev';
 
