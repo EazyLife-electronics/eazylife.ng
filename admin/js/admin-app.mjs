@@ -139,6 +139,8 @@ document.querySelectorAll('[data-notification-tab]').forEach(button => {
 
 /* ---------------- AUTH ---------------- */
 const loginButton=document.getElementById('loginBtn'),errorEl=document.getElementById('loginError'),googleButton=document.getElementById('googleLoginBtn'),registerButton=document.getElementById('registerBtn'),resendButton=document.getElementById('resendVerificationBtn');
+// Mark the login handler as installed so the HTML fallback does not show a false module-init warning.
+loginButton.dataset.authHandlerReady='yes';
 function authMessage(message,bad=false){errorEl.style.color=bad?'#c22':'#087f70';errorEl.textContent=message;errorEl.classList.remove('hidden')}
 function setAuthBusy(busy){[loginButton,registerButton,googleButton].forEach(b=>b.disabled=busy);loginButton.textContent=busy?'Please wait…':'Log In'}
 async function explainAuthFailure(err){const messages={'auth/unauthorized-domain':'This website domain is not authorized in Firebase Authentication settings.','auth/invalid-credential':'Email or password is incorrect.','auth/email-already-in-use':'That email already has an account. Sign in instead.','auth/weak-password':'Choose a stronger password (at least 6 characters).','auth/invalid-email':'The email address is not valid.','auth/too-many-requests':'Too many attempts. Wait before trying again.','auth/network-request-failed':'Network request failed. Check your connection.'};authMessage(messages[err.code]||('Authentication failed: '+(err.code||err.message||'Unknown error')),true)}
