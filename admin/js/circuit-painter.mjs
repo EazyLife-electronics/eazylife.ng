@@ -92,8 +92,8 @@ say('Starter component library loaded. Connecting to your saved component librar
 renderList();
 say('Starter symbols loaded. Checking admin session…');
 
-onAuthStateChanged(auth, user => {
-  if (!isAdminUser(user)) {
+onAuthStateChanged(auth, async user => {
+  if (!await verifyAdminAccess(user, db)) {
     redirectToAdminLogin(auth, signOut, user);
     return;
   }
