@@ -35,3 +35,12 @@ deliberately owner-managed through Firebase Console.
 Do not deploy the rules before the owner approval document exists: the current
 hardcoded-email rule will be replaced by UID approval, and missing approval means
 admin requests will be denied.
+
+## Existing media service integration
+
+The admin dashboard also authenticates to the separately deployed Cloudflare media
+Worker. This branch changes the website and Firestore authorization; it does not
+change that Worker deployment. Before approving additional admin accounts for full
+media-library access, audit/update the Worker authorization to validate the same
+owner-approved UID policy. The current owner account should be tested against its
+existing Worker policy during rollout.
