@@ -1,3 +1,5 @@
+> **Superseded note (2026-11-26):** This file describes the earlier hardcoded-email admin fix. Do not apply it over the current code. The active implementation is UID approval in `admin/js/admin-auth.mjs` and `firestore.rules`; see `docs/ADMIN-UID-APPROVAL.md` for the safe rollout.
+
 # EazyLife admin auth fix — how to apply
 
 Copy these files into your repo root (they match the existing paths):
